@@ -41,6 +41,7 @@ class Loader(Loader):
         :return:.
         """
         dispatcher.add_listener('window.first_tab.content', self._onWindowFirstTab)
+        dispatcher.add_listener('window.notepad.note_update', self._onNotepadNoteUpdate)
 
     @inject.params(storage='storage')
     def _onWindowFirstTab(self, event=None, dispatcher=None, storage=None):
@@ -57,10 +58,44 @@ class Loader(Loader):
         self.list.toolbar.savePdf.triggered.connect(self._onSavePdfEvent)
         self.list.toolbar.viewIcons.triggered.connect(self._onToggleView)
 
+        self.list.list.selectionChanged = self._onNoteSelected
+
         for fields in storage.notes:
             index, date, name, text = fields
-            self.list.addLine(name, text)
+            self.list.addLine(index, name, text)
         event.data.addWidget(self.list, 3)
+
+    @inject.params(dispatcher='event_dispatcher')
+    def _onNoteSelected(self, event=None, selection=None, dispatcher=None):
+        """
+        
+        :param event: 
+        :param dispatcher: 
+        :return: 
+        """
+        for index in self.list.list.selectedIndexes():
+            item = self.list.list.itemFromIndex(index)
+            widget = self.list.list.itemWidget(item)
+
+            dispatcher.dispatch('window.notepad.note_edit', (
+                item.index, widget.getTextUp(), widget.getTextDown()
+            ))
+
+    @inject.params(storage='storage')
+    def _onNotepadNoteUpdate(self, event=None, dispather=None, storage=None):
+        """
+
+        :param event: 
+        :param dispather: 
+        :return: 
+        """
+        index, name, text = event.data
+        for index in self.list.list.selectedIndexes():
+            widget = self.list.list.itemWidget(
+                self.list.list.itemFromIndex(index)
+            )
+            widget.setTextUp(name)
+            widget.setTextDown(text)
 
     @inject.params(dispatcher='event_dispatcher')
     def _onNewEvent(self, event=None, dispatcher=None):
@@ -71,7 +106,7 @@ class Loader(Loader):
         """
         name = 'Note 1'
         description = 'Note description 1'
-        self.list.addLine(name, description)
+        self.list.addLine(None, name, description)
         dispatcher.dispatch('window.notepad.note_new', (
             name, description
         ))

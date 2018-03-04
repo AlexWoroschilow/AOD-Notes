@@ -45,8 +45,14 @@ class Loader(Loader):
         dispatcher.add_listener('window.notepad.folder_new', self._onNotepadFolderNew)
         dispatcher.add_listener('window.notepad.folder_copy', self._onNotepadFolderCopy)
         dispatcher.add_listener('window.notepad.note_new', self._onNotepadNoteNew)
+        dispatcher.add_listener('window.notepad.note_update', self._onNotepadNoteUpdate)
+
         dispatcher.add_listener('window.notepad.note_copy', self._onNotepadNoteCopy)
         dispatcher.add_listener('window.notepad.note_export', self._onNotepadNoteExport)
+
+        # dispatcher.dispatch('window.notepad.note_update', (
+        #     self._index, self.name.text(), self.text.toHtml()
+        # ))
 
     @inject.params(storage='storage')
     def _onNotepadFolderNew(self, event=None, dispather=None, storage=None):
@@ -76,7 +82,8 @@ class Loader(Loader):
         :param dispather: 
         :return: 
         """
-        # storage.addFolder('Note 1', 'Note description')
+        name, description = event.data
+        storage.addNote(name, description)
 
     @inject.params(storage='storage')
     def _onNotepadNoteCopy(self, event=None, dispather=None, storage=None):
@@ -87,6 +94,17 @@ class Loader(Loader):
         :return: 
         """
         print(event)
+
+    @inject.params(storage='storage')
+    def _onNotepadNoteUpdate(self, event=None, dispather=None, storage=None):
+        """
+
+        :param event: 
+        :param dispather: 
+        :return: 
+        """
+        index, name, text = event.data
+        storage.updateNote(index, name, text)
 
     @inject.params(storage='storage')
     def _onNotepadNoteExport(self, event=None, dispather=None, storage=None):

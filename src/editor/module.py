@@ -17,6 +17,7 @@ from lib.plugin import Loader
 from .service import Storage
 from .gui.widget import TextEditor
 
+
 class Loader(Loader):
     @property
     def enabled(self):
@@ -41,6 +42,7 @@ class Loader(Loader):
         :return:.
         """
         dispatcher.add_listener('window.first_tab.content', self._onWindowFirstTab, 128)
+        dispatcher.add_listener('window.notepad.note_edit', self._onWindowNoteEdit)
 
     def _onWindowFirstTab(self, event=None, dispatcher=None):
         """
@@ -52,3 +54,13 @@ class Loader(Loader):
 
         self.editor = TextEditor()
         event.data.addWidget(self.editor, 5)
+
+    def _onWindowNoteEdit(self, event=None, dispatcher=None):
+        """
+        
+        :param event: 
+        :param dispatcher: 
+        :return: 
+        """
+        index, name, text = event.data
+        self.editor.edit(index, name, text)

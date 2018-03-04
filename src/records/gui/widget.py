@@ -40,21 +40,83 @@ class QCustomQWidget(QtWidgets.QWidget):
     def setTextUp(self, text):
         self.textUpQLabel.setText(text)
 
+    def getTextUp(self):
+        return self.textUpQLabel.text()
+
     def setTextDown(self, text):
         self.textDownQLabel.setText(text)
 
+    def getTextDown(self):
+        return self.textDownQLabel.text()
+
     def setIcon(self, imagePath):
         self.iconQLabel.setPixmap(QtGui.QPixmap(imagePath))
+
+
+class NoteItem(QtWidgets.QListWidgetItem):
+    def __init__(self, index=None, name=None, text=None):
+        """
+        
+        :param index: 
+        :param name: 
+        :param text: 
+        """
+        super(NoteItem, self).__init__()
+        self._index = index
+        self._name = name
+        self._text = text
+
+    @property
+    def index(self):
+        """
+        
+        :return: 
+        """
+        return self._index
+
+    @property
+    def name(self):
+        """
+
+        :return: 
+        """
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        """
+
+        :return: 
+        """
+        self._name = value
+        self.setText(value)
+
+    @property
+    def text(self):
+        """
+
+        :return: 
+        """
+        return self._text
+
+    @text.setter
+    def text(self, value):
+        """
+
+        :return: 
+        """
+        self._text = value
 
 
 class ItemList(QtWidgets.QListWidget):
     def __init__(self, parent=None):
         """
         
+        :param parent: 
         """
         super(ItemList, self).__init__(parent)
 
-    def addLine(self, name=None, descrption=None):
+    def addLine(self, index=None, name=None, text=None):
         """
         
         :param name: 
@@ -64,10 +126,9 @@ class ItemList(QtWidgets.QListWidget):
 
         myQCustomQWidget = QCustomQWidget()
         myQCustomQWidget.setTextUp(name)
-        myQCustomQWidget.setTextDown(descrption)
-        # myQCustomQWidget.setIcon("icons/bold.svg")
-        # Create QListWidgetItem
-        item = QtWidgets.QListWidgetItem(self)
+        myQCustomQWidget.setTextDown(text)
+
+        item = NoteItem(index, name, text)
         item.setSizeHint(myQCustomQWidget.sizeHint())
 
         self.addItem(item)
@@ -77,7 +138,8 @@ class ItemList(QtWidgets.QListWidget):
 class RecordList(QtWidgets.QWidget):
     def __init__(self, parent=None):
         """
-
+        
+        :param parent: 
         """
         super(RecordList, self).__init__(parent)
         self.setContentsMargins(0, 10, 10, 0)
@@ -104,11 +166,11 @@ class RecordList(QtWidgets.QWidget):
         layout1.addWidget(self.container)
         self.setLayout(layout1)
 
-    def addLine(self, name=None, descrption=None):
+    def addLine(self, index=None, name=None, text=None):
         """
         
         :param name: 
         :param descrption: 
         :return: 
         """
-        self.list.addLine(name, descrption)
+        self.list.addLine(index, name, text)

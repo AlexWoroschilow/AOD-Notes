@@ -153,7 +153,7 @@ class SQLiteStorage(object):
         :return: 
         """
         fields = (name, text, index)
-        self._connection.execute("UPDATE Note SET name=?, description=? WHERE id=?", fields)
+        self._connection.execute("UPDATE Note SET name=?, text=? WHERE id=?", fields)
         self._connection.commit()
 
     def removeNote(self, index=None, name=None, description=None):

@@ -76,6 +76,7 @@ class ToolbarbarWidget(QtWidgets.QToolBar):
         self.addAction(self.undoAction)
         self.addAction(self.redoAction)
 
+
 class FormatbarWidget(QtWidgets.QToolBar):
     def __init__(self):
         super(FormatbarWidget, self).__init__()
@@ -85,10 +86,7 @@ class FormatbarWidget(QtWidgets.QToolBar):
         self.fontBox = QtWidgets.QFontComboBox(self)
 
         self.fontSize = QtWidgets.QSpinBox(self)
-
-        # Will display " pt" after each value
         self.fontSize.setSuffix(" pt")
-
         self.fontSize.setValue(14)
 
         self.fontColor = QtWidgets.QAction(QtGui.QIcon("icons/font-color.png"), "Change font color", self)

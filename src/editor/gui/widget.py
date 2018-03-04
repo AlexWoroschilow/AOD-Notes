@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # PYQT5 PyQt4’s QtGui module has been split into PyQt5’s QtGui, QtPrintSupport and QtWidgets modules
-
+import inject
 from PyQt5.QtCore import Qt
 
 from PyQt5 import QtGui
@@ -13,6 +13,18 @@ from .bar import ToolbarbarWidget, FormatbarWidget
 # PYQT5 QMainWindow, QApplication, QAction, QFontComboBox, QSpinBox, QTextEdit, QMessageBox
 # PYQT5 QFileDialog, QColorDialog, QDialog
 # PYQT5 QPrintPreviewDialog, QPrintDialog
+
+class TextEditorName(QtWidgets.QLineEdit):
+    def __init__(self, parent=None):
+        """
+
+        :param parent: 
+        """
+        super(TextEditorName, self).__init__(parent)
+
+        font = self.font()
+        font.setPixelSize(24)
+        self.setFont(font)
 
 
 class TextEditor(QtWidgets.QWidget):
@@ -26,8 +38,15 @@ class TextEditor(QtWidgets.QWidget):
 
         self.changesSaved = True
         self.filename = ""
+        self._index = None
+
+        self.name = TextEditorName()
 
         self.text = QtWidgets.QTextEdit(self)
+        self.text.setTabStopWidth(33)
+        self.text.cursorPositionChanged.connect(self.cursorPosition)
+        self.text.textChanged.connect(self.changed)
+
         self.toolbar = ToolbarbarWidget()
         self.toolbar.saveAction.triggered.connect(self.save)
         self.toolbar.printAction.triggered.connect(self.printHandler)
@@ -59,24 +78,13 @@ class TextEditor(QtWidgets.QWidget):
         self.formatbar.dedentAction.triggered.connect(self.dedent)
         self.formatbar.imageAction.triggered.connect(self.insertImage)
 
-        # Set the tab stop width to around 33 pixels which is
-        # more or less 8 spaces
-        self.text.setTabStopWidth(33)
-        self.text.cursorPositionChanged.connect(self.cursorPosition)
-        self.text.textChanged.connect(self.changed)
-
         layout1 = QtWidgets.QVBoxLayout()
         layout1.setContentsMargins(0, 0, 0, 0)
 
         self.statusbar = QtWidgets.QLabel()
         self.statusbar.setText("Words: 12, Characters: 120")
 
-        line = QtWidgets.QLineEdit()
-        font = line.font()
-        font.setPixelSize(24)
-        line.setFont(font)
-
-        layout1.addWidget(line)
+        layout1.addWidget(self.name)
         layout1.addWidget(self.formatbar)
         layout1.addWidget(self.text)
         layout1.addWidget(self.statusbar)
@@ -90,6 +98,18 @@ class TextEditor(QtWidgets.QWidget):
         layout.addWidget(widget)
 
         self.setLayout(layout)
+
+    def edit(self, index=None, name=None, text=None):
+        """
+        
+        :param index: 
+        :param name: 
+        :param text: 
+        :return: 
+        """
+        self._index = index
+        self.name.setText(name)
+        self.text.setText(text)
 
     def changed(self):
         """
@@ -137,25 +157,16 @@ class TextEditor(QtWidgets.QWidget):
         # state = self.statusbar.isVisible()
         # self.statusbar.setVisible(not state)
 
-    def save(self):
-
-        # Only open dialog if there is no filename yet
-        # PYQT5 Returns a tuple in PyQt5, we only need the filename
-        if not self.filename:
-            self.filename = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File')[0]
-
-        if self.filename:
-
-            # Append extension if not there yet
-            if not self.filename.endswith(".writer"):
-                self.filename += ".writer"
-
-            # We just store the contents of the text file along with the
-            # format in html, which Qt does in a very nice way for us
-            with open(self.filename, "wt") as file:
-                file.write(self.text.toHtml())
-
-            self.changesSaved = True
+    @inject.params(dispatcher='event_dispatcher')
+    def save(self, event=None, dispatcher=None):
+        """
+        
+        :param dispatcher: 
+        :return: 
+        """
+        dispatcher.dispatch('window.notepad.note_update', (
+            self._index, self.name.text(), self.text.toHtml()
+        ))
 
     def preview(self):
 
