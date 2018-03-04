@@ -60,9 +60,13 @@ class Loader(Loader):
 
         self.list.list.selectionChanged = self._onNoteSelected
 
-        for fields in storage.notes:
-            index, date, name, text = fields
-            self.list.addLine(index, name, text)
+        for entity in storage.notes:
+            self.list.addLine(
+                entity.index,
+                entity.name,
+                entity.text
+            )
+
         event.data.addWidget(self.list, 3)
 
     @inject.params(dispatcher='event_dispatcher')
@@ -75,10 +79,8 @@ class Loader(Loader):
         """
         for index in self.list.list.selectedIndexes():
             item = self.list.list.itemFromIndex(index)
-            widget = self.list.list.itemWidget(item)
-
             dispatcher.dispatch('window.notepad.note_edit', (
-                item.index, widget.getTextUp(), widget.getTextDown()
+                item.index, item.name, item.text
             ))
 
     @inject.params(storage='storage')
@@ -91,11 +93,9 @@ class Loader(Loader):
         """
         index, name, text = event.data
         for index in self.list.list.selectedIndexes():
-            widget = self.list.list.itemWidget(
-                self.list.list.itemFromIndex(index)
-            )
-            widget.setTextUp(name)
-            widget.setTextDown(text)
+            item = self.list.list.itemFromIndex(index)
+            item.name = name
+            item.text = text
 
     @inject.params(dispatcher='event_dispatcher')
     def _onNewEvent(self, event=None, dispatcher=None):

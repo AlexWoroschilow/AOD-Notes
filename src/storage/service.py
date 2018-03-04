@@ -19,6 +19,63 @@ from datetime import datetime
 from os.path import expanduser
 
 
+class Entity(object):
+    def __init__(self, index=None, date=None, name=None, text=None):
+        """
+        
+        :param index: 
+        :param date: 
+        :param name: 
+        :param text: 
+        """
+        self._index = index
+        self._date = date
+        self._name = name
+        self._text = text
+
+    @property
+    def index(self):
+        """
+        
+        :return: 
+        """
+        return self._index
+
+    @property
+    def date(self):
+        """
+
+        :return: 
+        """
+        return self._date
+
+    @property
+    def name(self):
+        """
+
+        :return: 
+        """
+        return self._name
+
+    @property
+    def text(self):
+        """
+
+        :return: 
+        """
+        return self._text
+
+
+class Folder(Entity):
+    def __init__(self, index=None, date=None, name=None, text=None):
+        super(Folder, self).__init__(index, date, name, text)
+
+
+class Note(Entity):
+    def __init__(self, index=None, date=None, name=None, text=None):
+        super(Note, self).__init__(index, date, name, text)
+
+
 class SQLiteStorage(object):
     _connection = None
 
@@ -62,7 +119,7 @@ class SQLiteStorage(object):
         cursor = self._connection.cursor()
         for row in cursor.execute(query):
             index, date, name, description = row
-            yield [str(index), str(date), str(name), str(description)]
+            yield Folder(str(index), str(date), str(name), str(description))
 
     @folders.setter
     def folders(self, collection):
@@ -120,7 +177,7 @@ class SQLiteStorage(object):
         cursor = self._connection.cursor()
         for row in cursor.execute(query):
             index, date, name, text = row
-            yield [str(index), str(date), str(name), str(text)]
+            yield Note(str(index), str(date), str(name), str(text))
 
     @notes.setter
     def notes(self, collection):

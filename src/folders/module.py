@@ -58,9 +58,12 @@ class Loader(Loader):
         self.list.toolbar.copyAction.triggered.connect(self._onCopyEvent)
         self.list.toolbar.viewIcons.triggered.connect(self._onToggleView)
 
-        for fields in storage.folders:
-            index, date, name, description = fields
-            self.list.addLine(name, description)
+        for folder in storage.folders:
+            self.list.addLine(
+                folder.index,
+                folder.name,
+                folder.text
+            )
 
         event.data.addWidget(self.list, 2)
 

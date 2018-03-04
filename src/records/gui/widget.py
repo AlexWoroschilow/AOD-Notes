@@ -14,14 +14,61 @@ from PyQt5 import QtPrintSupport
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import Qt
 from .bar import ToolbarbarWidget
+import re
+from bs4 import BeautifulSoup, NavigableString
+
+
+class LabelTop(QtWidgets.QLabel):
+    def __init__(self, parent=None):
+        """
+        
+        :param parent: 
+        """
+        super(LabelTop, self).__init__(parent)
+        self.setStyleSheet('QLabel{ color: #000000; }')
+        font = self.font()
+        font.setPixelSize(18)
+        self.setFont(font)
+
+
+class LabelBottom(QtWidgets.QLabel):
+    def __init__(self, parent=None):
+        """
+        
+        :param parent: 
+        """
+        super(LabelBottom, self).__init__(parent)
+        self.setStyleSheet('QLabel{ color: #c0c0c0; }')
+        font = self.font()
+        # font.setPixelSize(12)
+        self.setFont(font)
+
+    def setText(self, value=None):
+        """
+        
+        :param value: 
+        :return: 
+        """
+
+        def remove_extra_spaces(data):
+            p = re.compile(r'\s+')
+            return p.sub(' ', data)
+
+        def remove_html_tags(data):
+            p = re.compile(r'<.*?>')
+            return remove_extra_spaces(p.sub('', data))
+
+        return super(LabelBottom, self).setText(remove_html_tags(value))
 
 
 class QCustomQWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(QCustomQWidget, self).__init__(parent)
         self.textQVBoxLayout = QtWidgets.QVBoxLayout()
-        self.textUpQLabel = QtWidgets.QLabel()
-        self.textDownQLabel = QtWidgets.QLabel()
+
+        self.textUpQLabel = LabelTop()
+        self.textDownQLabel = LabelBottom()
+
         self.textQVBoxLayout.addWidget(self.textUpQLabel)
         self.textQVBoxLayout.addWidget(self.textDownQLabel)
         self.allQHBoxLayout = QtWidgets.QHBoxLayout()
@@ -29,21 +76,24 @@ class QCustomQWidget(QtWidgets.QWidget):
         self.allQHBoxLayout.addWidget(self.iconQLabel, 0)
         self.allQHBoxLayout.addLayout(self.textQVBoxLayout, 1)
         self.setLayout(self.allQHBoxLayout)
-        # setStyleSheet
-        self.textUpQLabel.setStyleSheet('''
-            color: rgb(0, 0, 255);
-        ''')
-        self.textDownQLabel.setStyleSheet('''
-            color: rgb(255, 0, 0);
-        ''')
 
-    def setTextUp(self, text):
+    def setTextUp(self, text=None):
+        """
+        
+        :param text: 
+        :return: 
+        """
         self.textUpQLabel.setText(text)
 
     def getTextUp(self):
         return self.textUpQLabel.text()
 
-    def setTextDown(self, text):
+    def setTextDown(self, text=None):
+        """
+        
+        :param text: 
+        :return: 
+        """
         self.textDownQLabel.setText(text)
 
     def getTextDown(self):
@@ -54,7 +104,7 @@ class QCustomQWidget(QtWidgets.QWidget):
 
 
 class NoteItem(QtWidgets.QListWidgetItem):
-    def __init__(self, index=None, name=None, text=None):
+    def __init__(self, index=None, widget=None):
         """
         
         :param index: 
@@ -62,9 +112,18 @@ class NoteItem(QtWidgets.QListWidgetItem):
         :param text: 
         """
         super(NoteItem, self).__init__()
+        self._widget = widget
         self._index = index
-        self._name = name
-        self._text = text
+        self._name = None
+        self._text = None
+
+    @property
+    def widget(self):
+        """
+
+        :return: 
+        """
+        return self._widget
 
     @property
     def index(self):
@@ -88,8 +147,8 @@ class NoteItem(QtWidgets.QListWidgetItem):
 
         :return: 
         """
+        self.widget.setTextUp(value)
         self._name = value
-        self.setText(value)
 
     @property
     def text(self):
@@ -105,6 +164,7 @@ class NoteItem(QtWidgets.QListWidgetItem):
 
         :return: 
         """
+        self.widget.setTextDown(value)
         self._text = value
 
 
@@ -115,6 +175,10 @@ class ItemList(QtWidgets.QListWidget):
         :param parent: 
         """
         super(ItemList, self).__init__(parent)
+        self.setStyleSheet('''
+            QListWidget::item{ background-color: #fcf9f6; border: none; }
+            QListWidget::item:selected{ background-color: #fdfcf9 }
+        ''')
 
     def addLine(self, index=None, name=None, text=None):
         """
@@ -124,15 +188,13 @@ class ItemList(QtWidgets.QListWidget):
         :return: 
         """
 
-        myQCustomQWidget = QCustomQWidget()
-        myQCustomQWidget.setTextUp(name)
-        myQCustomQWidget.setTextDown(text)
-
-        item = NoteItem(index, name, text)
-        item.setSizeHint(myQCustomQWidget.sizeHint())
+        item = NoteItem(index, QCustomQWidget())
+        item.setSizeHint(item.widget.sizeHint())
+        item.name = name
+        item.text = text
 
         self.addItem(item)
-        self.setItemWidget(item, myQCustomQWidget)
+        self.setItemWidget(item, item.widget)
 
 
 class RecordList(QtWidgets.QWidget):

@@ -14,14 +14,60 @@ from PyQt5 import QtPrintSupport
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import Qt
 from .bar import ToolbarbarWidget
+import re
+
+
+class LabelTop(QtWidgets.QLabel):
+    def __init__(self, parent=None):
+        """
+
+        :param parent: 
+        """
+        super(LabelTop, self).__init__(parent)
+        self.setStyleSheet('color: #000')
+        font = self.font()
+        font.setPixelSize(18)
+        self.setFont(font)
+
+
+class LabelBottom(QtWidgets.QLabel):
+    def __init__(self, parent=None):
+        """
+
+        :param parent: 
+        """
+        super(LabelBottom, self).__init__(parent)
+        self.setStyleSheet('color: #c0c0c0')
+        font = self.font()
+        # font.setPixelSize(12)
+        self.setFont(font)
+
+    def setText(self, value=None):
+        """
+
+        :param value: 
+        :return: 
+        """
+
+        def remove_extra_spaces(data):
+            p = re.compile(r'\s+')
+            return p.sub(' ', data)
+
+        def remove_html_tags(data):
+            p = re.compile(r'<.*?>')
+            return remove_extra_spaces(p.sub('', data))
+
+        return super(LabelBottom, self).setText(remove_html_tags(value))
 
 
 class QCustomQWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(QCustomQWidget, self).__init__(parent)
         self.textQVBoxLayout = QtWidgets.QVBoxLayout()
-        self.textUpQLabel = QtWidgets.QLabel()
-        self.textDownQLabel = QtWidgets.QLabel()
+
+        self.textUpQLabel = LabelTop()
+        self.textDownQLabel = LabelBottom()
+
         self.textQVBoxLayout.addWidget(self.textUpQLabel)
         self.textQVBoxLayout.addWidget(self.textDownQLabel)
         self.allQHBoxLayout = QtWidgets.QHBoxLayout()
@@ -29,13 +75,6 @@ class QCustomQWidget(QtWidgets.QWidget):
         self.allQHBoxLayout.addWidget(self.iconQLabel, 0)
         self.allQHBoxLayout.addLayout(self.textQVBoxLayout, 1)
         self.setLayout(self.allQHBoxLayout)
-        # setStyleSheet
-        self.textUpQLabel.setStyleSheet('''
-            color: rgb(0, 0, 255);
-        ''')
-        self.textDownQLabel.setStyleSheet('''
-            color: rgb(255, 0, 0);
-        ''')
 
     def setTextUp(self, text):
         self.textUpQLabel.setText(text)
@@ -51,10 +90,11 @@ class ItemList(QtWidgets.QListWidget):
     def __init__(self, parent=None):
         """
         
+        :param parent: 
         """
         super(ItemList, self).__init__(parent)
 
-    def addLine(self, name=None, descrption=None):
+    def addLine(self, index=None, name=None, descrption=None):
         """
         
         :param name: 
@@ -81,6 +121,10 @@ class FolderList(QtWidgets.QWidget):
         """
         super(FolderList, self).__init__(parent)
         self.setContentsMargins(0, 10, 0, 0)
+        self.setStyleSheet('''
+            QListWidget::item{ background-color: #fcf9f6; border: none; }
+            QListWidget::item:selected{ background-color: #fdfcf9 }
+        ''')
 
         self.list = ItemList()
         self.toolbar = ToolbarbarWidget()
@@ -104,11 +148,11 @@ class FolderList(QtWidgets.QWidget):
         layout1.addWidget(self.container)
         self.setLayout(layout1)
 
-    def addLine(self, name=None, descrption=None):
+    def addLine(self, index=None, name=None, descrption=None):
         """
         
         :param name: 
         :param descrption: 
         :return: 
         """
-        self.list.addLine(name, descrption)
+        self.list.addLine(index, name, descrption)
