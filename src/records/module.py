@@ -70,7 +70,7 @@ class Loader(Loader):
             entity.index, entity.name, entity.text
         ))
 
-        event.data.addWidget(self.list, -1)
+        event.data.addWidget(self.list)
 
     @inject.params(dispatcher='event_dispatcher')
     def _onNoteSelected(self, event=None, selection=None, dispatcher=None):

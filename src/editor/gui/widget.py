@@ -21,6 +21,8 @@ class TextEditorName(QtWidgets.QLineEdit):
         :param parent: 
         """
         super(TextEditorName, self).__init__(parent)
+        self.setPlaceholderText('Write a title here...')
+        self.setClearButtonEnabled(True)
 
         font = self.font()
         font.setPixelSize(24)

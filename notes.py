@@ -77,6 +77,29 @@ class Application(QtWidgets.QApplication):
         self.exit()
 
 
+class Dashboard(QtWidgets.QWidget):
+    @inject.params(dispatcher='event_dispatcher', logger='logger')
+    def __init__(self, parent=None, dispatcher=None, logger=None):
+        super(Dashboard, self).__init__(parent)
+
+        self.content = QtWidgets.QSplitter()
+        self.content.setContentsMargins(0, 0, 0, 0)
+
+        # fill tabs with widgets from different modules
+        dispatcher.dispatch('window.first_tab.content', self.content)
+
+        self.content.setStretchFactor(0, 2)
+        self.content.setStretchFactor(1, 4)
+        self.content.setStretchFactor(2, 3)
+
+        layout = QtWidgets.QVBoxLayout()
+        # fill tabs with widgets from different modules
+        dispatcher.dispatch('window.header.content', layout)
+        layout.addWidget(self.content)
+
+        self.setLayout(layout)
+
+
 class MainWindow(QtWidgets.QMainWindow):
     @inject.params(dispatcher='event_dispatcher', logger='logger')
     def __init__(self, parent=None, dispatcher=None, logger=None):
@@ -93,23 +116,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setWindowIcon(QtGui.QIcon("icons/icon.svg"))
         self.setWindowTitle('Notepad')
 
-        layout = QtWidgets.QHBoxLayout()
-        layout.setSpacing(0)
-
-        self.content = QtWidgets.QSplitter()
-        self.content.setContentsMargins(0, 0, 0, 0)
-        self.content.setLayout(layout)
-
-        # fill tabs with widgets from different modules
-        dispatcher.dispatch('window.first_tab.content', layout)
-
-        self.content.setStretchFactor(0, 2)
-        self.content.setStretchFactor(1, 4)
-        self.content.setStretchFactor(2, 3)
-
         self.container = QtWidgets.QTabWidget(self)
-        self.container.addTab(self.content, self.tr('Dashboard'))
-
+        self.container.addTab(Dashboard(), self.tr('Dashboard'))
 
         from src.editor.gui.widget import TextEditor
         self.container.addTab(TextEditor(), self.tr("Nick Matsakis 12 years, 6 months ago  # | flag"))
@@ -117,7 +125,6 @@ class MainWindow(QtWidgets.QMainWindow):
         font = self.container.font()
         font.setPixelSize(18)
         self.container.setFont(font)
-
 
         self.setCentralWidget(self.container)
         self.setGeometry(100, 100, 1030, 800)
