@@ -89,6 +89,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         super(MainWindow, self).__init__(parent)
         self.setStyleSheet('QMainWindow{ background-color: #ffffff; }')
+
         self.setWindowIcon(QtGui.QIcon("icons/icon.svg"))
         self.setWindowTitle('Notepad')
 
@@ -102,12 +103,21 @@ class MainWindow(QtWidgets.QMainWindow):
         # fill tabs with widgets from different modules
         dispatcher.dispatch('window.first_tab.content', layout)
 
-        self.content.setStretchFactor(0, 1)
+        self.content.setStretchFactor(0, 2)
         self.content.setStretchFactor(1, 4)
         self.content.setStretchFactor(2, 3)
 
         self.container = QtWidgets.QTabWidget(self)
-        self.container.addTab(self.content, self.tr('Records'))
+        self.container.addTab(self.content, self.tr('Dashboard'))
+
+
+        from src.editor.gui.widget import TextEditor
+        self.container.addTab(TextEditor(), self.tr("Nick Matsakis 12 years, 6 months ago  # | flag"))
+
+        font = self.container.font()
+        font.setPixelSize(18)
+        self.container.setFont(font)
+
 
         self.setCentralWidget(self.container)
         self.setGeometry(100, 100, 1030, 800)

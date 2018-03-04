@@ -42,23 +42,6 @@ class LabelBottom(QtWidgets.QLabel):
         # font.setPixelSize(12)
         self.setFont(font)
 
-    def setText(self, value=None):
-        """
-
-        :param value: 
-        :return: 
-        """
-
-        def remove_extra_spaces(data):
-            p = re.compile(r'\s+')
-            return p.sub(' ', data)
-
-        def remove_html_tags(data):
-            p = re.compile(r'<.*?>')
-            return remove_extra_spaces(p.sub('', data))
-
-        return super(LabelBottom, self).setText(remove_html_tags(value))
-
 
 class QCustomQWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -94,7 +77,7 @@ class ItemList(QtWidgets.QListWidget):
         """
         super(ItemList, self).__init__(parent)
 
-    def addLine(self, index=None, name=None, descrption=None):
+    def addLine(self, index=None, name=None, text=None):
         """
         
         :param name: 
@@ -104,7 +87,7 @@ class ItemList(QtWidgets.QListWidget):
 
         myQCustomQWidget = QCustomQWidget()
         myQCustomQWidget.setTextUp(name)
-        myQCustomQWidget.setTextDown(descrption)
+        myQCustomQWidget.setTextDown(text)
         # myQCustomQWidget.setIcon("icons/bold.svg")
         # Create QListWidgetItem
         item = QtWidgets.QListWidgetItem(self)
@@ -121,11 +104,9 @@ class FolderList(QtWidgets.QWidget):
         :param parent: 
         """
         super(FolderList, self).__init__(parent)
-        self.setStyleSheet(''' 
-            QListWidget{ border: none; }
+        self.setStyleSheet('''QListWidget{ border: none; }
             QListWidget::item{ background-color: #fcf9f6; border: none; }
-            QListWidget::item:selected{ background-color: #fdfcf9 } 
-            ''')
+            QListWidget::item:selected{ background-color: #fdfcf9 }''')
 
         self.list = ItemList()
         self.toolbar = ToolbarbarWidget()

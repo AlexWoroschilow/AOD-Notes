@@ -76,7 +76,7 @@ class Loader(Loader):
         """
         name = 'Folder 1'
         description = 'Folder description 1'
-        self.list.addLine(name, description)
+        self.list.addLine(None, name, description)
         dispatcher.dispatch('window.notepad.folder_new', (
             name, description
         ))
