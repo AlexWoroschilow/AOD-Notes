@@ -117,14 +117,13 @@ class ItemList(QtWidgets.QListWidget):
 class FolderList(QtWidgets.QWidget):
     def __init__(self, parent=None):
         """
-
+        
+        :param parent: 
         """
         super(FolderList, self).__init__(parent)
+        self.setStyleSheet(''' QListWidget::item{ background-color: #fcf9f6; border: none; }
+            QListWidget::item:selected{ background-color: #fdfcf9 } ''')
         self.setContentsMargins(0, 10, 0, 0)
-        self.setStyleSheet('''
-            QListWidget::item{ background-color: #fcf9f6; border: none; }
-            QListWidget::item:selected{ background-color: #fdfcf9 }
-        ''')
 
         self.list = ItemList()
         self.toolbar = ToolbarbarWidget()
@@ -134,6 +133,7 @@ class FolderList(QtWidgets.QWidget):
         self.statusbar.setText("Total amount of folders: 12")
 
         layout = QtWidgets.QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
         layout.addWidget(self.list)
@@ -141,16 +141,16 @@ class FolderList(QtWidgets.QWidget):
 
         self.container.setLayout(layout)
         layout1 = QtWidgets.QHBoxLayout()
+        layout1.setContentsMargins(0, 0, 0, 10)
         layout1.addWidget(self.toolbar)
         layout1.addWidget(self.container)
-        layout1.setSpacing(0)
         self.setLayout(layout1)
 
-    def addLine(self, index=None, name=None, descrption=None):
+    def addLine(self, index=None, name=None, text=None):
         """
         
         :param name: 
         :param descrption: 
         :return: 
         """
-        self.list.addLine(index, name, descrption)
+        self.list.addLine(index, name, text)

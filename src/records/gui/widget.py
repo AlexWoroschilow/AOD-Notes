@@ -204,6 +204,8 @@ class RecordList(QtWidgets.QWidget):
         :param parent: 
         """
         super(RecordList, self).__init__(parent)
+        self.setStyleSheet(''' QListWidget::item{ background-color: #fcf9f6; border: none; }
+            QListWidget::item:selected{ background-color: #fdfcf9 } ''')
         self.setContentsMargins(0, 10, 10, 0)
 
         self.list = ItemList()
@@ -214,7 +216,7 @@ class RecordList(QtWidgets.QWidget):
         self.statusbar.setText("Total amount of records: 12")
 
         layout = QtWidgets.QVBoxLayout()
-        # layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
         layout.addWidget(self.list)
@@ -222,8 +224,7 @@ class RecordList(QtWidgets.QWidget):
 
         self.container.setLayout(layout)
         layout1 = QtWidgets.QHBoxLayout()
-        # layout1.setContentsMargins(0, 0, 0, 0)
-        layout1.setSpacing(0)
+        layout1.setContentsMargins(10, 0, 0, 10)
         layout1.addWidget(self.toolbar)
         layout1.addWidget(self.container)
         self.setLayout(layout1)

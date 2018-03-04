@@ -99,11 +99,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.content.setContentsMargins(0, 0, 0, 0)
         self.content.setLayout(layout)
 
+        # fill tabs with widgets from different modules
         dispatcher.dispatch('window.first_tab.content', layout)
+
+        self.content.setStretchFactor(0, 2)
+        self.content.setStretchFactor(1, 3)
+        self.content.setStretchFactor(2, 5)
 
         self.container = QtWidgets.QTabWidget(self)
         self.container.addTab(self.content, self.tr('Records'))
-        # self.container.addTab(TextEditor(), "50. More or less 8 spaces")
 
         self.setCentralWidget(self.container)
         self.setGeometry(100, 100, 1030, 800)
