@@ -84,7 +84,6 @@ class Dashboard(QtWidgets.QWidget):
 
         self.content = QtWidgets.QSplitter()
         self.content.setContentsMargins(0, 0, 0, 0)
-
         # fill tabs with widgets from different modules
         dispatcher.dispatch('window.first_tab.content', self.content)
 
@@ -93,6 +92,7 @@ class Dashboard(QtWidgets.QWidget):
         self.content.setStretchFactor(2, 3)
 
         layout = QtWidgets.QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
         # fill tabs with widgets from different modules
         dispatcher.dispatch('window.header.content', layout)
         layout.addWidget(self.content)

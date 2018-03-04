@@ -56,14 +56,11 @@ class Loader(Loader):
         self.list = FolderList()
         self.list.toolbar.newAction.triggered.connect(self._onNewEvent)
         self.list.toolbar.copyAction.triggered.connect(self._onCopyEvent)
-        self.list.toolbar.viewIcons.triggered.connect(self._onToggleView)
+        self.list.toolbar.refreshAction.triggered.connect(self._onRefreshEvent)
 
+        self.list.list.clear()
         for folder in storage.folders:
-            self.list.addLine(
-                folder.index,
-                folder.name,
-                folder.text
-            )
+            self.list.addLine(folder.index, folder.name, folder.text)
 
         event.data.addWidget(self.list)
 
@@ -90,11 +87,15 @@ class Loader(Loader):
         """
         dispatcher.dispatch('window.notepad.folder_copy')
 
-    @inject.params(dispatcher='event_dispatcher')
-    def _onToggleView(self, event=None, dispatcher=None):
+    @inject.params(dispatcher='event_dispatcher', storage='storage')
+    def _onRefreshEvent(self, event=None, dispatcher=None, storage=None):
         """
 
         :param event: 
+        :param dispatcher: 
+        :param storage: 
         :return: 
         """
-        print('_onToggleView')
+        self.list.list.clear()
+        for entity in storage.folders:
+            self.list.addLine(entity.index, entity.name, entity.text)

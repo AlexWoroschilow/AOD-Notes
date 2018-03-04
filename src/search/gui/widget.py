@@ -17,6 +17,7 @@ class SearchField(QtWidgets.QLineEdit):
         """
         super(SearchField, self).__init__(parent)
         self.setPlaceholderText('Type random string to search...')
+        self.setContentsMargins(20, 15, 20, 0)
         self.setClearButtonEnabled(True)
 
         font = self.font()

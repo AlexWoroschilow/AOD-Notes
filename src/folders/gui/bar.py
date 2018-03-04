@@ -32,15 +32,13 @@ class ToolbarbarWidget(QtWidgets.QToolBar):
         self.copyAction.setStatusTip("Copy text to clipboard")
         self.copyAction.setShortcut("Ctrl+C")
 
-        self.viewIcons = QtWidgets.QAction(QtGui.QIcon("icons/icons.svg"), "View as icons", self)
-        self.viewIcons.setStatusTip("View recors as list")
+        self.removeAction = QtWidgets.QAction(QtGui.QIcon("icons/remove.svg"), "Remove selected folder", self)
+        self.removeAction.setStatusTip("Remove selected folder")
+
+        self.refreshAction = QtWidgets.QAction(QtGui.QIcon("icons/refresh.svg"), "Refresh selected folder", self)
+        self.refreshAction.setStatusTip("Refresh selected folder")
 
         self.addAction(self.newAction)
         self.addAction(self.copyAction)
-
-        self.addSeparator()
-
-        self.addAction(self.viewIcons)
-
-
-
+        self.addAction(self.refreshAction)
+        self.addAction(self.removeAction)

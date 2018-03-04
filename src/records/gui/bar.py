@@ -36,7 +36,15 @@ class ToolbarbarWidget(QtWidgets.QToolBar):
         self.savePdf.setStatusTip("Export document as PDF")
         self.savePdf.setShortcut("Ctrl+Shift+P")
 
+        self.removeAction = QtWidgets.QAction(QtGui.QIcon("icons/remove.svg"), "Remove selected note", self)
+        self.removeAction.setStatusTip("Remove selected folder")
+
+        self.refreshAction = QtWidgets.QAction(QtGui.QIcon("icons/refresh.svg"), "Refresh selected folder", self)
+        self.refreshAction.setStatusTip("Refresh selected folder")
+
         self.addAction(self.newAction)
         self.addAction(self.copyAction)
         self.addAction(self.savePdf)
+        self.addAction(self.refreshAction)
+        self.addAction(self.removeAction)
 

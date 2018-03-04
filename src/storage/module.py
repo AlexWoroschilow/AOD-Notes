@@ -46,7 +46,7 @@ class Loader(Loader):
         dispatcher.add_listener('window.notepad.folder_copy', self._onNotepadFolderCopy)
         dispatcher.add_listener('window.notepad.note_new', self._onNotepadNoteNew)
         dispatcher.add_listener('window.notepad.note_update', self._onNotepadNoteUpdate)
-
+        dispatcher.add_listener('window.notepad.note_remove', self._onNotepadNoteRemove)
         dispatcher.add_listener('window.notepad.note_copy', self._onNotepadNoteCopy)
         dispatcher.add_listener('window.notepad.note_export', self._onNotepadNoteExport)
 
@@ -105,6 +105,17 @@ class Loader(Loader):
         """
         index, name, text = event.data
         storage.updateNote(index, name, text)
+
+    @inject.params(storage='storage')
+    def _onNotepadNoteRemove(self, event=None, dispather=None, storage=None):
+        """
+
+        :param event: 
+        :param dispather: 
+        :return: 
+        """
+        index, name, text = event.data
+        storage.removeNote(index, name, text)
 
     @inject.params(storage='storage')
     def _onNotepadNoteExport(self, event=None, dispather=None, storage=None):

@@ -46,25 +46,24 @@ class Loader(Loader):
     @inject.params(storage='storage', dispatcher='event_dispatcher')
     def _onWindowFirstTab(self, event=None, dispatcher=None, storage=None):
         """
-
+        
         :param event: 
         :param dispatcher: 
+        :param storage: 
         :return: 
         """
-
         self.list = RecordList()
         self.list.toolbar.newAction.triggered.connect(self._onNewEvent)
         self.list.toolbar.copyAction.triggered.connect(self._onCopyEvent)
         self.list.toolbar.savePdf.triggered.connect(self._onSavePdfEvent)
+        self.list.toolbar.removeAction.triggered.connect(self._onRemoveEvent)
+        self.list.toolbar.refreshAction.triggered.connect(self._onRefreshEvent)
 
         self.list.list.selectionChanged = self._onNoteSelected
 
+        self.list.list.clear()
         for entity in storage.notes:
-            self.list.addLine(
-                entity.index,
-                entity.name,
-                entity.text
-            )
+            self.list.addLine(entity.index, entity.name, entity.text)
 
         dispatcher.dispatch('window.notepad.note_edit', (
             entity.index, entity.name, entity.text
@@ -77,6 +76,7 @@ class Loader(Loader):
         """
         
         :param event: 
+        :param selection: 
         :param dispatcher: 
         :return: 
         """
@@ -89,9 +89,10 @@ class Loader(Loader):
     @inject.params(storage='storage')
     def _onNotepadNoteUpdate(self, event=None, dispather=None, storage=None):
         """
-
+        
         :param event: 
         :param dispather: 
+        :param storage: 
         :return: 
         """
         index, name, text = event.data
@@ -105,6 +106,7 @@ class Loader(Loader):
         """
         
         :param event: 
+        :param dispatcher: 
         :return: 
         """
         name = 'Note 1'
@@ -117,8 +119,9 @@ class Loader(Loader):
     @inject.params(dispatcher='event_dispatcher')
     def _onCopyEvent(self, event=None, dispatcher=None):
         """
-
+        
         :param event: 
+        :param dispatcher: 
         :return: 
         """
         for index in self.list.list.selectedIndexes():
@@ -131,8 +134,37 @@ class Loader(Loader):
     @inject.params(dispatcher='event_dispatcher')
     def _onSavePdfEvent(self, event=None, dispatcher=None):
         """
-
+        
         :param event: 
+        :param dispatcher: 
         :return: 
         """
         dispatcher.dispatch('window.notepad.note_export')
+
+    @inject.params(dispatcher='event_dispatcher')
+    def _onRemoveEvent(self, event=None, dispatcher=None):
+        """
+        
+        :param event: 
+        :param dispatcher: 
+        :return: 
+        """
+        for index in self.list.list.selectedIndexes():
+            item = self.list.list.itemFromIndex(index)
+            dispatcher.dispatch('window.notepad.note_remove', (
+                item.index, item.name, item.text
+            ))
+            self.list.list.takeItem(index.row())
+
+    @inject.params(dispatcher='event_dispatcher', storage='storage')
+    def _onRefreshEvent(self, event=None, dispatcher=None, storage=None):
+        """
+        
+        :param event: 
+        :param dispatcher: 
+        :param storage: 
+        :return: 
+        """
+        self.list.list.clear()
+        for entity in storage.notes:
+            self.list.addLine(entity.index, entity.name, entity.text)

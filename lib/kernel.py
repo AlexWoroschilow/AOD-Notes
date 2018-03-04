@@ -37,6 +37,8 @@ class Kernel(object):
         inject.configure(self.__init)
 
         for loader in self._loaders:
+            if not loader.enabled:
+                continue
             loader.boot()
 
         self._container = inject.get_injector()
