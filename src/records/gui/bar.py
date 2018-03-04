@@ -36,17 +36,7 @@ class ToolbarbarWidget(QtWidgets.QToolBar):
         self.savePdf.setStatusTip("Export document as PDF")
         self.savePdf.setShortcut("Ctrl+Shift+P")
 
-        self.viewIcons = QtWidgets.QAction(QtGui.QIcon("icons/icons.svg"), "View as icons", self)
-        self.viewIcons.setStatusTip("View recors as list")
-
         self.addAction(self.newAction)
         self.addAction(self.copyAction)
-
-        self.addSeparator()
-
-        self.addAction(self.viewIcons)
-
-        self.addSeparator()
-
         self.addAction(self.savePdf)
 

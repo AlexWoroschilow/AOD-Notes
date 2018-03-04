@@ -11,9 +11,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
-import string
 import sqlite3
-import logging
 
 from datetime import datetime
 from os.path import expanduser
@@ -115,7 +113,7 @@ class SQLiteStorage(object):
         
         :return: 
         """
-        query = "SELECT * FROM Folder ORDER BY date DESC"
+        query = "SELECT * FROM Folder ORDER BY name ASC"
         cursor = self._connection.cursor()
         for row in cursor.execute(query):
             index, date, name, description = row
@@ -173,7 +171,7 @@ class SQLiteStorage(object):
 
         :return: 
         """
-        query = "SELECT * FROM Note ORDER BY date DESC"
+        query = "SELECT * FROM Note ORDER BY name ASC"
         cursor = self._connection.cursor()
         for row in cursor.execute(query):
             index, date, name, text = row

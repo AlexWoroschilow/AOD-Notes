@@ -65,7 +65,7 @@ class Loader(Loader):
                 folder.text
             )
 
-        event.data.addWidget(self.list)
+        event.data.addWidget(self.list, -1)
 
     @inject.params(dispatcher='event_dispatcher')
     def _onNewEvent(self, event=None, dispatcher=None):

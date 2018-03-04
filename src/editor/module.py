@@ -61,7 +61,7 @@ class Loader(Loader):
         :param dispatcher: 
         :return: 
         """
-        event.data.addWidget(self.editor)
+        event.data.addWidget(self.editor, -1)
 
     def _onWindowNoteEdit(self, event=None, dispatcher=None):
         """

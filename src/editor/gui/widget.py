@@ -34,11 +34,15 @@ class TextEditor(QtWidgets.QWidget):
         :param parent: 
         """
         super(TextEditor, self).__init__(parent)
-        self.setContentsMargins(0, 10, 10, 0)
-
         self.changesSaved = True
         self.filename = ""
         self._index = None
+
+
+        self.setStyleSheet('''
+            QTextEdit{ border: none; }
+            QLineEdit{ border: none; }
+        ''')
 
         self.name = TextEditorName()
 
@@ -79,7 +83,7 @@ class TextEditor(QtWidgets.QWidget):
         self.formatbar.imageAction.triggered.connect(self.insertImage)
 
         layout1 = QtWidgets.QVBoxLayout()
-        layout1.setContentsMargins(0, 0, 0, 0)
+        layout1.setSpacing(5)
 
         self.statusbar = QtWidgets.QLabel()
         self.statusbar.setText("Words: 12, Characters: 120")
@@ -93,7 +97,6 @@ class TextEditor(QtWidgets.QWidget):
         widget.setLayout(layout1)
 
         layout = QtWidgets.QHBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.toolbar)
         layout.addWidget(widget)
 
@@ -130,7 +133,7 @@ class TextEditor(QtWidgets.QWidget):
         line = cursor.blockNumber() + 1
         col = cursor.columnNumber()
 
-        # self.statusbar.showMessage("Line: {} | Column: {}".format(line, col))
+        self.statusbar.setText("Line: {} | Column: {}".format(line, col))
 
     def toggleToolbar(self):
         """
@@ -194,7 +197,7 @@ class TextEditor(QtWidgets.QWidget):
         line = cursor.blockNumber() + 1
         col = cursor.columnNumber()
 
-        # self.statusbar.showMessage("Line: {} | Column: {}".format(line, col))
+        self.statusbar.setText("Line: {} | Column: {}".format(line, col))
 
     def wordCount(self):
         """

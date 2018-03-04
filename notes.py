@@ -102,9 +102,9 @@ class MainWindow(QtWidgets.QMainWindow):
         # fill tabs with widgets from different modules
         dispatcher.dispatch('window.first_tab.content', layout)
 
-        self.content.setStretchFactor(0, 2)
-        self.content.setStretchFactor(1, 3)
-        self.content.setStretchFactor(2, 5)
+        self.content.setStretchFactor(0, 1)
+        self.content.setStretchFactor(1, 4)
+        self.content.setStretchFactor(2, 3)
 
         self.container = QtWidgets.QTabWidget(self)
         self.container.addTab(self.content, self.tr('Records'))

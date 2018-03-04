@@ -56,7 +56,6 @@ class Loader(Loader):
         self.list.toolbar.newAction.triggered.connect(self._onNewEvent)
         self.list.toolbar.copyAction.triggered.connect(self._onCopyEvent)
         self.list.toolbar.savePdf.triggered.connect(self._onSavePdfEvent)
-        self.list.toolbar.viewIcons.triggered.connect(self._onToggleView)
 
         self.list.list.selectionChanged = self._onNoteSelected
 
@@ -71,7 +70,7 @@ class Loader(Loader):
             entity.index, entity.name, entity.text
         ))
 
-        event.data.addWidget(self.list)
+        event.data.addWidget(self.list, -1)
 
     @inject.params(dispatcher='event_dispatcher')
     def _onNoteSelected(self, event=None, selection=None, dispatcher=None):
@@ -122,7 +121,12 @@ class Loader(Loader):
         :param event: 
         :return: 
         """
-        dispatcher.dispatch('window.notepad.note_copy')
+        for index in self.list.list.selectedIndexes():
+            item = self.list.list.itemFromIndex(index)
+            self.list.addLine(None, item.name, item.text)
+            dispatcher.dispatch('window.notepad.note_new', (
+                item.name, item.text
+            ))
 
     @inject.params(dispatcher='event_dispatcher')
     def _onSavePdfEvent(self, event=None, dispatcher=None):
@@ -132,12 +136,3 @@ class Loader(Loader):
         :return: 
         """
         dispatcher.dispatch('window.notepad.note_export')
-
-    @inject.params(dispatcher='event_dispatcher')
-    def _onToggleView(self, event=None, dispatcher=None):
-        """
-
-        :param event: 
-        :return: 
-        """
-        print('_onToggleView')
