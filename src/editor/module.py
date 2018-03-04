@@ -41,8 +41,18 @@ class Loader(Loader):
         :param dispatcher:.
         :return:.
         """
+        dispatcher.add_listener('window.start', self._onWindowStart)
         dispatcher.add_listener('window.first_tab.content', self._onWindowFirstTab, 128)
         dispatcher.add_listener('window.notepad.note_edit', self._onWindowNoteEdit)
+
+    def _onWindowStart(self, event=None, dispatcher=None):
+        """
+        
+        :param event: 
+        :param dispatcher: 
+        :return: 
+        """
+        self.editor = TextEditor()
 
     def _onWindowFirstTab(self, event=None, dispatcher=None):
         """
@@ -51,9 +61,7 @@ class Loader(Loader):
         :param dispatcher: 
         :return: 
         """
-
-        self.editor = TextEditor()
-        event.data.addWidget(self.editor, 5)
+        event.data.addWidget(self.editor)
 
     def _onWindowNoteEdit(self, event=None, dispatcher=None):
         """

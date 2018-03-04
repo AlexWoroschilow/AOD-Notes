@@ -43,7 +43,7 @@ class Loader(Loader):
         dispatcher.add_listener('window.first_tab.content', self._onWindowFirstTab)
         dispatcher.add_listener('window.notepad.note_update', self._onNotepadNoteUpdate)
 
-    @inject.params(storage='storage')
+    @inject.params(storage='storage', dispatcher='event_dispatcher')
     def _onWindowFirstTab(self, event=None, dispatcher=None, storage=None):
         """
 
@@ -67,7 +67,11 @@ class Loader(Loader):
                 entity.text
             )
 
-        event.data.addWidget(self.list, 3)
+        dispatcher.dispatch('window.notepad.note_edit', (
+            entity.index, entity.name, entity.text
+        ))
+
+        event.data.addWidget(self.list)
 
     @inject.params(dispatcher='event_dispatcher')
     def _onNoteSelected(self, event=None, selection=None, dispatcher=None):

@@ -37,7 +37,7 @@ class Application(QtWidgets.QApplication):
         QtWidgets.QApplication.__init__(self, sys.argv)
 
         dispatcher = self.kernel.get('event_dispatcher')
-        dispatcher.add_listener('app.start', self.onWindowToggle)
+        dispatcher.add_listener('window.start', self.onWindowToggle)
         dispatcher.add_listener('window.toggle', self.onWindowToggle)
         dispatcher.add_listener('window.exit', self.onWindowExit)
 
@@ -49,7 +49,7 @@ class Application(QtWidgets.QApplication):
         :param logger: 
         :return: 
         """
-        dispatcher.dispatch('app.start', self)
+        dispatcher.dispatch('window.start', self)
 
         return super(Application, self).exec_()
 
@@ -88,7 +88,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """
 
         super(MainWindow, self).__init__(parent)
-
+        self.setStyleSheet('QMainWindow{ background-color: #ffffff; }')
         self.setWindowIcon(QtGui.QIcon("icons/icon.svg"))
         self.setWindowTitle('Notepad')
 

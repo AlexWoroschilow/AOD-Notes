@@ -134,7 +134,6 @@ class FolderList(QtWidgets.QWidget):
         self.statusbar.setText("Total amount of folders: 12")
 
         layout = QtWidgets.QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
         layout.addWidget(self.list)
@@ -142,10 +141,9 @@ class FolderList(QtWidgets.QWidget):
 
         self.container.setLayout(layout)
         layout1 = QtWidgets.QHBoxLayout()
-        layout1.setContentsMargins(0, 0, 0, 0)
-        layout1.setSpacing(0)
         layout1.addWidget(self.toolbar)
         layout1.addWidget(self.container)
+        layout1.setSpacing(0)
         self.setLayout(layout1)
 
     def addLine(self, index=None, name=None, descrption=None):
