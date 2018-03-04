@@ -42,7 +42,8 @@ class Loader(Loader):
         """
         dispatcher.add_listener('window.first_tab.content', self._onWindowFirstTab)
 
-    def _onWindowFirstTab(self, event=None, dispatcher=None):
+    @inject.params(storage='storage')
+    def _onWindowFirstTab(self, event=None, dispatcher=None, storage=None):
         """
 
         :param event: 
@@ -56,11 +57,9 @@ class Loader(Loader):
         self.list.toolbar.savePdf.triggered.connect(self._onSavePdfEvent)
         self.list.toolbar.viewIcons.triggered.connect(self._onToggleView)
 
-        for i in range(100):
-            name = '%s. More or less 8 spaces' % i
-            description = 'Set the tab stop width to around 33 pixels which is %s' % i
-            self.list.addLine(name, description)
-
+        for fields in storage.notes:
+            index, date, name, text = fields
+            self.list.addLine(name, text)
         event.data.addWidget(self.list, 3)
 
     @inject.params(dispatcher='event_dispatcher')
@@ -70,7 +69,12 @@ class Loader(Loader):
         :param event: 
         :return: 
         """
-        dispatcher.dispatch('window.notepad.note_new')
+        name = 'Note 1'
+        description = 'Note description 1'
+        self.list.addLine(name, description)
+        dispatcher.dispatch('window.notepad.note_new', (
+            name, description
+        ))
 
     @inject.params(dispatcher='event_dispatcher')
     def _onCopyEvent(self, event=None, dispatcher=None):

@@ -44,7 +44,8 @@ class Loader(Loader):
         """
         dispatcher.add_listener('window.first_tab.content', self._onWindowFirstTab)
 
-    def _onWindowFirstTab(self, event=None, dispatcher=None):
+    @inject.params(storage='storage')
+    def _onWindowFirstTab(self, event=None, dispatcher=None, storage=None):
         """
         
         :param event: 
@@ -57,9 +58,8 @@ class Loader(Loader):
         self.list.toolbar.copyAction.triggered.connect(self._onCopyEvent)
         self.list.toolbar.viewIcons.triggered.connect(self._onToggleView)
 
-        for i in range(100):
-            name = 'Folder %s' % i
-            description = 'some folder description %s' % i
+        for fields in storage.folders:
+            index, date, name, description = fields
             self.list.addLine(name, description)
 
         event.data.addWidget(self.list, 2)
@@ -71,7 +71,12 @@ class Loader(Loader):
         :param event: 
         :return: 
         """
-        dispatcher.dispatch('window.notepad.folder_new')
+        name = 'Folder 1'
+        description = 'Folder description 1'
+        self.list.addLine(name, description)
+        dispatcher.dispatch('window.notepad.folder_new', (
+            name, description
+        ))
 
     @inject.params(dispatcher='event_dispatcher')
     def _onCopyEvent(self, event=None, dispatcher=None):

@@ -14,7 +14,7 @@ import inject
 from PyQt5 import QtCore
 
 from lib.plugin import Loader
-from .service import Storage
+from .service import SQLiteStorage
 
 
 class Loader(Loader):
@@ -33,7 +33,7 @@ class Loader(Loader):
         :return:
         """
 
-        binder.bind_to_constructor('storage', Storage())
+        binder.bind('storage', SQLiteStorage("storage.dhf"))
 
     @inject.params(dispatcher='event_dispatcher')
     def boot(self, dispatcher=None):
@@ -48,25 +48,38 @@ class Loader(Loader):
         dispatcher.add_listener('window.notepad.note_copy', self._onNotepadNoteCopy)
         dispatcher.add_listener('window.notepad.note_export', self._onNotepadNoteExport)
 
-    def _onNotepadFolderNew(self, event=None, dispather=None):
-        """
-        
-        :param event: 
-        :param dispather: 
-        :return: 
-        """
-        print(event)
-
-    def _onNotepadFolderNew(self, event=None, dispather=None):
+    @inject.params(storage='storage')
+    def _onNotepadFolderNew(self, event=None, dispather=None, storage=None):
         """
 
         :param event: 
         :param dispather: 
         :return: 
         """
-        print(event)
+        name, description = event.data
+        storage.addFolder(name, description)
 
-    def _onNotepadFolderCopy(self, event=None, dispather=None):
+    @inject.params(storage='storage')
+    def _onNotepadFolderCopy(self, event=None, dispather=None, storage=None):
+        """
+
+        :param event: 
+        :param dispather: 
+        :return: 
+        """
+
+    @inject.params(storage='storage')
+    def _onNotepadNoteNew(self, event=None, dispather=None, storage=None):
+        """
+
+        :param event: 
+        :param dispather: 
+        :return: 
+        """
+        # storage.addFolder('Note 1', 'Note description')
+
+    @inject.params(storage='storage')
+    def _onNotepadNoteCopy(self, event=None, dispather=None, storage=None):
         """
 
         :param event: 
@@ -75,25 +88,8 @@ class Loader(Loader):
         """
         print(event)
 
-    def _onNotepadNoteNew(self, event=None, dispather=None):
-        """
-
-        :param event: 
-        :param dispather: 
-        :return: 
-        """
-        print(event)
-
-    def _onNotepadNoteCopy(self, event=None, dispather=None):
-        """
-
-        :param event: 
-        :param dispather: 
-        :return: 
-        """
-        print(event)
-
-    def _onNotepadNoteExport(self, event=None, dispather=None):
+    @inject.params(storage='storage')
+    def _onNotepadNoteExport(self, event=None, dispather=None, storage=None):
         """
 
         :param event: 

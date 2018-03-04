@@ -9,13 +9,161 @@
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITION
-import inject
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import os
+import string
+import sqlite3
+import logging
+
+from datetime import datetime
+from os.path import expanduser
 
 
-class Storage(object):
-    def __init__(self):
+class SQLiteStorage(object):
+    _connection = None
+
+    def __init__(self, database=None):
         """
         
-        :param battery: 
+        :param database: 
         """
+        database = database.replace('~', expanduser('~'))
+        if not os.path.isfile(database):
+            self.__init_database(database)
+        if self._connection is None:
+            self._connection = sqlite3.connect(database, check_same_thread=False)
+            self._connection.text_factory = str
+
+    def __init_database(self, database=None):
+        """
+        
+        :param database: 
+        :return: 
+        """
+        self._connection = sqlite3.connect(database, check_same_thread=False)
+        self._connection.text_factory = str
+        self._connection.execute("CREATE TABLE Folder (id INTEGER PRIMARY KEY, date TEXT, name TEXT, description TEXT)")
+        self._connection.execute("CREATE INDEX IDX_FOLDER_NAME ON Folder(name)")
+        self._connection.execute("CREATE INDEX IDX_FOLDER_DATE ON Folder(date)")
+        self._connection.execute("CREATE INDEX IDX_FOLDER_INDEX ON Folder(id)")
+
+        self._connection.execute("CREATE TABLE Note (id INTEGER PRIMARY KEY, date TEXT, name TEXT, text TEXT)")
+        self._connection.execute("CREATE INDEX IDX_NOTE_NAME ON Note(name)")
+        self._connection.execute("CREATE INDEX IDX_NOTE_DATE ON Note(date)")
+        self._connection.execute("CREATE INDEX IDX_NOTE_INDEX ON Note(id)")
+
+    @property
+    def folders(self):
+        """
+        
+        :return: 
+        """
+        query = "SELECT * FROM Folder ORDER BY date DESC"
+        cursor = self._connection.cursor()
+        for row in cursor.execute(query):
+            index, date, name, description = row
+            yield [str(index), str(date), str(name), str(description)]
+
+    @folders.setter
+    def folders(self, collection):
+        """
+        
+        :param collection: 
+        :return: 
+        """
+        pass
+
+    def addFolder(self, name=None, description=None):
+        """
+
+        :param word: 
+        :param translation: 
+        :return: 
+        """
+        time = datetime.now()
+        fields = (time.strftime("%Y.%m.%d %H:%M:%S"), name, description)
+        self._connection.execute("INSERT INTO Folder VALUES (NULL, ?, ?, ?)", fields)
+        self._connection.commit()
+
+    def updateFolder(self, index=None, name=None, description=None):
+        """
+
+        :param index: 
+        :param date: 
+        :param word: 
+        :param description: 
+        :return: 
+        """
+        fields = (name, description, index)
+        self._connection.execute("UPDATE Folder SET name=?, description=? WHERE id=?", fields)
+        self._connection.commit()
+
+    def removeFolder(self, index=None, name=None, text=None):
+        """
+
+        :param index: 
+        :param date: 
+        :param word: 
+        :param description: 
+        :return: 
+        """
+        self._connection.execute("DELETE FROM Folder WHERE id=?", [index])
+        self._connection.commit()
+
+    @property
+    def notes(self):
+        """
+
+        :return: 
+        """
+        query = "SELECT * FROM Note ORDER BY date DESC"
+        cursor = self._connection.cursor()
+        for row in cursor.execute(query):
+            index, date, name, text = row
+            yield [str(index), str(date), str(name), str(text)]
+
+    @notes.setter
+    def notes(self, collection):
+        """
+
+        :param collection: 
+        :return: 
+        """
+        pass
+
+    def addNote(self, name=None, text=None):
+        """
+
+        :param word: 
+        :param translation: 
+        :return: 
+        """
+        time = datetime.now()
+        fields = (time.strftime("%Y.%m.%d %H:%M:%S"), name, text)
+        self._connection.execute("INSERT INTO Note VALUES (NULL, ?, ?, ?)", fields)
+        self._connection.commit()
+
+    def updateNote(self, index=None, name=None, text=None):
+        """
+
+        :param index: 
+        :param date: 
+        :param word: 
+        :param description: 
+        :return: 
+        """
+        fields = (name, text, index)
+        self._connection.execute("UPDATE Note SET name=?, description=? WHERE id=?", fields)
+        self._connection.commit()
+
+    def removeNote(self, index=None, name=None, description=None):
+        """
+        
+        :param index: 
+        :param date: 
+        :param word: 
+        :param description: 
+        :return: 
+        """
+        self._connection.execute("DELETE FROM Note WHERE id=?", [index])
+        self._connection.commit()
