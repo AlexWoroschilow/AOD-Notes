@@ -60,6 +60,10 @@ class ToolbarbarWidget(QtWidgets.QToolBar):
         self.redoAction.setStatusTip("Redo last undone thing")
         self.redoAction.setShortcut("Ctrl+Y")
 
+        self.fullscreenAction = QtWidgets.QAction(QtGui.QIcon("icons/fullscreen.svg"), "Open editor in a new tab", self)
+        self.fullscreenAction.setStatusTip("Open editor in a new tab")
+
+
         self.addAction(self.saveAction)
         self.addAction(self.savePdf)
 
@@ -70,11 +74,18 @@ class ToolbarbarWidget(QtWidgets.QToolBar):
 
         self.addSeparator()
 
-        self.addAction(self.cutAction)
-        self.addAction(self.copyAction)
-        self.addAction(self.pasteAction)
         self.addAction(self.undoAction)
         self.addAction(self.redoAction)
+
+        self.addSeparator()
+
+        self.addAction(self.copyAction)
+        self.addAction(self.cutAction)
+        self.addAction(self.pasteAction)
+
+        self.addSeparator()
+
+        self.addAction(self.fullscreenAction)
 
 
 class FormatbarWidget(QtWidgets.QToolBar):

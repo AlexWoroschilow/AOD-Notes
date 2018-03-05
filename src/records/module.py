@@ -58,6 +58,7 @@ class Loader(Loader):
         self.list.toolbar.savePdf.triggered.connect(self._onSavePdfEvent)
         self.list.toolbar.removeAction.triggered.connect(self._onRemoveEvent)
         self.list.toolbar.refreshAction.triggered.connect(self._onRefreshEvent)
+        self.list.list.doubleClicked.connect(self._onDoubleClick)
 
         self.list.list.selectionChanged = self._onNoteSelected
 
@@ -69,7 +70,8 @@ class Loader(Loader):
             entity.index, entity.name, entity.text
         ))
 
-        event.data.addWidget(self.list)
+        container, parent = event.data
+        container.addWidget(self.list)
 
     @inject.params(dispatcher='event_dispatcher')
     def _onNoteSelected(self, event=None, selection=None, dispatcher=None):
@@ -168,3 +170,17 @@ class Loader(Loader):
         self.list.list.clear()
         for entity in storage.notes:
             self.list.addLine(entity.index, entity.name, entity.text)
+
+    @inject.params(dispatcher='event_dispatcher')
+    def _onDoubleClick(self, event=None, dispatcher=None):
+        """
+        
+        :param event: 
+        :param dispatcher: 
+        :param storage: 
+        :return: 
+        """
+        item = self.list.list.itemFromIndex(event)
+        dispatcher.dispatch('window.notepad.note_tab', (
+            item.index, item.name, item.text
+        ))

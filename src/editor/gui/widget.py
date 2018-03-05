@@ -30,31 +30,32 @@ class TextEditorName(QtWidgets.QLineEdit):
 
 
 class TextEditor(QtWidgets.QWidget):
-    def __init__(self, parent=None):
+    @inject.params(dispatcher='event_dispatcher')
+    def __init__(self, parent=None, dispatcher=None):
         """
         
         :param parent: 
+        :param dispatcher: 
         """
         super(TextEditor, self).__init__(parent)
+        dispatcher.add_listener('window.notepad.note_update', self._onWindowNoteEdit)
+
         self.changesSaved = True
         self.filename = ""
         self._index = None
 
-
-        self.setStyleSheet('''
-            QTextEdit{ border: none; }
-            QLineEdit{ border: none; }
-        ''')
+        self.setStyleSheet(''' QTextEdit{ border: none; }
+            QLineEdit{ border: none; }''')
 
         self.name = TextEditorName()
 
         self.text = QtWidgets.QTextEdit(self)
-        self.text.setTabStopWidth(33)
-        self.text.cursorPositionChanged.connect(self.cursorPosition)
         self.text.textChanged.connect(self.changed)
+        self.text.cursorPositionChanged.connect(self.cursorPosition)
+        self.text.setTabStopWidth(33)
 
         self.toolbar = ToolbarbarWidget()
-        self.toolbar.saveAction.triggered.connect(self.save)
+        self.toolbar.saveAction.triggered.connect(self._onSaveEvent)
         self.toolbar.printAction.triggered.connect(self.printHandler)
         self.toolbar.previewAction.triggered.connect(self.preview)
         self.toolbar.cutAction.triggered.connect(self.text.cut)
@@ -62,6 +63,7 @@ class TextEditor(QtWidgets.QWidget):
         self.toolbar.pasteAction.triggered.connect(self.text.paste)
         self.toolbar.undoAction.triggered.connect(self.text.undo)
         self.toolbar.redoAction.triggered.connect(self.text.redo)
+        self.toolbar.fullscreenAction.triggered.connect(self._onFullScreenEvent)
 
         self.formatbar = FormatbarWidget()
         self.formatbar.fontColor.triggered.connect(self.fontColorChanged)
@@ -103,6 +105,59 @@ class TextEditor(QtWidgets.QWidget):
         layout.addWidget(widget)
 
         self.setLayout(layout)
+
+    @inject.params(dispatcher='event_dispatcher')
+    def _onFullScreenEvent(self, event=None, dispatcher=None):
+        """
+        
+        :param event: 
+        :param dispatcher: 
+        :return: 
+        """
+        if dispatcher is None:
+            return None
+
+        dispatcher.dispatch('window.notepad.note_tab', (
+            self._index, self.name.text(), self.text.toHtml()
+        ))
+
+    @inject.params(storage='storage')
+    def _onWindowNoteEdit(self, event=None, dispatcher=None, storage=None):
+        """
+
+        :param event: 
+        :param dispatcher: 
+        :return: 
+        """
+        if storage is None:
+            return None
+
+        if event.data is None:
+            return None
+
+        index, name, text = event.data
+        if self._index not in [index]:
+            return None
+
+        if self.name is None:
+            return None
+
+        if self.text is None:
+            return None
+
+        self.name.setText(name)
+        self.text.setText(text)
+
+    @inject.params(dispatcher='event_dispatcher')
+    def _onSaveEvent(self, event=None, dispatcher=None):
+        """
+
+        :param dispatcher: 
+        :return: 
+        """
+        dispatcher.dispatch('window.notepad.note_update', (
+            self._index, self.name.text(), self.text.toHtml()
+        ))
 
     def edit(self, index=None, name=None, text=None):
         """
@@ -161,17 +216,6 @@ class TextEditor(QtWidgets.QWidget):
         """
         # state = self.statusbar.isVisible()
         # self.statusbar.setVisible(not state)
-
-    @inject.params(dispatcher='event_dispatcher')
-    def save(self, event=None, dispatcher=None):
-        """
-        
-        :param dispatcher: 
-        :return: 
-        """
-        dispatcher.dispatch('window.notepad.note_update', (
-            self._index, self.name.text(), self.text.toHtml()
-        ))
 
     def preview(self):
 

@@ -186,6 +186,18 @@ class SQLiteStorage(object):
         """
         pass
 
+    def getNote(self, index=None):
+        """
+        
+        :param index: 
+        :return: 
+        """
+        query = "SELECT * FROM Note WHERE id=?"
+        cursor = self._connection.cursor()
+        for row in cursor.execute(query, [index]):
+            index, date, name, text = row
+            return Note(str(index), str(date), str(name), str(text))
+
     def addNote(self, name=None, text=None):
         """
 

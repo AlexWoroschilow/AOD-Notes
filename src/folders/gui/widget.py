@@ -104,6 +104,7 @@ class FolderList(QtWidgets.QWidget):
         :param parent: 
         """
         super(FolderList, self).__init__(parent)
+        self.setContentsMargins(0, 0, 0, 0)
         self.setStyleSheet('''QListWidget{ border: none; }
             QListWidget::item{ background-color: #fcf9f6; border: none; }
             QListWidget::item:selected{ background-color: #fdfcf9 }''')

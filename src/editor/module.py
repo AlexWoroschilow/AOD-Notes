@@ -41,9 +41,10 @@ class Loader(Loader):
         :param dispatcher:.
         :return:.
         """
-        dispatcher.add_listener('window.start', self._onWindowStart)
+        dispatcher.add_listener('application.start', self._onWindowStart)
         dispatcher.add_listener('window.first_tab.content', self._onWindowFirstTab, 128)
         dispatcher.add_listener('window.notepad.note_edit', self._onWindowNoteEdit)
+        dispatcher.add_listener('window.notepad.note_tab', self._onWindowNoteTab)
 
     def _onWindowStart(self, event=None, dispatcher=None):
         """
@@ -52,6 +53,7 @@ class Loader(Loader):
         :param dispatcher: 
         :return: 
         """
+        self.parent = None
         self.editor = TextEditor()
 
     def _onWindowFirstTab(self, event=None, dispatcher=None):
@@ -61,7 +63,8 @@ class Loader(Loader):
         :param dispatcher: 
         :return: 
         """
-        event.data.addWidget(self.editor)
+        self.container, self.parent = event.data
+        self.container.addWidget(self.editor)
 
     def _onWindowNoteEdit(self, event=None, dispatcher=None):
         """
@@ -72,3 +75,21 @@ class Loader(Loader):
         """
         index, name, text = event.data
         self.editor.edit(index, name, text)
+
+    def _onWindowNoteTab(self, event=None, dispatcher=None):
+        """
+        
+        :param event: 
+        :param dispatcher: 
+        :return: 
+        """
+        if self.parent is None:
+            return None
+        index, name, text = event.data
+
+        editor = TextEditor()
+        editor.edit(index, name, text)
+        self.parent.addTab(editor, name)
+
+        index = self.parent.indexOf(editor)
+        self.parent.setCurrentIndex(index)

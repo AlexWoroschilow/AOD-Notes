@@ -62,7 +62,8 @@ class Loader(Loader):
         for folder in storage.folders:
             self.list.addLine(folder.index, folder.name, folder.text)
 
-        event.data.addWidget(self.list)
+        container, parent = event.data
+        container.addWidget(self.list)
 
     @inject.params(dispatcher='event_dispatcher')
     def _onNewEvent(self, event=None, dispatcher=None):

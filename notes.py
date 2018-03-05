@@ -36,11 +36,6 @@ class Application(QtWidgets.QApplication):
 
         QtWidgets.QApplication.__init__(self, sys.argv)
 
-        dispatcher = self.kernel.get('event_dispatcher')
-        dispatcher.add_listener('window.start', self.onWindowToggle)
-        dispatcher.add_listener('window.toggle', self.onWindowToggle)
-        dispatcher.add_listener('window.exit', self.onWindowExit)
-
     @inject.params(dispatcher='event_dispatcher', logger='logger')
     def exec_(self, dispatcher=None, logger=None):
         """
@@ -49,7 +44,11 @@ class Application(QtWidgets.QApplication):
         :param logger: 
         :return: 
         """
-        dispatcher.dispatch('window.start', self)
+        dispatcher.add_listener('application.start', self.onWindowToggle)
+        dispatcher.add_listener('window.toggle', self.onWindowToggle)
+        dispatcher.add_listener('window.exit', self.onWindowExit)
+
+        dispatcher.dispatch('application.start', self)
 
         return super(Application, self).exec_()
 
@@ -85,7 +84,9 @@ class Dashboard(QtWidgets.QWidget):
         self.content = QtWidgets.QSplitter()
         self.content.setContentsMargins(0, 0, 0, 0)
         # fill tabs with widgets from different modules
-        dispatcher.dispatch('window.first_tab.content', self.content)
+        dispatcher.dispatch('window.first_tab.content', (
+            self.content, parent
+        ))
 
         self.content.setStretchFactor(0, 2)
         self.content.setStretchFactor(1, 4)
@@ -117,19 +118,29 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setWindowTitle('Notepad')
 
         self.container = QtWidgets.QTabWidget(self)
-        self.container.addTab(Dashboard(), self.tr('Dashboard'))
+        self.container.setContentsMargins(0, 0, 0, 0)
 
-        from src.editor.gui.widget import TextEditor
-        self.container.addTab(TextEditor(), self.tr("Nick Matsakis 12 years, 6 months ago  # | flag"))
+        self.container.addTab(Dashboard(self.container), self.tr('Dashboard'))
+        self.container.setTabsClosable(True)
+        self.container.tabCloseRequested.connect(self._onTabClose)
 
         font = self.container.font()
         font.setPixelSize(18)
         self.container.setFont(font)
-
         self.setCentralWidget(self.container)
-        self.setGeometry(100, 100, 1030, 800)
 
-        self.show()
+    def _onTabClose(self, index=None):
+        """
+        
+        :param event: 
+        :return: 
+        """
+        if index in [0]:
+            return None
+        widget = self.container.widget(index)
+        if widget is not None:
+            widget.deleteLater()
+        self.container.removeTab(index)
 
     @inject.params(dispatcher='event_dispatcher', logger='logger')
     def closeEvent(self, event, dispatcher=None, logger=None):
@@ -139,14 +150,6 @@ class MainWindow(QtWidgets.QMainWindow):
         :return: 
         """
         dispatcher.dispatch('window.toggle')
-
-    def resizeEvent(self, event):
-        """
-
-        :param event: 
-        :return: 
-        """
-        # self.tab.setFixedSize(event.size())
 
 
 if __name__ == "__main__":
