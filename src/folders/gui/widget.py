@@ -69,6 +69,24 @@ class QCustomQWidget(QtWidgets.QWidget):
         self.iconQLabel.setPixmap(QtGui.QPixmap(imagePath))
 
 
+class FolderListWidgetItem(QtWidgets.QListWidgetItem):
+    def __init__(self, parent=None, folder=None):
+        """
+
+        :param parent: 
+        """
+        super(FolderListWidgetItem, self).__init__(parent)
+        self._folder = folder
+
+    @property
+    def folder(self):
+        """
+        
+        :return: 
+        """
+        return self._folder
+
+
 class ItemList(QtWidgets.QListWidget):
     def __init__(self, parent=None):
         """
@@ -77,7 +95,7 @@ class ItemList(QtWidgets.QListWidget):
         """
         super(ItemList, self).__init__(parent)
 
-    def addLine(self, index=None, name=None, text=None):
+    def addLine(self, folder=None):
         """
         
         :param name: 
@@ -86,11 +104,10 @@ class ItemList(QtWidgets.QListWidget):
         """
 
         myQCustomQWidget = QCustomQWidget()
-        myQCustomQWidget.setTextUp(name)
-        myQCustomQWidget.setTextDown(text)
-        # myQCustomQWidget.setIcon("icons/bold.svg")
-        # Create QListWidgetItem
-        item = QtWidgets.QListWidgetItem(self)
+        myQCustomQWidget.setTextUp(folder.name)
+        myQCustomQWidget.setTextDown(folder.text)
+
+        item = FolderListWidgetItem(self, folder)
         item.setSizeHint(myQCustomQWidget.sizeHint())
 
         self.addItem(item)
@@ -110,6 +127,20 @@ class FolderList(QtWidgets.QWidget):
             QListWidget::item:selected{ background-color: #fdfcf9 }''')
 
         self.list = ItemList()
+
+        # items = ['aa', 'bb', 'cc']
+        # self.list = QtWidgets.QTreeWidget()
+        # self.list.setHeaderHidden(True)
+        # font = self.list.font()
+        # font.setPixelSize(18)
+        # self.list.setFont(font)
+        #
+        # for item in items:
+        #     root = QtWidgets.QTreeWidgetItem(self.list, [item])
+        #     # root.setIcon(0, app.style().standardIcon(QtWidgets.QStyle.SP_ArrowUp))
+        #     for i in range(3):
+        #         sub_item = QtWidgets.QTreeWidgetItem(root, ["sub %s %s" % (item, i)])
+
         self.toolbar = ToolbarbarWidget()
         self.container = QtWidgets.QWidget()
 
@@ -127,11 +158,11 @@ class FolderList(QtWidgets.QWidget):
         layout1.addWidget(self.container)
         self.setLayout(layout1)
 
-    def addLine(self, index=None, name=None, text=None):
+    def addLine(self, folder=None):
         """
         
         :param name: 
         :param descrption: 
         :return: 
         """
-        self.list.addLine(index, name, text)
+        self.list.addLine(folder)

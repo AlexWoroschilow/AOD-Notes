@@ -42,6 +42,7 @@ class Loader(Loader):
         """
         dispatcher.add_listener('window.first_tab.content', self._onWindowFirstTab)
         dispatcher.add_listener('window.notepad.note_update', self._onNotepadNoteUpdate)
+        dispatcher.add_listener('window.notepad.folder_selected', self._onNotepadFolderSelected)
 
     @inject.params(storage='storage', dispatcher='event_dispatcher')
     def _onWindowFirstTab(self, event=None, dispatcher=None, storage=None):
@@ -58,8 +59,8 @@ class Loader(Loader):
         self.list.toolbar.savePdf.triggered.connect(self._onSavePdfEvent)
         self.list.toolbar.removeAction.triggered.connect(self._onRemoveEvent)
         self.list.toolbar.refreshAction.triggered.connect(self._onRefreshEvent)
+        self.list.folderEditor.returnPressed.connect(self._onFolderUpdated)
         self.list.list.doubleClicked.connect(self._onDoubleClick)
-
         self.list.list.selectionChanged = self._onNoteSelected
 
         self.list.list.clear()
@@ -183,4 +184,27 @@ class Loader(Loader):
         item = self.list.list.itemFromIndex(event)
         dispatcher.dispatch('window.notepad.note_tab', (
             item.index, item.name, item.text
+        ))
+
+    def _onNotepadFolderSelected(self, event=None, dispatcher=None):
+        """
+        
+        :param event: 
+        :param dispatcher: 
+        :return: 
+        """
+        self.list.setFolder(event.data)
+
+    @inject.params(dispatcher='event_dispatcher')
+    def _onFolderUpdated(self, event=None, dispatcher=None):
+        """
+        
+        :param event: 
+        :param dispatcher: 
+        :return: 
+        """
+        folder = self.list.folder
+        folder.name = self.list.folderEditor.text()
+        dispatcher.dispatch('window.notepad.folder_update', (
+            folder
         ))

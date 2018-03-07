@@ -12,11 +12,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
 from PyQt5 import QtCore
+from PyQt5 import QtWidgets
 
 from lib.plugin import Loader
 from .service import Storage
 
 from .gui.widget import FolderList
+from PyQt5.QtWidgets import QTreeView, QFileSystemModel, QApplication
+
+
+class FileTree(QTreeView):
+    def __init__(self):
+        QTreeView.__init__(self)
+        model = QFileSystemModel()
+        model.setRootPath('/')
+        self.setModel(model)
+        self.doubleClicked.connect(self.test)
+
+    def test(self, signal):
+        file_path = self.model().filePath(signal)
+        print(file_path)
 
 
 class Loader(Loader):
@@ -57,10 +72,12 @@ class Loader(Loader):
         self.list.toolbar.newAction.triggered.connect(self._onNewEvent)
         self.list.toolbar.copyAction.triggered.connect(self._onCopyEvent)
         self.list.toolbar.refreshAction.triggered.connect(self._onRefreshEvent)
+        self.list.list.doubleClicked.connect(self._onFolderSelected)
+        self.list.list.selectionChanged = self._onFolderSelected
 
         self.list.list.clear()
         for folder in storage.folders:
-            self.list.addLine(folder.index, folder.name, folder.text)
+            self.list.addLine(folder)
 
         container, parent = event.data
         container.addWidget(self.list)
@@ -99,4 +116,19 @@ class Loader(Loader):
         """
         self.list.list.clear()
         for entity in storage.folders:
-            self.list.addLine(entity.index, entity.name, entity.text)
+            self.list.addLine(entity)
+
+    @inject.params(dispatcher='event_dispatcher')
+    def _onFolderSelected(self, event=None, selection=None, dispatcher=None):
+        """
+
+        :param event: 
+        :param selection: 
+        :param dispatcher: 
+        :return: 
+        """
+        for index in self.list.list.selectedIndexes():
+            item = self.list.list.itemFromIndex(index)
+            dispatcher.dispatch('window.notepad.folder_selected', (
+                item.folder
+            ))

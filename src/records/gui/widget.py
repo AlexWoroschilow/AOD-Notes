@@ -14,6 +14,7 @@ from PyQt5 import QtPrintSupport
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import Qt
 from .bar import ToolbarbarWidget
+from .editor import FolderName
 import re
 from bs4 import BeautifulSoup, NavigableString
 
@@ -178,7 +179,7 @@ class ItemList(QtWidgets.QListWidget):
         self.setContentsMargins(0, 0, 0, 0)
         self.setStyleSheet('''
             QListWidget{ border: none; }
-            QListWidget::item{ background-color: #fcf9f6; border: none; }
+            QListWidget::item{ background-color: #fcf9f6; padding: 0px 0px 0px 0px; }
             QListWidget::item:selected{ background-color: #fdfcf9 }
         ''')
 
@@ -206,10 +207,14 @@ class RecordList(QtWidgets.QWidget):
         :param parent: 
         """
         super(RecordList, self).__init__(parent)
+        self._folder = None
+
         self.setStyleSheet(''' QListWidget::item{ background-color: #fcf9f6; border: none; }
             QListWidget::item:selected{ background-color: #fdfcf9 } ''')
 
         self.list = ItemList()
+        self.folderEditor = FolderName()
+        self.folderEditor.setText('Folder 1')
         self.toolbar = ToolbarbarWidget()
         self.container = QtWidgets.QWidget()
 
@@ -217,6 +222,7 @@ class RecordList(QtWidgets.QWidget):
         self.statusbar.setText("Total amount of records: 12")
 
         layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(self.folderEditor)
         layout.addWidget(self.list)
         layout.addWidget(self.statusbar)
 
@@ -226,6 +232,14 @@ class RecordList(QtWidgets.QWidget):
         layout1.addWidget(self.container)
         self.setLayout(layout1)
 
+    @property
+    def folder(self):
+        """
+        
+        :return: 
+        """
+        return self._folder
+
     def addLine(self, index=None, name=None, text=None):
         """
         
@@ -234,3 +248,12 @@ class RecordList(QtWidgets.QWidget):
         :return: 
         """
         self.list.addLine(index, name, text)
+
+    def setFolder(self, folder=None):
+        """
+        
+        :param folder: 
+        :return: 
+        """
+        self._folder = folder
+        self.folderEditor.setText(folder.name)
