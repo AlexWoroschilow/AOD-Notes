@@ -65,11 +65,8 @@ class Loader(Loader):
 
         self.list.list.clear()
         for entity in storage.notes:
-            self.list.addLine(entity.index, entity.name, entity.text)
-
-        dispatcher.dispatch('window.notepad.note_edit', (
-            entity.index, entity.name, entity.text
-        ))
+            self.list.addLine(entity)
+        dispatcher.dispatch('window.notepad.note_edit', entity)
 
         container, parent = event.data
         container.addWidget(self.list)
@@ -84,10 +81,8 @@ class Loader(Loader):
         :return: 
         """
         for index in self.list.list.selectedIndexes():
-            item = self.list.list.itemFromIndex(index)
-            dispatcher.dispatch('window.notepad.note_edit', (
-                item.index, item.name, item.text
-            ))
+            note = self.list.list.itemFromIndex(index)
+            dispatcher.dispatch('window.notepad.note_edit', note)
 
     @inject.params(storage='storage')
     def _onNotepadNoteUpdate(self, event=None, dispather=None, storage=None):
@@ -170,7 +165,7 @@ class Loader(Loader):
         """
         self.list.list.clear()
         for entity in storage.notes:
-            self.list.addLine(entity.index, entity.name, entity.text)
+            self.list.addLine(entity)
 
     @inject.params(dispatcher='event_dispatcher')
     def _onDoubleClick(self, event=None, dispatcher=None):
@@ -205,6 +200,4 @@ class Loader(Loader):
         """
         folder = self.list.folder
         folder.name = self.list.folderEditor.text()
-        dispatcher.dispatch('window.notepad.folder_update', (
-            folder
-        ))
+        dispatcher.dispatch('window.notepad.folder_update', folder)

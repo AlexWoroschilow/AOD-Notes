@@ -73,8 +73,8 @@ class Loader(Loader):
         :param dispatcher: 
         :return: 
         """
-        index, name, text = event.data
-        self.editor.edit(index, name, text)
+        note = event.data
+        self.editor.edit(note.index, note.name, note.text)
 
     def _onWindowNoteTab(self, event=None, dispatcher=None):
         """

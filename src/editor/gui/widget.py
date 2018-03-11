@@ -30,8 +30,8 @@ class TextEditorName(QtWidgets.QLineEdit):
 
 
 class TextEditor(QtWidgets.QWidget):
-    @inject.params(dispatcher='event_dispatcher')
-    def __init__(self, parent=None, dispatcher=None):
+    @inject.params(dispatcher='event_dispatcher', storage='storage')
+    def __init__(self, parent=None, dispatcher=None, storage=None):
         """
         
         :param parent: 

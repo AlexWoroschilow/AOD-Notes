@@ -183,7 +183,7 @@ class ItemList(QtWidgets.QListWidget):
             QListWidget::item:selected{ background-color: #fdfcf9 }
         ''')
 
-    def addLine(self, index=None, name=None, text=None):
+    def addLine(self, entity=None):
         """
         
         :param name: 
@@ -191,10 +191,10 @@ class ItemList(QtWidgets.QListWidget):
         :return: 
         """
 
-        item = NoteItem(index, QCustomQWidget())
+        item = NoteItem(entity.index, QCustomQWidget())
         item.setSizeHint(item.widget.sizeHint())
-        item.name = name
-        item.text = text
+        item.name = entity.name
+        item.text = entity.text
 
         self.addItem(item)
         self.setItemWidget(item, item.widget)
@@ -240,14 +240,14 @@ class RecordList(QtWidgets.QWidget):
         """
         return self._folder
 
-    def addLine(self, index=None, name=None, text=None):
+    def addLine(self, entity=None):
         """
         
         :param name: 
         :param descrption: 
         :return: 
         """
-        self.list.addLine(index, name, text)
+        self.list.addLine(entity)
 
     def setFolder(self, folder=None):
         """

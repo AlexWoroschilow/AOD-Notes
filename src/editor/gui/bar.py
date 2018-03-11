@@ -16,6 +16,7 @@ from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5 import QtCore
 from PyQt5 import QtSvg
+from .combo import FolderBomboBox
 
 
 class ToolbarbarWidget(QtWidgets.QToolBar):
@@ -63,7 +64,6 @@ class ToolbarbarWidget(QtWidgets.QToolBar):
         self.fullscreenAction = QtWidgets.QAction(QtGui.QIcon("icons/fullscreen.svg"), "Open editor in a new tab", self)
         self.fullscreenAction.setStatusTip("Open editor in a new tab")
 
-
         self.addAction(self.saveAction)
         self.addAction(self.savePdf)
 
@@ -94,6 +94,7 @@ class FormatbarWidget(QtWidgets.QToolBar):
         self.setOrientation(Qt.Horizontal)
         self.setContentsMargins(0, 0, 0, 0)
 
+        self.folder = FolderBomboBox()
         self.fontBox = QtWidgets.QFontComboBox(self)
 
         self.fontSize = QtWidgets.QSpinBox(self)
@@ -130,6 +131,7 @@ class FormatbarWidget(QtWidgets.QToolBar):
         self.dedentAction = QtWidgets.QAction(QtGui.QIcon("icons/outdent.svg"), "Dedent Area", self)
         self.dedentAction.setShortcut("Shift+Tab")
 
+        self.addWidget(self.folder)
         self.addWidget(self.fontBox)
         self.addWidget(self.fontSize)
 
