@@ -65,8 +65,8 @@ class Loader(Loader):
         :param dispather: 
         :return: 
         """
-        name, description = event.data
-        storage.addFolder(name, description)
+        model = event.data
+        storage.addFolder(model.name, model.text)
 
     @inject.params(storage='storage')
     def _onNotepadFolderCopy(self, event=None, dispather=None, storage=None):
@@ -97,8 +97,9 @@ class Loader(Loader):
         :param dispather: 
         :return: 
         """
-        name, description = event.data
-        storage.addNote(name, description)
+        entity = event.data
+        folder = entity.folder.index if entity.folder is not None else None
+        event.data = storage.addNote(entity.name, entity.text, folder)
 
     @inject.params(storage='storage')
     def _onNotepadNoteCopy(self, event=None, dispather=None, storage=None):
@@ -118,8 +119,8 @@ class Loader(Loader):
         :param dispather: 
         :return: 
         """
-        index, name, text = event.data
-        storage.updateNote(index, name, text)
+        entity = event.data
+        storage.updateNote(entity.index, entity.name, entity.text)
 
     @inject.params(storage='storage')
     def _onNotepadNoteRemove(self, event=None, dispather=None, storage=None):
@@ -129,8 +130,8 @@ class Loader(Loader):
         :param dispather: 
         :return: 
         """
-        index, name, text = event.data
-        storage.removeNote(index, name, text)
+        note = event.data
+        storage.removeNote(note.index)
 
     @inject.params(storage='storage')
     def _onNotepadNoteExport(self, event=None, dispather=None, storage=None):
@@ -151,5 +152,6 @@ class Loader(Loader):
         :param storage: 
         :return: 
         """
-        note, folder = event.data
-        print(note, folder)
+        entity, folder = event.data
+        if entity is not None and folder is not None:
+            storage.updateNoteFolder(entity.index, folder.index)

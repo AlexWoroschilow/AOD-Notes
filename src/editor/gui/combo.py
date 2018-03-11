@@ -34,6 +34,19 @@ class FolderBomboBox(QtWidgets.QComboBox):
 
         dispatcher.add_listener('window.notepad.note_edit', self._OnNoteSelected)
 
+    def setFolder(self, value=None):
+        """
+        
+        :param value: 
+        :return: 
+        """
+        self.blockSignals(True)
+        for index in range(0, self.count()):
+            folder = self.itemData(index)
+            if int(value) in [int(folder.index)]:
+                self.setCurrentIndex(index)
+        self.blockSignals(False)
+
     def _OnNoteSelected(self, event=None, dispatcher=None):
         """
         

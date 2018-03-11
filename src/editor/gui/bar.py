@@ -165,3 +165,11 @@ class FormatbarWidget(QtWidgets.QToolBar):
         self.addAction(self.imageAction)
         self.addAction(self.fontColor)
         self.addAction(self.backColor)
+
+    def setFolder(self, value=None):
+        """
+        
+        :param folder: 
+        :return: 
+        """
+        self.folder.setFolder(int(value))

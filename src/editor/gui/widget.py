@@ -114,12 +114,8 @@ class TextEditor(QtWidgets.QWidget):
         :param dispatcher: 
         :return: 
         """
-        if dispatcher is None:
-            return None
-
-        dispatcher.dispatch('window.notepad.note_tab', (
-            self._index, self.name.text(), self.text.toHtml()
-        ))
+        if self._entity is not None and dispatcher is not None:
+            dispatcher.dispatch('window.notepad.note_tab', self._entity)
 
     @inject.params(storage='storage')
     def _onWindowNoteEdit(self, event=None, dispatcher=None, storage=None):
@@ -135,8 +131,8 @@ class TextEditor(QtWidgets.QWidget):
         if event.data is None:
             return None
 
-        index, name, text = event.data
-        if self._index not in [index]:
+        entity = event.data
+        if self._entity.index not in [entity.index]:
             return None
 
         if self.name is None:
@@ -145,8 +141,8 @@ class TextEditor(QtWidgets.QWidget):
         if self.text is None:
             return None
 
-        self.name.setText(name)
-        self.text.setText(text)
+        self.name.setText(entity.name)
+        self.text.setText(entity.text)
 
     @inject.params(dispatcher='event_dispatcher')
     def _onSaveEvent(self, event=None, dispatcher=None):
@@ -155,11 +151,12 @@ class TextEditor(QtWidgets.QWidget):
         :param dispatcher: 
         :return: 
         """
-        dispatcher.dispatch('window.notepad.note_update', (
-            self._index, self.name.text(), self.text.toHtml()
-        ))
+        if self._entity is not None and dispatcher is not None:
+            self._entity.name = self.name.text()
+            self._entity.text = self.text.toHtml()
+            dispatcher.dispatch('window.notepad.note_update', self._entity)
 
-    def edit(self, index=None, name=None, text=None):
+    def edit(self, entity=None):
         """
         
         :param index: 
@@ -167,9 +164,10 @@ class TextEditor(QtWidgets.QWidget):
         :param text: 
         :return: 
         """
-        self._index = index
-        self.name.setText(name)
-        self.text.setText(text)
+        self._entity = entity
+        self.name.setText(entity.name)
+        self.formatbar.setFolder(entity.folder)
+        self.text.setText(entity.text)
 
     def changed(self):
         """

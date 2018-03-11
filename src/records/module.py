@@ -17,7 +17,46 @@ from lib.plugin import Loader
 from .gui.widget import RecordList
 
 
+class NoteModel(object):
+    def __init__(self, name=None, text=None, folder=None):
+        """
+
+        :param name: 
+        :param text: 
+        """
+        self._name = name
+        self._folder = folder
+        self._text = text
+
+    @property
+    def folder(self):
+        """
+        
+        :return: 
+        """
+        return self._folder
+
+    @property
+    def name(self):
+        """
+
+        :return: 
+        """
+        return self._name
+
+    @property
+    def text(self):
+        """
+
+        :return: 
+        """
+        return self._text
+
+
 class Loader(Loader):
+    _list = None
+    _folder = None
+
     @property
     def enabled(self):
         """
@@ -53,23 +92,31 @@ class Loader(Loader):
         :param storage: 
         :return: 
         """
-        self.list = RecordList()
-        self.list.toolbar.newAction.triggered.connect(self._onNewEvent)
-        self.list.toolbar.copyAction.triggered.connect(self._onCopyEvent)
-        self.list.toolbar.savePdf.triggered.connect(self._onSavePdfEvent)
-        self.list.toolbar.removeAction.triggered.connect(self._onRemoveEvent)
-        self.list.toolbar.refreshAction.triggered.connect(self._onRefreshEvent)
-        self.list.folderEditor.returnPressed.connect(self._onFolderUpdated)
-        self.list.list.doubleClicked.connect(self._onDoubleClick)
-        self.list.list.selectionChanged = self._onNoteSelected
-
-        self.list.list.clear()
-        for entity in storage.notes:
-            self.list.addLine(entity)
-        dispatcher.dispatch('window.notepad.note_edit', entity)
-
+        self._list = RecordList()
         container, parent = event.data
-        container.addWidget(self.list)
+        container.addWidget(self._list)
+
+        self._list.toolbar.newAction.triggered.connect(self._onNewEvent)
+        self._list.toolbar.copyAction.triggered.connect(self._onCopyEvent)
+        self._list.toolbar.savePdf.triggered.connect(self._onSavePdfEvent)
+        self._list.toolbar.removeAction.triggered.connect(self._onRemoveEvent)
+        self._list.toolbar.refreshAction.triggered.connect(self._onRefreshEvent)
+        self._list.folderEditor.returnPressed.connect(self._onFolderUpdated)
+        self._list.list.doubleClicked.connect(self._onDoubleClick)
+        self._list.list.selectionChanged = self._onNoteSelected
+
+        if self._folder is None:
+            return None
+
+        first = None
+        self._list.list.clear()
+        for entity in storage.notesByFolder(self._folder):
+            if first is None:
+                first = entity
+            self._list.addLine(entity)
+        self._list.setFolder(self._folder)
+
+        dispatcher.dispatch('window.notepad.note_edit', first)
 
     @inject.params(dispatcher='event_dispatcher')
     def _onNoteSelected(self, event=None, selection=None, dispatcher=None):
@@ -80,9 +127,10 @@ class Loader(Loader):
         :param dispatcher: 
         :return: 
         """
-        for index in self.list.list.selectedIndexes():
-            note = self.list.list.itemFromIndex(index)
-            dispatcher.dispatch('window.notepad.note_edit', note)
+        for index in self._list.list.selectedIndexes():
+            item = self._list.list.itemFromIndex(index)
+            if item is not None and item.entity is not None:
+                dispatcher.dispatch('window.notepad.note_edit', item.entity)
 
     @inject.params(storage='storage')
     def _onNotepadNoteUpdate(self, event=None, dispather=None, storage=None):
@@ -93,11 +141,10 @@ class Loader(Loader):
         :param storage: 
         :return: 
         """
-        index, name, text = event.data
-        for index in self.list.list.selectedIndexes():
-            item = self.list.list.itemFromIndex(index)
-            item.name = name
-            item.text = text
+        entity = event.data
+        for index in self._list.list.selectedIndexes():
+            item = self._list.list.itemFromIndex(index)
+            item.entity = event.data
 
     @inject.params(dispatcher='event_dispatcher')
     def _onNewEvent(self, event=None, dispatcher=None):
@@ -107,12 +154,10 @@ class Loader(Loader):
         :param dispatcher: 
         :return: 
         """
-        name = 'Note 1'
-        description = 'Note description 1'
-        self.list.addLine(None, name, description)
-        dispatcher.dispatch('window.notepad.note_new', (
-            name, description
-        ))
+        model = NoteModel('New note', 'New description', self._folder)
+        event = dispatcher.dispatch('window.notepad.note_new', model)
+        if event is not None and event.data is not None:
+            self._list.addLine(event.data)
 
     @inject.params(dispatcher='event_dispatcher')
     def _onCopyEvent(self, event=None, dispatcher=None):
@@ -122,12 +167,11 @@ class Loader(Loader):
         :param dispatcher: 
         :return: 
         """
-        for index in self.list.list.selectedIndexes():
-            item = self.list.list.itemFromIndex(index)
-            self.list.addLine(None, item.name, item.text)
-            dispatcher.dispatch('window.notepad.note_new', (
-                item.name, item.text
-            ))
+        for index in self._list.list.selectedIndexes():
+            item = self._list.list.itemFromIndex(index)
+            if item is not None and item.entity is not None:
+                event = dispatcher.dispatch('window.notepad.note_new', item.entity)
+                self._list.addLine(event.data)
 
     @inject.params(dispatcher='event_dispatcher')
     def _onSavePdfEvent(self, event=None, dispatcher=None):
@@ -147,12 +191,11 @@ class Loader(Loader):
         :param dispatcher: 
         :return: 
         """
-        for index in self.list.list.selectedIndexes():
-            item = self.list.list.itemFromIndex(index)
-            dispatcher.dispatch('window.notepad.note_remove', (
-                item.index, item.name, item.text
-            ))
-            self.list.list.takeItem(index.row())
+        for index in self._list.list.selectedIndexes():
+            item = self._list.list.itemFromIndex(index)
+            if item is not None and item.entity is not None:
+                dispatcher.dispatch('window.notepad.note_remove', item.entity)
+                self._list.list.takeItem(index.row())
 
     @inject.params(dispatcher='event_dispatcher', storage='storage')
     def _onRefreshEvent(self, event=None, dispatcher=None, storage=None):
@@ -163,9 +206,13 @@ class Loader(Loader):
         :param storage: 
         :return: 
         """
-        self.list.list.clear()
-        for entity in storage.notes:
-            self.list.addLine(entity)
+        if self._folder is None:
+            return None
+
+        self._list.list.clear()
+        for entity in storage.notesByFolder(self._folder):
+            self._list.addLine(entity)
+        self._list.setFolder(self._folder)
 
     @inject.params(dispatcher='event_dispatcher')
     def _onDoubleClick(self, event=None, dispatcher=None):
@@ -176,19 +223,34 @@ class Loader(Loader):
         :param storage: 
         :return: 
         """
-        item = self.list.list.itemFromIndex(event)
-        dispatcher.dispatch('window.notepad.note_tab', (
-            item.index, item.name, item.text
-        ))
+        item = self._list.list.itemFromIndex(event)
+        if item is not None and item.entity is not None:
+            dispatcher.dispatch('window.notepad.note_tab', item.entity)
 
-    def _onNotepadFolderSelected(self, event=None, dispatcher=None):
+    @inject.params(dispatcher='event_dispatcher', storage='storage')
+    def _onNotepadFolderSelected(self, event=None, dispatcher=None, storage=None):
         """
         
         :param event: 
         :param dispatcher: 
         :return: 
         """
-        self.list.setFolder(event.data)
+        self._folder = event.data
+        if self._folder is None:
+            return None
+
+        if self._list is None:
+            return None
+
+        first = None
+        self._list.list.clear()
+        for entity in storage.notesByFolder(self._folder):
+            if first is None:
+                first = entity
+            self._list.addLine(entity)
+        self._list.setFolder(self._folder)
+
+        dispatcher.dispatch('window.notepad.note_edit', first)
 
     @inject.params(dispatcher='event_dispatcher')
     def _onFolderUpdated(self, event=None, dispatcher=None):
@@ -198,6 +260,6 @@ class Loader(Loader):
         :param dispatcher: 
         :return: 
         """
-        folder = self.list.folder
-        folder.name = self.list.folderEditor.text()
+        folder = self._list.folder
+        folder.name = self._list.folderEditor.text()
         dispatcher.dispatch('window.notepad.folder_update', folder)

@@ -55,7 +55,9 @@ class LabelBottom(QtWidgets.QLabel):
             p = re.compile(r'\s+')
             return p.sub(' ', data)
 
-        def remove_html_tags(data):
+        def remove_html_tags(data=None):
+            if data is None:
+                return None
             p = re.compile(r'<.*?>')
             return remove_extra_spaces(p.sub('', data))
 
@@ -105,7 +107,7 @@ class QCustomQWidget(QtWidgets.QWidget):
 
 
 class NoteItem(QtWidgets.QListWidgetItem):
-    def __init__(self, index=None, widget=None):
+    def __init__(self, entity=None, widget=None):
         """
         
         :param index: 
@@ -113,60 +115,36 @@ class NoteItem(QtWidgets.QListWidgetItem):
         :param text: 
         """
         super(NoteItem, self).__init__()
+        widget.setTextDown(entity.text)
+        widget.setTextUp(entity.name)
+        self._entity = entity
         self._widget = widget
-        self._index = index
-        self._name = None
-        self._text = None
 
     @property
     def widget(self):
         """
-
+        
         :return: 
         """
         return self._widget
 
     @property
-    def index(self):
-        """
-        
-        :return: 
-        """
-        return self._index
-
-    @property
-    def name(self):
+    def entity(self):
         """
 
         :return: 
         """
-        return self._name
+        return self._entity
 
-    @name.setter
-    def name(self, value):
+    @entity.setter
+    def entity(self, entity=None):
         """
 
         :return: 
         """
-        self.widget.setTextUp(value)
-        self._name = value
-
-    @property
-    def text(self):
-        """
-
-        :return: 
-        """
-        return self._text
-
-    @text.setter
-    def text(self, value):
-        """
-
-        :return: 
-        """
-        self.widget.setTextDown(value)
-        self._text = value
+        self._widget.setTextUp(entity.name)
+        self._widget.setTextDown(entity.text)
+        self._entity = entity
 
 
 class ItemList(QtWidgets.QListWidget):
@@ -191,10 +169,8 @@ class ItemList(QtWidgets.QListWidget):
         :return: 
         """
 
-        item = NoteItem(entity.index, QCustomQWidget())
+        item = NoteItem(entity, QCustomQWidget())
         item.setSizeHint(item.widget.sizeHint())
-        item.name = entity.name
-        item.text = entity.text
 
         self.addItem(item)
         self.setItemWidget(item, item.widget)

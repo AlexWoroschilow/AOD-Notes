@@ -15,23 +15,36 @@ from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
 from lib.plugin import Loader
-from .service import Storage
 
 from .gui.widget import FolderList
 from PyQt5.QtWidgets import QTreeView, QFileSystemModel, QApplication
 
 
-class FileTree(QTreeView):
-    def __init__(self):
-        QTreeView.__init__(self)
-        model = QFileSystemModel()
-        model.setRootPath('/')
-        self.setModel(model)
-        self.doubleClicked.connect(self.test)
+class FolderModel(object):
+    def __init__(self, name=None, text=None):
+        """
+        
+        :param name: 
+        :param text: 
+        """
+        self._name = name
+        self._text = text
 
-    def test(self, signal):
-        file_path = self.model().filePath(signal)
-        print(file_path)
+    @property
+    def name(self):
+        """
+
+        :return: 
+        """
+        return self._name
+
+    @property
+    def text(self):
+        """
+
+        :return: 
+        """
+        return self._text
 
 
 class Loader(Loader):
@@ -75,9 +88,15 @@ class Loader(Loader):
         self.list.list.doubleClicked.connect(self._onFolderSelected)
         self.list.list.selectionChanged = self._onFolderSelected
 
+        first = None
         self.list.list.clear()
         for folder in storage.folders:
+            if first is None:
+                first = folder
             self.list.addLine(folder)
+
+        if first is not None:
+            dispatcher.dispatch('window.notepad.folder_selected', first)
 
         container, parent = event.data
         container.addWidget(self.list)
@@ -89,12 +108,8 @@ class Loader(Loader):
         :param event: 
         :return: 
         """
-        name = 'Folder 1'
-        description = 'Folder description 1'
-        self.list.addLine(None, name, description)
-        dispatcher.dispatch('window.notepad.folder_new', (
-            name, description
-        ))
+        self.list.addLine(FolderModel('New folder', 'New folder description'))
+        dispatcher.dispatch('window.notepad.folder_new', FolderModel('New folder', 'New folder description'))
 
     @inject.params(dispatcher='event_dispatcher')
     def _onCopyEvent(self, event=None, dispatcher=None):
@@ -129,6 +144,5 @@ class Loader(Loader):
         """
         for index in self.list.list.selectedIndexes():
             item = self.list.list.itemFromIndex(index)
-            dispatcher.dispatch('window.notepad.folder_selected', (
-                item.folder
-            ))
+            if item is not None and item.folder is not None:
+                dispatcher.dispatch('window.notepad.folder_selected', item.folder)

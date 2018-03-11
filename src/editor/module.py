@@ -14,11 +14,12 @@ import inject
 from PyQt5 import QtCore
 
 from lib.plugin import Loader
-from .service import Storage
 from .gui.widget import TextEditor
 
 
 class Loader(Loader):
+    _entity = None
+
     @property
     def enabled(self):
         """
@@ -73,8 +74,11 @@ class Loader(Loader):
         :param dispatcher: 
         :return: 
         """
-        note = event.data
-        self.editor.edit(note.index, note.name, note.text)
+        if event.data is None:
+            return None
+
+        entity = event.data
+        self.editor.edit(entity)
 
     def _onWindowNoteTab(self, event=None, dispatcher=None):
         """
@@ -85,10 +89,11 @@ class Loader(Loader):
         """
         if self.parent is None:
             return None
-        index, name, text = event.data
 
         editor = TextEditor()
-        editor.edit(index, name, text)
+        editor.edit(event.data)
+
+        name = event.data.name
         self.parent.addTab(editor, name)
 
         index = self.parent.indexOf(editor)
