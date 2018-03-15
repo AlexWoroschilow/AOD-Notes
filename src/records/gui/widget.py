@@ -4,6 +4,7 @@ import sys
 
 # PYQT5 PyQt4’s QtGui module has been split into PyQt5’s QtGui, QtPrintSupport and QtWidgets modules
 
+import inject
 from PyQt5 import QtWidgets
 # PYQT5 QMainWindow, QApplication, QAction, QFontComboBox, QSpinBox, QTextEdit, QMessageBox
 # PYQT5 QFileDialog, QColorDialog, QDialog
@@ -177,7 +178,8 @@ class ItemList(QtWidgets.QListWidget):
 
 
 class RecordList(QtWidgets.QWidget):
-    def __init__(self, parent=None):
+    @inject.params(dispatcher='event_dispatcher', storage='storage')
+    def __init__(self, parent=None, dispatcher=None, storage=None):
         """
         
         :param parent: 
@@ -192,6 +194,11 @@ class RecordList(QtWidgets.QWidget):
         self.folderEditor = FolderName()
         self.folderEditor.setText('Folder 1')
         self.toolbar = ToolbarbarWidget()
+
+        dispatcher.dispatch('window.notepad.toolbar', (
+            self, self.toolbar
+        ))
+
         self.container = QtWidgets.QWidget()
 
         self.statusbar = QtWidgets.QLabel()
@@ -207,6 +214,18 @@ class RecordList(QtWidgets.QWidget):
         layout1.addWidget(self.toolbar)
         layout1.addWidget(self.container)
         self.setLayout(layout1)
+
+    @property
+    def entity(self):
+        """
+
+        :return: 
+        """
+        for index in self.list.selectedIndexes():
+            item = self.list.itemFromIndex(index)
+            if item is not None and item.entity is not None:
+                return item.entity
+        return None
 
     @property
     def folder(self):

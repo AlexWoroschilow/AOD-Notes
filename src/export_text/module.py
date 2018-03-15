@@ -12,7 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
 import inject
-import pdfkit
 
 from PyQt5 import QtGui
 from PyQt5 import QtWidgets
@@ -39,8 +38,8 @@ class Loader(Loader):
         :param dispatcher:.
         :return:.
         """
-        dispatcher.add_listener('window.notepad.toolbar', self._onWindowNotepadToolbar, 1)
-        dispatcher.add_listener('window.notelist.toolbar', self._onWindowNotepadToolbar, 1)
+        dispatcher.add_listener('window.notepad.toolbar', self._onWindowNotepadToolbar, 3)
+        dispatcher.add_listener('window.notelist.toolbar', self._onWindowNotepadToolbar, 3)
 
     def _onWindowNotepadToolbar(self, event=None, dispather=None, storage=None):
         """
@@ -54,16 +53,15 @@ class Loader(Loader):
         if self._editor is None or self._toolbar is None:
             raise 'Editor or Toolbar object can not be empty'
 
-        self._widget = QtWidgets.QAction(QtGui.QIcon("icons/pdf.svg"), self._editor.tr("Save as pdf"), self._toolbar)
-        self._widget.setStatusTip(self._editor.tr("Export document as PDF"))
-        self._widget.triggered.connect(self._onNotepadExportPdf)
+        self._widget = QtWidgets.QAction(QtGui.QIcon("icons/text.svg"), self._editor.tr("Save as text"), self._toolbar)
+        self._widget.setStatusTip(self._editor.tr("Export document as text"))
+        self._widget.triggered.connect(self._onNotepadExportText)
         self._widget.setShortcut("Ctrl+Shift+P")
 
-        self._toolbar.addSeparator()
         self._toolbar.addAction(self._widget)
 
     @inject.params(dispatcher='event_dispatcher')
-    def _onNotepadExportPdf(self, event=None, dispatcher=None):
+    def _onNotepadExportText(self, event=None, dispatcher=None):
         """
 
         :param event: 
@@ -86,10 +84,11 @@ class Loader(Loader):
 
             document = QtGui.QTextDocument()
             document.setHtml(self._editor.entity.text)
-            encoding = QtCore.QByteArray(bytes('UTF8', 'utf-8'))
 
             if not os.path.exists(path):
-                pdfkit.from_string(document.toHtml(encoding=encoding), path)
+                with open(path, 'w+') as stream:
+                    stream.write(document.toPlainText())
+                    stream.close()
                 continue
 
             message = self._editor.tr("Are you sure you want to overwrite the file '%s' ?" % path)
@@ -97,4 +96,6 @@ class Loader(Loader):
             if reply == QtWidgets.QMessageBox.No:
                 continue
 
-            pdfkit.from_string(document.toHtml(encoding=encoding), path)
+            with open(path, 'w+') as stream:
+                stream.write(document.toPlainText())
+                stream.close()

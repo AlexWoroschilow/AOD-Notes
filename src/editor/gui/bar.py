@@ -66,13 +66,6 @@ class ToolbarbarWidget(QtWidgets.QToolBar):
 
         self.addAction(self.saveAction)
 
-        self.addSeparator()
-
-        self.addAction(self.printAction)
-        self.addAction(self.previewAction)
-
-        self.addSeparator()
-
         self.addAction(self.undoAction)
         self.addAction(self.redoAction)
 
@@ -81,8 +74,10 @@ class ToolbarbarWidget(QtWidgets.QToolBar):
         self.addAction(self.copyAction)
         self.addAction(self.cutAction)
         self.addAction(self.pasteAction)
-
         self.addSeparator()
+
+        self.addAction(self.printAction)
+        self.addAction(self.previewAction)
 
         self.addAction(self.fullscreenAction)
 
