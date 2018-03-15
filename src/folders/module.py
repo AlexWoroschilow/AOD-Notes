@@ -139,6 +139,11 @@ class Loader(Loader):
         :param dispatcher: 
         :return: 
         """
+        message = self._list.tr("Are you sure you want to remove this Folder?")
+        reply = QtWidgets.QMessageBox.question(self._list, 'Remove folder', message, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
+        if reply == QtWidgets.QMessageBox.No:
+            return None
+
         for index in self._list.list.selectedIndexes():
             item = self._list.list.itemFromIndex(index)
             if item is not None and item.folder is not None:

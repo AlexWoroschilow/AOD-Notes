@@ -12,6 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
 from PyQt5 import QtCore
+from PyQt5 import QtWidgets
+from PyQt5 import QtGui
 
 from lib.plugin import Loader
 from .gui.widget import RecordList
@@ -191,6 +193,11 @@ class Loader(Loader):
         :param dispatcher: 
         :return: 
         """
+        message = self._list.tr("Are you sure you want to remove this Note?")
+        reply = QtWidgets.QMessageBox.question(self._list, 'Remove note', message, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
+        if reply == QtWidgets.QMessageBox.No:
+            return None
+
         for index in self._list.list.selectedIndexes():
             item = self._list.list.itemFromIndex(index)
             if item is not None and item.entity is not None:
