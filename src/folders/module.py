@@ -81,44 +81,69 @@ class Loader(Loader):
         :return: 
         """
 
-        self.list = FolderList()
-        self.list.toolbar.newAction.triggered.connect(self._onNewEvent)
-        self.list.toolbar.copyAction.triggered.connect(self._onCopyEvent)
-        self.list.toolbar.refreshAction.triggered.connect(self._onRefreshEvent)
-        self.list.list.doubleClicked.connect(self._onFolderSelected)
-        self.list.list.selectionChanged = self._onFolderSelected
+        self._list = FolderList()
+        self._list.toolbar.newAction.triggered.connect(self._onFolderNewEvent)
+        self._list.toolbar.copyAction.triggered.connect(self._onFolderCopyEvent)
+        self._list.toolbar.refreshAction.triggered.connect(self._onRefreshEvent)
+        self._list.toolbar.removeAction.triggered.connect(self._onFolderRemoveEvent)
+
+        self._list.list.doubleClicked.connect(self._onFolderSelected)
+        self._list.list.selectionChanged = self._onFolderSelected
 
         first = None
-        self.list.list.clear()
+        self._list.list.clear()
         for folder in storage.folders:
             if first is None:
                 first = folder
-            self.list.addLine(folder)
+            self._list.addLine(folder)
 
         if first is not None:
             dispatcher.dispatch('window.notepad.folder_selected', first)
 
         container, parent = event.data
-        container.addWidget(self.list)
+        container.addWidget(self._list)
 
     @inject.params(dispatcher='event_dispatcher')
-    def _onNewEvent(self, event=None, dispatcher=None):
+    def _onFolderNewEvent(self, event=None, dispatcher=None):
         """
 
         :param event: 
         :return: 
         """
-        self.list.addLine(FolderModel('New folder', 'New folder description'))
-        dispatcher.dispatch('window.notepad.folder_new', FolderModel('New folder', 'New folder description'))
+
+        model = FolderModel('New folder', 'New folder description')
+        event = dispatcher.dispatch('window.notepad.folder_new', model)
+        if event is not None and event.data is not None:
+            self._list.addLine(event.data)
 
     @inject.params(dispatcher='event_dispatcher')
-    def _onCopyEvent(self, event=None, dispatcher=None):
+    def _onFolderCopyEvent(self, event=None, dispatcher=None):
         """
 
         :param event: 
         :return: 
         """
-        dispatcher.dispatch('window.notepad.folder_copy')
+        for index in self._list.list.selectedIndexes():
+            item = self._list.list.itemFromIndex(index)
+            if item is not None and item.folder is not None:
+                model = FolderModel(item.folder.name, item.folder.text)
+                event = dispatcher.dispatch('window.notepad.folder_new', item.folder)
+                if event is not None and event.data is not None:
+                    self._list.addLine(event.data)
+
+    @inject.params(dispatcher='event_dispatcher')
+    def _onFolderRemoveEvent(self, event=None, dispatcher=None):
+        """
+        
+        :param event: 
+        :param dispatcher: 
+        :return: 
+        """
+        for index in self._list.list.selectedIndexes():
+            item = self._list.list.itemFromIndex(index)
+            if item is not None and item.folder is not None:
+                dispatcher.dispatch('window.notepad.folder_remove', item.folder)
+                self._list.list.takeItem(index.row())
 
     @inject.params(dispatcher='event_dispatcher', storage='storage')
     def _onRefreshEvent(self, event=None, dispatcher=None, storage=None):
@@ -129,9 +154,9 @@ class Loader(Loader):
         :param storage: 
         :return: 
         """
-        self.list.list.clear()
+        self._list.list.clear()
         for entity in storage.folders:
-            self.list.addLine(entity)
+            self._list.addLine(entity)
 
     @inject.params(dispatcher='event_dispatcher')
     def _onFolderSelected(self, event=None, selection=None, dispatcher=None):
@@ -142,7 +167,7 @@ class Loader(Loader):
         :param dispatcher: 
         :return: 
         """
-        for index in self.list.list.selectedIndexes():
-            item = self.list.list.itemFromIndex(index)
+        for index in self._list.list.selectedIndexes():
+            item = self._list.list.itemFromIndex(index)
             if item is not None and item.folder is not None:
                 dispatcher.dispatch('window.notepad.folder_selected', item.folder)

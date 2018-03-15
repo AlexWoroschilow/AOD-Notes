@@ -29,9 +29,9 @@ class ToolbarbarWidget(QtWidgets.QToolBar):
         self.saveAction.setStatusTip("Save document")
         self.saveAction.setShortcut("Ctrl+S")
 
-        self.savePdf = QtWidgets.QAction(QtGui.QIcon("icons/pdf.svg"), "Save as pdf", self)
-        self.savePdf.setStatusTip("Export document as PDF")
-        self.savePdf.setShortcut("Ctrl+Shift+P")
+        # self.savePdf = QtWidgets.QAction(QtGui.QIcon("icons/pdf.svg"), "Save as pdf", self)
+        # self.savePdf.setStatusTip("Export document as PDF")
+        # self.savePdf.setShortcut("Ctrl+Shift+P")
 
         self.printAction = QtWidgets.QAction(QtGui.QIcon("icons/print.svg"), "Print document", self)
         self.printAction.setStatusTip("Print document")
@@ -65,7 +65,6 @@ class ToolbarbarWidget(QtWidgets.QToolBar):
         self.fullscreenAction.setStatusTip("Open editor in a new tab")
 
         self.addAction(self.saveAction)
-        self.addAction(self.savePdf)
 
         self.addSeparator()
 

@@ -65,6 +65,10 @@ class TextEditor(QtWidgets.QWidget):
         self.toolbar.redoAction.triggered.connect(self.text.redo)
         self.toolbar.fullscreenAction.triggered.connect(self._onFullScreenEvent)
 
+        dispatcher.dispatch('window.notepad.toolbar', (
+            self, self.toolbar
+        ))
+
         self.formatbar = FormatbarWidget()
         self.formatbar.fontColor.triggered.connect(self.fontColorChanged)
         self.formatbar.fontBox.currentFontChanged.connect(lambda font: self.text.setCurrentFont(font))
@@ -86,6 +90,10 @@ class TextEditor(QtWidgets.QWidget):
         self.formatbar.dedentAction.triggered.connect(self.dedent)
         self.formatbar.imageAction.triggered.connect(self.insertImage)
 
+        dispatcher.dispatch('window.notepad.formatbar', (
+            self, self.formatbar
+        ))
+
         layout1 = QtWidgets.QVBoxLayout()
         layout1.setSpacing(5)
 
@@ -105,6 +113,14 @@ class TextEditor(QtWidgets.QWidget):
         layout.addWidget(widget)
 
         self.setLayout(layout)
+
+    @property
+    def entity(self):
+        """
+        
+        :return: 
+        """
+        return self._entity
 
     @inject.params(dispatcher='event_dispatcher')
     def _onFullScreenEvent(self, event=None, dispatcher=None):

@@ -150,6 +150,18 @@ class SQLiteStorage(object):
         self._connection.execute("CREATE INDEX IDX_NOTE_DATE ON Note(date)")
         self._connection.execute("CREATE INDEX IDX_NOTE_INDEX ON Note(id)")
 
+    def getFolder(self, index=None):
+        """
+
+        :param index: 
+        :return: 
+        """
+        query = "SELECT * FROM Folder WHERE id=?"
+        cursor = self._connection.cursor()
+        for row in cursor.execute(query, [index]):
+            index, date, name, text = row
+            return Folder(index, date, name, text)
+
     @property
     def folders(self):
         """
@@ -183,6 +195,11 @@ class SQLiteStorage(object):
         self._connection.execute("INSERT INTO Folder VALUES (NULL, ?, ?, ?)", fields)
         self._connection.commit()
 
+        cursor = self._connection.cursor()
+        for row in cursor.execute("SELECT last_insert_rowid()"):
+            index, = row
+            return self.getFolder(index)
+
     def updateFolder(self, index=None, name=None, text=None):
         """
 
@@ -205,6 +222,8 @@ class SQLiteStorage(object):
         :param text: 
         :return: 
         """
+        for note in self.notesByFolderIndex(index):
+            self.updateNoteFolder(note.index, None)
         self._connection.execute("DELETE FROM Folder WHERE id=?", [index])
         self._connection.commit()
 
@@ -225,9 +244,16 @@ class SQLiteStorage(object):
 
         :return: 
         """
+        return self.notesByFolderIndex(folder.index)
+
+    def notesByFolderIndex(self, folder=None):
+        """
+
+        :return: 
+        """
         query = "SELECT * FROM Note WHERE folder=? ORDER BY name ASC"
         cursor = self._connection.cursor()
-        for row in cursor.execute(query, [folder.index]):
+        for row in cursor.execute(query, [folder]):
             index, folder, date, name, text = row
             yield Note(index, folder, date, name, text)
 

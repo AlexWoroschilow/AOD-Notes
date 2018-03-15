@@ -45,6 +45,7 @@ class Loader(Loader):
         dispatcher.add_listener('window.notepad.folder_new', self._onNotepadFolderNew)
         dispatcher.add_listener('window.notepad.folder_copy', self._onNotepadFolderCopy)
         dispatcher.add_listener('window.notepad.folder_update', self._onNotepadFolderUpdate)
+        dispatcher.add_listener('window.notepad.folder_remove', self._onNotepadFolderRemove)
 
         dispatcher.add_listener('window.notepad.note_new', self._onNotepadNoteNew)
         dispatcher.add_listener('window.notepad.note_update', self._onNotepadNoteUpdate)
@@ -65,8 +66,11 @@ class Loader(Loader):
         :param dispather: 
         :return: 
         """
-        model = event.data
-        storage.addFolder(model.name, model.text)
+        if event.data is None:
+            return None
+
+        event.data = storage.addFolder(
+            event.data.name, event.data.text)
 
     @inject.params(storage='storage')
     def _onNotepadFolderCopy(self, event=None, dispather=None, storage=None):
@@ -88,6 +92,18 @@ class Loader(Loader):
         """
         folder = event.data
         storage.updateFolder(folder.index, folder.name, folder.text)
+
+    @inject.params(storage='storage')
+    def _onNotepadFolderRemove(self, event=None, dispather=None, storage=None):
+        """
+        
+        :param event: 
+        :param dispather: 
+        :param storage: 
+        :return: 
+        """
+        folder = event.data
+        storage.removeFolder(folder.index, folder.name, folder.text)
 
     @inject.params(storage='storage')
     def _onNotepadNoteNew(self, event=None, dispather=None, storage=None):

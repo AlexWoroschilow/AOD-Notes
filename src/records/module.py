@@ -96,7 +96,7 @@ class Loader(Loader):
         container, parent = event.data
         container.addWidget(self._list)
 
-        self._list.toolbar.newAction.triggered.connect(self._onNewEvent)
+        self._list.toolbar.newAction.triggered.connect(self._onNotepadNewEvent)
         self._list.toolbar.copyAction.triggered.connect(self._onCopyEvent)
         self._list.toolbar.savePdf.triggered.connect(self._onSavePdfEvent)
         self._list.toolbar.removeAction.triggered.connect(self._onRemoveEvent)
@@ -147,7 +147,7 @@ class Loader(Loader):
             item.entity = event.data
 
     @inject.params(dispatcher='event_dispatcher')
-    def _onNewEvent(self, event=None, dispatcher=None):
+    def _onNotepadNewEvent(self, event=None, dispatcher=None):
         """
         
         :param event: 

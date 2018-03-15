@@ -128,19 +128,6 @@ class FolderList(QtWidgets.QWidget):
 
         self.list = ItemList()
 
-        # items = ['aa', 'bb', 'cc']
-        # self.list = QtWidgets.QTreeWidget()
-        # self.list.setHeaderHidden(True)
-        # font = self.list.font()
-        # font.setPixelSize(18)
-        # self.list.setFont(font)
-        #
-        # for item in items:
-        #     root = QtWidgets.QTreeWidgetItem(self.list, [item])
-        #     # root.setIcon(0, app.style().standardIcon(QtWidgets.QStyle.SP_ArrowUp))
-        #     for i in range(3):
-        #         sub_item = QtWidgets.QTreeWidgetItem(root, ["sub %s %s" % (item, i)])
-
         self.toolbar = ToolbarbarWidget()
         self.container = QtWidgets.QWidget()
 
