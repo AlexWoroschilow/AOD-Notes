@@ -143,7 +143,6 @@ class Loader(Loader):
         :param storage: 
         :return: 
         """
-        entity = event.data
         for index in self._list.list.selectedIndexes():
             item = self._list.list.itemFromIndex(index)
             item.entity = event.data

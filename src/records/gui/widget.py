@@ -42,7 +42,6 @@ class LabelBottom(QtWidgets.QLabel):
         super(LabelBottom, self).__init__(parent)
         self.setStyleSheet('QLabel{ color: #c0c0c0; }')
         font = self.font()
-        # font.setPixelSize(12)
         self.setFont(font)
 
     def setText(self, value=None):
@@ -52,17 +51,12 @@ class LabelBottom(QtWidgets.QLabel):
         :return: 
         """
 
-        def remove_extra_spaces(data):
-            p = re.compile(r'\s+')
-            return p.sub(' ', data)
+        document = QtGui.QTextDocument()
+        document.setHtml(value)
 
-        def remove_html_tags(data=None):
-            if data is None:
-                return None
-            p = re.compile(r'<.*?>')
-            return remove_extra_spaces(p.sub('', data))
+        text = re.sub(r'^$\n', ' ', document.toPlainText(), flags=re.MULTILINE)
 
-        return super(LabelBottom, self).setText(remove_html_tags(value))
+        return super(LabelBottom, self).setText(text[0:150])
 
 
 class QCustomQWidget(QtWidgets.QWidget):
@@ -101,9 +95,18 @@ class QCustomQWidget(QtWidgets.QWidget):
         self.textDownQLabel.setText(text)
 
     def getTextDown(self):
+        """
+        
+        :return: 
+        """
         return self.textDownQLabel.text()
 
     def setIcon(self, imagePath):
+        """
+        
+        :param imagePath: 
+        :return: 
+        """
         self.iconQLabel.setPixmap(QtGui.QPixmap(imagePath))
 
 
@@ -143,6 +146,7 @@ class NoteItem(QtWidgets.QListWidgetItem):
 
         :return: 
         """
+
         self._widget.setTextUp(entity.name)
         self._widget.setTextDown(entity.text)
         self._entity = entity

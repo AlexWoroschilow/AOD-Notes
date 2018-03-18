@@ -71,6 +71,7 @@ class Loader(Loader):
         :return:.
         """
         dispatcher.add_listener('window.first_tab.content', self._onWindowFirstTab)
+        dispatcher.add_listener('window.notepad.folder_update', self._onFolderUpdated)
 
     @inject.params(storage='storage')
     def _onWindowFirstTab(self, event=None, dispatcher=None, storage=None):
@@ -176,3 +177,18 @@ class Loader(Loader):
             item = self._list.list.itemFromIndex(index)
             if item is not None and item.folder is not None:
                 dispatcher.dispatch('window.notepad.folder_selected', item.folder)
+
+    def _onFolderUpdated(self, event=None, dispatcher=None):
+        """
+        
+        :param event: 
+        :param dispatcher: 
+        :return: 
+        """
+        if len(self._list.list.selectedIndexes()):
+            for index in self._list.list.selectedIndexes():
+                item = self._list.list.itemFromIndex(index)
+                item.folder = event.data
+            return None
+        item = self._list.list.item(0)
+        item.folder = event.data

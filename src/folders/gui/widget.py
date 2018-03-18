@@ -69,14 +69,26 @@ class QCustomQWidget(QtWidgets.QWidget):
         self.iconQLabel.setPixmap(QtGui.QPixmap(imagePath))
 
 
-class FolderListWidgetItem(QtWidgets.QListWidgetItem):
-    def __init__(self, parent=None, folder=None):
+class FolderItem(QtWidgets.QListWidgetItem):
+    def __init__(self, entity=None, widget=None):
         """
 
         :param parent: 
         """
-        super(FolderListWidgetItem, self).__init__(parent)
-        self._folder = folder
+        super(FolderItem, self).__init__()
+        widget.setTextDown(entity.text)
+        widget.setTextUp(entity.name)
+        self._entity = entity
+        self._widget = widget
+        self._folder = entity
+
+    @property
+    def widget(self):
+        """
+
+        :return: 
+        """
+        return self._widget
 
     @property
     def folder(self):
@@ -85,6 +97,16 @@ class FolderListWidgetItem(QtWidgets.QListWidgetItem):
         :return: 
         """
         return self._folder
+
+    @folder.setter
+    def folder(self, entity=None):
+        """
+
+        :return:
+        """
+        self._widget.setTextUp(entity.name)
+        self._widget.setTextDown(entity.text)
+        self._entity = entity
 
 
 class ItemList(QtWidgets.QListWidget):
@@ -103,15 +125,11 @@ class ItemList(QtWidgets.QListWidget):
         :return: 
         """
 
-        myQCustomQWidget = QCustomQWidget()
-        myQCustomQWidget.setTextUp(folder.name)
-        myQCustomQWidget.setTextDown(folder.text)
-
-        item = FolderListWidgetItem(self, folder)
-        item.setSizeHint(myQCustomQWidget.sizeHint())
+        item = FolderItem(folder, QCustomQWidget())
+        item.setSizeHint(item.widget.sizeHint())
 
         self.addItem(item)
-        self.setItemWidget(item, myQCustomQWidget)
+        self.setItemWidget(item, item.widget)
 
 
 class FolderList(QtWidgets.QWidget):

@@ -53,8 +53,8 @@ class Loader(Loader):
         if self._editor is None or self._toolbar is None:
             raise 'Editor or Toolbar object can not be empty'
 
-        self._widget = QtWidgets.QAction(QtGui.QIcon("icons/text.svg"), self._editor.tr("Save as text"), self._toolbar)
-        self._widget.setStatusTip(self._editor.tr("Export document as text"))
+        self._widget = QtWidgets.QAction(QtGui.QIcon("icons/text.svg"), self._editor.tr("Export to text"), self._toolbar)
+        self._widget.setStatusTip(self._editor.tr("Export document to text"))
         self._widget.triggered.connect(self._onNotepadExportText)
         self._widget.setShortcut("Ctrl+Shift+P")
 

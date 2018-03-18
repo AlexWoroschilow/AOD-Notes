@@ -53,6 +53,7 @@ class TextEditor(QtWidgets.QWidget):
         self.text.textChanged.connect(self.changed)
         self.text.cursorPositionChanged.connect(self.cursorPosition)
         self.text.setTabStopWidth(33)
+        # self.text.setReadOnly(True)
 
         self.toolbar = ToolbarbarWidget()
         self.toolbar.saveAction.triggered.connect(self._onSaveEvent)
@@ -182,7 +183,8 @@ class TextEditor(QtWidgets.QWidget):
         """
         self._entity = entity
         self.name.setText(entity.name)
-        self.formatbar.setFolder(entity.folder)
+        if entity.folder is not None:
+            self.formatbar.setFolder(entity.folder)
         self.text.setText(entity.text)
 
     def changed(self):

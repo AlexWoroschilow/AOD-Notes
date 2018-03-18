@@ -54,8 +54,8 @@ class Loader(Loader):
         if self._editor is None or self._toolbar is None:
             raise 'Editor or Toolbar object can not be empty'
 
-        self._widget = QtWidgets.QAction(QtGui.QIcon("icons/pdf.svg"), self._editor.tr("Save as pdf"), self._toolbar)
-        self._widget.setStatusTip(self._editor.tr("Export document as PDF"))
+        self._widget = QtWidgets.QAction(QtGui.QIcon("icons/pdf.svg"), self._editor.tr("Export to PDF"), self._toolbar)
+        self._widget.setStatusTip(self._editor.tr("Export document to PDF"))
         self._widget.triggered.connect(self._onNotepadExportPdf)
         self._widget.setShortcut("Ctrl+Shift+P")
 

@@ -251,7 +251,7 @@ class SQLiteStorage(object):
 
         :return: 
         """
-        query = "SELECT * FROM Note WHERE folder=? ORDER BY name ASC"
+        query = "SELECT * FROM Note WHERE folder=? OR folder IS NULL ORDER BY name ASC"
         cursor = self._connection.cursor()
         for row in cursor.execute(query, [folder]):
             index, folder, date, name, text = row
