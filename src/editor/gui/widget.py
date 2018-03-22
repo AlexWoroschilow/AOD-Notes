@@ -4,15 +4,12 @@
 import inject
 from PyQt5.QtCore import Qt
 
+from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5 import QtPrintSupport
 from PyQt5 import QtWidgets
 from .bar import ToolbarbarWidget, FormatbarWidget
 
-
-# PYQT5 QMainWindow, QApplication, QAction, QFontComboBox, QSpinBox, QTextEdit, QMessageBox
-# PYQT5 QFileDialog, QColorDialog, QDialog
-# PYQT5 QPrintPreviewDialog, QPrintDialog
 
 class TextEditorName(QtWidgets.QLineEdit):
     def __init__(self, parent=None):
@@ -38,6 +35,7 @@ class TextEditor(QtWidgets.QWidget):
         :param dispatcher: 
         """
         super(TextEditor, self).__init__(parent)
+
         dispatcher.add_listener('window.notepad.note_update', self._onWindowNoteEdit)
 
         self.changesSaved = True
@@ -50,10 +48,53 @@ class TextEditor(QtWidgets.QWidget):
         self.name = TextEditorName()
 
         self.text = QtWidgets.QTextEdit(self)
+        self.text.setAcceptDrops(True)
+        self.text.setAcceptRichText(True)
+        self.text.setWordWrapMode(QtGui.QTextOption.WordWrap)
         self.text.textChanged.connect(self.changed)
         self.text.cursorPositionChanged.connect(self.cursorPosition)
+        self.text.setViewportMargins(50, 50, 20, 20)
+
+        self.text.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.text.setStyleSheet("background-color: #FFFFFF;")
+        self.text.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.text.setMinimumHeight(self.height())
+        self.text.setFixedWidth(595)
         self.text.setTabStopWidth(33)
-        # self.text.setReadOnly(True)
+
+        doc = self.text.document()
+        doc.setPageSize(QtCore.QSizeF(595, self.height()))
+        rootFrame = doc.rootFrame()
+        fmt = rootFrame.frameFormat()
+        rootFrame.setFrameFormat(fmt)
+
+        # Container widget that holds page
+        container = QtWidgets.QWidget(self)
+
+        container.setStyleSheet("background-color: #A0A0A0;")
+
+        # Layout for container
+        layout = QtWidgets.QGridLayout(self)
+
+        # Empty widget for spacing
+        layout.addWidget(QtWidgets.QWidget(), 0, 0)
+
+        # Add QTextEdit to layout
+        layout.addWidget(self.text, 1, 0)
+
+        # Set layout to container
+        container.setLayout(layout)
+
+        # Put container into a scroll area so that
+        # the user can scroll down to see all the pages
+        self.scrollArea = QtWidgets.QScrollArea(self)
+
+        self.scrollArea.setWidget(container)
+
+        self.scrollArea.setWidgetResizable(True)
+
+        # Align the scrollArea's widget in the center
+        self.scrollArea.setAlignment(Qt.AlignHCenter)
 
         self.toolbar = ToolbarbarWidget()
         self.toolbar.saveAction.triggered.connect(self._onSaveEvent)
@@ -103,7 +144,7 @@ class TextEditor(QtWidgets.QWidget):
 
         layout1.addWidget(self.name)
         layout1.addWidget(self.formatbar)
-        layout1.addWidget(self.text)
+        layout1.addWidget(self.scrollArea)
         layout1.addWidget(self.statusbar)
 
         widget = QtWidgets.QWidget()
@@ -122,6 +163,12 @@ class TextEditor(QtWidgets.QWidget):
         :return: 
         """
         return self._entity
+
+    # def _onZoomInClicked(self):
+    #     self.text.zoom(+1)
+    #
+    # def _onZoomOutClicked(self):
+    #     self.text.zoom(-1)
 
     @inject.params(dispatcher='event_dispatcher')
     def _onFullScreenEvent(self, event=None, dispatcher=None):
