@@ -146,13 +146,15 @@ class FormatbarWidget(QtWidgets.QToolBar):
 
         self.addSeparator()
 
-        self.addAction(self.bulletAction)
-        self.addAction(self.numberedAction)
-
         self.addAction(self.alignLeft)
         self.addAction(self.alignCenter)
         self.addAction(self.alignRight)
         self.addAction(self.alignJustify)
+        self.addSeparator()
+
+        self.addAction(self.bulletAction)
+        self.addAction(self.numberedAction)
+        self.addSeparator()
 
         self.addAction(self.indentAction)
         self.addAction(self.dedentAction)
