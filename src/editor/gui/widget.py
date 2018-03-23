@@ -8,7 +8,7 @@ from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5 import QtPrintSupport
 from PyQt5 import QtWidgets
-from .bar import ToolbarbarWidget, FormatbarWidget
+from .bar import ToolbarbarWidgetLeft, ToolbarbarWidgetRight, FormatbarWidget
 
 
 class TextEditorName(QtWidgets.QLineEdit):
@@ -98,31 +98,25 @@ class TextEditor(QtWidgets.QWidget):
         # Align the scrollArea's widget in the center
         self.scrollArea.setAlignment(Qt.AlignHCenter)
 
-        self.toolbar = ToolbarbarWidget()
-        self.toolbar.saveAction.triggered.connect(self._onSaveEvent)
-        self.toolbar.printAction.triggered.connect(self.printHandler)
-        self.toolbar.previewAction.triggered.connect(self.preview)
-        self.toolbar.cutAction.triggered.connect(self.text.cut)
-        self.toolbar.copyAction.triggered.connect(self.text.copy)
-        self.toolbar.pasteAction.triggered.connect(self.text.paste)
-        self.toolbar.undoAction.triggered.connect(self.text.undo)
-        self.toolbar.redoAction.triggered.connect(self.text.redo)
-        self.toolbar.fullscreenAction.triggered.connect(self._onFullScreenEvent)
+        self.leftbar = ToolbarbarWidgetLeft()
+        self.leftbar.saveAction.triggered.connect(self._onSaveEvent)
+        self.leftbar.printAction.triggered.connect(self.printHandler)
+        self.leftbar.previewAction.triggered.connect(self.preview)
+        self.leftbar.cutAction.triggered.connect(self.text.cut)
+        self.leftbar.copyAction.triggered.connect(self.text.copy)
+        self.leftbar.pasteAction.triggered.connect(self.text.paste)
+        self.leftbar.undoAction.triggered.connect(self.text.undo)
+        self.leftbar.redoAction.triggered.connect(self.text.redo)
+        self.leftbar.fullscreenAction.triggered.connect(self._onFullScreenEvent)
 
-        dispatcher.dispatch('window.notepad.toolbar', (
-            self, self.toolbar
+        dispatcher.dispatch('window.notepad.leftbar', (
+            self, self.leftbar
         ))
 
         self.formatbar = FormatbarWidget()
         self.formatbar.fontColor.triggered.connect(self.fontColorChanged)
         self.formatbar.fontBox.currentFontChanged.connect(lambda font: self.text.setCurrentFont(font))
         self.formatbar.fontSize.valueChanged.connect(lambda size: self.text.setFontPointSize(size))
-        self.formatbar.underlAction.triggered.connect(self.underline)
-        self.formatbar.italicAction.triggered.connect(self.italic)
-        self.formatbar.boldAction.triggered.connect(self.bold)
-        self.formatbar.strikeAction.triggered.connect(self.strike)
-        self.formatbar.superAction.triggered.connect(self.superScript)
-        self.formatbar.subAction.triggered.connect(self.subScript)
         self.formatbar.backColor.triggered.connect(self.highlight)
         self.formatbar.bulletAction.triggered.connect(self.bulletList)
         self.formatbar.numberedAction.triggered.connect(self.numberList)
@@ -138,23 +132,49 @@ class TextEditor(QtWidgets.QWidget):
             self, self.formatbar
         ))
 
-        layout1 = QtWidgets.QVBoxLayout()
-        layout1.setSpacing(5)
+        self.rightbar = ToolbarbarWidgetRight()
+        self.rightbar.italicAction.triggered.connect(self.italic)
+        self.rightbar.boldAction.triggered.connect(self.bold)
+        self.rightbar.strikeAction.triggered.connect(self.strike)
+        self.rightbar.superAction.triggered.connect(self.superScript)
+        self.rightbar.subAction.triggered.connect(self.subScript)
+        self.rightbar.backColor.triggered.connect(self.highlight)
+
+        dispatcher.dispatch('window.notepad.rightbar', (
+            self, self.rightbar
+        ))
 
         self.statusbar = QtWidgets.QLabel()
         self.statusbar.setText("Words: 12, Characters: 120")
 
+        # layout1.setSpacing(5)
+
+
+        layout3 = QtWidgets.QVBoxLayout()
+        layout3.addWidget(self.formatbar)
+        layout3.addWidget(self.scrollArea)
+
+        widget3 = QtWidgets.QWidget()
+        widget3.setLayout(layout3)
+
+        layout2 = QtWidgets.QHBoxLayout()
+        layout2.addWidget(widget3)
+        layout2.addWidget(self.rightbar)
+
+        widget2 = QtWidgets.QWidget()
+        widget2.setLayout(layout2)
+
+        layout1 = QtWidgets.QVBoxLayout()
         layout1.addWidget(self.name)
-        layout1.addWidget(self.formatbar)
-        layout1.addWidget(self.scrollArea)
+        layout1.addWidget(widget2)
         layout1.addWidget(self.statusbar)
 
-        widget = QtWidgets.QWidget()
-        widget.setLayout(layout1)
+        widget1 = QtWidgets.QWidget()
+        widget1.setLayout(layout1)
 
         layout = QtWidgets.QHBoxLayout()
-        layout.addWidget(self.toolbar)
-        layout.addWidget(widget)
+        layout.addWidget(self.leftbar)
+        layout.addWidget(widget1)
 
         self.setLayout(layout)
 
@@ -262,8 +282,8 @@ class TextEditor(QtWidgets.QWidget):
         
         :return: 
         """
-        state = self.toolbar.isVisible()
-        self.toolbar.setVisible(not state)
+        state = self.leftbar.isVisible()
+        self.leftbar.setVisible(not state)
 
     def toggleFormatbar(self):
         """

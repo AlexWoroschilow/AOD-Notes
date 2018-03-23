@@ -19,19 +19,15 @@ from PyQt5 import QtSvg
 from .combo import FolderBomboBox
 
 
-class ToolbarbarWidget(QtWidgets.QToolBar):
+class ToolbarbarWidgetLeft(QtWidgets.QToolBar):
     def __init__(self):
-        super(ToolbarbarWidget, self).__init__()
+        super(ToolbarbarWidgetLeft, self).__init__()
         self.setOrientation(Qt.Vertical)
         self.setContentsMargins(0, 0, 0, 0)
 
         self.saveAction = QtWidgets.QAction(QtGui.QIcon("icons/save.svg"), "Save", self)
         self.saveAction.setStatusTip("Save document")
         self.saveAction.setShortcut("Ctrl+S")
-
-        # self.savePdf = QtWidgets.QAction(QtGui.QIcon("icons/pdf.svg"), "Save as pdf", self)
-        # self.savePdf.setStatusTip("Export document as PDF")
-        # self.savePdf.setShortcut("Ctrl+Shift+P")
 
         self.printAction = QtWidgets.QAction(QtGui.QIcon("icons/print.svg"), "Print document", self)
         self.printAction.setStatusTip("Print document")
@@ -82,6 +78,33 @@ class ToolbarbarWidget(QtWidgets.QToolBar):
         self.addAction(self.fullscreenAction)
 
 
+class ToolbarbarWidgetRight(QtWidgets.QToolBar):
+    def __init__(self):
+        super(ToolbarbarWidgetRight, self).__init__()
+        self.setOrientation(Qt.Vertical)
+        self.setContentsMargins(0, 0, 0, 0)
+
+        self.fontColor = QtWidgets.QAction(QtGui.QIcon("icons/font-color.png"), "Change font color", self)
+        self.boldAction = QtWidgets.QAction(QtGui.QIcon("icons/bold.svg"), "Bold", self)
+        self.italicAction = QtWidgets.QAction(QtGui.QIcon("icons/italic.svg"), "Italic", self)
+        self.underlAction = QtWidgets.QAction(QtGui.QIcon("icons/underline.svg"), "Underline", self)
+        self.strikeAction = QtWidgets.QAction(QtGui.QIcon("icons/strike.svg"), "Strike-out", self)
+        self.superAction = QtWidgets.QAction(QtGui.QIcon("icons/superscript.svg"), "Superscript", self)
+        self.subAction = QtWidgets.QAction(QtGui.QIcon("icons/subscript.svg"), "Subscript", self)
+        self.backColor = QtWidgets.QAction(QtGui.QIcon("icons/highlight.png"), "Change background color", self)
+
+        self.addAction(self.boldAction)
+        self.addAction(self.italicAction)
+        self.addAction(self.underlAction)
+        self.addAction(self.strikeAction)
+
+        self.addAction(self.superAction)
+        self.addAction(self.subAction)
+
+        self.addAction(self.fontColor)
+        self.addAction(self.backColor)
+
+
 class FormatbarWidget(QtWidgets.QToolBar):
     def __init__(self):
         super(FormatbarWidget, self).__init__()
@@ -96,12 +119,6 @@ class FormatbarWidget(QtWidgets.QToolBar):
         self.fontSize.setValue(14)
 
         self.fontColor = QtWidgets.QAction(QtGui.QIcon("icons/font-color.png"), "Change font color", self)
-        self.boldAction = QtWidgets.QAction(QtGui.QIcon("icons/bold.svg"), "Bold", self)
-        self.italicAction = QtWidgets.QAction(QtGui.QIcon("icons/italic.svg"), "Italic", self)
-        self.underlAction = QtWidgets.QAction(QtGui.QIcon("icons/underline.svg"), "Underline", self)
-        self.strikeAction = QtWidgets.QAction(QtGui.QIcon("icons/strike.svg"), "Strike-out", self)
-        self.superAction = QtWidgets.QAction(QtGui.QIcon("icons/superscript.svg"), "Superscript", self)
-        self.subAction = QtWidgets.QAction(QtGui.QIcon("icons/subscript.svg"), "Subscript", self)
         self.backColor = QtWidgets.QAction(QtGui.QIcon("icons/highlight.png"), "Change background color", self)
 
         self.bulletAction = QtWidgets.QAction(QtGui.QIcon("icons/bullet.svg"), "Insert bullet List", self)
@@ -126,15 +143,6 @@ class FormatbarWidget(QtWidgets.QToolBar):
         self.dedentAction.setShortcut("Shift+Tab")
 
         self.addWidget(self.folder)
-        self.addWidget(self.fontBox)
-        self.addWidget(self.fontSize)
-
-        self.addSeparator()
-
-        self.addAction(self.boldAction)
-        self.addAction(self.italicAction)
-        self.addAction(self.underlAction)
-        self.addAction(self.strikeAction)
 
         self.addSeparator()
 
@@ -151,14 +159,14 @@ class FormatbarWidget(QtWidgets.QToolBar):
 
         self.addSeparator()
 
-        self.addAction(self.superAction)
-        self.addAction(self.subAction)
-
-        self.addSeparator()
-
         self.addAction(self.imageAction)
         self.addAction(self.fontColor)
         self.addAction(self.backColor)
+
+        self.addSeparator()
+
+        self.addWidget(self.fontBox)
+        self.addWidget(self.fontSize)
 
     def setFolder(self, value=None):
         """

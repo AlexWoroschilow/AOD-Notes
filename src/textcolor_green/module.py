@@ -37,7 +37,7 @@ class Loader(Loader):
         :param dispatcher:.
         :return:.
         """
-        dispatcher.add_listener('window.notepad.toolbar', self._onWindowNotepadToolbar, 100)
+        dispatcher.add_listener('window.notepad.rightbar', self._onWindowNotepadToolbar, 100)
 
     def _onWindowNotepadToolbar(self, event=None, dispather=None, storage=None):
         """
