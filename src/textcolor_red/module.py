@@ -15,7 +15,6 @@ import inject
 
 from PyQt5 import QtGui
 from PyQt5 import QtWidgets
-from PyQt5 import QtCore
 
 from lib.plugin import Loader
 
@@ -38,8 +37,7 @@ class Loader(Loader):
         :param dispatcher:.
         :return:.
         """
-        dispatcher.add_listener('window.notepad.toolbar', self._onWindowNotepadToolbar, 200)
-        dispatcher.add_listener('window.notelist.toolbar', self._onWindowNotepadToolbar, 200)
+        dispatcher.add_listener('window.notepad.toolbar', self._onWindowNotepadToolbar, 100)
 
     def _onWindowNotepadToolbar(self, event=None, dispather=None, storage=None):
         """
@@ -53,22 +51,21 @@ class Loader(Loader):
         if self._editor is None or self._toolbar is None:
             raise 'Editor or Toolbar object can not be empty'
 
-        self._widget = QtWidgets.QAction(QtGui.QIcon("icons/html.svg"), self._editor.tr("Export to HTML"), self._toolbar)
-        self._widget.setStatusTip(self._editor.tr("Export document to HTML"))
-        self._widget.triggered.connect(self._onNotepadExportHtml)
-        self._widget.setShortcut("Ctrl+Shift+P")
+        self._widget = QtWidgets.QAction(QtGui.QIcon("icons/font-red.svg"), self._editor.tr("Change the text color to green"), self._toolbar)
+        self._widget.setStatusTip(self._editor.tr("Change the text color to green"))
+        self._widget.triggered.connect(self._onButtonPressed)
 
         self._toolbar.addAction(self._widget)
 
     @inject.params(dispatcher='event_dispatcher')
-    def _onNotepadExportHtml(self, event=None, dispatcher=None):
+    def _onButtonPressed(self, event=None, dispatcher=None):
         """
-
+        #7f7f7f
         :param event: 
         :param dispatcher: 
         :return: 
         """
-        if self._editor is None or self._editor.entity is None:
+        if self._editor is None or self._editor.text is None:
             msg = QtWidgets.QMessageBox(self._editor)
             msg.setIcon(QtWidgets.QMessageBox.Information)
             msg.setWindowTitle("Select the Note")
@@ -76,27 +73,5 @@ class Loader(Loader):
             msg.setStandardButtons(QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel)
             return msg.show()
 
-        selector = QtWidgets.QFileDialog()
-        if not selector.exec_():
-            return None
-
-        for path in selector.selectedFiles():
-
-            document = QtGui.QTextDocument()
-            document.setHtml(self._editor.entity.text)
-            encoding = QtCore.QByteArray(bytes('UTF8', 'utf-8'))
-
-            if not os.path.exists(path):
-                with open(path, 'w+') as stream:
-                    stream.write(document.toHtml(encoding=encoding))
-                    stream.close()
-                continue
-
-            message = self._editor.tr("Are you sure you want to overwrite the file '%s' ?" % path)
-            reply = QtWidgets.QMessageBox.question(self._editor, 'Message', message, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
-            if reply == QtWidgets.QMessageBox.No:
-                continue
-
-            with open(path, 'w+') as stream:
-                stream.write(document.toHtml(encoding=encoding))
-                stream.close()
+        color = QtGui.QColor.fromRgb(127, 0, 0)
+        self._editor.text.setTextColor(color)

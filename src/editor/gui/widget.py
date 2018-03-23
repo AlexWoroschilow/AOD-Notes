@@ -58,6 +58,8 @@ class TextEditor(QtWidgets.QWidget):
         self.text.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.text.setStyleSheet("background-color: #FFFFFF;")
         self.text.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.text.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
         self.text.setMinimumHeight(self.height())
         self.text.setFixedWidth(595)
         self.text.setTabStopWidth(33)
