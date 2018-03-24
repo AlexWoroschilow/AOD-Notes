@@ -174,6 +174,23 @@ class SQLiteStorage(object):
             index, date, name, text = row
             yield Folder(str(index), str(date), str(name), str(text))
 
+    def foldersByString(self, string=None):
+        """
+
+        :return: 
+        """
+
+        query = "SELECT Folder.* FROM Folder " \
+                "LEFT JOIN Note ON Note.folder = Folder.id " \
+                "WHERE Note.name LIKE ? OR Note.text LIKE ? " \
+                "GROUP BY Folder.id " \
+                "ORDER BY Folder.name ASC "
+
+        cursor = self._connection.cursor()
+        for row in cursor.execute(query, ["%%%s%%" % string, "%%%s%%" % string]):
+            index, date, name, text = row
+            yield Folder(str(index), str(date), str(name), str(text))
+
     @folders.setter
     def folders(self, collection):
         """
@@ -239,12 +256,18 @@ class SQLiteStorage(object):
             index, folder, date, name, text = row
             yield Note(index, folder, date, name, text)
 
-    def notesByFolder(self, folder=None):
+    def notesByFolder(self, folder=None, search=None):
         """
 
         :return: 
         """
-        return self.notesByFolderIndex(folder.index)
+        if folder is None and search is None:
+            return None
+
+        if search is None or not len(search):
+            return self.notesByFolderIndex(folder.index)
+
+        return self.notesByFolderIndexAndString(folder.index, search)
 
     def notesByFolderIndex(self, folder=None):
         """
@@ -254,6 +277,23 @@ class SQLiteStorage(object):
         query = "SELECT * FROM Note WHERE folder=? OR folder IS NULL ORDER BY name ASC"
         cursor = self._connection.cursor()
         for row in cursor.execute(query, [folder]):
+            index, folder, date, name, text = row
+            yield Note(index, folder, date, name, text)
+
+    def notesByFolderIndexAndString(self, folder=None, string=None):
+        """
+        
+        :param folder: 
+        :param string: 
+        :return: 
+        """
+        query = "SELECT * FROM Note " \
+                "WHERE (folder=? OR folder IS NULL) " \
+                "AND (Note.name LIKE ? OR Note.text LIKE ?) " \
+                "ORDER BY name ASC"
+
+        cursor = self._connection.cursor()
+        for row in cursor.execute(query, [folder, "%%%s%%" % string, "%%%s%%" % string]):
             index, folder, date, name, text = row
             yield Note(index, folder, date, name, text)
 

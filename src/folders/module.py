@@ -48,6 +48,9 @@ class FolderModel(object):
 
 
 class Loader(Loader):
+    _first = None
+    _search = None
+
     @property
     def enabled(self):
         """
@@ -73,15 +76,19 @@ class Loader(Loader):
         dispatcher.add_listener('window.first_tab.content', self._onWindowFirstTab)
         dispatcher.add_listener('window.notepad.folder_update', self._onFolderUpdated)
 
-    @inject.params(storage='storage')
+        # listen for the search request from the search module
+        # the request string will be given as a data object to the event
+        dispatcher.add_listener('window.search.request', self._onSearchRequest, 100)
+
+    @inject.params(dispatcher='event_dispatcher', storage='storage')
     def _onWindowFirstTab(self, event=None, dispatcher=None, storage=None):
         """
         
         :param event: 
         :param dispatcher: 
+        :param storage: 
         :return: 
         """
-
         self._list = FolderList()
         self._list.toolbar.newAction.triggered.connect(self._onFolderNewEvent)
         self._list.toolbar.copyAction.triggered.connect(self._onFolderCopyEvent)
@@ -91,18 +98,22 @@ class Loader(Loader):
         self._list.list.doubleClicked.connect(self._onFolderSelected)
         self._list.list.selectionChanged = self._onFolderSelected
 
-        first = None
+        self._first = None
         self._list.list.clear()
         for folder in storage.folders:
-            if first is None:
-                first = folder
+            if self._first is None:
+                self._first = folder
             self._list.addLine(folder)
-
-        if first is not None:
-            dispatcher.dispatch('window.notepad.folder_selected', first)
 
         container, parent = event.data
         container.addWidget(self._list)
+
+        if self._first is None:
+            return None
+
+        dispatcher.dispatch('window.notepad.folder_selected', (
+            self._first, self._search
+        ))
 
     @inject.params(dispatcher='event_dispatcher')
     def _onFolderNewEvent(self, event=None, dispatcher=None):
@@ -127,7 +138,6 @@ class Loader(Loader):
         for index in self._list.list.selectedIndexes():
             item = self._list.list.itemFromIndex(index)
             if item is not None and item.folder is not None:
-                model = FolderModel(item.folder.name, item.folder.text)
                 event = dispatcher.dispatch('window.notepad.folder_new', item.folder)
                 if event is not None and event.data is not None:
                     self._list.addLine(event.data)
@@ -175,8 +185,13 @@ class Loader(Loader):
         """
         for index in self._list.list.selectedIndexes():
             item = self._list.list.itemFromIndex(index)
-            if item is not None and item.folder is not None:
-                dispatcher.dispatch('window.notepad.folder_selected', item.folder)
+            if item is None or item.folder is None:
+                return None
+
+            self._first = item.folder
+            dispatcher.dispatch('window.notepad.folder_selected', (
+                self._first, self._search
+            ))
 
     def _onFolderUpdated(self, event=None, dispatcher=None):
         """
@@ -192,3 +207,30 @@ class Loader(Loader):
             return None
         item = self._list.list.item(0)
         item.folder = event.data
+
+    @inject.params(dispatcher='event_dispatcher', storage='storage')
+    def _onSearchRequest(self, event=None, dispatcher=None, storage=None):
+        """
+        
+        :param event: 
+        :param dispatcher: 
+        :param storage: 
+        :return: 
+        """
+        self._search = event.data
+        if self._search is None:
+            return None
+
+        self._first = None
+        self._list.list.clear()
+        for entity in storage.foldersByString(self._search):
+            if self._first is None:
+                self._first = entity
+            self._list.addLine(entity)
+
+        if self._first is None:
+            return None
+
+        dispatcher.dispatch('window.notepad.folder_selected', (
+            self._first, self._search
+        ))

@@ -94,8 +94,12 @@ class Dashboard(QtWidgets.QWidget):
 
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
+
         # fill tabs with widgets from different modules
-        dispatcher.dispatch('window.header.content', layout)
+        dispatcher.dispatch('window.header.content', (
+            layout, self
+        ))
+
         layout.addWidget(self.content)
 
         self.setLayout(layout)

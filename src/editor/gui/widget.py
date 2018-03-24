@@ -114,11 +114,9 @@ class TextEditor(QtWidgets.QWidget):
         ))
 
         self.formatbar = FormatbarWidget()
-        self.formatbar.fontColor.triggered.connect(self.fontColorChanged)
+        self.formatbar.bulletAction.triggered.connect(self.bulletList)
         self.formatbar.fontBox.currentFontChanged.connect(lambda font: self.text.setCurrentFont(font))
         self.formatbar.fontSize.valueChanged.connect(lambda size: self.text.setFontPointSize(size))
-        self.formatbar.backColor.triggered.connect(self.highlight)
-        self.formatbar.bulletAction.triggered.connect(self.bulletList)
         self.formatbar.numberedAction.triggered.connect(self.numberList)
         self.formatbar.alignLeft.triggered.connect(self.alignLeft)
         self.formatbar.alignCenter.triggered.connect(self.alignCenter)

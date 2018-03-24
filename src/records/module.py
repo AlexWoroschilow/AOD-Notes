@@ -85,6 +85,10 @@ class Loader(Loader):
         dispatcher.add_listener('window.notepad.note_update', self._onNotepadNoteUpdate)
         dispatcher.add_listener('window.notepad.folder_selected', self._onNotepadFolderSelected)
 
+        # listen for the search request from the search module
+        # the request string will be given as a data object to the event
+        dispatcher.add_listener('window.search.request', self._onSearchRequest, 50)
+
     @inject.params(storage='storage', dispatcher='event_dispatcher')
     def _onWindowFirstTab(self, event=None, dispatcher=None, storage=None):
         """
@@ -241,7 +245,7 @@ class Loader(Loader):
         :param dispatcher: 
         :return: 
         """
-        self._folder = event.data
+        self._folder, self._search = event.data
         if self._folder is None:
             return None
 
@@ -250,7 +254,7 @@ class Loader(Loader):
 
         first = None
         self._list.list.clear()
-        for entity in storage.notesByFolder(self._folder):
+        for entity in storage.notesByFolder(self._folder, self._search):
             if first is None:
                 first = entity
             self._list.addLine(entity)
@@ -269,3 +273,27 @@ class Loader(Loader):
         folder = self._list.folder
         folder.name = self._list.folderEditor.text()
         dispatcher.dispatch('window.notepad.folder_update', folder)
+
+    @inject.params(dispatcher='event_dispatcher', storage='storage')
+    def _onSearchRequest(self, event=None, dispatcher=None, storage=None):
+        """
+        
+        :param event: 
+        :param dispatcher: 
+        :return: 
+        """
+        # if self._folder is None:
+        #     return None
+        #
+        # if self._list is None:
+        #     return None
+        #
+        # first = None
+        self._list.list.clear()
+        # for entity in storage.notesByFolder(self._folder):
+        #     if first is None:
+        #         first = entity
+        #     self._list.addLine(entity)
+        # self._list.setFolder(self._folder)
+        #
+        # dispatcher.dispatch('window.notepad.note_edit', first)

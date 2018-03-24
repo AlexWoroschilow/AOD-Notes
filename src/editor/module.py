@@ -19,6 +19,7 @@ from .gui.widget import TextEditor
 
 class Loader(Loader):
     _entity = None
+    _editor = None
 
     @property
     def enabled(self):
@@ -55,7 +56,7 @@ class Loader(Loader):
         :return: 
         """
         self.parent = None
-        self.editor = TextEditor()
+        self._editor = TextEditor()
 
     def _onWindowFirstTab(self, event=None, dispatcher=None):
         """
@@ -65,7 +66,10 @@ class Loader(Loader):
         :return: 
         """
         self.container, self.parent = event.data
-        self.container.addWidget(self.editor)
+        if self._editor is None:
+            return None
+
+        self.container.addWidget(self._editor)
 
     def _onWindowNoteEdit(self, event=None, dispatcher=None):
         """
@@ -77,8 +81,11 @@ class Loader(Loader):
         if event.data is None:
             return None
 
+        if self._editor is None:
+            return None
+
         entity = event.data
-        self.editor.edit(entity)
+        self._editor.edit(entity)
 
     def _onWindowNoteTab(self, event=None, dispatcher=None):
         """

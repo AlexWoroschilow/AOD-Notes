@@ -118,9 +118,6 @@ class FormatbarWidget(QtWidgets.QToolBar):
         self.fontSize.setSuffix(" pt")
         self.fontSize.setValue(14)
 
-        self.fontColor = QtWidgets.QAction(QtGui.QIcon("icons/font-color.png"), "Change font color", self)
-        self.backColor = QtWidgets.QAction(QtGui.QIcon("icons/highlight.png"), "Change background color", self)
-
         self.bulletAction = QtWidgets.QAction(QtGui.QIcon("icons/bullet.svg"), "Insert bullet List", self)
         self.bulletAction.setStatusTip("Insert bullet list")
         self.bulletAction.setShortcut("Ctrl+Shift+B")
@@ -160,15 +157,12 @@ class FormatbarWidget(QtWidgets.QToolBar):
         self.addAction(self.dedentAction)
 
         self.addSeparator()
-
         self.addAction(self.imageAction)
-        self.addAction(self.fontColor)
-        self.addAction(self.backColor)
-
         self.addSeparator()
 
         self.addWidget(self.fontBox)
         self.addWidget(self.fontSize)
+
 
     def setFolder(self, value=None):
         """
