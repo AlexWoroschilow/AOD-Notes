@@ -59,13 +59,28 @@ class QCustomQWidget(QtWidgets.QWidget):
         self.allQHBoxLayout.addLayout(self.textQVBoxLayout, 1)
         self.setLayout(self.allQHBoxLayout)
 
-    def setTextUp(self, text):
+    def setTextUp(self, text=None):
+        """
+        
+        :param text: 
+        :return: 
+        """
         self.textUpQLabel.setText(text)
 
-    def setTextDown(self, text):
+    def setTextDown(self, text=None):
+        """
+        
+        :param text: 
+        :return: 
+        """
         self.textDownQLabel.setText(text)
 
-    def setIcon(self, imagePath):
+    def setIcon(self, imagePath=None):
+        """
+        
+        :param imagePath: 
+        :return: 
+        """
         self.iconQLabel.setPixmap(QtGui.QPixmap(imagePath))
 
 
@@ -171,5 +186,36 @@ class FolderList(QtWidgets.QWidget):
         :return: 
         """
         self.list.addLine(folder)
+
+        self.statusbar.setText("%i folders found" % self.list.count())
+
+    def selectedIndexes(self):
+        """
+        
+        :return: 
+        """
+        return self.list.selectedIndexes()
+
+    def itemFromIndex(self, index=None):
+        """
+        
+        :param index: 
+        :return: 
+        """
+        if index is None:
+            return None
+
+        return self.list.itemFromIndex(index)
+
+    def takeItem(self, index=None):
+        """
+        
+        :param item: 
+        :return: 
+        """
+        if index is None:
+            return None
+
+        self.list.takeItem(index.row())
 
         self.statusbar.setText("%i folders found" % self.list.count())

@@ -140,6 +140,7 @@ class FormatbarWidget(QtWidgets.QToolBar):
         self.dedentAction.setShortcut("Shift+Tab")
 
         self.addWidget(self.folder)
+        self.addWidget(self.fontSize)
 
         self.addSeparator()
 
@@ -157,7 +158,6 @@ class FormatbarWidget(QtWidgets.QToolBar):
         self.addAction(self.dedentAction)
 
         self.addSeparator()
-        self.addWidget(self.fontSize)
         self.addAction(self.imageAction)
 
         # self.addWidget(self.fontBox)

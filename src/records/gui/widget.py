@@ -18,6 +18,7 @@ from .bar import ToolbarbarWidget
 from .editor import FolderName
 import re
 from bs4 import BeautifulSoup, NavigableString
+import textwrap
 
 
 class LabelTop(QtWidgets.QLabel):
@@ -54,9 +55,16 @@ class LabelBottom(QtWidgets.QLabel):
         document = QtGui.QTextDocument()
         document.setHtml(value)
 
-        text = re.sub(r'^$\n', ' ', document.toPlainText(), flags=re.MULTILINE)
+        text = document.toPlainText()
+        if not len(text):
+            return None
 
-        return super(LabelBottom, self).setText(text[0:150])
+        text = document.toPlainText() \
+            .replace('\r', ' ') \
+            .replace('\n', ' ')
+
+        return super(LabelBottom, self) \
+            .setText('%s...' % textwrap.fill(text[0:220], 80))
 
 
 class QCustomQWidget(QtWidgets.QWidget):
@@ -84,6 +92,10 @@ class QCustomQWidget(QtWidgets.QWidget):
         self.textUpQLabel.setText(text)
 
     def getTextUp(self):
+        """
+        
+        :return: 
+        """
         return self.textUpQLabel.text()
 
     def setTextDown(self, text=None):
@@ -239,15 +251,6 @@ class RecordList(QtWidgets.QWidget):
         """
         return self._folder
 
-    def addLine(self, entity=None):
-        """
-        
-        :param name: 
-        :param descrption: 
-        :return: 
-        """
-        self.list.addLine(entity)
-
     def setFolder(self, folder=None):
         """
         
@@ -257,5 +260,44 @@ class RecordList(QtWidgets.QWidget):
         self._folder = folder
         self.folderEditor.setText(folder.name)
 
+    def addLine(self, entity=None):
+        """
+
+        :param name: 
+        :param descrption: 
+        :return: 
+        """
+        self.list.addLine(entity)
+
         self.statusbar.setText("%i records found" % self.list.count())
 
+    def selectedIndexes(self):
+        """
+
+        :return: 
+        """
+        return self.list.selectedIndexes()
+
+    def itemFromIndex(self, index=None):
+        """
+
+        :param index: 
+        :return: 
+        """
+        if index is None:
+            return None
+
+        return self.list.itemFromIndex(index)
+
+    def takeItem(self, index=None):
+        """
+
+        :param item: 
+        :return: 
+        """
+        if index is None:
+            return None
+
+        self.list.takeItem(index.row())
+
+        self.statusbar.setText("%i records found" % self.list.count())

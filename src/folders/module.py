@@ -128,6 +128,8 @@ class Loader(Loader):
         if event is not None and event.data is not None:
             self._list.addLine(event.data)
 
+        self._onRefreshEvent(event, dispatcher)
+
     @inject.params(dispatcher='event_dispatcher')
     def _onFolderCopyEvent(self, event=None, dispatcher=None):
         """
@@ -142,6 +144,8 @@ class Loader(Loader):
                 if event is not None and event.data is not None:
                     self._list.addLine(event.data)
 
+        self._onRefreshEvent(event, dispatcher)
+
     @inject.params(dispatcher='event_dispatcher')
     def _onFolderRemoveEvent(self, event=None, dispatcher=None):
         """
@@ -155,11 +159,11 @@ class Loader(Loader):
         if reply == QtWidgets.QMessageBox.No:
             return None
 
-        for index in self._list.list.selectedIndexes():
-            item = self._list.list.itemFromIndex(index)
+        for index in self._list.selectedIndexes():
+            item = self._list.itemFromIndex(index)
             if item is not None and item.folder is not None:
                 dispatcher.dispatch('window.notepad.folder_remove', item.folder)
-                self._list.list.takeItem(index.row())
+                self._list.takeItem(index)
 
     @inject.params(dispatcher='event_dispatcher', storage='storage')
     def _onRefreshEvent(self, event=None, dispatcher=None, storage=None):
@@ -207,6 +211,8 @@ class Loader(Loader):
             return None
         item = self._list.list.item(0)
         item.folder = event.data
+
+        self._onRefreshEvent(event, dispatcher)
 
     @inject.params(dispatcher='event_dispatcher', storage='storage')
     def _onSearchRequest(self, event=None, dispatcher=None, storage=None):

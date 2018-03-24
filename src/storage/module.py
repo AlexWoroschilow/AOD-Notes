@@ -114,8 +114,7 @@ class Loader(Loader):
         :return: 
         """
         entity = event.data
-        folder = entity.folder.index if entity.folder is not None else None
-        event.data = storage.addNote(entity.name, entity.text, folder)
+        event.data = storage.addNote(entity.name, entity.text, entity.folder)
 
     @inject.params(storage='storage')
     def _onNotepadNoteCopy(self, event=None, dispather=None, storage=None):
