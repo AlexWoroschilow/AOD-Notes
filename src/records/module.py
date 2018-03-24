@@ -104,7 +104,7 @@ class Loader(Loader):
         container.addWidget(self._list)
 
         self._list.toolbar.newAction.triggered.connect(self._onNotepadNewEvent)
-        self._list.toolbar.copyAction.triggered.connect(self._onCopyEvent)
+        self._list.toolbar.copyAction.triggered.connect(self._onNotepadCopyEvent)
         self._list.toolbar.savePdf.triggered.connect(self._onSavePdfEvent)
         self._list.toolbar.removeAction.triggered.connect(self._onRemoveEvent)
         self._list.toolbar.refreshAction.triggered.connect(self._onRefreshEvent)
@@ -163,7 +163,7 @@ class Loader(Loader):
         :param dispatcher: 
         :return: 
         """
-        model = NoteModel('New note', 'New description', self._folder)
+        model = NoteModel('New note', 'New description', self._folder.index)
         event = dispatcher.dispatch('window.notepad.note_new', model)
         if event is not None and event.data is not None:
             self._list.addLine(event.data)
@@ -172,7 +172,7 @@ class Loader(Loader):
         self._onRefreshEvent(event, dispatcher)
 
     @inject.params(dispatcher='event_dispatcher')
-    def _onCopyEvent(self, event=None, dispatcher=None):
+    def _onNotepadCopyEvent(self, event=None, dispatcher=None):
         """
         
         :param event: 

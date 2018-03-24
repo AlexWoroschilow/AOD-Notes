@@ -8,25 +8,12 @@ from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5 import QtPrintSupport
 from PyQt5 import QtWidgets
+
+from .text import TextEditor, NameEditor, TextWriter
 from .bar import ToolbarbarWidgetLeft, ToolbarbarWidgetRight, FormatbarWidget
 
 
-class TextEditorName(QtWidgets.QLineEdit):
-    def __init__(self, parent=None):
-        """
-
-        :param parent: 
-        """
-        super(TextEditorName, self).__init__(parent)
-        self.setPlaceholderText('Write a title here...')
-        self.setClearButtonEnabled(True)
-
-        font = self.font()
-        font.setPixelSize(24)
-        self.setFont(font)
-
-
-class TextEditor(QtWidgets.QWidget):
+class TextEditorWidget(QtWidgets.QWidget):
     @inject.params(dispatcher='event_dispatcher', storage='storage')
     def __init__(self, parent=None, dispatcher=None, storage=None):
         """
@@ -34,7 +21,7 @@ class TextEditor(QtWidgets.QWidget):
         :param parent: 
         :param dispatcher: 
         """
-        super(TextEditor, self).__init__(parent)
+        super(TextEditorWidget, self).__init__(parent)
 
         dispatcher.add_listener('window.notepad.note_update', self._onWindowNoteEdit)
 
@@ -45,78 +32,31 @@ class TextEditor(QtWidgets.QWidget):
         self.setStyleSheet(''' QTextEdit{ border: none; }
             QLineEdit{ border: none; }''')
 
-        self.name = TextEditorName()
+        self.name = NameEditor()
 
-        self.text = QtWidgets.QTextEdit(self)
-        self.text.setAcceptDrops(True)
-        self.text.setAcceptRichText(True)
-        self.text.setWordWrapMode(QtGui.QTextOption.WordWrap)
-        self.text.textChanged.connect(self.changed)
-        self.text.cursorPositionChanged.connect(self.cursorPosition)
-        self.text.setViewportMargins(50, 50, 20, 20)
-
-        self.text.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.text.setStyleSheet("background-color: #FFFFFF;")
-        self.text.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.text.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-
-        self.text.setMinimumHeight(self.height())
-        self.text.setFixedWidth(595)
-        self.text.setTabStopWidth(33)
-
-        doc = self.text.document()
-        doc.setPageSize(QtCore.QSizeF(595, self.height()))
-        rootFrame = doc.rootFrame()
-        fmt = rootFrame.frameFormat()
-        rootFrame.setFrameFormat(fmt)
-
-        # Container widget that holds page
-        container = QtWidgets.QWidget(self)
-
-        container.setStyleSheet("background-color: #A0A0A0;")
-
-        # Layout for container
-        layout = QtWidgets.QGridLayout(self)
-
-        # Empty widget for spacing
-        layout.addWidget(QtWidgets.QWidget(), 0, 0)
-
-        # Add QTextEdit to layout
-        layout.addWidget(self.text, 1, 0)
-
-        # Set layout to container
-        container.setLayout(layout)
-
-        # Put container into a scroll area so that
-        # the user can scroll down to see all the pages
-        self.scrollArea = QtWidgets.QScrollArea(self)
-
-        self.scrollArea.setWidget(container)
-
-        self.scrollArea.setWidgetResizable(True)
-
-        # Align the scrollArea's widget in the center
-        self.scrollArea.setAlignment(Qt.AlignHCenter)
+        self.writer = TextWriter(self)
+        self.writer.text.cursorPositionChanged.connect(self.cursorPosition)
+        self.writer.text.textChanged.connect(self.changed)
 
         self.leftbar = ToolbarbarWidgetLeft()
         self.leftbar.saveAction.triggered.connect(self._onSaveEvent)
         self.leftbar.printAction.triggered.connect(self.printHandler)
         self.leftbar.previewAction.triggered.connect(self.preview)
-        self.leftbar.cutAction.triggered.connect(self.text.cut)
-        self.leftbar.copyAction.triggered.connect(self.text.copy)
-        self.leftbar.pasteAction.triggered.connect(self.text.paste)
-        self.leftbar.undoAction.triggered.connect(self.text.undo)
-        self.leftbar.redoAction.triggered.connect(self.text.redo)
+        self.leftbar.cutAction.triggered.connect(self.writer.text.cut)
+        self.leftbar.copyAction.triggered.connect(self.writer.text.copy)
+        self.leftbar.pasteAction.triggered.connect(self.writer.text.paste)
+        self.leftbar.undoAction.triggered.connect(self.writer.text.undo)
+        self.leftbar.redoAction.triggered.connect(self.writer.text.redo)
         self.leftbar.fullscreenAction.triggered.connect(self._onFullScreenEvent)
 
         dispatcher.dispatch('window.notepad.leftbar', (
-            self, self.leftbar
+            self.writer, self.leftbar
         ))
 
         self.formatbar = FormatbarWidget()
         self.formatbar.bulletAction.triggered.connect(self.bulletList)
-        # self.formatbar.fontBox.currentFontChanged.connect(lambda font: self.text.setCurrentFont(font))
-        self.formatbar.fontSize.valueChanged.connect(lambda size: self.text.setFontPointSize(size))
+        # self.formatbar.fontBox.currentFontChanged.connect(lambda font: self.writer.text.setCurrentFont(font))
+        self.formatbar.fontSize.valueChanged.connect(lambda size: self.writer.text.setFontPointSize(size))
         self.formatbar.numberedAction.triggered.connect(self.numberList)
         self.formatbar.alignLeft.triggered.connect(self.alignLeft)
         self.formatbar.alignCenter.triggered.connect(self.alignCenter)
@@ -127,7 +67,7 @@ class TextEditor(QtWidgets.QWidget):
         self.formatbar.imageAction.triggered.connect(self.insertImage)
 
         dispatcher.dispatch('window.notepad.formatbar', (
-            self, self.formatbar
+            self.writer, self.formatbar
         ))
 
         self.rightbar = ToolbarbarWidgetRight()
@@ -139,7 +79,7 @@ class TextEditor(QtWidgets.QWidget):
         self.rightbar.backColor.triggered.connect(self.highlight)
 
         dispatcher.dispatch('window.notepad.rightbar', (
-            self, self.rightbar
+            self.writer, self.rightbar
         ))
 
         self.statusbar = QtWidgets.QLabel()
@@ -150,7 +90,7 @@ class TextEditor(QtWidgets.QWidget):
 
         layout3 = QtWidgets.QVBoxLayout()
         layout3.addWidget(self.formatbar)
-        layout3.addWidget(self.scrollArea)
+        layout3.addWidget(self.writer)
 
         widget3 = QtWidgets.QWidget()
         widget3.setLayout(layout3)
@@ -184,12 +124,6 @@ class TextEditor(QtWidgets.QWidget):
         """
         return self._entity
 
-    # def _onZoomInClicked(self):
-    #     self.text.zoom(+1)
-    #
-    # def _onZoomOutClicked(self):
-    #     self.text.zoom(-1)
-
     @inject.params(dispatcher='event_dispatcher')
     def _onFullScreenEvent(self, event=None, dispatcher=None):
         """
@@ -198,8 +132,10 @@ class TextEditor(QtWidgets.QWidget):
         :param dispatcher: 
         :return: 
         """
-        if self._entity is not None and dispatcher is not None:
-            dispatcher.dispatch('window.notepad.note_tab', self._entity)
+        if self._entity is None or dispatcher is None:
+            return None
+
+        dispatcher.dispatch('window.notepad.note_tab', self._entity)
 
     @inject.params(storage='storage')
     def _onWindowNoteEdit(self, event=None, dispatcher=None, storage=None):
@@ -209,24 +145,18 @@ class TextEditor(QtWidgets.QWidget):
         :param dispatcher: 
         :return: 
         """
-        if storage is None:
-            return None
-
-        if event.data is None:
+        if storage is None or event.data is None:
             return None
 
         entity = event.data
         if self._entity.index not in [entity.index]:
             return None
 
-        if self.name is None:
-            return None
-
-        if self.text is None:
+        if self.writer.text is None or self.name is None:
             return None
 
         self.name.setText(entity.name)
-        self.text.setText(entity.text)
+        self.writer.text.setText(entity.text)
 
     @inject.params(dispatcher='event_dispatcher')
     def _onSaveEvent(self, event=None, dispatcher=None):
@@ -237,7 +167,7 @@ class TextEditor(QtWidgets.QWidget):
         """
         if self._entity is not None and dispatcher is not None:
             self._entity.name = self.name.text()
-            self._entity.text = self.text.toHtml()
+            self._entity.text = self.writer.text.toHtml()
             dispatcher.dispatch('window.notepad.note_update', self._entity)
 
     def edit(self, entity=None):
@@ -252,7 +182,7 @@ class TextEditor(QtWidgets.QWidget):
         self.name.setText(entity.name)
         if entity.folder is not None:
             self.formatbar.setFolder(entity.folder)
-        self.text.setText(entity.text)
+        self.writer.text.setText(entity.text)
 
     def changed(self):
         """
@@ -267,7 +197,7 @@ class TextEditor(QtWidgets.QWidget):
         :return: 
         """
 
-        cursor = self.text.textCursor()
+        cursor = self.writer.text.textCursor()
 
         # Mortals like 1-indexed things
         line = cursor.blockNumber() + 1
@@ -306,7 +236,7 @@ class TextEditor(QtWidgets.QWidget):
         preview = QtPrintSupport.QPrintPreviewDialog()
 
         # If a print is requested, open print dialog
-        preview.paintRequested.connect(lambda p: self.text.print_(p))
+        preview.paintRequested.connect(lambda p: self.writer.text.print_(p))
 
         preview.exec_()
 
@@ -316,11 +246,11 @@ class TextEditor(QtWidgets.QWidget):
         dialog = QtPrintSupport.QPrintDialog()
 
         if dialog.exec_() == QtWidgets.QDialog.Accepted:
-            self.text.document().print_(dialog.printer())
+            self.writer.text.document().print_(dialog.printer())
 
     def cursorPosition(self):
 
-        cursor = self.text.textCursor()
+        cursor = self.writer.text.textCursor()
 
         # Mortals like 1-indexed things
         line = cursor.blockNumber() + 1
@@ -362,7 +292,7 @@ class TextEditor(QtWidgets.QWidget):
 
             else:
 
-                cursor = self.text.textCursor()
+                cursor = self.writer.text.textCursor()
 
                 cursor.insertImage(image, filename)
 
@@ -372,51 +302,51 @@ class TextEditor(QtWidgets.QWidget):
         color = QtWidgets.QColorDialog.getColor()
 
         # Set it as the new text color
-        self.text.setTextColor(color)
+        self.writer.text.setTextColor(color)
 
     def highlight(self):
 
         color = QtWidgets.QColorDialog.getColor()
 
-        self.text.setTextBackgroundColor(color)
+        self.writer.text.setTextBackgroundColor(color)
 
     def bold(self):
 
-        if self.text.fontWeight() == QtGui.QFont.Bold:
+        if self.writer.text.fontWeight() == QtGui.QFont.Bold:
 
-            self.text.setFontWeight(QtGui.QFont.Normal)
+            self.writer.text.setFontWeight(QtGui.QFont.Normal)
 
         else:
 
-            self.text.setFontWeight(QtGui.QFont.Bold)
+            self.writer.text.setFontWeight(QtGui.QFont.Bold)
 
     def italic(self):
 
-        state = self.text.fontItalic()
+        state = self.writer.text.fontItalic()
 
-        self.text.setFontItalic(not state)
+        self.writer.text.setFontItalic(not state)
 
     def underline(self):
 
-        state = self.text.fontUnderline()
+        state = self.writer.text.fontUnderline()
 
-        self.text.setFontUnderline(not state)
+        self.writer.text.setFontUnderline(not state)
 
     def strike(self):
 
         # Grab the text's format
-        fmt = self.text.currentCharFormat()
+        fmt = self.writer.text.currentCharFormat()
 
         # Set the fontStrikeOut property to its opposite
         fmt.setFontStrikeOut(not fmt.fontStrikeOut())
 
         # And set the next char format
-        self.text.setCurrentCharFormat(fmt)
+        self.writer.text.setCurrentCharFormat(fmt)
 
     def superScript(self):
 
         # Grab the current format
-        fmt = self.text.currentCharFormat()
+        fmt = self.writer.text.currentCharFormat()
 
         # And get the vertical alignment property
         align = fmt.verticalAlignment()
@@ -431,12 +361,12 @@ class TextEditor(QtWidgets.QWidget):
             fmt.setVerticalAlignment(QtGui.QTextCharFormat.AlignNormal)
 
         # Set the new format
-        self.text.setCurrentCharFormat(fmt)
+        self.writer.text.setCurrentCharFormat(fmt)
 
     def subScript(self):
 
         # Grab the current format
-        fmt = self.text.currentCharFormat()
+        fmt = self.writer.text.currentCharFormat()
 
         # And get the vertical alignment property
         align = fmt.verticalAlignment()
@@ -451,24 +381,24 @@ class TextEditor(QtWidgets.QWidget):
             fmt.setVerticalAlignment(QtGui.QTextCharFormat.AlignNormal)
 
         # Set the new format
-        self.text.setCurrentCharFormat(fmt)
+        self.writer.text.setCurrentCharFormat(fmt)
 
     def alignLeft(self):
-        self.text.setAlignment(Qt.AlignLeft)
+        self.writer.text.setAlignment(Qt.AlignLeft)
 
     def alignRight(self):
-        self.text.setAlignment(Qt.AlignRight)
+        self.writer.text.setAlignment(Qt.AlignRight)
 
     def alignCenter(self):
-        self.text.setAlignment(Qt.AlignCenter)
+        self.writer.text.setAlignment(Qt.AlignCenter)
 
     def alignJustify(self):
-        self.text.setAlignment(Qt.AlignJustify)
+        self.writer.text.setAlignment(Qt.AlignJustify)
 
     def indent(self):
 
         # Grab the cursor
-        cursor = self.text.textCursor()
+        cursor = self.writer.text.textCursor()
 
         if cursor.hasSelection():
 
@@ -523,7 +453,7 @@ class TextEditor(QtWidgets.QWidget):
 
     def dedent(self):
 
-        cursor = self.text.textCursor()
+        cursor = self.writer.text.textCursor()
 
         if cursor.hasSelection():
 
@@ -550,14 +480,14 @@ class TextEditor(QtWidgets.QWidget):
 
     def bulletList(self):
 
-        cursor = self.text.textCursor()
+        cursor = self.writer.text.textCursor()
 
         # Insert bulleted list
         cursor.insertList(QtGui.QTextListFormat.ListDisc)
 
     def numberList(self):
 
-        cursor = self.text.textCursor()
+        cursor = self.writer.text.textCursor()
 
         # Insert list with numbers
         cursor.insertList(QtGui.QTextListFormat.ListDecimal)

@@ -43,15 +43,12 @@ class Loader(Loader):
         :return:.
         """
         dispatcher.add_listener('window.notepad.folder_new', self._onNotepadFolderNew)
-        dispatcher.add_listener('window.notepad.folder_copy', self._onNotepadFolderCopy)
         dispatcher.add_listener('window.notepad.folder_update', self._onNotepadFolderUpdate)
         dispatcher.add_listener('window.notepad.folder_remove', self._onNotepadFolderRemove)
 
         dispatcher.add_listener('window.notepad.note_new', self._onNotepadNoteNew)
         dispatcher.add_listener('window.notepad.note_update', self._onNotepadNoteUpdate)
         dispatcher.add_listener('window.notepad.note_remove', self._onNotepadNoteRemove)
-        dispatcher.add_listener('window.notepad.note_copy', self._onNotepadNoteCopy)
-        dispatcher.add_listener('window.notepad.note_export', self._onNotepadNoteExport)
         dispatcher.add_listener('window.notepad.note_folder', self._onNotepadNoteFolder)
 
         # dispatcher.dispatch('window.notepad.note_update', (
@@ -71,15 +68,6 @@ class Loader(Loader):
 
         event.data = storage.addFolder(
             event.data.name, event.data.text)
-
-    @inject.params(storage='storage')
-    def _onNotepadFolderCopy(self, event=None, dispather=None, storage=None):
-        """
-
-        :param event: 
-        :param dispather: 
-        :return: 
-        """
 
     @inject.params(storage='storage')
     def _onNotepadFolderUpdate(self, event=None, dispather=None, storage=None):
@@ -117,16 +105,6 @@ class Loader(Loader):
         event.data = storage.addNote(entity.name, entity.text, entity.folder)
 
     @inject.params(storage='storage')
-    def _onNotepadNoteCopy(self, event=None, dispather=None, storage=None):
-        """
-
-        :param event: 
-        :param dispather: 
-        :return: 
-        """
-        print(event)
-
-    @inject.params(storage='storage')
     def _onNotepadNoteUpdate(self, event=None, dispather=None, storage=None):
         """
 
@@ -147,16 +125,6 @@ class Loader(Loader):
         """
         note = event.data
         storage.removeNote(note.index)
-
-    @inject.params(storage='storage')
-    def _onNotepadNoteExport(self, event=None, dispather=None, storage=None):
-        """
-
-        :param event: 
-        :param dispather: 
-        :return: 
-        """
-        print(event)
 
     @inject.params(storage='storage')
     def _onNotepadNoteFolder(self, event=None, dispather=None, storage=None):

@@ -14,7 +14,7 @@ import inject
 from PyQt5 import QtCore
 
 from lib.plugin import Loader
-from .gui.widget import TextEditor
+from .gui.widget import TextEditorWidget
 
 
 class Loader(Loader):
@@ -55,8 +55,8 @@ class Loader(Loader):
         :param dispatcher: 
         :return: 
         """
-        self.parent = None
-        self._editor = TextEditor()
+        self._parent = None
+        self._editor = TextEditorWidget()
 
     def _onWindowFirstTab(self, event=None, dispatcher=None):
         """
@@ -65,7 +65,7 @@ class Loader(Loader):
         :param dispatcher: 
         :return: 
         """
-        self.container, self.parent = event.data
+        self.container, self._parent = event.data
         if self._editor is None:
             return None
 
@@ -84,8 +84,11 @@ class Loader(Loader):
         if self._editor is None:
             return None
 
-        entity = event.data
-        self._editor.edit(entity)
+        self._entity = event.data
+        if self._entity is None:
+            return None
+
+        self._editor.edit(self._entity)
 
     def _onWindowNoteTab(self, event=None, dispatcher=None):
         """
@@ -94,14 +97,18 @@ class Loader(Loader):
         :param dispatcher: 
         :return: 
         """
-        if self.parent is None:
+        if self._parent is None:
             return None
 
-        editor = TextEditor()
-        editor.edit(event.data)
+        self._entity = event.data
+        if self._entity is None:
+            return None
+
+        editor = TextEditorWidget()
+        editor.edit(self._entity)
 
         name = event.data.name
-        self.parent.addTab(editor, name)
+        self._parent.addTab(editor, name)
 
-        index = self.parent.indexOf(editor)
-        self.parent.setCurrentIndex(index)
+        index = self._parent.indexOf(editor)
+        self._parent.setCurrentIndex(index)
