@@ -171,3 +171,5 @@ class FolderList(QtWidgets.QWidget):
         :return: 
         """
         self.list.addLine(folder)
+
+        self.statusbar.setText("%i folders found" % self.list.count())

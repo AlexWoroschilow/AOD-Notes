@@ -256,3 +256,6 @@ class RecordList(QtWidgets.QWidget):
         """
         self._folder = folder
         self.folderEditor.setText(folder.name)
+
+        self.statusbar.setText("%i records found" % self.list.count())
+

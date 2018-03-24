@@ -112,7 +112,7 @@ class FormatbarWidget(QtWidgets.QToolBar):
         self.setContentsMargins(0, 0, 0, 0)
 
         self.folder = FolderBomboBox()
-        self.fontBox = QtWidgets.QFontComboBox(self)
+        # self.fontBox = QtWidgets.QFontComboBox(self)
 
         self.fontSize = QtWidgets.QSpinBox(self)
         self.fontSize.setSuffix(" pt")
@@ -157,11 +157,10 @@ class FormatbarWidget(QtWidgets.QToolBar):
         self.addAction(self.dedentAction)
 
         self.addSeparator()
-        self.addAction(self.imageAction)
-        self.addSeparator()
-
-        self.addWidget(self.fontBox)
         self.addWidget(self.fontSize)
+        self.addAction(self.imageAction)
+
+        # self.addWidget(self.fontBox)
 
 
     def setFolder(self, value=None):
