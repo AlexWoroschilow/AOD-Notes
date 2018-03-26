@@ -11,7 +11,6 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
-from PyQt5 import QtCore
 
 from lib.plugin import Loader
 from .gui.widget import TextEditorWidget
@@ -46,7 +45,9 @@ class Loader(Loader):
         dispatcher.add_listener('application.start', self._onWindowStart)
         dispatcher.add_listener('window.first_tab.content', self._onWindowFirstTab, 128)
         dispatcher.add_listener('window.notepad.note_edit', self._onWindowNoteEdit)
-        dispatcher.add_listener('window.notepad.note_tab', self._onWindowNoteTab)
+        dispatcher.add_listener('window.notepad.note_select', self._onWindowNoteTab)
+
+        dispatcher.add_listener('window.notepad.folder_open', self._onNotepadFolderOpen)
 
     def _onWindowStart(self, event=None, dispatcher=None):
         """
@@ -90,11 +91,13 @@ class Loader(Loader):
 
         self._editor.edit(self._entity)
 
-    def _onWindowNoteTab(self, event=None, dispatcher=None):
+    @inject.params(dispatcher='event_dispatcher', storage='storage')
+    def _onWindowNoteTab(self, event=None, dispatcher=None, storage=None):
         """
         
         :param event: 
         :param dispatcher: 
+        :param storage: 
         :return: 
         """
         if self._parent is None:
@@ -107,8 +110,21 @@ class Loader(Loader):
         editor = TextEditorWidget()
         editor.edit(self._entity)
 
-        name = event.data.name
-        self._parent.addTab(editor, name)
+        dispatcher.dispatch('window.tab', (
+            editor, self._entity
+        ))
 
-        index = self._parent.indexOf(editor)
-        self._parent.setCurrentIndex(index)
+    @inject.params(dispatcher='event_dispatcher', storage='storage')
+    def _onNotepadFolderOpen(self, event=None, dispatcher=None, storage=None):
+        """
+
+        :param event: 
+        :param dispatcher: 
+        :param storage: 
+        :return: 
+        """
+        self._folder, self._search = event.data
+        if self._folder is None:
+            return None
+
+        print(self._folder)

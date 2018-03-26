@@ -1,6 +1,15 @@
 # -*- coding: utf-8 -*-
-
-# PYQT5 PyQt4’s QtGui module has been split into PyQt5’s QtGui, QtPrintSupport and QtWidgets modules
+# Copyright 2015 Alex Woroschilow (alex.woroschilow@gmail.com)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
 from PyQt5.QtCore import Qt
 
@@ -19,36 +28,14 @@ class TextWriter(QtWidgets.QScrollArea):
 
         self.text = TextEditor(self)
 
-        doc = self.text.document()
-        doc.setPageSize(QtCore.QSizeF(595, self.height()))
-        rootFrame = doc.rootFrame()
-        fmt = rootFrame.frameFormat()
-        rootFrame.setFrameFormat(fmt)
-
-        # Container widget that holds page
-        container = QtWidgets.QWidget(self)
-
-        container.setStyleSheet("background-color: #A0A0A0;")
-
-        # Layout for container
-        layout = QtWidgets.QGridLayout(self)
-
-        # Empty widget for spacing
-        layout.addWidget(QtWidgets.QWidget(), 0, 0)
-
-        # Add QTextEdit to layout
-        layout.addWidget(self.text, 1, 0)
-
-        # Set layout to container
-        container.setLayout(layout)
-
-        self.setWidget(container)
-
         self.setWidgetResizable(True)
+        self.setWidget(self.text)
 
         # Align the scrollArea's widget in the center
         self.setAlignment(Qt.AlignHCenter)
-
+        self.setStyleSheet("background-color: #A0A0A0;")
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
 
 class TextEditor(QtWidgets.QTextEdit):
@@ -58,16 +45,12 @@ class TextEditor(QtWidgets.QTextEdit):
         self.setAcceptDrops(True)
         self.setAcceptRichText(True)
         self.setWordWrapMode(QtGui.QTextOption.WordWrap)
-        self.setViewportMargins(50, 50, 20, 20)
+        self.setViewportMargins(40, 20, 20, 20)
 
         self.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.setStyleSheet("background-color: #FFFFFF;")
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-
-        self.setMinimumHeight(self.height())
-        self.setFixedWidth(595)
-        self.setTabStopWidth(33)
 
 
 class NameEditor(QtWidgets.QLineEdit):
@@ -78,7 +61,6 @@ class NameEditor(QtWidgets.QLineEdit):
         """
         super(NameEditor, self).__init__(parent)
         self.setPlaceholderText('Write a title here...')
-        self.setClearButtonEnabled(True)
 
         font = self.font()
         font.setPixelSize(24)

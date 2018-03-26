@@ -103,14 +103,14 @@ class Loader(Loader):
         container, parent = event.data
         container.addWidget(self._list)
 
-        self._list.toolbar.newAction.triggered.connect(self._onNotepadNewEvent)
-        self._list.toolbar.copyAction.triggered.connect(self._onNotepadCopyEvent)
+        self._list.toolbar.newAction.triggered.connect(self._onNotepadNoteNewEvent)
+        self._list.toolbar.copyAction.triggered.connect(self._onNotepadNoteCopyEvent)
         self._list.toolbar.savePdf.triggered.connect(self._onSavePdfEvent)
         self._list.toolbar.removeAction.triggered.connect(self._onRemoveEvent)
         self._list.toolbar.refreshAction.triggered.connect(self._onRefreshEvent)
         self._list.folderEditor.returnPressed.connect(self._onFolderUpdated)
-        self._list.list.doubleClicked.connect(self._onDoubleClick)
-        self._list.list.selectionChanged = self._onNoteSelected
+        self._list.list.doubleClicked.connect(self._onNotepadNoteDoubleClick)
+        self._list.list.selectionChanged = self._onNotepadNoteSelected
 
         if self._folder is None:
             return None
@@ -126,7 +126,7 @@ class Loader(Loader):
         dispatcher.dispatch('window.notepad.note_edit', self._first)
 
     @inject.params(dispatcher='event_dispatcher')
-    def _onNoteSelected(self, event=None, selection=None, dispatcher=None):
+    def _onNotepadNoteSelected(self, event=None, selection=None, dispatcher=None):
         """
         
         :param event: 
@@ -156,7 +156,7 @@ class Loader(Loader):
         self._onRefreshEvent(event, dispatcher)
 
     @inject.params(dispatcher='event_dispatcher')
-    def _onNotepadNewEvent(self, event=None, dispatcher=None):
+    def _onNotepadNoteNewEvent(self, event=None, dispatcher=None):
         """
         
         :param event: 
@@ -172,15 +172,15 @@ class Loader(Loader):
         self._onRefreshEvent(event, dispatcher)
 
     @inject.params(dispatcher='event_dispatcher')
-    def _onNotepadCopyEvent(self, event=None, dispatcher=None):
+    def _onNotepadNoteCopyEvent(self, event=None, dispatcher=None):
         """
         
         :param event: 
         :param dispatcher: 
         :return: 
         """
-        for index in self._list.list.selectedIndexes():
-            item = self._list.list.itemFromIndex(index)
+        for index in self._list.selectedIndexes():
+            item = self._list.itemFromIndex(index)
             if item is not None and item.entity is not None:
                 event = dispatcher.dispatch('window.notepad.note_new', item.entity)
                 self._list.addLine(event.data)
@@ -234,17 +234,19 @@ class Loader(Loader):
         self._list.setFolder(self._folder)
 
     @inject.params(dispatcher='event_dispatcher')
-    def _onDoubleClick(self, event=None, dispatcher=None):
+    def _onNotepadNoteDoubleClick(self, event=None, dispatcher=None):
         """
         
         :param event: 
         :param dispatcher: 
-        :param storage: 
         :return: 
         """
         item = self._list.itemFromIndex(event)
-        if item is not None and item.entity is not None:
-            dispatcher.dispatch('window.notepad.note_tab', item.entity)
+        if item is None and item.entity is None:
+            return None
+
+        dispatcher.dispatch('window.notepad.note_select', item.entity)
+
 
     @inject.params(dispatcher='event_dispatcher', storage='storage')
     def _onNotepadFolderSelected(self, event=None, dispatcher=None, storage=None):

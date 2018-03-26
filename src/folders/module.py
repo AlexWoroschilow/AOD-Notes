@@ -95,7 +95,7 @@ class Loader(Loader):
         self._list.toolbar.refreshAction.triggered.connect(self._onRefreshEvent)
         self._list.toolbar.removeAction.triggered.connect(self._onFolderRemoveEvent)
 
-        self._list.list.doubleClicked.connect(self._onFolderSelected)
+        self._list.list.doubleClicked.connect(self._onFolderOpen)
         self._list.list.selectionChanged = self._onFolderSelected
 
         self._first = None
@@ -161,9 +161,11 @@ class Loader(Loader):
 
         for index in self._list.selectedIndexes():
             item = self._list.itemFromIndex(index)
-            if item is not None and item.folder is not None:
-                dispatcher.dispatch('window.notepad.folder_remove', item.folder)
-                self._list.takeItem(index)
+            if item is None and item.folder is None:
+                continue
+
+            dispatcher.dispatch('window.notepad.folder_remove', item.folder)
+            self._list.takeItem(index)
 
     @inject.params(dispatcher='event_dispatcher', storage='storage')
     def _onRefreshEvent(self, event=None, dispatcher=None, storage=None):
@@ -179,6 +181,25 @@ class Loader(Loader):
             self._list.addLine(entity)
 
     @inject.params(dispatcher='event_dispatcher')
+    def _onFolderOpen(self, event=None, selection=None, dispatcher=None):
+        """
+
+        :param event: 
+        :param selection: 
+        :param dispatcher: 
+        :return: 
+        """
+        for index in self._list.selectedIndexes():
+            item = self._list.itemFromIndex(index)
+            if item is None or item.folder is None:
+                continue
+
+            self._first = item.folder
+            dispatcher.dispatch('window.notepad.folder_open', (
+                self._first, self._search
+            ))
+
+    @inject.params(dispatcher='event_dispatcher')
     def _onFolderSelected(self, event=None, selection=None, dispatcher=None):
         """
 
@@ -187,16 +208,17 @@ class Loader(Loader):
         :param dispatcher: 
         :return: 
         """
-        for index in self._list.list.selectedIndexes():
-            item = self._list.list.itemFromIndex(index)
+        for index in self._list.selectedIndexes():
+            item = self._list.itemFromIndex(index)
             if item is None or item.folder is None:
-                return None
+                continue
 
             self._first = item.folder
             dispatcher.dispatch('window.notepad.folder_selected', (
                 self._first, self._search
             ))
 
+    @inject.params(dispatcher='event_dispatcher')
     def _onFolderUpdated(self, event=None, dispatcher=None):
         """
         

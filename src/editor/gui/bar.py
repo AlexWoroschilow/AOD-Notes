@@ -18,6 +18,38 @@ from PyQt5 import QtCore
 from PyQt5 import QtSvg
 from .combo import FolderBomboBox
 
+class ToolbarbarWidget(QtWidgets.QToolBar):
+    def __init__(self):
+        super(ToolbarbarWidget, self).__init__()
+        self.setOrientation(Qt.Vertical)
+        self.setContentsMargins(0, 0, 0, 0)
+
+        self.newAction = QtWidgets.QAction(QtGui.QIcon("icons/new.svg"), "New", self)
+        self.newAction.setShortcut("Ctrl+N")
+        self.newAction.setStatusTip("Create a new document from scratch.")
+
+        self.copyAction = QtWidgets.QAction(QtGui.QIcon("icons/copy.svg"), "Copy to clipboard", self)
+        self.copyAction.setStatusTip("Copy text to clipboard")
+        self.copyAction.setShortcut("Ctrl+C")
+
+        self.savePdf = QtWidgets.QAction(QtGui.QIcon("icons/pdf.svg"), "Save as pdf", self)
+        self.savePdf.setStatusTip("Export document as PDF")
+        self.savePdf.setShortcut("Ctrl+Shift+P")
+
+        self.removeAction = QtWidgets.QAction(QtGui.QIcon("icons/remove.svg"), "Remove selected note", self)
+        self.removeAction.setStatusTip("Remove selected folder")
+
+        self.refreshAction = QtWidgets.QAction(QtGui.QIcon("icons/refresh.svg"), "Refresh selected folder", self)
+        self.refreshAction.setStatusTip("Refresh selected folder")
+
+        self.addAction(self.newAction)
+        self.addAction(self.copyAction)
+        self.addAction(self.savePdf)
+        self.addAction(self.refreshAction)
+        self.addAction(self.removeAction)
+
+
+
 
 class ToolbarbarWidgetLeft(QtWidgets.QToolBar):
     def __init__(self):

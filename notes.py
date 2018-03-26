@@ -25,9 +25,9 @@ from lib.kernel import Kernel
 
 
 class Application(QtWidgets.QApplication):
-    def __init__(self, options=None, args=None, dispatcher=None, logger=None):
+    def __init__(self, options=None, args=None):
         """
-
+        
         :param options: 
         :param args: 
         """
@@ -46,7 +46,7 @@ class Application(QtWidgets.QApplication):
         """
         dispatcher.add_listener('application.start', self.onWindowToggle)
         dispatcher.add_listener('window.toggle', self.onWindowToggle)
-        dispatcher.add_listener('window.exit', self.onWindowExit)
+        dispatcher.add_listener('window.exit', self.exit)
 
         dispatcher.dispatch('application.start', self)
 
@@ -54,8 +54,9 @@ class Application(QtWidgets.QApplication):
 
     def onWindowToggle(self, event=None, dispatcher=None):
         """
-
+        
         :param event: 
+        :param dispatcher: 
         :return: 
         """
         if self.window is None:
@@ -66,23 +67,21 @@ class Application(QtWidgets.QApplication):
         self.window = None
         return None
 
-    def onWindowExit(self, event=None, dispatcher=None):
-        """
-        
-        :param event: 
-        :param dispatcher: 
-        :return: 
-        """
-        self.exit()
-
 
 class Dashboard(QtWidgets.QWidget):
     @inject.params(dispatcher='event_dispatcher', logger='logger')
     def __init__(self, parent=None, dispatcher=None, logger=None):
+        """
+        
+        :param parent: 
+        :param dispatcher: 
+        :param logger: 
+        """
         super(Dashboard, self).__init__(parent)
 
         self.content = QtWidgets.QSplitter()
         self.content.setContentsMargins(0, 0, 0, 0)
+
         # fill tabs with widgets from different modules
         dispatcher.dispatch('window.first_tab.content', (
             self.content, parent
@@ -115,16 +114,18 @@ class MainWindow(QtWidgets.QMainWindow):
         :param logger: 
         """
 
+        dispatcher.add_listener('window.tab', self._onTabNew)
+
         super(MainWindow, self).__init__(parent)
         self.setStyleSheet('QMainWindow{ background-color: #ffffff; }')
 
         self.setWindowIcon(QtGui.QIcon("icons/icon.svg"))
-        self.setWindowTitle('Notepad')
+        self.setWindowTitle('Cloud notepad')
 
         self.container = QtWidgets.QTabWidget(self)
         self.container.setContentsMargins(0, 0, 0, 0)
 
-        self.container.addTab(Dashboard(self.container), self.tr('Dashboard'))
+        self.container.addTab(Dashboard(self.container), self.tr('Notes'))
         self.container.setTabsClosable(True)
         self.container.tabCloseRequested.connect(self._onTabClose)
 
@@ -132,6 +133,23 @@ class MainWindow(QtWidgets.QMainWindow):
         font.setPixelSize(18)
         self.container.setFont(font)
         self.setCentralWidget(self.container)
+
+    def _onTabNew(self, event=None, dispatcher=None):
+        """
+        
+        :param event: 
+        :param dispatcher: 
+        :return: 
+        """
+        widget, entity = event.data
+        if widget is None or entity is None:
+            return None
+
+        self.container.addTab(widget, entity.name)
+
+        self.container.setCurrentIndex(
+            self.container.indexOf(widget)
+        )
 
     def _onTabClose(self, index=None):
         """
