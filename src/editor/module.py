@@ -11,14 +11,16 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
+from PyQt5 import QtWidgets
 
 from lib.plugin import Loader
-from .gui.widget import TextEditorWidget
+from .gui.widget import NotepadEditorWidget
 
 
 class Loader(Loader):
     _entity = None
     _editor = None
+    _folder = None
 
     @property
     def enabled(self):
@@ -44,12 +46,14 @@ class Loader(Loader):
         """
         dispatcher.add_listener('application.start', self._onWindowStart)
         dispatcher.add_listener('window.first_tab.content', self._onWindowFirstTab, 128)
-        dispatcher.add_listener('window.notepad.note_edit', self._onWindowNoteEdit)
-        dispatcher.add_listener('window.notepad.note_select', self._onWindowNoteTab)
-
         dispatcher.add_listener('window.notepad.folder_open', self._onNotepadFolderOpen)
 
-    def _onWindowStart(self, event=None, dispatcher=None):
+        dispatcher.add_listener('window.first_tab.content', self._onWindowFirstTab)
+        dispatcher.add_listener('window.notepad.note_update', self._onNotepadNoteUpdate, 128)
+        dispatcher.add_listener('window.notepad.folder_selected', self._onNotepadFolderSelect)
+
+    @inject.params(storage='storage', dispatcher='event_dispatcher')
+    def _onWindowStart(self, event=None, dispatcher=None, storage=None):
         """
         
         :param event: 
@@ -57,7 +61,20 @@ class Loader(Loader):
         :return: 
         """
         self._parent = None
-        self._editor = TextEditorWidget()
+        self._editor = NotepadEditorWidget()
+
+        if self._folder is None:
+            return None
+
+        self._first = None
+        self._editor.list.clear()
+        for entity in storage.notesByFolder(self._folder):
+            if self._first is None:
+                self._first = entity
+            self._editor._list.addLine(entity)
+        self._editor._list.setFolder(self._folder)
+
+        dispatcher.dispatch('window.notepad.note_edit', self._first)
 
     def _onWindowFirstTab(self, event=None, dispatcher=None):
         """
@@ -72,48 +89,6 @@ class Loader(Loader):
 
         self.container.addWidget(self._editor)
 
-    def _onWindowNoteEdit(self, event=None, dispatcher=None):
-        """
-        
-        :param event: 
-        :param dispatcher: 
-        :return: 
-        """
-        if event.data is None:
-            return None
-
-        if self._editor is None:
-            return None
-
-        self._entity = event.data
-        if self._entity is None:
-            return None
-
-        self._editor.edit(self._entity)
-
-    @inject.params(dispatcher='event_dispatcher', storage='storage')
-    def _onWindowNoteTab(self, event=None, dispatcher=None, storage=None):
-        """
-        
-        :param event: 
-        :param dispatcher: 
-        :param storage: 
-        :return: 
-        """
-        if self._parent is None:
-            return None
-
-        self._entity = event.data
-        if self._entity is None:
-            return None
-
-        editor = TextEditorWidget()
-        editor.edit(self._entity)
-
-        dispatcher.dispatch('window.tab', (
-            editor, self._entity
-        ))
-
     @inject.params(dispatcher='event_dispatcher', storage='storage')
     def _onNotepadFolderOpen(self, event=None, dispatcher=None, storage=None):
         """
@@ -127,4 +102,33 @@ class Loader(Loader):
         if self._folder is None:
             return None
 
-        print(self._folder)
+        editor = NotepadEditorWidget()
+        editor.setContent((self._folder, None, self._search))
+
+        dispatcher.dispatch('window.tab', (
+            editor, self._folder
+        ))
+
+    @inject.params(storage='storage')
+    def _onNotepadNoteUpdate(self, event=None, dispatcher=None, storage=None):
+        """
+
+        :param event: 
+        :param dispather: 
+        :param storage: 
+        :return: 
+        """
+        self._editor._onRefreshEvent(event, dispatcher)
+
+    @inject.params(dispatcher='event_dispatcher', storage='storage')
+    def _onNotepadFolderSelect(self, event=None, dispatcher=None, storage=None):
+        """
+
+        :param event: 
+        :param dispatcher: 
+        :return: 
+        """
+        self._folder, self._search = event.data
+        if self._editor is None:
+            return None
+        self._editor.setContent((self._folder, None, self._search))

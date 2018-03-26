@@ -201,6 +201,7 @@ class RecordList(QtWidgets.QWidget):
         :param parent: 
         """
         super(RecordList, self).__init__(parent)
+
         self._folder = None
 
         self.setStyleSheet(''' QListWidget::item{ background-color: #fcf9f6; border: none; }
@@ -257,8 +258,13 @@ class RecordList(QtWidgets.QWidget):
         :param folder: 
         :return: 
         """
+        if folder is None:
+            self.folderEditor.setVisible(False)
+            return None
+
         self._folder = folder
         self.folderEditor.setText(folder.name)
+        self.folderEditor.setVisible(True)
 
     def addLine(self, entity=None):
         """

@@ -87,9 +87,8 @@ class Dashboard(QtWidgets.QWidget):
             self.content, parent
         ))
 
-        self.content.setStretchFactor(0, 2)
-        self.content.setStretchFactor(1, 4)
-        self.content.setStretchFactor(2, 3)
+        self.content.setStretchFactor(0, 1)
+        self.content.setStretchFactor(1, 2)
 
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)

@@ -256,9 +256,6 @@ class Loader(Loader):
                 self._first = entity
             self._list.addLine(entity)
 
-        if self._first is None:
-            return None
-
         dispatcher.dispatch('window.notepad.folder_selected', (
             self._first, self._search
         ))
