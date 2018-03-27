@@ -11,20 +11,9 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
-from PyQt5.QtCore import Qt
-
-from PyQt5 import QtCore
-from PyQt5 import QtPrintSupport
 from PyQt5 import QtWidgets
-from PyQt5 import QtGui
 
 from .text import TextEditorWidget
-from .text import NameEditor
-from .text import TextWriter
-
-from .bar import ToolbarbarWidgetLeft
-from .bar import ToolbarbarWidgetRight
-from .bar import FormatbarWidget
 from .list import RecordList
 
 
@@ -242,5 +231,7 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
         :return: 
         """
 
-        self._entity = event.data
-        self.setContent((self._folder, self._entity, self._search))
+        self._list.list.clear()
+        for entity in storage.notesByFolder(self._folder):
+            self._list.addLine(entity)
+        self._list.setFolder(self._folder)
