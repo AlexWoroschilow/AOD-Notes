@@ -18,27 +18,41 @@ from PyQt5 import QtCore
 from PyQt5 import QtSvg
 
 
-class ToolbarbarWidget(QtWidgets.QToolBar):
-    def __init__(self):
+class ToolBarbarButton(QtWidgets.QPushButton):
+    def __init__(self, parent=None, dispatcher=None):
+        super(ToolBarbarButton, self).__init__()
+        self.setFlat(True)
+
+
+class ToolbarbarWidget(QtWidgets.QWidget):
+    @inject.params(dispatcher='event_dispatcher')
+    def __init__(self, parent=None, dispatcher=None):
         super(ToolbarbarWidget, self).__init__()
-        self.setOrientation(Qt.Vertical)
-        self.setContentsMargins(0, 0, 0, 0)
 
-        self.newAction = QtWidgets.QAction(QtGui.QIcon("icons/new.svg"), "New", self)
+        self.newAction = ToolBarbarButton()
+        self.newAction.setIcon(QtGui.QIcon("icons/new.svg"))
+        self.newAction.setToolTip("Create a new folder.")
         self.newAction.setShortcut("Ctrl+N")
-        self.newAction.setStatusTip("Create a new document from scratch.")
 
-        self.copyAction = QtWidgets.QAction(QtGui.QIcon("icons/copy.svg"), "Copy to clipboard", self)
-        self.copyAction.setStatusTip("Copy text to clipboard")
+        self.copyAction = ToolBarbarButton()
+        self.copyAction.setIcon(QtGui.QIcon("icons/copy.svg"))
+        self.copyAction.setToolTip("Clone selected folder")
         self.copyAction.setShortcut("Ctrl+C")
 
-        self.removeAction = QtWidgets.QAction(QtGui.QIcon("icons/remove.svg"), "Remove selected folder", self)
-        self.removeAction.setStatusTip("Remove selected folder")
+        self.removeAction = ToolBarbarButton()
+        self.removeAction.setIcon(QtGui.QIcon("icons/remove.svg"))
+        self.removeAction.setToolTip("Remove selected folder")
 
-        self.refreshAction = QtWidgets.QAction(QtGui.QIcon("icons/refresh.svg"), "Refresh selected folder", self)
-        self.refreshAction.setStatusTip("Refresh selected folder")
+        self.refreshAction = ToolBarbarButton()
+        self.refreshAction.setIcon(QtGui.QIcon("icons/refresh.svg"))
+        self.refreshAction.setToolTip("Refresh list")
 
-        self.addAction(self.newAction)
-        self.addAction(self.copyAction)
-        self.addAction(self.refreshAction)
-        self.addAction(self.removeAction)
+        self.layout = QtWidgets.QVBoxLayout()
+        self.layout.addWidget(self.newAction)
+        self.layout.addWidget(self.copyAction)
+        self.layout.addWidget(self.removeAction)
+        self.layout.addWidget(self.refreshAction)
+
+        self.layout.addStretch()
+
+        self.setLayout(self.layout)

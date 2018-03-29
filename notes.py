@@ -88,7 +88,7 @@ class Dashboard(QtWidgets.QWidget):
         ))
 
         self.content.setStretchFactor(0, 1)
-        self.content.setStretchFactor(1, 2)
+        self.content.setStretchFactor(1, 1)
 
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -122,7 +122,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setWindowTitle('Cloud notepad')
 
         self.container = QtWidgets.QTabWidget(self)
-        self.container.setContentsMargins(0, 0, 0, 0)
 
         self.container.addTab(Dashboard(self.container), self.tr('Notes'))
         self.container.setTabsClosable(True)

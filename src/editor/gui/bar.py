@@ -43,11 +43,11 @@ class ToolbarbarWidget(QtWidgets.QWidget):
 
         self.removeAction = ToolBarbarButton()
         self.removeAction.setIcon(QtGui.QIcon("icons/remove.svg"))
-        self.removeAction.setToolTip("Remove selected folder")
+        self.removeAction.setToolTip("Remove selected document")
 
         self.refreshAction = ToolBarbarButton()
         self.refreshAction.setIcon(QtGui.QIcon("icons/refresh.svg"))
-        self.refreshAction.setToolTip("Refresh selected folder")
+        self.refreshAction.setToolTip("Refresh list")
 
         self.layout = QtWidgets.QVBoxLayout()
         self.layout.addWidget(self.newAction)

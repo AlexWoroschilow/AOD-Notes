@@ -85,6 +85,10 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
         self.addWidget(self._list)
         self.addWidget(self._editor)
 
+        self.setStretchFactor(0, 1)
+        self.setStretchFactor(1, 1)
+
+
     @inject.params(storage='storage')
     def setContent(self, data=None, storage=None):
         """

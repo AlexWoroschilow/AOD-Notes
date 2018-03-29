@@ -90,10 +90,10 @@ class Loader(Loader):
         :return: 
         """
         self._list = FolderList()
-        self._list.toolbar.newAction.triggered.connect(self._onFolderNewEvent)
-        self._list.toolbar.copyAction.triggered.connect(self._onFolderCopyEvent)
-        self._list.toolbar.refreshAction.triggered.connect(self._onRefreshEvent)
-        self._list.toolbar.removeAction.triggered.connect(self._onFolderRemoveEvent)
+        self._list.toolbar.newAction.clicked.connect(self._onFolderNewEvent)
+        self._list.toolbar.copyAction.clicked.connect(self._onFolderCopyEvent)
+        self._list.toolbar.refreshAction.clicked.connect(self._onRefreshEvent)
+        self._list.toolbar.removeAction.clicked.connect(self._onFolderRemoveEvent)
 
         self._list.list.doubleClicked.connect(self._onFolderOpen)
         self._list.list.selectionChanged = self._onFolderSelected

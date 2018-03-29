@@ -159,24 +159,18 @@ class FolderList(QtWidgets.QWidget):
             QListWidget::item{ background-color: #fcf9f6; border: none; }
             QListWidget::item:selected{ background-color: #fdfcf9 }''')
 
-        self.list = ItemList()
 
         self.toolbar = ToolbarbarWidget()
-        self.container = QtWidgets.QWidget()
-
+        self.list = ItemList()
         self.statusbar = QtWidgets.QLabel()
-        self.statusbar.setText("Total amount of folders: 12")
+        self.statusbar.setText("...")
 
-        layout = QtWidgets.QVBoxLayout()
+        layout = QtWidgets.QGridLayout()
+        layout.addWidget(self.toolbar, 0, 0, 3, 1)
+        layout.addWidget(self.list, 0, 1)
+        layout.addWidget(self.statusbar, 1, 1)
+        self.setLayout(layout)
 
-        layout.addWidget(self.list)
-        layout.addWidget(self.statusbar)
-
-        self.container.setLayout(layout)
-        layout1 = QtWidgets.QHBoxLayout()
-        layout1.addWidget(self.toolbar)
-        layout1.addWidget(self.container)
-        self.setLayout(layout1)
 
     def addLine(self, folder=None):
         """

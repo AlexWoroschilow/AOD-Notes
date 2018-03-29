@@ -125,7 +125,6 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.formatbar.dedentAction.clicked.connect(self.dedent)
         self.formatbar.imageAction.clicked.connect(self.insertImage)
 
-
         self.rightbar = ToolbarbarWidgetRight(self.writer)
         self.rightbar.italicAction.clicked.connect(self.italic)
         self.rightbar.boldAction.clicked.connect(self.bold)
@@ -136,32 +135,13 @@ class TextEditorWidget(QtWidgets.QWidget):
 
         self.statusbar = QtWidgets.QLabel()
 
-        layout3 = QtWidgets.QVBoxLayout()
-        layout3.addWidget(self.formatbar)
-        layout3.addWidget(self.writer)
-
-        widget3 = QtWidgets.QWidget()
-        widget3.setLayout(layout3)
-
-        layout2 = QtWidgets.QHBoxLayout()
-        layout2.addWidget(widget3)
-        layout2.addWidget(self.rightbar)
-
-
-        widget2 = QtWidgets.QWidget()
-        widget2.setLayout(layout2)
-
-        layout1 = QtWidgets.QVBoxLayout()
-        layout1.addWidget(self.name)
-        layout1.addWidget(widget2)
-        layout1.addWidget(self.statusbar)
-
-        widget1 = QtWidgets.QWidget()
-        widget1.setLayout(layout1)
-
-        layout = QtWidgets.QHBoxLayout()
-        layout.addWidget(self.leftbar)
-        layout.addWidget(widget1)
+        layout = QtWidgets.QGridLayout()
+        layout.addWidget(self.leftbar, 0, 0, 5, 1)
+        layout.addWidget(self.name, 0, 1, 1, 2)
+        layout.addWidget(self.rightbar, 1, 2, 3, 1)
+        layout.addWidget(self.formatbar, 1, 1)
+        layout.addWidget(self.writer, 2, 1)
+        layout.addWidget(self.statusbar, 3, 1)
 
         self.setLayout(layout)
 

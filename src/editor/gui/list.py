@@ -209,24 +209,21 @@ class RecordList(QtWidgets.QWidget):
 
         self.list = ItemList()
         self.folderEditor = NameEditor()
-        self.folderEditor.setText('Folder 1')
+        self.folderEditor.setText('...')
         self.toolbar = ToolbarbarWidget(self)
 
-        self.container = QtWidgets.QWidget()
+        # self.container = QtWidgets.QWidget()
 
         self.statusbar = QtWidgets.QLabel()
         self.statusbar.setText("Total amount of records: 12")
 
-        layout = QtWidgets.QVBoxLayout()
-        layout.addWidget(self.folderEditor)
-        layout.addWidget(self.list)
-        layout.addWidget(self.statusbar)
+        layout = QtWidgets.QGridLayout()
+        layout.addWidget(self.toolbar, 0, 0, 4, 1)
+        layout.addWidget(self.folderEditor, 0, 1, 1, 2)
+        layout.addWidget(self.list, 1, 1)
+        layout.addWidget(self.statusbar, 2, 1)
 
-        self.container.setLayout(layout)
-        layout1 = QtWidgets.QHBoxLayout()
-        layout1.addWidget(self.toolbar)
-        layout1.addWidget(self.container)
-        self.setLayout(layout1)
+        self.setLayout(layout)
 
     @property
     def entity(self):
