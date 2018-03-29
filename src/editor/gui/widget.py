@@ -74,10 +74,10 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
         self._list = RecordList()
         self._editor = TextEditorWidget()
 
-        self._list.toolbar.newAction.triggered.connect(self._onNotepadNoteNewEvent)
-        self._list.toolbar.copyAction.triggered.connect(self._onNotepadNoteCopyEvent)
-        self._list.toolbar.removeAction.triggered.connect(self._onRemoveEvent)
-        self._list.toolbar.refreshAction.triggered.connect(self._onRefreshEvent)
+        self._list.toolbar.newAction.toggled.connect(self._onNotepadNoteNewEvent)
+        self._list.toolbar.copyAction.toggled.connect(self._onNotepadNoteCopyEvent)
+        self._list.toolbar.removeAction.toggled.connect(self._onRemoveEvent)
+        self._list.toolbar.refreshAction.toggled.connect(self._onRefreshEvent)
         self._list.folderEditor.returnPressed.connect(self._onFolderUpdated)
         self._list.list.doubleClicked.connect(self._onNotepadNoteDoubleClick)
         self._list.list.selectionChanged = self._onNotepadNoteSelected

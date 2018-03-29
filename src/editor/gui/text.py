@@ -102,49 +102,37 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.writer.text.cursorPositionChanged.connect(self.cursorPosition)
         self.writer.text.textChanged.connect(self.changed)
 
-        self.leftbar = ToolbarbarWidgetLeft()
-        self.leftbar.saveAction.triggered.connect(self._onSaveEvent)
-        self.leftbar.printAction.triggered.connect(self.printHandler)
-        self.leftbar.previewAction.triggered.connect(self.preview)
-        self.leftbar.cutAction.triggered.connect(self.writer.text.cut)
-        self.leftbar.copyAction.triggered.connect(self.writer.text.copy)
-        self.leftbar.pasteAction.triggered.connect(self.writer.text.paste)
-        self.leftbar.undoAction.triggered.connect(self.writer.text.undo)
-        self.leftbar.redoAction.triggered.connect(self.writer.text.redo)
-        self.leftbar.fullscreenAction.triggered.connect(self._onFullScreenEvent)
+        self.leftbar = ToolbarbarWidgetLeft(self)
+        self.leftbar.saveAction.clicked.connect(self._onSaveEvent)
+        self.leftbar.printAction.clicked.connect(self.printHandler)
+        self.leftbar.previewAction.clicked.connect(self.preview)
+        self.leftbar.cutAction.clicked.connect(self.writer.text.cut)
+        self.leftbar.copyAction.clicked.connect(self.writer.text.copy)
+        self.leftbar.pasteAction.clicked.connect(self.writer.text.paste)
+        self.leftbar.undoAction.clicked.connect(self.writer.text.undo)
+        self.leftbar.redoAction.clicked.connect(self.writer.text.redo)
+        self.leftbar.fullscreenAction.clicked.connect(self._onFullScreenEvent)
 
-        dispatcher.dispatch('window.notepad.leftbar', (
-            self, self.leftbar
-        ))
-
-        self.formatbar = FormatbarWidget()
-        self.formatbar.bulletAction.triggered.connect(self.bulletList)
-        # self.formatbar.fontBox.currentFontChanged.connect(lambda font: self.writer.text.setCurrentFont(font))
+        self.formatbar = FormatbarWidget(self)
         self.formatbar.fontSize.valueChanged.connect(lambda size: self.writer.text.setFontPointSize(size))
-        self.formatbar.numberedAction.triggered.connect(self.numberList)
-        self.formatbar.alignLeft.triggered.connect(self.alignLeft)
-        self.formatbar.alignCenter.triggered.connect(self.alignCenter)
-        self.formatbar.alignRight.triggered.connect(self.alignRight)
-        self.formatbar.alignJustify.triggered.connect(self.alignJustify)
-        self.formatbar.indentAction.triggered.connect(self.indent)
-        self.formatbar.dedentAction.triggered.connect(self.dedent)
-        self.formatbar.imageAction.triggered.connect(self.insertImage)
+        self.formatbar.bulletAction.clicked.connect(self.bulletList)
+        self.formatbar.numberedAction.clicked.connect(self.numberList)
+        self.formatbar.alignLeft.clicked.connect(self.alignLeft)
+        self.formatbar.alignCenter.clicked.connect(self.alignCenter)
+        self.formatbar.alignRight.clicked.connect(self.alignRight)
+        self.formatbar.alignJustify.clicked.connect(self.alignJustify)
+        self.formatbar.indentAction.clicked.connect(self.indent)
+        self.formatbar.dedentAction.clicked.connect(self.dedent)
+        self.formatbar.imageAction.clicked.connect(self.insertImage)
 
-        dispatcher.dispatch('window.notepad.formatbar', (
-            self, self.formatbar
-        ))
 
-        self.rightbar = ToolbarbarWidgetRight()
-        self.rightbar.italicAction.triggered.connect(self.italic)
-        self.rightbar.boldAction.triggered.connect(self.bold)
-        self.rightbar.strikeAction.triggered.connect(self.strike)
-        self.rightbar.superAction.triggered.connect(self.superScript)
-        self.rightbar.subAction.triggered.connect(self.subScript)
-        self.rightbar.backColor.triggered.connect(self.highlight)
-
-        dispatcher.dispatch('window.notepad.rightbar', (
-            self, self.rightbar
-        ))
+        self.rightbar = ToolbarbarWidgetRight(self.writer)
+        self.rightbar.italicAction.clicked.connect(self.italic)
+        self.rightbar.boldAction.clicked.connect(self.bold)
+        self.rightbar.strikeAction.clicked.connect(self.strike)
+        self.rightbar.superAction.clicked.connect(self.superScript)
+        self.rightbar.subAction.clicked.connect(self.subScript)
+        self.rightbar.backColor.clicked.connect(self.highlight)
 
         self.statusbar = QtWidgets.QLabel()
 
@@ -158,6 +146,7 @@ class TextEditorWidget(QtWidgets.QWidget):
         layout2 = QtWidgets.QHBoxLayout()
         layout2.addWidget(widget3)
         layout2.addWidget(self.rightbar)
+
 
         widget2 = QtWidgets.QWidget()
         widget2.setLayout(layout2)

@@ -51,11 +51,13 @@ class Loader(Loader):
         if self._editor is None or self._toolbar is None:
             raise 'Editor or Toolbar object can not be empty'
 
-        self._widget = QtWidgets.QAction(QtGui.QIcon("icons/font-green.svg"), self._editor.tr("Change the text color to green"), self._toolbar)
-        self._widget.setStatusTip(self._editor.tr("Change the text color to green"))
-        self._widget.triggered.connect(self._onButtonPressed)
+        self._widget = QtWidgets.QPushButton()
+        self._widget.setIcon(QtGui.QIcon("icons/font-green.svg"))
+        self._widget.setToolTip("Change the text color to green")
+        self._widget.clicked.connect(self._onButtonPressed)
+        self._widget.setFlat(True)
 
-        self._toolbar.addAction(self._widget)
+        self._toolbar.addWidget(self._widget)
 
     @inject.params(dispatcher='event_dispatcher')
     def _onButtonPressed(self, event=None, dispatcher=None):

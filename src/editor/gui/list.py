@@ -210,11 +210,7 @@ class RecordList(QtWidgets.QWidget):
         self.list = ItemList()
         self.folderEditor = NameEditor()
         self.folderEditor.setText('Folder 1')
-        self.toolbar = ToolbarbarWidget()
-
-        dispatcher.dispatch('window.notelist.toolbar', (
-            self, self.toolbar
-        ))
+        self.toolbar = ToolbarbarWidget(self)
 
         self.container = QtWidgets.QWidget()
 
