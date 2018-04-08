@@ -78,7 +78,7 @@ class Loader(Loader):
         # self.action2 = QtWidgets.QShortcut(QtGui.QKeySequence("ESC"), self._widget)
         # self.action2.activated.connect(self._onShortcutSearchClean)
 
-        self._container.addWidget(self._widget, -1)
+        self._container.addWidget(self._widget)
 
     @inject.params(dispather='event_dispatcher')
     def _OnSearchRequestEvent(self, event=None, dispather=None):

@@ -45,11 +45,11 @@ class Loader(Loader):
         :return:.
         """
         dispatcher.add_listener('application.start', self._onWindowStart)
-        dispatcher.add_listener('window.first_tab.content', self._onWindowFirstTab, 128)
-        dispatcher.add_listener('window.notepad.folder_open', self._onNotepadFolderOpen)
 
-        dispatcher.add_listener('window.first_tab.content', self._onWindowFirstTab)
+        dispatcher.add_listener('window.first_tab.content', self._onWindowFirstTab, 128)
         dispatcher.add_listener('window.notepad.note_update', self._onNotepadNoteUpdate, 128)
+
+        dispatcher.add_listener('window.notepad.folder_open', self._onNotepadFolderOpen)
         dispatcher.add_listener('window.notepad.folder_selected', self._onNotepadFolderSelect)
 
     @inject.params(storage='storage', dispatcher='event_dispatcher')

@@ -55,7 +55,7 @@ class Kernel(object):
         binder.bind('event_dispatcher', Dispatcher(logging.getLogger('ed')))
 
         for module_source in self.__modules(self._sources):
-            module = importlib.import_module(module_source, True)
+            module = importlib.import_module(module_source, False)
             with module.Loader(self._options, self._args) as loader:
                 self._loaders.append(loader)
                 if not loader.enabled:

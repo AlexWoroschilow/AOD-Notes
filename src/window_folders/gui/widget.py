@@ -1,63 +1,51 @@
 # -*- coding: utf-8 -*-
 
 import sys
-
-# PYQT5 PyQt4’s QtGui module has been split into PyQt5’s QtGui, QtPrintSupport and QtWidgets modules
-
+import re
 from PyQt5 import QtWidgets
-# PYQT5 QMainWindow, QApplication, QAction, QFontComboBox, QSpinBox, QTextEdit, QMessageBox
-# PYQT5 QFileDialog, QColorDialog, QDialog
-
 from PyQt5 import QtPrintSupport
-# PYQT5 QPrintPreviewDialog, QPrintDialog
-
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import Qt
 from .bar import ToolbarbarWidget
-import re
 
 
 class LabelTop(QtWidgets.QLabel):
+
     def __init__(self, parent=None):
         """
 
         :param parent: 
         """
         super(LabelTop, self).__init__(parent)
-        self.setStyleSheet('color: #000')
-        font = self.font()
-        font.setPixelSize(18)
-        self.setFont(font)
+        self.setObjectName('LabelTop')
 
 
 class LabelBottom(QtWidgets.QLabel):
+
     def __init__(self, parent=None):
         """
 
         :param parent: 
         """
         super(LabelBottom, self).__init__(parent)
-        self.setStyleSheet('color: #c0c0c0')
-        font = self.font()
-        # font.setPixelSize(12)
-        self.setFont(font)
+        self.setObjectName('LabelBottom')
 
 
 class QCustomQWidget(QtWidgets.QWidget):
+
     def __init__(self, parent=None):
         super(QCustomQWidget, self).__init__(parent)
         self.textQVBoxLayout = QtWidgets.QVBoxLayout()
+        self.textQVBoxLayout.setContentsMargins(10, 10, 0, 10)
+        self.textQVBoxLayout.setSpacing(0)
 
         self.textUpQLabel = LabelTop()
-        self.textDownQLabel = LabelBottom()
-
         self.textQVBoxLayout.addWidget(self.textUpQLabel)
+
+        self.textDownQLabel = LabelBottom()
         self.textQVBoxLayout.addWidget(self.textDownQLabel)
-        self.allQHBoxLayout = QtWidgets.QHBoxLayout()
-        self.iconQLabel = QtWidgets.QLabel()
-        self.allQHBoxLayout.addWidget(self.iconQLabel, 0)
-        self.allQHBoxLayout.addLayout(self.textQVBoxLayout, 1)
-        self.setLayout(self.allQHBoxLayout)
+
+        self.setLayout(self.textQVBoxLayout)
 
     def setTextUp(self, text=None):
         """
@@ -85,12 +73,14 @@ class QCustomQWidget(QtWidgets.QWidget):
 
 
 class FolderItem(QtWidgets.QListWidgetItem):
+
     def __init__(self, entity=None, widget=None):
         """
 
         :param parent: 
         """
         super(FolderItem, self).__init__()
+        
         widget.setTextDown(entity.text)
         widget.setTextUp(entity.name)
         self._entity = entity
@@ -125,12 +115,16 @@ class FolderItem(QtWidgets.QListWidgetItem):
 
 
 class ItemList(QtWidgets.QListWidget):
+
     def __init__(self, parent=None):
         """
         
         :param parent: 
         """
         super(ItemList, self).__init__(parent)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setContentsMargins(0, 0, 0, 0)
+        self.setObjectName('foldersList')
 
     def addLine(self, folder=None):
         """
@@ -147,7 +141,8 @@ class ItemList(QtWidgets.QListWidget):
         self.setItemWidget(item, item.widget)
 
 
-class FolderList(QtWidgets.QWidget):
+class FolderList(QtWidgets.QSplitter):
+
     def __init__(self, parent=None):
         """
         
@@ -155,22 +150,28 @@ class FolderList(QtWidgets.QWidget):
         """
         super(FolderList, self).__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
-        self.setStyleSheet('''QListWidget{ border: none; }
-            QListWidget::item{ background-color: #fcf9f6; border: none; }
-            QListWidget::item:selected{ background-color: #fdfcf9 }''')
-
+        self.setObjectName('foldersWidget')
 
         self.toolbar = ToolbarbarWidget()
+        self.addWidget(self.toolbar)
+
         self.list = ItemList()
+        self.list.setMinimumWidth(200)
+
         self.statusbar = QtWidgets.QLabel()
         self.statusbar.setText("...")
 
-        layout = QtWidgets.QGridLayout()
-        layout.addWidget(self.toolbar, 0, 0, 3, 1)
-        layout.addWidget(self.list, 0, 1)
-        layout.addWidget(self.statusbar, 1, 1)
-        self.setLayout(layout)
+        layout = QtWidgets.QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
 
+        layout.addWidget(self.list)
+        layout.addWidget(self.statusbar)
+
+        container = QtWidgets.QWidget()
+        container.setLayout(layout)
+        
+        self.addWidget(container)
 
     def addLine(self, folder=None):
         """
@@ -181,6 +182,9 @@ class FolderList(QtWidgets.QWidget):
         """
         self.list.addLine(folder)
 
+        if self.statusbar is None:
+            return None 
+        
         self.statusbar.setText("%i folders found" % self.list.count())
 
     def selectedIndexes(self):
@@ -211,5 +215,8 @@ class FolderList(QtWidgets.QWidget):
             return None
 
         self.list.takeItem(index.row())
+
+        if self.statusbar is None:
+            return None 
 
         self.statusbar.setText("%i folders found" % self.list.count())

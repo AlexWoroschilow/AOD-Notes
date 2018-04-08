@@ -68,16 +68,18 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
         :param storage: 
         """
         super(NotepadEditorWidget, self).__init__(parent)
+        self.setContentsMargins(0, 0, 0, 0)
+        self.setObjectName('editorWidget')
 
         dispatcher.add_listener('window.notepad.note_update', self._onNotepadNoteUpdate, 128)
 
-        self._list = RecordList()
         self._editor = TextEditorWidget()
 
-        self._list.toolbar.newAction.toggled.connect(self._onNotepadNoteNewEvent)
-        self._list.toolbar.copyAction.toggled.connect(self._onNotepadNoteCopyEvent)
-        self._list.toolbar.removeAction.toggled.connect(self._onRemoveEvent)
-        self._list.toolbar.refreshAction.toggled.connect(self._onRefreshEvent)
+        self._list = RecordList()
+        self._list.toolbar.newAction.clicked.connect(self._onNotepadNoteNewEvent)
+        self._list.toolbar.copyAction.clicked.connect(self._onNotepadNoteCopyEvent)
+        self._list.toolbar.removeAction.clicked.connect(self._onRemoveEvent)
+        self._list.toolbar.refreshAction.clicked.connect(self._onRefreshEvent)
         self._list.folderEditor.returnPressed.connect(self._onFolderUpdated)
         self._list.list.doubleClicked.connect(self._onNotepadNoteDoubleClick)
         self._list.list.selectionChanged = self._onNotepadNoteSelected
@@ -85,9 +87,8 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
         self.addWidget(self._list)
         self.addWidget(self._editor)
 
-        self.setStretchFactor(0, 1)
-        self.setStretchFactor(1, 1)
-
+        self.setStretchFactor(0, 2)
+        self.setStretchFactor(1, 3)
 
     @inject.params(storage='storage')
     def setContent(self, data=None, storage=None):
@@ -151,7 +152,8 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
         :return: 
         """
         message = self._list.tr("Are you sure you want to remove this Note?")
-        reply = QtWidgets.QMessageBox.question(self._list, 'Remove note', message, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
+        reply = QtWidgets.QMessageBox.question(self._list, 'Remove note', message, QtWidgets.QMessageBox.Yes,
+                                               QtWidgets.QMessageBox.No)
         if reply == QtWidgets.QMessageBox.No:
             return None
 

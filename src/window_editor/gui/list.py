@@ -14,12 +14,12 @@ from PyQt5 import QtPrintSupport
 
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import Qt
-from .bar import ToolbarbarWidget
-from .text import NameEditor
 import re
 from bs4 import BeautifulSoup, NavigableString
 import textwrap
 
+from .bar import ToolBarWidget
+from .text import NameEditor
 
 class LabelTop(QtWidgets.QLabel):
     def __init__(self, parent=None):
@@ -28,10 +28,7 @@ class LabelTop(QtWidgets.QLabel):
         :param parent: 
         """
         super(LabelTop, self).__init__(parent)
-        self.setStyleSheet('QLabel{ color: #000000; }')
-        font = self.font()
-        font.setPixelSize(18)
-        self.setFont(font)
+        self.setStyleSheet('QLabel{ color: #000; font-size: 14px }')
 
 
 class LabelBottom(QtWidgets.QLabel):
@@ -41,9 +38,7 @@ class LabelBottom(QtWidgets.QLabel):
         :param parent: 
         """
         super(LabelBottom, self).__init__(parent)
-        self.setStyleSheet('QLabel{ color: #c0c0c0; }')
-        font = self.font()
-        self.setFont(font)
+        self.setStyleSheet('QLabel{ color: #c0c0c0; font-size: 10px }')
 
     def setText(self, value=None):
         """
@@ -71,17 +66,16 @@ class QCustomQWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(QCustomQWidget, self).__init__(parent)
         self.textQVBoxLayout = QtWidgets.QVBoxLayout()
+        self.textQVBoxLayout.setContentsMargins(10, 10, 0, 10)
+        self.textQVBoxLayout.setSpacing(0)
 
         self.textUpQLabel = LabelTop()
-        self.textDownQLabel = LabelBottom()
-
         self.textQVBoxLayout.addWidget(self.textUpQLabel)
+
+        self.textDownQLabel = LabelBottom()
         self.textQVBoxLayout.addWidget(self.textDownQLabel)
-        self.allQHBoxLayout = QtWidgets.QHBoxLayout()
-        self.iconQLabel = QtWidgets.QLabel()
-        self.allQHBoxLayout.addWidget(self.iconQLabel, 0)
-        self.allQHBoxLayout.addLayout(self.textQVBoxLayout, 1)
-        self.setLayout(self.allQHBoxLayout)
+
+        self.setLayout(self.textQVBoxLayout)
 
     def setTextUp(self, text=None):
         """
@@ -131,6 +125,7 @@ class NoteItem(QtWidgets.QListWidgetItem):
         :param text: 
         """
         super(NoteItem, self).__init__()
+        
         widget.setTextDown(entity.text)
         widget.setTextUp(entity.name)
         self._entity = entity
@@ -171,12 +166,8 @@ class ItemList(QtWidgets.QListWidget):
         :param parent: 
         """
         super(ItemList, self).__init__(parent)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setContentsMargins(0, 0, 0, 0)
-        self.setStyleSheet('''
-            QListWidget{ border: none; }
-            QListWidget::item{ background-color: #fcf9f6; padding: 0px 0px 0px 0px; }
-            QListWidget::item:selected{ background-color: #fdfcf9 }
-        ''')
 
     def addLine(self, entity=None):
         """
@@ -193,7 +184,7 @@ class ItemList(QtWidgets.QListWidget):
         self.setItemWidget(item, item.widget)
 
 
-class RecordList(QtWidgets.QWidget):
+class RecordList(QtWidgets.QSplitter):
     @inject.params(dispatcher='event_dispatcher', storage='storage')
     def __init__(self, parent=None, dispatcher=None, storage=None):
         """
@@ -201,29 +192,34 @@ class RecordList(QtWidgets.QWidget):
         :param parent: 
         """
         super(RecordList, self).__init__(parent)
+        self.setContentsMargins(0, 0, 0, 0)
 
         self._folder = None
 
-        self.setStyleSheet(''' QListWidget::item{ background-color: #fcf9f6; border: none; }
-            QListWidget::item:selected{ background-color: #fdfcf9 } ''')
+        self.toolbar = ToolBarWidget(self)
+        self.addWidget(self.toolbar)
+
 
         self.list = ItemList()
+        self.list.setMinimumWidth(250)
+
         self.folderEditor = NameEditor()
         self.folderEditor.setText('...')
-        self.toolbar = ToolbarbarWidget(self)
-
-        # self.container = QtWidgets.QWidget()
 
         self.statusbar = QtWidgets.QLabel()
-        self.statusbar.setText("Total amount of records: 12")
-
+        self.statusbar.setText("...")
+        
         layout = QtWidgets.QGridLayout()
-        layout.addWidget(self.toolbar, 0, 0, 4, 1)
+        layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.folderEditor, 0, 1, 1, 2)
         layout.addWidget(self.list, 1, 1)
         layout.addWidget(self.statusbar, 2, 1)
+        layout.setSpacing(0)
 
-        self.setLayout(layout)
+        content = QtWidgets.QWidget()
+        content.setLayout(layout)
+        
+        self.addWidget(content)
 
     @property
     def entity(self):

@@ -17,6 +17,7 @@ from PyQt5 import QtGui
 from PyQt5 import QtWidgets
 
 from lib.plugin import Loader
+from PyQt5 import QtCore
 
 
 class Loader(Loader):
@@ -55,6 +56,7 @@ class Loader(Loader):
         self._widget.setIcon(QtGui.QIcon("icons/font-gray.svg"))
         self._widget.setToolTip("Change the text color to gray")
         self._widget.clicked.connect(self._onButtonPressed)
+        self._widget.setMaximumSize(QtCore.QSize(20, 20))
         self._widget.setFlat(True)
 
         self._toolbar.addWidget(self._widget)

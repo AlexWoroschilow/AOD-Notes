@@ -18,8 +18,8 @@ from PyQt5 import QtPrintSupport
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 
-from .bar import ToolbarbarWidgetLeft
-from .bar import ToolbarbarWidgetRight
+from .bar import ToolbarWidgetLeft
+from .bar import ToolBarWidgetRight
 from .bar import FormatbarWidget
 
 
@@ -30,6 +30,8 @@ class TextWriter(QtWidgets.QScrollArea):
         :param parent: 
         """
         super(TextWriter, self).__init__(parent)
+        self.setContentsMargins(0, 0, 0, 0)
+        self.setObjectName('editorQScrollArea')
 
         self.text = TextEditor(self)
 
@@ -38,7 +40,6 @@ class TextWriter(QtWidgets.QScrollArea):
 
         # Align the scrollArea's widget in the center
         self.setAlignment(Qt.AlignHCenter)
-        self.setStyleSheet("background-color: #A0A0A0;")
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
@@ -46,6 +47,7 @@ class TextWriter(QtWidgets.QScrollArea):
 class TextEditor(QtWidgets.QTextEdit):
     def __init__(self, parent=None):
         super(TextEditor, self).__init__(parent)
+        self.setObjectName('editorTextEditor')
 
         self.setAcceptDrops(True)
         self.setAcceptRichText(True)
@@ -53,7 +55,6 @@ class TextEditor(QtWidgets.QTextEdit):
         self.setViewportMargins(40, 20, 20, 20)
 
         self.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.setStyleSheet("background-color: #FFFFFF;")
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
@@ -65,13 +66,8 @@ class NameEditor(QtWidgets.QLineEdit):
         :param parent: 
         """
         super(NameEditor, self).__init__(parent)
+        self.setObjectName('editorNameEditor')
         self.setPlaceholderText('Write a title here...')
-
-        self.setStyleSheet(''' QLineEdit{ border: none; }''')
-
-        font = self.font()
-        font.setPixelSize(24)
-        self.setFont(font)
 
 
 class TextEditorWidget(QtWidgets.QWidget):
@@ -88,13 +84,12 @@ class TextEditorWidget(QtWidgets.QWidget):
         :param dispatcher: 
         """
         super(TextEditorWidget, self).__init__(parent)
+        self.setObjectName('editorTextEditorWidget')
+        self.setContentsMargins(0, 0, 0, 0)
 
         self.changesSaved = True
         self.filename = ""
         self._index = None
-
-        self.setStyleSheet(''' QTextEdit{ border: none; }
-            QLineEdit{ border: none; }''')
 
         self.name = NameEditor()
 
@@ -102,7 +97,7 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.writer.text.cursorPositionChanged.connect(self.cursorPosition)
         self.writer.text.textChanged.connect(self.changed)
 
-        self.leftbar = ToolbarbarWidgetLeft(self)
+        self.leftbar = ToolbarWidgetLeft(self)
         self.leftbar.saveAction.clicked.connect(self._onSaveEvent)
         self.leftbar.printAction.clicked.connect(self.printHandler)
         self.leftbar.previewAction.clicked.connect(self.preview)
@@ -125,7 +120,7 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.formatbar.dedentAction.clicked.connect(self.dedent)
         self.formatbar.imageAction.clicked.connect(self.insertImage)
 
-        self.rightbar = ToolbarbarWidgetRight(self.writer)
+        self.rightbar = ToolBarWidgetRight(self.writer)
         self.rightbar.italicAction.clicked.connect(self.italic)
         self.rightbar.boldAction.clicked.connect(self.bold)
         self.rightbar.strikeAction.clicked.connect(self.strike)
@@ -136,12 +131,15 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.statusbar = QtWidgets.QLabel()
 
         layout = QtWidgets.QGridLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+
         layout.addWidget(self.leftbar, 0, 0, 5, 1)
         layout.addWidget(self.name, 0, 1, 1, 2)
         layout.addWidget(self.rightbar, 1, 2, 3, 1)
         layout.addWidget(self.formatbar, 1, 1)
         layout.addWidget(self.writer, 2, 1)
         layout.addWidget(self.statusbar, 3, 1)
+        layout.setSpacing(0)
 
         self.setLayout(layout)
 
@@ -313,7 +311,8 @@ class TextEditorWidget(QtWidgets.QWidget):
 
         # Get image file name
         # PYQT5 Returns a tuple in PyQt5
-        filename = QtWidgets.QFileDialog.getOpenFileName(self, 'Insert image', ".", "Images (*.png *.xpm *.jpg *.bmp *.gif)")[0]
+        filename = \
+        QtWidgets.QFileDialog.getOpenFileName(self, 'Insert image', ".", "Images (*.png *.xpm *.jpg *.bmp *.gif)")[0]
 
         if filename:
 

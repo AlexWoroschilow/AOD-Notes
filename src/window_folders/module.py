@@ -13,12 +13,10 @@
 import inject
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
-
-from lib.plugin import Loader
-
-from .gui.widget import FolderList
 from PyQt5.QtWidgets import QTreeView, QFileSystemModel, QApplication
 
+from lib.plugin import Loader
+from .gui.widget import FolderList
 
 class FolderModel(object):
     def __init__(self, name=None, text=None):

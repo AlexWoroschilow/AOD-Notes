@@ -25,11 +25,12 @@ class ToolBarbarButton(QtWidgets.QPushButton):
         self.setFlat(True)
 
 
-class ToolbarbarWidget(QtWidgets.QWidget):
+class ToolBarWidget(QtWidgets.QWidget):
     @inject.params(dispatcher='event_dispatcher')
     def __init__(self, parent=None, dispatcher=None):
-        super(ToolbarbarWidget, self).__init__()
+        super(ToolBarWidget, self).__init__()
         self.setContentsMargins(0, 0, 0, 0)
+        self.setMinimumWidth(50)
 
         self.newAction = ToolBarbarButton()
         self.newAction.setIcon(QtGui.QIcon("icons/new.svg"))
@@ -39,7 +40,6 @@ class ToolbarbarWidget(QtWidgets.QWidget):
         self.copyAction = ToolBarbarButton()
         self.copyAction.setIcon(QtGui.QIcon("icons/copy.svg"))
         self.copyAction.setToolTip("Copy text to clipboard")
-        self.copyAction.setShortcut("Ctrl+C")
 
         self.removeAction = ToolBarbarButton()
         self.removeAction.setIcon(QtGui.QIcon("icons/remove.svg"))
@@ -72,10 +72,13 @@ class ToolbarbarWidget(QtWidgets.QWidget):
         self.layout.addWidget(widget)
 
 
-class ToolbarbarWidgetLeft(QtWidgets.QWidget):
+class ToolbarWidgetLeft(QtWidgets.QWidget):
     @inject.params(dispatcher='event_dispatcher')
     def __init__(self, parent=None, dispatcher=None):
-        super(ToolbarbarWidgetLeft, self).__init__()
+        super(ToolbarWidgetLeft, self).__init__()
+        self.setContentsMargins(0, 0, 0, 0)
+        self.setMinimumWidth(50)
+        self.setObjectName('editorToolbarWidgetLeft')
 
         self.saveAction = ToolBarbarButton()
         self.saveAction.setIcon(QtGui.QIcon("icons/save.svg"))
@@ -141,11 +144,13 @@ class ToolbarbarWidgetLeft(QtWidgets.QWidget):
         self.setLayout(self.layout)
 
 
-class ToolbarbarWidgetRight(QtWidgets.QWidget):
+class ToolBarWidgetRight(QtWidgets.QWidget):
     @inject.params(dispatcher='event_dispatcher')
     def __init__(self, parent=None, dispatcher=None):
-        super(ToolbarbarWidgetRight, self).__init__()
-
+        super(ToolBarWidgetRight, self).__init__()
+        self.setContentsMargins(0, 0, 0, 0)
+        self.setObjectName('editorToolBarWidgetRight')
+        
         self.boldAction = ToolBarbarButton()
         self.boldAction.setIcon(QtGui.QIcon("icons/bold.svg"))
         self.boldAction.setToolTip("Bold")
@@ -201,8 +206,7 @@ class FormatbarWidget(QtWidgets.QWidget):
     @inject.params(dispatcher='event_dispatcher')
     def __init__(self, parent=None, dispatcher=None):
         super(FormatbarWidget, self).__init__()
-        # self.setOrientation(Qt.Horizontal)
-        # self.setContentsMargins(0, 0, 0, 0)
+        self.setContentsMargins(0, 0, 0, 0)
 
         self.folder = FolderBomboBox()
         # self.fontBox = QtWidgets.QFontComboBox(self)

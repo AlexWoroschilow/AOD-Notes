@@ -19,12 +19,14 @@ from PyQt5 import QtSvg
 
 
 class ToolBarbarButton(QtWidgets.QPushButton):
+
     def __init__(self, parent=None, dispatcher=None):
         super(ToolBarbarButton, self).__init__()
         self.setFlat(True)
 
 
 class ToolbarbarWidget(QtWidgets.QWidget):
+
     @inject.params(dispatcher='event_dispatcher')
     def __init__(self, parent=None, dispatcher=None):
         super(ToolbarbarWidget, self).__init__()

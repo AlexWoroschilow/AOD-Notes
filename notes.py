@@ -18,13 +18,19 @@ import inject
 import logging
 import optparse
 
-from PyQt5 import QtGui
+from PyQt5 import QtGui, QtCore
 from PyQt5 import QtWidgets
 
 from lib.kernel import Kernel
 
+import os
+
+abspath = os.path.abspath(__file__)
+os.chdir(os.path.dirname(abspath))
+
 
 class Application(QtWidgets.QApplication):
+
     def __init__(self, options=None, args=None):
         """
         
@@ -68,69 +74,38 @@ class Application(QtWidgets.QApplication):
         return None
 
 
-class Dashboard(QtWidgets.QWidget):
+class WindowHeader(QtWidgets.QWidget):
+
     @inject.params(dispatcher='event_dispatcher', logger='logger')
     def __init__(self, parent=None, dispatcher=None, logger=None):
-        """
-        
-        :param parent: 
-        :param dispatcher: 
-        :param logger: 
-        """
-        super(Dashboard, self).__init__(parent)
-
-        self.content = QtWidgets.QSplitter()
-        self.content.setContentsMargins(0, 0, 0, 0)
-
-        # fill tabs with widgets from different modules
-        dispatcher.dispatch('window.first_tab.content', (
-            self.content, parent
-        ))
-
-        self.content.setStretchFactor(0, 1)
-        self.content.setStretchFactor(1, 1)
+        super(WindowHeader, self).__init__(parent)
+        self.setContentsMargins(0, 0, 0, 0)
 
         layout = QtWidgets.QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-
+        layout.setContentsMargins(10, 0, 10, 0)
+            
         # fill tabs with widgets from different modules
         dispatcher.dispatch('window.header.content', (
             layout, self
         ))
 
-        layout.addWidget(self.content)
-
         self.setLayout(layout)
 
 
-class MainWindow(QtWidgets.QMainWindow):
+class WindowContent(QtWidgets.QTabWidget):
+
     @inject.params(dispatcher='event_dispatcher', logger='logger')
     def __init__(self, parent=None, dispatcher=None, logger=None):
-        """
+        super(WindowContent, self).__init__(parent)
+        self.setContentsMargins(0, 0, 0, 0)
         
-        :param parent: 
-        :param dispatcher: 
-        :param logger: 
-        """
+        self.setTabPosition(QtWidgets.QTabWidget.West)
+        self.tabCloseRequested.connect(self._onTabClose)
+
+        self.addTab(Dashboard(parent), self.tr('Notes'))
+        self.setTabsClosable(True)
 
         dispatcher.add_listener('window.tab', self._onTabNew)
-
-        super(MainWindow, self).__init__(parent)
-        self.setStyleSheet('QMainWindow{ background-color: #ffffff; }')
-
-        self.setWindowIcon(QtGui.QIcon("icons/icon.svg"))
-        self.setWindowTitle('Cloud notepad')
-
-        self.container = QtWidgets.QTabWidget(self)
-
-        self.container.addTab(Dashboard(self.container), self.tr('Notes'))
-        self.container.setTabsClosable(True)
-        self.container.tabCloseRequested.connect(self._onTabClose)
-
-        font = self.container.font()
-        font.setPixelSize(18)
-        self.container.setFont(font)
-        self.setCentralWidget(self.container)
 
     def _onTabNew(self, event=None, dispatcher=None):
         """
@@ -143,11 +118,8 @@ class MainWindow(QtWidgets.QMainWindow):
         if widget is None or entity is None:
             return None
 
-        self.container.addTab(widget, entity.name)
-
-        self.container.setCurrentIndex(
-            self.container.indexOf(widget)
-        )
+        self.addTab(widget, entity.name)
+        self.setCurrentIndex(self.indexOf(widget))
 
     def _onTabClose(self, index=None):
         """
@@ -157,10 +129,71 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         if index in [0]:
             return None
-        widget = self.container.widget(index)
+        widget = self.widget(index)
         if widget is not None:
             widget.deleteLater()
-        self.container.removeTab(index)
+        self.removeTab(index)
+
+
+class Dashboard(QtWidgets.QWidget):
+
+    @inject.params(dispatcher='event_dispatcher', logger='logger')
+    def __init__(self, parent=None, dispatcher=None, logger=None):
+        """
+        
+        :param parent:
+        :param dispatcher:
+        :param logger:
+        """
+        super(Dashboard, self).__init__(parent)
+        self.setContentsMargins(0, 0, 0, 0)
+        
+        layout = QtWidgets.QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+
+        self.content = QtWidgets.QSplitter()
+        self.content.setContentsMargins(0, 0, 0, 0)
+
+        # fill tabs with widgets from different modules
+        dispatcher.dispatch('window.first_tab.content', (
+            self.content, parent
+        ))
+
+        layout.addWidget(self.content)
+
+        self.setLayout(layout)
+
+
+class MainWindow(QtWidgets.QMainWindow):
+
+    @inject.params(dispatcher='event_dispatcher', logger='logger')
+    def __init__(self, parent=None, dispatcher=None, logger=None):
+        """
+        
+        :param parent: 
+        :param dispatcher: 
+        :param logger: 
+        """
+        super(MainWindow, self).__init__(parent)
+        self.setContentsMargins(0, 0, 0, 0)
+
+        with open("css/stylesheet.qss") as stream:
+            self.setStyleSheet(stream.read())
+
+        self.setWindowIcon(QtGui.QIcon("icons/icon.svg"))
+        self.setWindowTitle('Cloud notepad')
+
+        layout = QtWidgets.QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+
+        layout.addWidget(WindowHeader(self))
+        layout.addWidget(WindowContent(self))
+
+        content = QtWidgets.QWidget()
+        content.setLayout(layout)
+
+        self.setCentralWidget(content)
 
     @inject.params(dispatcher='event_dispatcher', logger='logger')
     def closeEvent(self, event, dispatcher=None, logger=None):
@@ -174,7 +207,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
 if __name__ == "__main__":
     parser = optparse.OptionParser()
-    parser.add_option("-t", "--tray", action="store_true", default=False, dest="tray", help="enable grafic user interface")
+    parser.add_option("-t", "--tray", action="store_true", default=False, dest="tray",
+                      help="enable grafic user interface")
     parser.add_option("-g", "--gui", action="store_true", default=True, dest="gui", help="enable grafic user interface")
 
     (options, args) = parser.parse_args()
