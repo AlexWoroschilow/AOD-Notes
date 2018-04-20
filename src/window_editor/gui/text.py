@@ -70,11 +70,13 @@ class TextEditorWidget(QtWidgets.QWidget):
     _folder = None
     _list = None
 
-    @inject.params(storage='storage')
-    def __init__(self, parent=None, storage=None):
+    @inject.params(storage='storage', kernel='kernel')
+    def __init__(self, parent=None, storage=None, kernel='kernel'):
         super(TextEditorWidget, self).__init__(parent)
         self.setObjectName('editorTextEditorWidget')
         self.setContentsMargins(0, 0, 0, 0)
+
+        kernel.listen('window.notepad.note_update', self._onNoteUpdateEvent, 128)
 
         self.changesSaved = True
         self.filename = ""
@@ -128,35 +130,21 @@ class TextEditorWidget(QtWidgets.QWidget):
 
         self.setLayout(layout)
 
+    def _onNoteUpdateEvent(self, event=None):
+        if self._entity.index in [event.data.index]:
+            self.setEntity(event.data)
+
     @property
     def entity(self):
-        """
-
-        :return: 
-        """
         return self._entity
 
-    @inject.params(dispatcher='event_dispatcher')
-    def _onFullScreenEvent(self, event=None, dispatcher=None):
-        """
-
-        :param event: 
-        :param dispatcher: 
-        :return: 
-        """
-        if self._entity is None or dispatcher is None:
-            return None
-
-        dispatcher.dispatch('window.notepad.note_tab', self._entity)
+    @inject.params(kernel='kernel')
+    def _onFullScreenEvent(self, event=None, kernel=None):
+        if self._entity is not None and kernel is not None:
+            kernel.dispatch('window.notepad.note_tab', self._entity)
 
     @inject.params(storage='storage')
     def _onWindowNoteEdit(self, event=None, dispatcher=None, storage=None):
-        """
-
-        :param event: 
-        :param dispatcher: 
-        :return: 
-        """
         if storage is None or event.data is None:
             return None
 

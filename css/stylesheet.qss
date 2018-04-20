@@ -19,8 +19,8 @@ QListWidget {
 }
 QListWidget::item:hover,
 QListWidget::item:selected { 
-	border-left: 2px solid #e1e1e1;
-	background: #f6f7f8;
+	border-left: 3px solid qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #f1f2f3, stop: 1.0 #fafbfd);
+	background: #fafbfd;
 }
 
 QListWidget#foldersList { 
@@ -28,7 +28,7 @@ QListWidget#foldersList {
 }
 QListWidget#foldersList::item:hover,
 QListWidget#foldersList::item:selected  { 
-	border-left: 2px solid #737c82;
+	border-left: 5px solid qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #414649, stop: 1.0 #454b4e);
 	background: #454b4e;
 }
 
