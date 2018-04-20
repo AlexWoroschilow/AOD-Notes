@@ -20,21 +20,23 @@ from .combo import FolderBomboBox
 
 
 class ToolBarbarButton(QtWidgets.QPushButton):
+
     def __init__(self, parent=None, dispatcher=None):
         super(ToolBarbarButton, self).__init__()
         self.setFlat(True)
 
 
 class ToolBarWidget(QtWidgets.QWidget):
+
     @inject.params(dispatcher='event_dispatcher')
     def __init__(self, parent=None, dispatcher=None):
         super(ToolBarWidget, self).__init__()
         self.setContentsMargins(0, 0, 0, 0)
-        self.setMinimumWidth(50)
+        self.setMaximumWidth(40)
 
         self.newAction = ToolBarbarButton()
         self.newAction.setIcon(QtGui.QIcon("icons/new.svg"))
-        self.newAction.setToolTip("Create a new document from scratch.")
+        self.newAction.setToolTip("Create a new document.")
         self.newAction.setShortcut("Ctrl+N")
 
         self.copyAction = ToolBarbarButton()
@@ -73,6 +75,7 @@ class ToolBarWidget(QtWidgets.QWidget):
 
 
 class ToolbarWidgetLeft(QtWidgets.QWidget):
+
     @inject.params(dispatcher='event_dispatcher')
     def __init__(self, parent=None, dispatcher=None):
         super(ToolbarWidgetLeft, self).__init__()
@@ -145,6 +148,7 @@ class ToolbarWidgetLeft(QtWidgets.QWidget):
 
 
 class ToolBarWidgetRight(QtWidgets.QWidget):
+
     @inject.params(dispatcher='event_dispatcher')
     def __init__(self, parent=None, dispatcher=None):
         super(ToolBarWidgetRight, self).__init__()
@@ -203,6 +207,7 @@ class ToolBarWidgetRight(QtWidgets.QWidget):
 
 
 class FormatbarWidget(QtWidgets.QWidget):
+
     @inject.params(dispatcher='event_dispatcher')
     def __init__(self, parent=None, dispatcher=None):
         super(FormatbarWidget, self).__init__()

@@ -24,6 +24,7 @@ from .bar import FormatbarWidget
 
 
 class TextWriter(QtWidgets.QScrollArea):
+
     def __init__(self, parent=None):
         """
 
@@ -45,14 +46,15 @@ class TextWriter(QtWidgets.QScrollArea):
 
 
 class TextEditor(QtWidgets.QTextEdit):
+
     def __init__(self, parent=None):
         super(TextEditor, self).__init__(parent)
         self.setObjectName('editorTextEditor')
 
-        self.setAcceptDrops(True)
-        self.setAcceptRichText(True)
         self.setWordWrapMode(QtGui.QTextOption.WordWrap)
         self.setViewportMargins(40, 20, 20, 20)
+        self.setAcceptRichText(True)
+        self.setAcceptDrops(True)
 
         self.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -60,6 +62,7 @@ class TextEditor(QtWidgets.QTextEdit):
 
 
 class NameEditor(QtWidgets.QLineEdit):
+
     def __init__(self, parent=None):
         """
 
@@ -128,18 +131,14 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.rightbar.subAction.clicked.connect(self.subScript)
         self.rightbar.backColor.clicked.connect(self.highlight)
 
-        self.statusbar = QtWidgets.QLabel()
-
         layout = QtWidgets.QGridLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(0, 10, 0, 0)
 
         layout.addWidget(self.leftbar, 0, 0, 5, 1)
         layout.addWidget(self.name, 0, 1, 1, 2)
         layout.addWidget(self.rightbar, 1, 2, 3, 1)
         layout.addWidget(self.formatbar, 1, 1)
         layout.addWidget(self.writer, 2, 1)
-        layout.addWidget(self.statusbar, 3, 1)
-        layout.setSpacing(0)
 
         self.setLayout(layout)
 
@@ -241,8 +240,6 @@ class TextEditorWidget(QtWidgets.QWidget):
         line = cursor.blockNumber() + 1
         col = cursor.columnNumber()
 
-        self.statusbar.setText("Line: {} | Column: {}".format(line, col))
-
     def toggleToolbar(self):
         """
 
@@ -265,8 +262,6 @@ class TextEditorWidget(QtWidgets.QWidget):
 
         :return: 
         """
-        # state = self.statusbar.isVisible()
-        # self.statusbar.setVisible(not state)
 
     def preview(self):
 
@@ -293,8 +288,6 @@ class TextEditorWidget(QtWidgets.QWidget):
         # Mortals like 1-indexed things
         line = cursor.blockNumber() + 1
         col = cursor.columnNumber()
-
-        self.statusbar.setText("Line: {} | Column: {}".format(line, col))
 
     def wordCount(self):
         """

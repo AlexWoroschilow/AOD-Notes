@@ -21,6 +21,7 @@ from .gui.widget import SearchField
 
 
 class Loader(Loader):
+
     @property
     def enabled(self):
         """
@@ -75,10 +76,17 @@ class Loader(Loader):
         self._action1 = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+f"), self._widget)
         self._action1.activated.connect(self._onShortcutSearchStart)
 
-        # self.action2 = QtWidgets.QShortcut(QtGui.QKeySequence("ESC"), self._widget)
-        # self.action2.activated.connect(self._onShortcutSearchClean)
+        self._container.addAction(QtWidgets.QAction(QtGui.QIcon("icons/plus.svg"), 'Create new folder', self._container))
+        self._container.addAction(QtWidgets.QAction(QtGui.QIcon("icons/plus.svg"), 'Create new document', self._container))
 
+        #spacer = QtWidgets.QWidget();
+        #spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred);
+        #self._container.addWidget(spacer)
         self._container.addWidget(self._widget)
+        #self._container.addWidget(spacer)
+        self._container.addAction(QtWidgets.QAction(QtGui.QIcon("icons/settings.svg"), None, self._container))
+        
+
 
     @inject.params(dispather='event_dispatcher')
     def _OnSearchRequestEvent(self, event=None, dispather=None):

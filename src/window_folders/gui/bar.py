@@ -30,23 +30,25 @@ class ToolbarbarWidget(QtWidgets.QWidget):
     @inject.params(dispatcher='event_dispatcher')
     def __init__(self, parent=None, dispatcher=None):
         super(ToolbarbarWidget, self).__init__()
+        self.setContentsMargins(0, 0, 0, 0)
+        self.setMaximumWidth(40)
 
         self.newAction = ToolBarbarButton()
-        self.newAction.setIcon(QtGui.QIcon("icons/new.svg"))
-        self.newAction.setToolTip("Create a new folder.")
+        self.newAction.setIcon(QtGui.QIcon("icons/new-light.svg"))
+        self.newAction.setToolTip("Create a new folder")
         self.newAction.setShortcut("Ctrl+N")
 
         self.copyAction = ToolBarbarButton()
-        self.copyAction.setIcon(QtGui.QIcon("icons/copy.svg"))
+        self.copyAction.setIcon(QtGui.QIcon("icons/copy-light.svg"))
         self.copyAction.setToolTip("Clone selected folder")
         self.copyAction.setShortcut("Ctrl+C")
 
         self.removeAction = ToolBarbarButton()
-        self.removeAction.setIcon(QtGui.QIcon("icons/remove.svg"))
+        self.removeAction.setIcon(QtGui.QIcon("icons/remove-light.svg"))
         self.removeAction.setToolTip("Remove selected folder")
 
         self.refreshAction = ToolBarbarButton()
-        self.refreshAction.setIcon(QtGui.QIcon("icons/refresh.svg"))
+        self.refreshAction.setIcon(QtGui.QIcon("icons/refresh-light.svg"))
         self.refreshAction.setToolTip("Refresh list")
 
         self.layout = QtWidgets.QVBoxLayout()

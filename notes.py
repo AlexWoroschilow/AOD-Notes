@@ -20,6 +20,7 @@ import optparse
 
 from PyQt5 import QtGui, QtCore
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt
 
 from lib.kernel import Kernel
 
@@ -82,11 +83,16 @@ class WindowHeader(QtWidgets.QWidget):
         self.setContentsMargins(0, 0, 0, 0)
 
         layout = QtWidgets.QVBoxLayout()
-        layout.setContentsMargins(10, 0, 10, 0)
+        layout.setContentsMargins(0, 0, 0, 0)
             
+        toolbar = parent.addToolBar('main')
+        toolbar.setIconSize(QtCore.QSize(20, 20))
+        toolbar.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        toolbar.setFloatable(False)
+        toolbar.setMovable(False)
         # fill tabs with widgets from different modules
         dispatcher.dispatch('window.header.content', (
-            layout, self
+            toolbar, self
         ))
 
         self.setLayout(layout)
@@ -150,7 +156,6 @@ class Dashboard(QtWidgets.QWidget):
         
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
 
         self.content = QtWidgets.QSplitter()
         self.content.setContentsMargins(0, 0, 0, 0)

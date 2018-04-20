@@ -20,8 +20,11 @@ import textwrap
 
 from .bar import ToolBarWidget
 from .text import NameEditor
+from builtins import int
+
 
 class LabelTop(QtWidgets.QLabel):
+
     def __init__(self, parent=None):
         """
         
@@ -32,6 +35,7 @@ class LabelTop(QtWidgets.QLabel):
 
 
 class LabelBottom(QtWidgets.QLabel):
+
     def __init__(self, parent=None):
         """
         
@@ -47,27 +51,34 @@ class LabelBottom(QtWidgets.QLabel):
         :return: 
         """
 
-        document = QtGui.QTextDocument()
-        document.setHtml(value)
+        self._document = QtGui.QTextDocument()
+        self._document.setHtml(value)
 
-        text = document.toPlainText()
+        text = self._document.toPlainText()
         if not len(text):
             return None
 
-        text = document.toPlainText() \
-            .replace('\r', ' ') \
-            .replace('\n', ' ')
+        width = 150
+        text = self._document.toPlainText().replace('\r', ' ').replace('\n', ' ')
+        return super(LabelBottom, self).setText('%s...' % textwrap.fill(text[0:width], int(width / 5)))
 
-        return super(LabelBottom, self) \
-            .setText('%s...' % textwrap.fill(text[0:220], 80))
+    def resizeEvent(self, event):
+        width = event.size().width()
+        if width is None:
+            return None
+        
+
+        text = self._document.toPlainText().replace('\r', ' ').replace('\n', ' ')
+        super(LabelBottom, self).setText('%s...' % textwrap.fill(text[0:width], int(width / 5)))
+        super(LabelBottom, self).resizeEvent(event)
 
 
 class QCustomQWidget(QtWidgets.QWidget):
+
     def __init__(self, parent=None):
         super(QCustomQWidget, self).__init__(parent)
         self.textQVBoxLayout = QtWidgets.QVBoxLayout()
         self.textQVBoxLayout.setContentsMargins(10, 10, 0, 10)
-        self.textQVBoxLayout.setSpacing(0)
 
         self.textUpQLabel = LabelTop()
         self.textQVBoxLayout.addWidget(self.textUpQLabel)
@@ -107,16 +118,13 @@ class QCustomQWidget(QtWidgets.QWidget):
         """
         return self.textDownQLabel.text()
 
-    def setIcon(self, imagePath):
-        """
-        
-        :param imagePath: 
-        :return: 
-        """
-        self.iconQLabel.setPixmap(QtGui.QPixmap(imagePath))
+    def resizeEvent(self, event):
+        self.textDownQLabel.resizeEvent(event)
+        super(QCustomQWidget, self).resizeEvent(event)
 
 
 class NoteItem(QtWidgets.QListWidgetItem):
+
     def __init__(self, entity=None, widget=None):
         """
         
@@ -158,8 +166,12 @@ class NoteItem(QtWidgets.QListWidgetItem):
         self._widget.setTextDown(entity.text)
         self._entity = entity
 
+    def resizeEvent(self, event):
+        self._widget.resizeEvent(event)
+
 
 class ItemList(QtWidgets.QListWidget):
+
     def __init__(self, parent=None):
         """
         
@@ -168,6 +180,8 @@ class ItemList(QtWidgets.QListWidget):
         super(ItemList, self).__init__(parent)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setContentsMargins(0, 0, 0, 0)
+        self.setMinimumWidth(200)
+        self.setWordWrap(True)
 
     def addLine(self, entity=None):
         """
@@ -183,8 +197,17 @@ class ItemList(QtWidgets.QListWidget):
         self.addItem(item)
         self.setItemWidget(item, item.widget)
 
+    def resizeEvent(self, event):
+        for i in range(0, self.count()):
+            item = self.item(i)
+            if item is None:
+                continue
+            item.resizeEvent(event)
+        super(ItemList, self).resizeEvent(event)
+
 
 class RecordList(QtWidgets.QSplitter):
+
     @inject.params(dispatcher='event_dispatcher', storage='storage')
     def __init__(self, parent=None, dispatcher=None, storage=None):
         """
@@ -199,27 +222,23 @@ class RecordList(QtWidgets.QSplitter):
         self.toolbar = ToolBarWidget(self)
         self.addWidget(self.toolbar)
 
-
         self.list = ItemList()
-        self.list.setMinimumWidth(250)
 
         self.folderEditor = NameEditor()
         self.folderEditor.setText('...')
 
-        self.statusbar = QtWidgets.QLabel()
-        self.statusbar.setText("...")
-        
         layout = QtWidgets.QGridLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(0, 10, 0, 0)
         layout.addWidget(self.folderEditor, 0, 1, 1, 2)
         layout.addWidget(self.list, 1, 1)
-        layout.addWidget(self.statusbar, 2, 1)
-        layout.setSpacing(0)
 
         content = QtWidgets.QWidget()
         content.setLayout(layout)
         
         self.addWidget(content)
+
+        self.setCollapsible(0, True)
+        self.setCollapsible(1, False)
 
     @property
     def entity(self):
@@ -264,8 +283,6 @@ class RecordList(QtWidgets.QSplitter):
         """
         self.list.addLine(entity)
 
-        self.statusbar.setText("%i records found" % self.list.count())
-
     def selectedIndexes(self):
         """
 
@@ -294,5 +311,3 @@ class RecordList(QtWidgets.QSplitter):
             return None
 
         self.list.takeItem(index.row())
-
-        self.statusbar.setText("%i records found" % self.list.count())

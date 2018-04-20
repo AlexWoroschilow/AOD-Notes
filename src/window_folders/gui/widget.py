@@ -156,22 +156,12 @@ class FolderList(QtWidgets.QSplitter):
         self.addWidget(self.toolbar)
 
         self.list = ItemList()
-        self.list.setMinimumWidth(200)
+        self.list.setMinimumWidth(180)
 
-        self.statusbar = QtWidgets.QLabel()
-        self.statusbar.setText("...")
-
-        layout = QtWidgets.QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
-
-        layout.addWidget(self.list)
-        layout.addWidget(self.statusbar)
-
-        container = QtWidgets.QWidget()
-        container.setLayout(layout)
+        self.addWidget(self.list)
         
-        self.addWidget(container)
+        self.setCollapsible(0, True)
+        self.setCollapsible(1, False)
 
     def addLine(self, folder=None):
         """
@@ -181,11 +171,6 @@ class FolderList(QtWidgets.QSplitter):
         :return: 
         """
         self.list.addLine(folder)
-
-        if self.statusbar is None:
-            return None 
-        
-        self.statusbar.setText("%i folders found" % self.list.count())
 
     def selectedIndexes(self):
         """
@@ -216,7 +201,3 @@ class FolderList(QtWidgets.QSplitter):
 
         self.list.takeItem(index.row())
 
-        if self.statusbar is None:
-            return None 
-
-        self.statusbar.setText("%i folders found" % self.list.count())
