@@ -58,6 +58,7 @@ class Loader(Loader):
         self._widget.setIcon(QtGui.QIcon("icons/pdf.svg"))
         self._widget.setToolTip("Export document to PDF")
         self._widget.clicked.connect(self._onNotepadExportPdf)
+        self._widget.setIconSize(QtCore.QSize(20,20))
         self._widget.setFlat(True)
 
         self._toolbar.addWidget(self._widget)

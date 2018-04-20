@@ -51,7 +51,7 @@ class Loader(Loader):
         self._widget.setIcon(QtGui.QIcon("icons/font-black.svg"))
         self._widget.setToolTip("Change the text color to black")
         self._widget.clicked.connect(self._onButtonPressed)
-        self._widget.setMaximumWidth(35)
+        self._widget.setIconSize(QtCore.QSize(20,20))
         self._widget.setFlat(True)
 
         self._toolbar.addWidget(self._widget)

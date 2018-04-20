@@ -57,6 +57,7 @@ class Loader(Loader):
         self._widget.setIcon(QtGui.QIcon("icons/html.svg"))
         self._widget.setToolTip("Export document to HTML")
         self._widget.clicked.connect(self._onNotepadExportHtml)
+        self._widget.setIconSize(QtCore.QSize(20,20))
         self._widget.setFlat(True)
 
         self._toolbar.addWidget(self._widget)

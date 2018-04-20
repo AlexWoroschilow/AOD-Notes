@@ -23,7 +23,7 @@ class ToolBarbarButton(QtWidgets.QPushButton):
 
     def __init__(self, parent=None, dispatcher=None):
         super(ToolBarbarButton, self).__init__()
-        self.setMaximumWidth(35)
+        self.setIconSize(QtCore.QSize(20,20))
         self.setFlat(True)
 
 

@@ -45,7 +45,7 @@ class Loader(Loader):
         # listen for the search request from the search module
         # the request string will be given as a data object to the event
         kernel.listen('window.search.request', self._onSearchRequest, 100)
-        kernel.listen('window.first_tab.content', self._onWindowFirstTab, 128)
+        kernel.listen('window.first_tab.content', self._onWindowFirstTab, 100)
         kernel.listen('window.notepad.note_update.folder', self._onNotepadFolderUpdate, 128)
         kernel.listen('window.notepad.folder_update', self._onFolderUpdated, 128)
         kernel.listen('window.notepad.folder_new', self._onRefreshEvent, 128)

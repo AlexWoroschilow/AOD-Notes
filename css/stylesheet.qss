@@ -1,3 +1,8 @@
+QTabBar::close-button {
+    image: url(icons/close.svg);
+    subcontrol-position: right;
+}
+
 QToolBar { 
 	border: none; 
 }
