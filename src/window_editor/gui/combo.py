@@ -19,51 +19,58 @@ from PyQt5 import QtSvg
 
 
 class FolderBomboBox(QtWidgets.QComboBox):
-    @inject.params(storage='storage', dispatcher='event_dispatcher')
-    def __init__(self, storage=None, dispatcher=None):
-        """
-        
-        :param storage: 
-        """
+
+    @inject.params(storage='storage', kernel='kernel')
+    def __init__(self, storage=None, kernel=None):
         super(FolderBomboBox, self).__init__()
         self._note = None
 
         for folder in storage.folders:
             self.addItem(folder.name, folder)
+
+        kernel.listen('window.notepad.note_edit', self._OnNoteSelected, 128)
+        kernel.listen('window.notepad.folder_update', self._OnFolderUpdate, 128)
+        kernel.listen('window.notepad.folder_remove', self._OnFolderUpdate, 128)
+        kernel.listen('window.notepad.folder_new', self._OnFolderUpdate, 128)
+
         self.currentIndexChanged.connect(self._OnFolderChanged)
 
-        dispatcher.add_listener('window.notepad.note_edit', self._OnNoteSelected)
+    def _OnNoteSelected(self, event=None, dispatcher=None):
+        self._note = event.data
+        if self._note is None:
+            return None
+        
+        self._setFolder(self._note.folder)
+
+    @inject.params(kernel='kernel')
+    def _OnFolderChanged(self, event=None, kernel=None):
+        kernel.dispatch('window.notepad.note_update.folder', (
+            self._note, self.itemData(self.currentIndex())
+        ))
+
+    @inject.params(storage='storage')
+    def _OnFolderUpdate(self, event=None, storage=None):
+        current_folder = None
+        current_index = self.currentIndex();
+        if current_index is not None:
+            current_folder = self.itemData(current_index) 
+        
+        self.clear()
+        for index, folder in enumerate(storage.folders, start=0):
+            self.addItem(folder.name, folder)
+            if int(current_folder.index) == int(folder.index):
+                self.setCurrentIndex(index)
 
     def setFolder(self, value=None):
-        """
-        
-        :param value: 
-        :return: 
-        """
         self.blockSignals(True)
+        self._setFolder(value)
+        self.blockSignals(False)
+
+    def _setFolder(self, value=None):
+        if value is None:
+            return None
         for index in range(0, self.count()):
             folder = self.itemData(index)
             if int(value) in [int(folder.index)]:
-                self.setCurrentIndex(index)
-        self.blockSignals(False)
+                return self.setCurrentIndex(index)
 
-    def _OnNoteSelected(self, event=None, dispatcher=None):
-        """
-        
-        :param event: 
-        :param dispatcher: 
-        :return: 
-        """
-        self._note = event.data
-
-    @inject.params(dispatcher='event_dispatcher')
-    def _OnFolderChanged(self, event=None, dispatcher=None):
-        """
-        
-        :param event: 
-        :param dispatcher: 
-        :return: 
-        """
-        dispatcher.dispatch('window.notepad.note_folder', (
-            self._note, self.itemData(event)
-        ))

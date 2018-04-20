@@ -32,12 +32,7 @@ class Loader(Loader):
         return True
 
     @inject.params(dispatcher='event_dispatcher')
-    def boot(self, dispatcher=None):
-        """
-
-        :param dispatcher:.
-        :return:.
-        """
+    def boot(self, options=None, args=None, dispatcher=None):
         dispatcher.add_listener('window.notepad.rightbar', self._onWindowNotepadToolbar, 100)
 
     def _onWindowNotepadToolbar(self, event=None, dispather=None, storage=None):
@@ -56,7 +51,7 @@ class Loader(Loader):
         self._widget.setIcon(QtGui.QIcon("icons/font-blue.svg"))
         self._widget.setToolTip("Change the text color to blue")
         self._widget.clicked.connect(self._onButtonPressed)
-        self._widget.setMaximumSize(QtCore.QSize(20, 20))
+        self._widget.setMaximumWidth(35)
         self._widget.setFlat(True)
 
         self._toolbar.addWidget(self._widget)

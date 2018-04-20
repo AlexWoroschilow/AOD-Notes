@@ -66,7 +66,6 @@ class LabelBottom(QtWidgets.QLabel):
         width = event.size().width()
         if width is None:
             return None
-        
 
         text = self._document.toPlainText().replace('\r', ' ').replace('\n', ' ')
         super(LabelBottom, self).setText('%s...' % textwrap.fill(text[0:width], int(width / 5)))
@@ -178,7 +177,9 @@ class ItemList(QtWidgets.QListWidget):
         :param parent: 
         """
         super(ItemList, self).__init__(parent)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        
         self.setContentsMargins(0, 0, 0, 0)
         self.setMinimumWidth(200)
         self.setWordWrap(True)
@@ -210,10 +211,6 @@ class RecordList(QtWidgets.QSplitter):
 
     @inject.params(dispatcher='event_dispatcher', storage='storage')
     def __init__(self, parent=None, dispatcher=None, storage=None):
-        """
-        
-        :param parent: 
-        """
         super(RecordList, self).__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
 
@@ -222,17 +219,17 @@ class RecordList(QtWidgets.QSplitter):
         self.toolbar = ToolBarWidget(self)
         self.addWidget(self.toolbar)
 
-        self.list = ItemList()
-
-        self.folderEditor = NameEditor()
-        self.folderEditor.setText('...')
-
         layout = QtWidgets.QGridLayout()
         layout.setContentsMargins(0, 10, 0, 0)
-        layout.addWidget(self.folderEditor, 0, 1, 1, 2)
+        
+        self.folderEditor = NameEditor()
+        layout.addWidget(self.folderEditor, 0, 1, 1, 1)
+        
+        self.list = ItemList()
         layout.addWidget(self.list, 1, 1)
 
         content = QtWidgets.QWidget()
+        content.setContentsMargins(0, 0, 0, 0)
         content.setLayout(layout)
         
         self.addWidget(content)

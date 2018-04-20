@@ -18,6 +18,7 @@ from .service import SQLiteStorage
 
 
 class Loader(Loader):
+
     @property
     def enabled(self):
         """
@@ -35,21 +36,16 @@ class Loader(Loader):
 
         binder.bind('storage', SQLiteStorage("storage.dhf"))
 
-    @inject.params(dispatcher='event_dispatcher')
-    def boot(self, dispatcher=None):
-        """
+    @inject.params(kernel='kernel')
+    def boot(self, options=None, args=None, kernel=None):
+        kernel.listen('window.notepad.folder_new', self._onNotepadFolderNew, 0)
+        kernel.listen('window.notepad.folder_update', self._onNotepadFolderUpdate, 0)
+        kernel.listen('window.notepad.folder_remove', self._onNotepadFolderRemove, 0)
 
-        :param dispatcher:.
-        :return:.
-        """
-        dispatcher.add_listener('window.notepad.folder_new', self._onNotepadFolderNew)
-        dispatcher.add_listener('window.notepad.folder_update', self._onNotepadFolderUpdate)
-        dispatcher.add_listener('window.notepad.folder_remove', self._onNotepadFolderRemove)
-
-        dispatcher.add_listener('window.notepad.note_new', self._onNotepadNoteNew)
-        dispatcher.add_listener('window.notepad.note_update', self._onNotepadNoteUpdate)
-        dispatcher.add_listener('window.notepad.note_remove', self._onNotepadNoteRemove)
-        dispatcher.add_listener('window.notepad.note_folder', self._onNotepadNoteFolder)
+        kernel.listen('window.notepad.note_new', self._onNotepadNoteNew)
+        kernel.listen('window.notepad.note_update', self._onNotepadNoteUpdate)
+        kernel.listen('window.notepad.note_update.folder', self._onNotepadNoteFolder)
+        kernel.listen('window.notepad.note_remove', self._onNotepadNoteRemove)
 
         # dispatcher.dispatch('window.notepad.note_update', (
         #     self._index, self.name.text(), self.text.toHtml()
@@ -71,13 +67,6 @@ class Loader(Loader):
 
     @inject.params(storage='storage')
     def _onNotepadFolderUpdate(self, event=None, dispather=None, storage=None):
-        """
-        
-        :param event: 
-        :param dispather: 
-        :param storage: 
-        :return: 
-        """
         folder = event.data
         storage.updateFolder(folder.index, folder.name, folder.text)
 

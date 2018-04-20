@@ -10,6 +10,7 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import os
 import inject
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
@@ -20,52 +21,53 @@ from lib.plugin import Loader
 from .gui.widget import SearchField
 
 
+class NoteModel(object):
+
+    def __init__(self, name=None, text=None, folder=None):
+        self._name = name
+        self._folder = folder
+        self._text = text
+
+    @property
+    def folder(self):
+        return self._folder
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def text(self):
+        return self._text
+
+
+class FolderModel(object):
+
+    def __init__(self, name=None, text=None):
+        self._name = name
+        self._text = text
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def text(self):
+        return self._text
+
+
 class Loader(Loader):
 
     @property
     def enabled(self):
-        """
-
-        :return:
-        """
         return True
 
-    def config(self, binder=None):
-        """
-
-        :param binder:
-        :return:
-        """
-
     @inject.params(dispatcher='event_dispatcher')
-    def boot(self, dispatcher=None):
-        """
-
-        :param dispatcher:.
-        :return:.
-        """
+    def boot(self, options=None, args=None, dispatcher=None):
         dispatcher.add_listener('window.header.content', self._onWindowHeader)
 
     @inject.params(storage='storage')
-    def _onNotepadFolderNew(self, event=None, dispather=None, storage=None):
-        """
-
-        :param event: 
-        :param dispather: 
-        :return: 
-        """
-        name, description = event.data
-        storage.addFolder(name, description)
-
-    @inject.params(storage='storage')
     def _onWindowHeader(self, event=None, dispather=None, storage=None):
-        """
-
-        :param event: 
-        :param dispather: 
-        :return: 
-
-        """
         self._container, self._parent = event.data
         if self._container is None:
             return None
@@ -76,49 +78,72 @@ class Loader(Loader):
         self._action1 = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+f"), self._widget)
         self._action1.activated.connect(self._onShortcutSearchStart)
 
-        self._container.addAction(QtWidgets.QAction(QtGui.QIcon("icons/plus.svg"), 'Create new folder', self._container))
-        self._container.addAction(QtWidgets.QAction(QtGui.QIcon("icons/plus.svg"), 'Create new document', self._container))
-
-        #spacer = QtWidgets.QWidget();
-        #spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred);
-        #self._container.addWidget(spacer)
-        self._container.addWidget(self._widget)
-        #self._container.addWidget(spacer)
-        self._container.addAction(QtWidgets.QAction(QtGui.QIcon("icons/settings.svg"), None, self._container))
+        self._actionCreateFolder = QtWidgets.QAction(QtGui.QIcon("icons/plus.svg"), 'Create folder', self._container)
+        self._actionCreateFolder.triggered.connect(self._onCreateFolder)
+        self._container.addAction(self._actionCreateFolder)
         
+        self._actionCreateNote = QtWidgets.QAction(QtGui.QIcon("icons/plus.svg"), 'Create document', self._container)
+        self._actionCreateNote.triggered.connect(self._onCreateNote)
+        self._container.addAction(self._actionCreateNote)
 
+        self._actionImportNote = QtWidgets.QAction(QtGui.QIcon("icons/import.svg"), 'Import document', self._container)
+        self._actionImportNote.triggered.connect(self._onImportNote)
+        self._container.addAction(self._actionImportNote)
+
+        spacer = QtWidgets.QWidget();
+        spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred);
+        self._container.addWidget(spacer)
+        self._container.addWidget(self._widget)
+        # self._container.addWidget(spacer)
+        
+        self._actionSettings = QtWidgets.QAction(QtGui.QIcon("icons/settings.svg"), None, self._container)
+        self._container.addAction(self._actionSettings)
 
     @inject.params(dispather='event_dispatcher')
     def _OnSearchRequestEvent(self, event=None, dispather=None):
-        """
-
-        :param event: 
-        :return: 
-        """
         dispather.dispatch('window.search.request', self._widget.text())
 
     @inject.params(dispather='event_dispatcher')
     def _onShortcutSearchStart(self, event=None, dispather=None):
-        """
-
-        :param event: 
-        :return: 
-        """
         if self._widget is None:
             return None
-
         self._widget.setFocusPolicy(Qt.StrongFocus)
         self._widget.setFocus()
 
-    @inject.params(dispather='event_dispatcher')
-    def _onShortcutSearchClean(self, event=None, dispather=None):
-        """
+    @inject.params(storage='storage')
+    def _onNotepadFolderNew(self, event=None, dispather=None, storage=None):
+        name, description = event.data
+        storage.addFolder(name, description)
 
-        :return: 
-        """
-        if self._widget is None:
+    @inject.params(kernel='kernel')
+    def _onCreateFolder(self, event, kernel=None):
+        model = FolderModel('New folder', 'New folder description')
+        kernel.dispatch('window.notepad.folder_new', model)
+
+    @inject.params(kernel='kernel')
+    def _onCreateNote(self, event, kernel=None):
+        model = NoteModel('New note', 'New description', None)
+        kernel.dispatch('window.notepad.note_new', model)
+
+    @inject.params(kernel='kernel')
+    def _onImportNote(self, event, kernel=None):
+        selector = QtWidgets.QFileDialog()
+        if not selector.exec_():
             return None
 
-        self._widget.setText("")
+        for path in selector.selectedFiles():
+            if not os.path.exists(path):
+                continue
 
-        dispather.dispatch('window.search.request', self._widget.text())
+            size = os.path.getsize(path) / 1000000 
+            if size and size >= 1: 
+                message = self._widget.tr("The file  '%s' is about %.2f Mb, are you sure?" % (path, size))
+                reply = QtWidgets.QMessageBox.question(self._widget, 'Message', message, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
+                if reply == QtWidgets.QMessageBox.No:
+                    continue
+            
+            with open(path, 'r') as stream:
+                model = NoteModel(os.path.basename(path), stream.read())
+                kernel.dispatch('window.notepad.note_new', model)
+                stream.close()
+

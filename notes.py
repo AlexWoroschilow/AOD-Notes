@@ -153,6 +153,7 @@ class Dashboard(QtWidgets.QWidget):
         """
         super(Dashboard, self).__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
+        self.setObjectName('dashboard')
         
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -198,6 +199,10 @@ class MainWindow(QtWidgets.QMainWindow):
         content = QtWidgets.QWidget()
         content.setLayout(layout)
 
+        spacer = QtWidgets.QWidget();
+        spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred);
+        self.statusBar().addWidget(spacer);
+        self.statusBar().addWidget(QtWidgets.QLabel("Message in statusbar"));
         self.setCentralWidget(content)
 
     @inject.params(dispatcher='event_dispatcher', logger='logger')

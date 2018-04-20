@@ -25,19 +25,10 @@ class Loader(Loader):
 
     @property
     def enabled(self):
-        """
-
-        :return:
-        """
         return True
 
     @inject.params(dispatcher='event_dispatcher')
-    def boot(self, dispatcher=None):
-        """
-
-        :param dispatcher:.
-        :return:.
-        """
+    def boot(self, options=None, args=None, dispatcher=None):
         dispatcher.add_listener('window.notepad.leftbar', self._onWindowNotepadToolbar, 300)
         dispatcher.add_listener('window.notelist.toolbar', self._onWindowNotepadToolbar, 300)
 

@@ -14,6 +14,7 @@ import logging
 
 
 class Event(object):
+
     def __init__(self, data=None):
         self.__name = None
         self.__data = data
@@ -36,12 +37,14 @@ class Event(object):
 
 
 class EventSubscriberInterface(object):
+
     @property
     def subscribed(self):
         raise NotImplementedError()
 
 
 class EventListenerItem(object):
+
     def __init__(self, listener, priority=0):
         self.__listener = listener
         self.__priority = priority
@@ -82,7 +85,7 @@ class Dispatcher(object):
         logger = logging.getLogger('ed')
         for listener_item in self._listeners[name]:
             try:
-                listener_item.listener(event, self)
+                listener_item.listener(event)
             except Exception as ex:
                 logger.exception(ex)
         return event

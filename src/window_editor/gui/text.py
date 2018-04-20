@@ -26,10 +26,6 @@ from .bar import FormatbarWidget
 class TextWriter(QtWidgets.QScrollArea):
 
     def __init__(self, parent=None):
-        """
-
-        :param parent: 
-        """
         super(TextWriter, self).__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
         self.setObjectName('editorQScrollArea')
@@ -50,11 +46,11 @@ class TextEditor(QtWidgets.QTextEdit):
     def __init__(self, parent=None):
         super(TextEditor, self).__init__(parent)
         self.setObjectName('editorTextEditor')
-
         self.setWordWrapMode(QtGui.QTextOption.WordWrap)
         self.setViewportMargins(40, 20, 20, 20)
         self.setAcceptRichText(True)
         self.setAcceptDrops(True)
+        self.setFontPointSize(14)
 
         self.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -64,13 +60,8 @@ class TextEditor(QtWidgets.QTextEdit):
 class NameEditor(QtWidgets.QLineEdit):
 
     def __init__(self, parent=None):
-        """
-
-        :param parent: 
-        """
         super(NameEditor, self).__init__(parent)
         self.setObjectName('editorNameEditor')
-        self.setPlaceholderText('Write a title here...')
 
 
 class TextEditorWidget(QtWidgets.QWidget):
@@ -79,13 +70,8 @@ class TextEditorWidget(QtWidgets.QWidget):
     _folder = None
     _list = None
 
-    @inject.params(dispatcher='event_dispatcher', storage='storage')
-    def __init__(self, parent=None, dispatcher=None, storage=None):
-        """
-
-        :param parent: 
-        :param dispatcher: 
-        """
+    @inject.params(storage='storage')
+    def __init__(self, parent=None, storage=None):
         super(TextEditorWidget, self).__init__(parent)
         self.setObjectName('editorTextEditorWidget')
         self.setContentsMargins(0, 0, 0, 0)
@@ -100,7 +86,7 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.writer.text.cursorPositionChanged.connect(self.cursorPosition)
         self.writer.text.textChanged.connect(self.changed)
 
-        self.leftbar = ToolbarWidgetLeft(self)
+        self.leftbar = ToolbarWidgetLeft(self.writer)
         self.leftbar.saveAction.clicked.connect(self._onSaveEvent)
         self.leftbar.printAction.clicked.connect(self.printHandler)
         self.leftbar.previewAction.clicked.connect(self.preview)
@@ -111,7 +97,7 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.leftbar.redoAction.clicked.connect(self.writer.text.redo)
         self.leftbar.fullscreenAction.clicked.connect(self._onFullScreenEvent)
 
-        self.formatbar = FormatbarWidget(self)
+        self.formatbar = FormatbarWidget(self.writer)
         self.formatbar.fontSize.valueChanged.connect(lambda size: self.writer.text.setFontPointSize(size))
         self.formatbar.bulletAction.clicked.connect(self.bulletList)
         self.formatbar.numberedAction.clicked.connect(self.numberList)
@@ -184,29 +170,17 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.name.setText(entity.name)
         self.writer.text.setText(entity.text)
 
-    @inject.params(dispatcher='event_dispatcher')
-    def _onSaveEvent(self, event=None, dispatcher=None):
-        """
-
-        :param dispatcher: 
-        :return: 
-        """
-
-        if self._entity is None and dispatcher is None:
+    @inject.params(kernel='kernel')
+    def _onSaveEvent(self, event=None, kernel=None):
+        if self._entity is None or kernel is None:
             return None
 
         self._entity.name = self.name.text()
         self._entity.text = self.writer.text.toHtml()
-        dispatcher.dispatch('window.notepad.note_update', self._entity)
+
+        kernel.dispatch('window.notepad.note_update', self._entity)
 
     def setEntity(self, entity=None):
-        """
-
-        :param index: 
-        :param name: 
-        :param text: 
-        :return: 
-        """
         self._entity = entity
         if self._entity is None:
             self.writer.text.setText('')
@@ -222,10 +196,6 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.formatbar.setFolder(self._entity.folder)
 
     def changed(self):
-        """
-
-        :return: 
-        """
         self.changesSaved = False
 
     def cursorPosition(self):
@@ -345,17 +315,13 @@ class TextEditorWidget(QtWidgets.QWidget):
     def bold(self):
 
         if self.writer.text.fontWeight() == QtGui.QFont.Bold:
-
             self.writer.text.setFontWeight(QtGui.QFont.Normal)
-
         else:
-
             self.writer.text.setFontWeight(QtGui.QFont.Bold)
 
     def italic(self):
 
         state = self.writer.text.fontItalic()
-
         self.writer.text.setFontItalic(not state)
 
     def underline(self):
@@ -405,11 +371,8 @@ class TextEditorWidget(QtWidgets.QWidget):
 
         # Toggle the state
         if align == QtGui.QTextCharFormat.AlignNormal:
-
             fmt.setVerticalAlignment(QtGui.QTextCharFormat.AlignSubScript)
-
         else:
-
             fmt.setVerticalAlignment(QtGui.QTextCharFormat.AlignNormal)
 
         # Set the new format

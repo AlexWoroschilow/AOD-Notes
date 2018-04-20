@@ -23,6 +23,7 @@ class ToolBarbarButton(QtWidgets.QPushButton):
 
     def __init__(self, parent=None, dispatcher=None):
         super(ToolBarbarButton, self).__init__()
+        self.setMaximumWidth(35)
         self.setFlat(True)
 
 
@@ -273,7 +274,7 @@ class FormatbarWidget(QtWidgets.QWidget):
         self.layout.addWidget(self.imageAction)
 
         dispatcher.dispatch('window.notepad.formatbar', (
-            self, self.layout
+            parent, self.layout
         ))
 
         self.layout.addStretch()

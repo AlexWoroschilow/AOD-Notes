@@ -32,7 +32,7 @@ class Loader(Loader):
         return True
 
     @inject.params(dispatcher='event_dispatcher')
-    def boot(self, dispatcher=None):
+    def boot(self, options=None, args=None, dispatcher=None):
         """
 
         :param dispatcher:.
@@ -70,12 +70,7 @@ class Loader(Loader):
         :return: 
         """
         if self._editor is None or self._editor.entity is None:
-            msg = QtWidgets.QMessageBox(self._editor)
-            msg.setIcon(QtWidgets.QMessageBox.Information)
-            msg.setWindowTitle("Select the Note")
-            msg.setText(self._editor.tr('Please select the Note first'))
-            msg.setStandardButtons(QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel)
-            return msg.show()
+            return None
 
         selector = QtWidgets.QFileDialog()
         if not selector.exec_():

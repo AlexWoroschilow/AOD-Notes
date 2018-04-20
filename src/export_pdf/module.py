@@ -33,7 +33,7 @@ class Loader(Loader):
         return True
 
     @inject.params(dispatcher='event_dispatcher')
-    def boot(self, dispatcher=None):
+    def boot(self, options=None, args=None, dispatcher=None):
         """
 
         :param dispatcher:.

@@ -10,14 +10,12 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import os
 import inject
 
 from PyQt5 import QtGui
 from PyQt5 import QtWidgets
 
 from lib.plugin import Loader
-from PyQt5 import QtCore
 
 
 class Loader(Loader):
@@ -27,46 +25,31 @@ class Loader(Loader):
     def enabled(self):
         return True
 
-    @inject.params(dispatcher='event_dispatcher')
-    def boot(self, options=None, args=None, dispatcher=None):
-        dispatcher.add_listener('window.notepad.rightbar', self._onWindowNotepadToolbar, 100)
+    @inject.params(kernel='kernel')
+    def boot(self, options=None, args=None, kernel=None):
+        kernel.listen('window.notepad.formatbar', self._onWindowNotepadToolbar, 110)
 
-    def _onWindowNotepadToolbar(self, event=None, dispather=None, storage=None):
-        """
-        
-        :param event: 
-        :param dispather: 
-        :param storage: 
-        :return: 
-        """
+    def _onWindowNotepadToolbar(self, event=None):
         self._editor, self._toolbar = event.data
         if self._editor is None or self._toolbar is None:
             raise 'Editor or Toolbar object can not be empty'
 
         self._widget = QtWidgets.QPushButton()
-        self._widget.setIcon(QtGui.QIcon("icons/font-green.svg"))
-        self._widget.setToolTip("Change the text color to green")
+        self._widget.setIcon(QtGui.QIcon("icons/line.svg"))
+        self._widget.setToolTip(self._editor.tr('Add a line'))
         self._widget.clicked.connect(self._onButtonPressed)
         self._widget.setMaximumWidth(35)
         self._widget.setFlat(True)
 
         self._toolbar.addWidget(self._widget)
 
-    @inject.params(dispatcher='event_dispatcher')
-    def _onButtonPressed(self, event=None, dispatcher=None):
-        """
-        #7f7f7f
-        :param event: 
-        :param dispatcher: 
-        :return: 
-        """
+    def _onButtonPressed(self, event=None):
         if self._editor is None or self._editor.text is None:
             msg = QtWidgets.QMessageBox(self._editor)
             msg.setIcon(QtWidgets.QMessageBox.Information)
-            msg.setWindowTitle("Select the Note")
+            msg.setWindowTitle(self._editor.tr('Select the Note'))
             msg.setText(self._editor.tr('Please select the Note first'))
             msg.setStandardButtons(QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel)
             return msg.show()
 
-        color = QtGui.QColor.fromRgb(0, 127, 0)
-        self._editor.text.setTextColor(color)
+        self._editor.text.insertHtml('<hr>< /hr>')
