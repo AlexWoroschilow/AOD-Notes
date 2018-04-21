@@ -88,37 +88,20 @@ class QCustomQWidget(QtWidgets.QWidget):
         self.setLayout(self.textQVBoxLayout)
 
     def setTextUp(self, text=None):
-        """
-        
-        :param text: 
-        :return: 
-        """
         self.textUpQLabel.setText(text)
 
     def getTextUp(self):
-        """
-        
-        :return: 
-        """
         return self.textUpQLabel.text()
 
     def setTextDown(self, text=None):
-        """
-        
-        :param text: 
-        :return: 
-        """
         self.textDownQLabel.setText(text)
 
     def getTextDown(self):
-        """
-        
-        :return: 
-        """
         return self.textDownQLabel.text()
 
     def resizeEvent(self, event):
-        self.textDownQLabel.resizeEvent(event)
+        width = event.size().width()
+        self.textDownQLabel.setFixedWidth(width - 20)
         super(QCustomQWidget, self).resizeEvent(event)
 
 

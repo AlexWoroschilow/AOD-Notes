@@ -4,7 +4,8 @@ QTabBar::close-button {
 }
 
 QToolBar { 
-	border: none; 
+	border: none;
+	background-color: #f1f2f3; 
 }
 QTabWidget::pane {
 	border-top: 5px solid qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #f1f2f3, stop: 1.0 #414649);
@@ -20,12 +21,11 @@ QSplitter {
 }
 
 QListWidget { 
-	border: none; background-color: #f1f2f3; 
+	border: none; background-color: #f1f2f3;
 }
 QListWidget::item:hover,
 QListWidget::item:selected { 
-	border-left: 3px solid qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #f1f2f3, stop: 1.0 #fafbfd);
-	background: #fafbfd;
+	background: solid qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #f3f4f5, stop: 0.25 #f5f6f7, stop: 1.0 #f8f9fa);
 }
 
 QListWidget#foldersList { 
@@ -33,13 +33,15 @@ QListWidget#foldersList {
 }
 QListWidget#foldersList::item:hover,
 QListWidget#foldersList::item:selected  { 
-	border-left: 5px solid qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #414649, stop: 1.0 #454b4e);
-	background: #454b4e;
+	background: solid qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #414649, stop: 0.02 #515659, stop: 1 #515659);
 }
 
 
-QSplitter#foldersWidget { border: none; background-color: #414649; }
 QSplitter#foldersWidget QLabel { color: #c0c0c0; }
+QSplitter#foldersWidget { border: none; background-color: #414649; }
+QSplitter#foldersWidget QToolBar { border: none; background-color: #414649; }
+
+
 QLabel#LabelTop { color: #A0A0A0; font-size: 14px }
 QLabel#LabelBottom { color: #A0A0A0; font-size: 10px }
 
@@ -47,8 +49,11 @@ QSplitter#editorWidget { border: none; background-color: #fff; }
 QSplitter#editorWidget QWidget#editorTextEditorWidget { border: none; }
 QSplitter#editorWidget QWidget#editorTextEditorWidget QLineEdit#editorNameEditor { background-color: #fff; font-size: 18px; padding-left: 5px;  margin: 10px 45px 0px 0px; }
 QSplitter#editorWidget QWidget#editorTextEditorWidget QTextEdit#editorTextEditor { background-color: #fff; border: 1px !important; }
-QSplitter#editorWidget QWidget#editorTextEditorWidget QWidget#editorToolbarWidgetLeft { border: none; }
-QSplitter#editorWidget QWidget#editorTextEditorWidget QWidget#editorToolBarWidgetRight { border: none; background-color: #414649; }
+QSplitter#editorWidget QWidget#editorTextEditorWidget QToolBar { border: none; background-color: #fff; }
+QSplitter#editorWidget QWidget#editorTextEditorWidget { border: none; }
+QSplitter#editorWidget QWidget#editorRecordListWidget QTextEdit { border: none; background: #f1f2f3}
+
+
 
 QSplitter#editorWidget QLineEdit#editorNameEditor { padding-left: 5px;  margin: 10px 20px 0px 10px; background-color: #f1f2f3; font-size: 18px; }
 
@@ -58,6 +63,7 @@ QScrollArea#editorQScrollArea {background-color: #fff; }
 QWidget#editorTextEditorWidget { border: none; background-color: #000; }
 QWidget#editorTextEditorWidget QLineEdit#editorNameEditor { background-color: #fff; font-size: 18px; padding-left: 5px;  margin: 10px 45px 0px 0px; }
 QWidget#editorTextEditorWidget QTextEdit#editorTextEditor { background-color: #fff; border: 1px !important; }
-QWidget#editorTextEditorWidget QWidget#editorToolbarWidgetLeft { border: none; }
-QWidget#editorTextEditorWidget QWidget#editorToolBarWidgetRight { border: none; background-color: #414649; }
+QWidget#editorTextEditorWidget QWidget#editorToolbarWidgetLeft { border: none; background-color: #fff; }
+QWidget#editorTextEditorWidget QWidget#editorToolBarWidgetRight { border: none; background-color: #fff; }
+QWidget#editorTextEditorWidget QWidget#editorFormatBarWidget { border: none; background-color: #fff; }
 

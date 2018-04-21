@@ -15,24 +15,25 @@ from PyQt5.Qt import Qt
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5 import QtCore
-from PyQt5 import QtSvg
 
 
 class ToolBarbarButton(QtWidgets.QPushButton):
 
     def __init__(self, parent=None, dispatcher=None):
         super(ToolBarbarButton, self).__init__()
-        self.setIconSize(QtCore.QSize(20,20))
+        self.setIconSize(QtCore.QSize(20, 20))
         self.setFlat(True)
 
 
-class ToolbarbarWidget(QtWidgets.QWidget):
+class ToolbarbarWidget(QtWidgets.QToolBar):
 
-    @inject.params(dispatcher='event_dispatcher')
-    def __init__(self, parent=None, dispatcher=None):
+    @inject.params(kernel='kernel')
+    def __init__(self, parent=None, kernel=None):
         super(ToolbarbarWidget, self).__init__()
+        self.setObjectName('folderToolbarWidgetLeft')
         self.setContentsMargins(0, 0, 0, 0)
-        self.setMaximumWidth(40)
+        self.setOrientation(Qt.Vertical)
+        self.setMaximumWidth(35)
 
         self.newAction = ToolBarbarButton()
         self.newAction.setIcon(QtGui.QIcon("icons/new-light.svg"))
@@ -52,12 +53,8 @@ class ToolbarbarWidget(QtWidgets.QWidget):
         self.refreshAction.setIcon(QtGui.QIcon("icons/refresh-light.svg"))
         self.refreshAction.setToolTip("Refresh list")
 
-        self.layout = QtWidgets.QVBoxLayout()
-        self.layout.addWidget(self.newAction)
-        self.layout.addWidget(self.copyAction)
-        self.layout.addWidget(self.removeAction)
-        self.layout.addWidget(self.refreshAction)
+        self.addWidget(self.newAction)
+        self.addWidget(self.copyAction)
+        self.addWidget(self.removeAction)
+        self.addWidget(self.refreshAction)
 
-        self.layout.addStretch()
-
-        self.setLayout(self.layout)

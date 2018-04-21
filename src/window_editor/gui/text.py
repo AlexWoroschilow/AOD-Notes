@@ -53,7 +53,6 @@ class TextEditor(QtWidgets.QTextEdit):
         self.setFontPointSize(14)
 
         self.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
 

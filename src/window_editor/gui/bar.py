@@ -23,17 +23,18 @@ class ToolBarbarButton(QtWidgets.QPushButton):
 
     def __init__(self, parent=None, dispatcher=None):
         super(ToolBarbarButton, self).__init__()
-        self.setIconSize(QtCore.QSize(20,20))
+        self.setIconSize(QtCore.QSize(20, 20))
         self.setFlat(True)
 
 
-class ToolBarWidget(QtWidgets.QWidget):
+class ToolBarWidget(QtWidgets.QToolBar):
 
     @inject.params(dispatcher='event_dispatcher')
     def __init__(self, parent=None, dispatcher=None):
         super(ToolBarWidget, self).__init__()
         self.setContentsMargins(0, 0, 0, 0)
-        self.setMaximumWidth(40)
+        self.setOrientation(Qt.Vertical)
+        self.setMaximumWidth(35)
 
         self.newAction = ToolBarbarButton()
         self.newAction.setIcon(QtGui.QIcon("icons/new.svg"))
@@ -52,37 +53,25 @@ class ToolBarWidget(QtWidgets.QWidget):
         self.refreshAction.setIcon(QtGui.QIcon("icons/refresh.svg"))
         self.refreshAction.setToolTip("Refresh list")
 
-        self.layout = QtWidgets.QVBoxLayout()
-        self.layout.addWidget(self.newAction)
-        self.layout.addWidget(self.copyAction)
-        self.layout.addWidget(self.removeAction)
-        self.layout.addWidget(self.refreshAction)
+        self.addWidget(self.newAction)
+        self.addWidget(self.copyAction)
+        self.addWidget(self.removeAction)
+        self.addWidget(self.refreshAction)
 
         dispatcher.dispatch('window.notelist.toolbar', (
-            parent, self.layout
+            parent, self
         ))
 
-        self.layout.addStretch()
 
-        self.setLayout(self.layout)
-
-    def addWidget(self, widget=None):
-        """
-        
-        :param widget: 
-        :return: 
-        """
-        self.layout.addWidget(widget)
-
-
-class ToolbarWidgetLeft(QtWidgets.QWidget):
+class ToolbarWidgetLeft(QtWidgets.QToolBar):
 
     @inject.params(dispatcher='event_dispatcher')
     def __init__(self, parent=None, dispatcher=None):
         super(ToolbarWidgetLeft, self).__init__()
-        self.setContentsMargins(0, 0, 0, 0)
-        self.setMinimumWidth(50)
         self.setObjectName('editorToolbarWidgetLeft')
+        self.setContentsMargins(0, 0, 0, 0)
+        self.setOrientation(Qt.Vertical)
+        self.setMaximumWidth(35)
 
         self.saveAction = ToolBarbarButton()
         self.saveAction.setIcon(QtGui.QIcon("icons/save.svg"))
@@ -128,34 +117,31 @@ class ToolbarWidgetLeft(QtWidgets.QWidget):
         self.fullscreenAction.setIcon(QtGui.QIcon("icons/fullscreen.svg"))
         self.fullscreenAction.setToolTip("Open editor in a new tab")
 
-        self.layout = QtWidgets.QVBoxLayout()
-        self.layout.addWidget(self.saveAction)
-        self.layout.addWidget(self.undoAction)
-        self.layout.addWidget(self.redoAction)
-        self.layout.addWidget(self.copyAction)
-        self.layout.addWidget(self.cutAction)
-        self.layout.addWidget(self.pasteAction)
-        self.layout.addWidget(self.printAction)
-        self.layout.addWidget(self.previewAction)
-        self.layout.addWidget(self.fullscreenAction)
+        self.addWidget(self.saveAction)
+        self.addWidget(self.undoAction)
+        self.addWidget(self.redoAction)
+        self.addWidget(self.copyAction)
+        self.addWidget(self.cutAction)
+        self.addWidget(self.pasteAction)
+        self.addWidget(self.printAction)
+        self.addWidget(self.previewAction)
+        self.addWidget(self.fullscreenAction)
 
         dispatcher.dispatch('window.notepad.leftbar', (
-            parent, self.layout
+            parent, self
         ))
 
-        self.layout.addStretch()
 
-        self.setLayout(self.layout)
-
-
-class ToolBarWidgetRight(QtWidgets.QWidget):
+class ToolBarWidgetRight(QtWidgets.QToolBar):
 
     @inject.params(dispatcher='event_dispatcher')
     def __init__(self, parent=None, dispatcher=None):
         super(ToolBarWidgetRight, self).__init__()
-        self.setContentsMargins(0, 0, 0, 0)
         self.setObjectName('editorToolBarWidgetRight')
-        
+        self.setOrientation(Qt.Vertical)
+        self.setContentsMargins(0, 0, 0, 0)
+        self.setMaximumWidth(35)
+
         self.boldAction = ToolBarbarButton()
         self.boldAction.setIcon(QtGui.QIcon("icons/bold.svg"))
         self.boldAction.setToolTip("Bold")
@@ -188,34 +174,29 @@ class ToolBarWidgetRight(QtWidgets.QWidget):
         self.backColor.setIcon(QtGui.QIcon("icons/highlight.png"))
         self.backColor.setToolTip("Print document")
 
-        self.layout = QtWidgets.QVBoxLayout()
-        self.layout.addWidget(self.boldAction)
-        self.layout.addWidget(self.italicAction)
-        self.layout.addWidget(self.underlAction)
-        self.layout.addWidget(self.strikeAction)
-        self.layout.addWidget(self.superAction)
-        self.layout.addWidget(self.subAction)
-        self.layout.addWidget(self.fontColor)
-        self.layout.addWidget(self.backColor)
+        self.addWidget(self.boldAction)
+        self.addWidget(self.italicAction)
+        self.addWidget(self.underlAction)
+        self.addWidget(self.strikeAction)
+        self.addWidget(self.superAction)
+        self.addWidget(self.subAction)
+        self.addWidget(self.fontColor)
+        self.addWidget(self.backColor)
 
         dispatcher.dispatch('window.notepad.rightbar', (
-            parent, self.layout
+            parent, self
         ))
 
-        self.layout.addStretch()
 
-        self.setLayout(self.layout)
+class FormatbarWidget(QtWidgets.QToolBar):
 
-
-class FormatbarWidget(QtWidgets.QWidget):
-
-    @inject.params(dispatcher='event_dispatcher')
-    def __init__(self, parent=None, dispatcher=None):
+    @inject.params(kernel='kernel')
+    def __init__(self, parent=None, kernel=None):
         super(FormatbarWidget, self).__init__()
         self.setContentsMargins(0, 0, 0, 0)
+        self.setObjectName('editorFormatBarWidget')
 
         self.folder = FolderBomboBox()
-        # self.fontBox = QtWidgets.QFontComboBox(self)
 
         self.fontSize = QtWidgets.QSpinBox(self)
         self.fontSize.setSuffix(" pt")
@@ -257,34 +238,24 @@ class FormatbarWidget(QtWidgets.QWidget):
         self.dedentAction.setIcon(QtGui.QIcon("icons/outdent.svg"))
         self.dedentAction.setToolTip("Dedent Area")
 
-        self.layout = QtWidgets.QHBoxLayout()
-        self.layout.addWidget(self.folder)
-        self.layout.addWidget(self.fontSize)
+        self.addWidget(self.folder)
+        self.addWidget(self.fontSize)
 
-        self.layout.addWidget(self.alignLeft)
-        self.layout.addWidget(self.alignCenter)
-        self.layout.addWidget(self.alignRight)
-        self.layout.addWidget(self.alignJustify)
+        self.addWidget(self.alignLeft)
+        self.addWidget(self.alignCenter)
+        self.addWidget(self.alignRight)
+        self.addWidget(self.alignJustify)
 
-        self.layout.addWidget(self.bulletAction)
-        self.layout.addWidget(self.numberedAction)
+        self.addWidget(self.bulletAction)
+        self.addWidget(self.numberedAction)
 
-        self.layout.addWidget(self.indentAction)
-        self.layout.addWidget(self.dedentAction)
-        self.layout.addWidget(self.imageAction)
+        self.addWidget(self.indentAction)
+        self.addWidget(self.dedentAction)
+        self.addWidget(self.imageAction)
 
-        dispatcher.dispatch('window.notepad.formatbar', (
-            parent, self.layout
+        kernel.dispatch('window.notepad.formatbar', (
+            parent, self
         ))
 
-        self.layout.addStretch()
-
-        self.setLayout(self.layout)
-
     def setFolder(self, value=None):
-        """
-        
-        :param folder: 
-        :return: 
-        """
         self.folder.setFolder(int(value))

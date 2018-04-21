@@ -33,11 +33,6 @@ os.chdir(os.path.dirname(abspath))
 class Application(QtWidgets.QApplication):
 
     def __init__(self, options=None, args=None):
-        """
-        
-        :param options: 
-        :param args: 
-        """
         self.kernel = Kernel(options, args)
         self.window = None
 
@@ -45,12 +40,6 @@ class Application(QtWidgets.QApplication):
 
     @inject.params(dispatcher='event_dispatcher', logger='logger')
     def exec_(self, dispatcher=None, logger=None):
-        """
-
-        :param dispather: 
-        :param logger: 
-        :return: 
-        """
         dispatcher.add_listener('application.start', self.onWindowToggle)
         dispatcher.add_listener('window.toggle', self.onWindowToggle)
         dispatcher.add_listener('window.exit', self.exit)
@@ -60,12 +49,6 @@ class Application(QtWidgets.QApplication):
         return super(Application, self).exec_()
 
     def onWindowToggle(self, event=None, dispatcher=None):
-        """
-        
-        :param event: 
-        :param dispatcher: 
-        :return: 
-        """
         if self.window is None:
             self.window = MainWindow()
             return self.window.show()
@@ -100,8 +83,8 @@ class WindowHeader(QtWidgets.QWidget):
 
 class WindowContent(QtWidgets.QTabWidget):
 
-    @inject.params(dispatcher='event_dispatcher', logger='logger')
-    def __init__(self, parent=None, dispatcher=None, logger=None):
+    @inject.params(kernel='kernel', logger='logger')
+    def __init__(self, parent=None, kernel=None, logger=None):
         super(WindowContent, self).__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
         
@@ -111,15 +94,9 @@ class WindowContent(QtWidgets.QTabWidget):
         self.addTab(Dashboard(parent), self.tr('Notes'))
         self.setTabsClosable(True)
 
-        dispatcher.add_listener('window.tab', self._onTabNew)
+        kernel.listen('window.tab', self._onTabNew)
 
     def _onTabNew(self, event=None, dispatcher=None):
-        """
-        
-        :param event: 
-        :param dispatcher: 
-        :return: 
-        """
         widget, entity = event.data
         if widget is None or entity is None:
             return None
@@ -128,11 +105,6 @@ class WindowContent(QtWidgets.QTabWidget):
         self.setCurrentIndex(self.indexOf(widget))
 
     def _onTabClose(self, index=None):
-        """
-        
-        :param event: 
-        :return: 
-        """
         if index in [0]:
             return None
         widget = self.widget(index)
@@ -143,14 +115,8 @@ class WindowContent(QtWidgets.QTabWidget):
 
 class Dashboard(QtWidgets.QWidget):
 
-    @inject.params(dispatcher='event_dispatcher', logger='logger')
-    def __init__(self, parent=None, dispatcher=None, logger=None):
-        """
-        
-        :param parent:
-        :param dispatcher:
-        :param logger:
-        """
+    @inject.params(kernel='kernel', logger='logger')
+    def __init__(self, parent=None, kernel=None, logger=None):
         super(Dashboard, self).__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
         self.setObjectName('dashboard')
@@ -162,7 +128,7 @@ class Dashboard(QtWidgets.QWidget):
         self.content.setContentsMargins(0, 0, 0, 0)
 
         # fill tabs with widgets from different modules
-        dispatcher.dispatch('window.first_tab.content', (
+        kernel.dispatch('window.first_tab.content', (
             self.content, parent
         ))
 
@@ -175,12 +141,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     @inject.params(dispatcher='event_dispatcher', logger='logger')
     def __init__(self, parent=None, dispatcher=None, logger=None):
-        """
-        
-        :param parent: 
-        :param dispatcher: 
-        :param logger: 
-        """
         super(MainWindow, self).__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
 
@@ -207,11 +167,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     @inject.params(dispatcher='event_dispatcher', logger='logger')
     def closeEvent(self, event, dispatcher=None, logger=None):
-        """
-
-        :param event: 
-        :return: 
-        """
         dispatcher.dispatch('window.toggle')
 
 

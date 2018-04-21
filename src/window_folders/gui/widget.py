@@ -12,10 +12,6 @@ from .bar import ToolbarbarWidget
 class LabelTop(QtWidgets.QLabel):
 
     def __init__(self, parent=None):
-        """
-
-        :param parent: 
-        """
         super(LabelTop, self).__init__(parent)
         self.setObjectName('LabelTop')
 
@@ -23,10 +19,6 @@ class LabelTop(QtWidgets.QLabel):
 class LabelBottom(QtWidgets.QLabel):
 
     def __init__(self, parent=None):
-        """
-
-        :param parent: 
-        """
         super(LabelBottom, self).__init__(parent)
         self.setObjectName('LabelBottom')
 

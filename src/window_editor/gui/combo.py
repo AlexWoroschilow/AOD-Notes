@@ -39,7 +39,6 @@ class FolderBomboBox(QtWidgets.QComboBox):
         self._note = event.data
         if self._note is None:
             return None
-        
         self._setFolder(self._note.folder)
 
     @inject.params(kernel='kernel')

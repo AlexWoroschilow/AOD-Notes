@@ -11,6 +11,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import logging
+from itertools import count
 
 
 class Event(object):
@@ -83,11 +84,13 @@ class Dispatcher(object):
         event.name = name
 
         logger = logging.getLogger('ed')
-        for listener_item in self._listeners[name]:
+        
+        for index, listener_item in enumerate(self._listeners[name]):
             try:
                 listener_item.listener(event)
-            except Exception as ex:
-                logger.exception(ex)
+            except (Exception, RuntimeError) as ex:
+                logger.exception('Remove %s from pool: %s' % (name, ex))
+                self._listeners[name].pop(index)
         return event
 
     def add_listener(self, event_name, listener, priority=0):
