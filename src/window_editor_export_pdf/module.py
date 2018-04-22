@@ -20,6 +20,7 @@ from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 
 from lib.plugin import Loader
+from lib.widget.button import ToolBarButton
 
 
 class Loader(Loader):
@@ -34,21 +35,19 @@ class Loader(Loader):
         kernel.listen('window.notelist.toolbar', self._onWindowNotepadToolbar, 100)
 
     def _onWindowNotepadToolbar(self, event=None):
-        editor, toolbar = event.data
-        if editor is None or toolbar is None:
+        widget = ToolBarButton()
+        widget.editor, widget.toolbar = event.data
+        if widget.editor is None or widget.toolbar is None:
             raise 'Editor or Toolbar object can not be empty'
 
-        widget = QtWidgets.QPushButton()
         widget.setIcon(QtGui.QIcon("icons/pdf.svg"))
-        widget.setToolTip(editor.tr("Export document to PDF"))
-        widget.setIconSize(QtCore.QSize(20, 20))
+        widget.setToolTip(widget.tr("Export document to PDF"))
+        
         widget.clicked.connect(functools.partial(
             self._onNotepadExport, widget=widget
         ))
-        widget.setFlat(True)
-        widget.editor = editor 
 
-        toolbar.addWidget(widget)
+        widget.toolbar.addWidget(widget)
 
     @inject.params(kernel='kernel')
     def _onNotepadExport(self, event=None, widget=None, kernel=None):

@@ -14,10 +14,9 @@ import inject
 import functools
 
 from PyQt5 import QtGui
-from PyQt5 import QtWidgets
-from PyQt5 import QtCore
 
 from lib.plugin import Loader
+from lib.widget.button import ToolBarButton
 
 
 class Loader(Loader):
@@ -31,15 +30,13 @@ class Loader(Loader):
         kernel.listen('window.notepad.formatbar', self._onWindowNotepadToolbar, 110)
 
     def _onWindowNotepadToolbar(self, event=None):
-        widget = QtWidgets.QPushButton()
+        widget = ToolBarButton()
         widget.editor, widget.toolbar = event.data
         if widget.editor is None or widget.toolbar is None:
             raise 'Editor or Toolbar object can not be empty'
         
         widget.setIcon(QtGui.QIcon("icons/line.svg"))
-        widget.setToolTip(widget.editor.tr('Add a line'))
-        widget.setIconSize(QtCore.QSize(20, 20))
-        widget.setFlat(True)
+        widget.setToolTip(widget.tr('Add a line'))
         
         widget.clicked.connect(functools.partial(
             self._onButtonPressed, widget=widget

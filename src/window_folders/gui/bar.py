@@ -14,15 +14,8 @@ import inject
 from PyQt5.Qt import Qt
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
-from PyQt5 import QtCore
 
-
-class ToolBarbarButton(QtWidgets.QPushButton):
-
-    def __init__(self, parent=None, dispatcher=None):
-        super(ToolBarbarButton, self).__init__()
-        self.setIconSize(QtCore.QSize(20, 20))
-        self.setFlat(True)
+from lib.widget.button import ToolBarButton
 
 
 class ToolbarbarWidget(QtWidgets.QToolBar):
@@ -35,21 +28,21 @@ class ToolbarbarWidget(QtWidgets.QToolBar):
         self.setOrientation(Qt.Vertical)
         self.setMaximumWidth(35)
 
-        self.newAction = ToolBarbarButton()
+        self.newAction = ToolBarButton()
         self.newAction.setIcon(QtGui.QIcon("icons/new-light.svg"))
         self.newAction.setToolTip("Create a new folder")
         self.newAction.setShortcut("Ctrl+N")
 
-        self.copyAction = ToolBarbarButton()
+        self.copyAction = ToolBarButton()
         self.copyAction.setIcon(QtGui.QIcon("icons/copy-light.svg"))
         self.copyAction.setToolTip("Clone selected folder")
         self.copyAction.setShortcut("Ctrl+C")
 
-        self.removeAction = ToolBarbarButton()
+        self.removeAction = ToolBarButton()
         self.removeAction.setIcon(QtGui.QIcon("icons/remove-light.svg"))
         self.removeAction.setToolTip("Remove selected folder")
 
-        self.refreshAction = ToolBarbarButton()
+        self.refreshAction = ToolBarButton()
         self.refreshAction.setIcon(QtGui.QIcon("icons/refresh-light.svg"))
         self.refreshAction.setToolTip("Refresh list")
 

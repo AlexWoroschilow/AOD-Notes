@@ -14,10 +14,9 @@ import inject
 import functools
 
 from PyQt5 import QtGui
-from PyQt5 import QtWidgets
 
 from lib.plugin import Loader
-from PyQt5 import QtCore
+from lib.widget.button import ToolBarButton
 
 
 class Loader(Loader):
@@ -31,15 +30,13 @@ class Loader(Loader):
         kernel.listen('window.notepad.rightbar', self._onWindowNotepadToolbar, 100)
 
     def _onWindowNotepadToolbar(self, event=None):
-        widget = QtWidgets.QPushButton()
+        widget = ToolBarButton()
         widget.editor, widget.toolbar = event.data
         if widget.editor is None or widget.toolbar is None:
             raise 'Editor or Toolbar object can not be empty'
 
         widget.setIcon(QtGui.QIcon("icons/font-gray.svg"))
-        widget.setToolTip("Change the text color to gray")
-        widget.setIconSize(QtCore.QSize(20, 20))
-        widget.setFlat(True)
+        widget.setToolTip(widget.tr("Change the text color to gray"))
 
         widget.clicked.connect(functools.partial(
             self._onButtonPressed, widget=widget

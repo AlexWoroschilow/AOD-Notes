@@ -11,19 +11,13 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
+
 from PyQt5.Qt import Qt
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
-from PyQt5 import QtCore
+
+from lib.widget.button import ToolBarButton
 from .combo import FolderBomboBox
-
-
-class ToolBarbarButton(QtWidgets.QPushButton):
-
-    def __init__(self, parent=None, dispatcher=None):
-        super(ToolBarbarButton, self).__init__()
-        self.setIconSize(QtCore.QSize(20, 20))
-        self.setFlat(True)
 
 
 class ToolBarWidget(QtWidgets.QToolBar):
@@ -35,20 +29,20 @@ class ToolBarWidget(QtWidgets.QToolBar):
         self.setOrientation(Qt.Vertical)
         self.setMaximumWidth(35)
 
-        self.newAction = ToolBarbarButton()
+        self.newAction = ToolBarButton()
         self.newAction.setIcon(QtGui.QIcon("icons/new.svg"))
         self.newAction.setToolTip("Create a new document.")
         self.newAction.setShortcut("Ctrl+N")
 
-        self.copyAction = ToolBarbarButton()
+        self.copyAction = ToolBarButton()
         self.copyAction.setIcon(QtGui.QIcon("icons/copy.svg"))
         self.copyAction.setToolTip("Copy text to clipboard")
 
-        self.removeAction = ToolBarbarButton()
+        self.removeAction = ToolBarButton()
         self.removeAction.setIcon(QtGui.QIcon("icons/remove.svg"))
         self.removeAction.setToolTip("Remove selected document")
 
-        self.refreshAction = ToolBarbarButton()
+        self.refreshAction = ToolBarButton()
         self.refreshAction.setIcon(QtGui.QIcon("icons/refresh.svg"))
         self.refreshAction.setToolTip("Refresh list")
 
@@ -72,47 +66,47 @@ class ToolbarWidgetLeft(QtWidgets.QToolBar):
         self.setOrientation(Qt.Vertical)
         self.setMaximumWidth(35)
 
-        self.saveAction = ToolBarbarButton()
+        self.saveAction = ToolBarButton()
         self.saveAction.setIcon(QtGui.QIcon("icons/save.svg"))
         self.saveAction.setToolTip("Save document")
         self.saveAction.setShortcut("Ctrl+S")
 
-        self.printAction = ToolBarbarButton()
+        self.printAction = ToolBarButton()
         self.printAction.setIcon(QtGui.QIcon("icons/print.svg"))
         self.printAction.setToolTip("Print document")
         self.printAction.setShortcut("Ctrl+P")
 
-        self.previewAction = ToolBarbarButton()
+        self.previewAction = ToolBarButton()
         self.previewAction.setIcon(QtGui.QIcon("icons/preview.svg"))
         self.previewAction.setToolTip("Preview page before printing")
         self.previewAction.setShortcut("Ctrl+Shift+P")
 
-        self.cutAction = ToolBarbarButton()
+        self.cutAction = ToolBarButton()
         self.cutAction.setIcon(QtGui.QIcon("icons/cut.svg"))
         self.cutAction.setToolTip("Cut to clipboard")
         self.cutAction.setShortcut("Ctrl+X")
 
-        self.copyAction = ToolBarbarButton()
+        self.copyAction = ToolBarButton()
         self.copyAction.setIcon(QtGui.QIcon("icons/copy.svg"))
         self.copyAction.setToolTip("Copy text to clipboard")
         self.copyAction.setShortcut("Ctrl+C")
 
-        self.pasteAction = ToolBarbarButton()
+        self.pasteAction = ToolBarButton()
         self.pasteAction.setIcon(QtGui.QIcon("icons/paste.svg"))
         self.pasteAction.setToolTip("Paste text from clipboard")
         self.pasteAction.setShortcut("Ctrl+V")
 
-        self.undoAction = ToolBarbarButton()
+        self.undoAction = ToolBarButton()
         self.undoAction.setIcon(QtGui.QIcon("icons/undo.svg"))
         self.undoAction.setToolTip("Undo last action")
         self.undoAction.setShortcut("Ctrl+Z")
 
-        self.redoAction = ToolBarbarButton()
+        self.redoAction = ToolBarButton()
         self.redoAction.setIcon(QtGui.QIcon("icons/redo.svg"))
         self.redoAction.setToolTip("Redo last undone thing")
         self.redoAction.setShortcut("Ctrl+Y")
 
-        self.fullscreenAction = ToolBarbarButton()
+        self.fullscreenAction = ToolBarButton()
         self.fullscreenAction.setIcon(QtGui.QIcon("icons/fullscreen.svg"))
         self.fullscreenAction.setToolTip("Open editor in a new tab")
 
@@ -141,35 +135,35 @@ class ToolBarWidgetRight(QtWidgets.QToolBar):
         self.setContentsMargins(0, 0, 0, 0)
         self.setMaximumWidth(35)
 
-        self.boldAction = ToolBarbarButton()
+        self.boldAction = ToolBarButton()
         self.boldAction.setIcon(QtGui.QIcon("icons/bold.svg"))
         self.boldAction.setToolTip("Bold")
 
-        self.italicAction = ToolBarbarButton()
+        self.italicAction = ToolBarButton()
         self.italicAction.setIcon(QtGui.QIcon("icons/italic.svg"))
         self.italicAction.setToolTip("Italic")
 
-        self.underlAction = ToolBarbarButton()
+        self.underlAction = ToolBarButton()
         self.underlAction.setIcon(QtGui.QIcon("icons/underline.svg"))
         self.underlAction.setToolTip("Underline")
 
-        self.strikeAction = ToolBarbarButton()
+        self.strikeAction = ToolBarButton()
         self.strikeAction.setIcon(QtGui.QIcon("icons/strike.svg"))
         self.strikeAction.setToolTip("Strike-out")
 
-        self.superAction = ToolBarbarButton()
+        self.superAction = ToolBarButton()
         self.superAction.setIcon(QtGui.QIcon("icons/superscript.svg"))
         self.superAction.setToolTip("Print document")
 
-        self.subAction = ToolBarbarButton()
+        self.subAction = ToolBarButton()
         self.subAction.setIcon(QtGui.QIcon("icons/subscript.svg"))
         self.subAction.setToolTip("Subscript")
 
-        self.fontColor = ToolBarbarButton()
+        self.fontColor = ToolBarButton()
         self.fontColor.setIcon(QtGui.QIcon("icons/font-color.png"))
         self.fontColor.setToolTip("Change font color")
 
-        self.backColor = ToolBarbarButton()
+        self.backColor = ToolBarButton()
         self.backColor.setIcon(QtGui.QIcon("icons/highlight.png"))
         self.backColor.setToolTip("Print document")
 
@@ -201,39 +195,39 @@ class FormatbarWidget(QtWidgets.QToolBar):
         self.fontSize.setSuffix(" pt")
         self.fontSize.setValue(14)
 
-        self.bulletAction = ToolBarbarButton()
+        self.bulletAction = ToolBarButton()
         self.bulletAction.setIcon(QtGui.QIcon("icons/bullet.svg"))
         self.bulletAction.setToolTip("Insert bullet List")
 
-        self.numberedAction = ToolBarbarButton()
+        self.numberedAction = ToolBarButton()
         self.numberedAction.setIcon(QtGui.QIcon("icons/number.svg"))
         self.numberedAction.setToolTip("Insert numbered List")
 
-        self.imageAction = ToolBarbarButton()
+        self.imageAction = ToolBarButton()
         self.imageAction.setIcon(QtGui.QIcon("icons/image.svg"))
         self.imageAction.setToolTip("Insert image")
 
-        self.alignLeft = ToolBarbarButton()
+        self.alignLeft = ToolBarButton()
         self.alignLeft.setIcon(QtGui.QIcon("icons/align-left.svg"))
         self.alignLeft.setToolTip("Align left")
 
-        self.alignCenter = ToolBarbarButton()
+        self.alignCenter = ToolBarButton()
         self.alignCenter.setIcon(QtGui.QIcon("icons/align-center.svg"))
         self.alignCenter.setToolTip("Align center")
 
-        self.alignRight = ToolBarbarButton()
+        self.alignRight = ToolBarButton()
         self.alignRight.setIcon(QtGui.QIcon("icons/align-right.svg"))
         self.alignRight.setToolTip("Align right")
 
-        self.alignJustify = ToolBarbarButton()
+        self.alignJustify = ToolBarButton()
         self.alignJustify.setIcon(QtGui.QIcon("icons/align-justify.svg"))
         self.alignJustify.setToolTip("Align justify")
 
-        self.indentAction = ToolBarbarButton()
+        self.indentAction = ToolBarButton()
         self.indentAction.setIcon(QtGui.QIcon("icons/indent.svg"))
         self.indentAction.setToolTip("Indent Area")
 
-        self.dedentAction = ToolBarbarButton()
+        self.dedentAction = ToolBarButton()
         self.dedentAction.setIcon(QtGui.QIcon("icons/outdent.svg"))
         self.dedentAction.setToolTip("Dedent Area")
 

@@ -19,6 +19,8 @@ from PyQt5 import QtCore
 
 from lib.plugin import Loader
 
+from lib.widget.button import ToolBarButton
+
 
 class Loader(Loader):
 
@@ -31,15 +33,13 @@ class Loader(Loader):
         kernel.listen('window.notepad.rightbar', self._onWindowNotepadToolbar, 0)
 
     def _onWindowNotepadToolbar(self, event=None):
-        widget = QtWidgets.QPushButton()
+        widget = ToolBarButton()
         widget.editor, widget.toolbar = event.data
         if widget.editor is None or widget.toolbar is None:
             raise 'Editor or Toolbar object can not be empty'
 
         widget.setIcon(QtGui.QIcon("icons/h1.svg"))
-        widget.setToolTip(widget.editor.tr('Add a header 1'))
-        widget.setIconSize(QtCore.QSize(20, 20))
-        widget.setFlat(True)
+        widget.setToolTip(widget.tr('Add a header 1'))
         
         widget.clicked.connect(functools.partial(
             self._onButtonPressed, widget=widget

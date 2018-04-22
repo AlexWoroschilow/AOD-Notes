@@ -16,9 +16,9 @@ import functools
 
 from PyQt5 import QtGui
 from PyQt5 import QtWidgets
-from PyQt5 import QtCore
 
 from lib.plugin import Loader
+from lib.widget.button import ToolBarButton
 
 
 class Loader(Loader):
@@ -33,21 +33,19 @@ class Loader(Loader):
         kernel.listen('window.notelist.toolbar', self._onWindowNotepadToolbar, 300)
 
     def _onWindowNotepadToolbar(self, event=None, storage=None):
-        editor, toolbar = event.data
-        if editor is None or toolbar is None:
+        widget = ToolBarButton()
+        widget.editor, widget.toolbar = event.data
+        if widget.editor is None or widget.toolbar is None:
             raise 'Editor or Toolbar object can not be empty'
-
-        widget = QtWidgets.QPushButton(toolbar)
+        
         widget.setIcon(QtGui.QIcon("icons/text.svg"))
-        widget.setToolTip("Export document to text")
+        widget.setToolTip(widget.tr("Export document to text"))
+        
         widget.clicked.connect(functools.partial(
             self._onNotepadExportText, widget=widget
         ))
-        widget.setIconSize(QtCore.QSize(20, 20))
-        widget.setFlat(True)
-        widget.editor = editor 
 
-        toolbar.addWidget(widget)
+        widget.toolbar.addWidget(widget)
 
     @inject.params(kernel='kernel')
     def _onNotepadExportText(self, event=None, widget=None, kernel=None):

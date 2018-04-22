@@ -10,15 +10,13 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import os
 import inject
 import functools
 
 from PyQt5 import QtGui
-from PyQt5 import QtWidgets
 
 from lib.plugin import Loader
-from PyQt5 import QtCore
+from lib.widget.button import ToolBarButton
 
 
 class Loader(Loader):
@@ -32,15 +30,13 @@ class Loader(Loader):
         kernel.listen('window.notepad.rightbar', self._onWindowNotepadToolbar, 100)
 
     def _onWindowNotepadToolbar(self, event=None, dispather=None, storage=None):
-        widget = QtWidgets.QPushButton()
+        widget = ToolBarButton()
         widget.editor, widget.toolbar = event.data
         if widget.editor is None or widget.toolbar is None:
             raise 'Editor or Toolbar object can not be empty'
 
         widget.setIcon(QtGui.QIcon("icons/font-red.svg"))
         widget.setToolTip(widget.tr("Change the text color to red"))
-        widget.setIconSize(QtCore.QSize(20, 20))
-        widget.setFlat(True)
         
         widget.clicked.connect(functools.partial(
             self._onButtonPressed, widget=widget
