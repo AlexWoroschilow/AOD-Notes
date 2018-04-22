@@ -11,7 +11,6 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
-from PyQt5 import QtCore
 
 from lib.plugin import Loader
 from .service import SQLiteStorage
@@ -21,19 +20,9 @@ class Loader(Loader):
 
     @property
     def enabled(self):
-        """
-
-        :return:
-        """
         return True
 
     def config(self, binder=None):
-        """
-
-        :param binder:
-        :return:
-        """
-
         binder.bind('storage', SQLiteStorage("storage.dhf"))
 
     @inject.params(kernel='kernel')
@@ -47,23 +36,11 @@ class Loader(Loader):
         kernel.listen('window.notepad.note_update.folder', self._onNotepadNoteFolder)
         kernel.listen('window.notepad.note_remove', self._onNotepadNoteRemove)
 
-        # dispatcher.dispatch('window.notepad.note_update', (
-        #     self._index, self.name.text(), self.text.toHtml()
-        # ))
-
     @inject.params(storage='storage')
     def _onNotepadFolderNew(self, event=None, dispather=None, storage=None):
-        """
-
-        :param event: 
-        :param dispather: 
-        :return: 
-        """
         if event.data is None:
             return None
-
-        event.data = storage.addFolder(
-            event.data.name, event.data.text)
+        event.data = storage.addFolder(event.data.name, event.data.text)
 
     @inject.params(storage='storage')
     def _onNotepadFolderUpdate(self, event=None, dispather=None, storage=None):
@@ -72,58 +49,26 @@ class Loader(Loader):
 
     @inject.params(storage='storage')
     def _onNotepadFolderRemove(self, event=None, dispather=None, storage=None):
-        """
-        
-        :param event: 
-        :param dispather: 
-        :param storage: 
-        :return: 
-        """
         folder = event.data
         storage.removeFolder(folder.index, folder.name, folder.text)
 
     @inject.params(storage='storage')
     def _onNotepadNoteNew(self, event=None, dispather=None, storage=None):
-        """
-
-        :param event: 
-        :param dispather: 
-        :return: 
-        """
         entity = event.data
         event.data = storage.addNote(entity.name, entity.text, entity.folder)
 
     @inject.params(storage='storage')
     def _onNotepadNoteUpdate(self, event=None, dispather=None, storage=None):
-        """
-
-        :param event: 
-        :param dispather: 
-        :return: 
-        """
         entity = event.data
         storage.updateNote(entity.index, entity.name, entity.text)
 
     @inject.params(storage='storage')
     def _onNotepadNoteRemove(self, event=None, dispather=None, storage=None):
-        """
-
-        :param event: 
-        :param dispather: 
-        :return: 
-        """
         note = event.data
         storage.removeNote(note.index)
 
     @inject.params(storage='storage')
     def _onNotepadNoteFolder(self, event=None, dispather=None, storage=None):
-        """
-        
-        :param event: 
-        :param dispather: 
-        :param storage: 
-        :return: 
-        """
         entity, folder = event.data
         if entity is not None and folder is not None:
             storage.updateNoteFolder(entity.index, folder.index)

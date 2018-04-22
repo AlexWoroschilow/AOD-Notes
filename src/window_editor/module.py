@@ -11,7 +11,6 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
-from PyQt5 import QtWidgets
 
 from lib.plugin import Loader
 from .gui.widget import NotepadEditorWidget
@@ -25,17 +24,18 @@ class Loader(Loader):
 
     @inject.params(kernel='kernel')
     def boot(self, options=None, args=None, kernel=None):
-        self._folder = None
-
         kernel.listen('window.notepad.folder_open', self._onNotepadFolderOpen, 128)
         kernel.listen('window.notepad.folder_selected', self._onNotepadFolderSelect, 128)
-        kernel.listen('window.first_tab.content', self._onWindowFirstTab, 128)
+        kernel.listen('window.dashboard.content', self._onWindowDashboard, 128)
         kernel.listen('application.start', self._onWindowStart)
+
+        self._editor = None
+        self._folder = None
+        self._first = None
 
     @inject.params(storage='storage', kernel='kernel')
     def _onWindowStart(self, event=None, kernel=None, storage=None):
         self._editor = NotepadEditorWidget()
-        self._parent = None
 
         if self._folder is None:
             return None
@@ -49,18 +49,19 @@ class Loader(Loader):
 
         kernel.dispatch('window.notepad.note_edit', self._first)
 
-    def _onWindowFirstTab(self, event=None, dispatcher=None):
-        self.container, self._parent = event.data
+    def _onWindowDashboard(self, event=None, dispatcher=None):
+        container, parent = event.data
         if self._editor is None:
             return None
 
-        self.container.addWidget(self._editor)
+        container.addWidget(self._editor)
 
-    @inject.params(dispatcher='event_dispatcher', storage='storage')
-    def _onNotepadFolderSelect(self, event=None, dispatcher=None, storage=None):
+    @inject.params(storage='storage')
+    def _onNotepadFolderSelect(self, event=None, storage=None):
         self._folder, self._search, self._entity = event.data
         if self._editor is None:
             return None
+        
         self._editor.setContent((self._folder, self._entity, self._search))
 
     @inject.params(kernel='kernel', storage='storage')

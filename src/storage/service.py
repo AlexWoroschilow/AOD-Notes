@@ -18,101 +18,61 @@ from os.path import expanduser
 
 
 class Entity(object):
+
     def __init__(self, index=None, date=None, name=None, text=None):
-        """
-        
-        :param index: 
-        :param date: 
-        :param name: 
-        :param text: 
-        """
         self._index = index
         self._date = date
         self._name = name
         self._text = text
 
+    def __eq__(self, other=None):
+        if other is not None:
+            return self.index == other.index
+        return False
+
     @property
     def index(self):
-        """
-        
-        :return: 
-        """
         return self._index
 
     @property
     def date(self):
-        """
-
-        :return: 
-        """
         return self._date
 
     @property
     def name(self):
-        """
-
-        :return: 
-        """
         return self._name
 
     @name.setter
     def name(self, value=None):
-        """
-        
-        :param value: 
-        :return: 
-        """
         self._name = value
 
     @property
     def text(self):
-        """
-
-        :return: 
-        """
         return self._text
 
     @text.setter
     def text(self, value):
-        """
-
-        :return: 
-        """
         self._text = value
 
 
 class Folder(Entity):
+
     def __init__(self, index=None, date=None, name=None, text=None):
         super(Folder, self).__init__(index, date, name, text)
 
 
 class Note(Entity):
+
     def __init__(self, index=None, folder=None, date=None, name=None, text=None):
-        """
-        
-        :param index: 
-        :param folder: 
-        :param date: 
-        :param name: 
-        :param text: 
-        """
         super(Note, self).__init__(index, date, name, text)
         self._folder = folder
 
     @property
     def folder(self):
-        """
-
-        :return: 
-        """
         return self._folder
 
     @folder.setter
     def folder(self, value):
-        """
-
-        :return: 
-        """
         self._folder = value
 
 
@@ -120,10 +80,6 @@ class SQLiteStorage(object):
     _connection = None
 
     def __init__(self, database=None):
-        """
-        
-        :param database: 
-        """
         database = database.replace('~', expanduser('~'))
         if not os.path.isfile(database):
             self.__init_database(database)
@@ -132,11 +88,6 @@ class SQLiteStorage(object):
             self._connection.text_factory = str
 
     def __init_database(self, database=None):
-        """
-        
-        :param database: 
-        :return: 
-        """
         self._connection = sqlite3.connect(database, check_same_thread=False)
         self._connection.text_factory = str
         self._connection.execute("CREATE TABLE Folder (id INTEGER PRIMARY KEY, date TEXT, name TEXT, text TEXT)")
@@ -151,11 +102,6 @@ class SQLiteStorage(object):
         self._connection.execute("CREATE INDEX IDX_NOTE_INDEX ON Note(id)")
 
     def getFolder(self, index=None):
-        """
-
-        :param index: 
-        :return: 
-        """
         query = "SELECT * FROM Folder WHERE id=?"
         cursor = self._connection.cursor()
         for row in cursor.execute(query, [index]):
@@ -164,10 +110,6 @@ class SQLiteStorage(object):
 
     @property
     def folders(self):
-        """
-        
-        :return: 
-        """
         query = "SELECT * FROM Folder ORDER BY name ASC"
         cursor = self._connection.cursor()
         for row in cursor.execute(query):
@@ -175,11 +117,6 @@ class SQLiteStorage(object):
             yield Folder(str(index), str(date), str(name), str(text))
 
     def foldersByString(self, string=None):
-        """
-
-        :return: 
-        """
-
         query = "SELECT Folder.* FROM Folder " \
                 "LEFT JOIN Note ON Note.folder = Folder.id " \
                 "WHERE Note.name LIKE ? OR Note.text LIKE ? " \
@@ -193,20 +130,9 @@ class SQLiteStorage(object):
 
     @folders.setter
     def folders(self, collection):
-        """
-        
-        :param collection: 
-        :return: 
-        """
         pass
 
     def addFolder(self, name=None, text=None):
-        """
-
-        :param word: 
-        :param translation: 
-        :return: 
-        """
         time = datetime.now()
         fields = (time.strftime("%Y.%m.%d %H:%M:%S"), name, text)
         self._connection.execute("INSERT INTO Folder VALUES (NULL, ?, ?, ?)", fields)
@@ -218,27 +144,11 @@ class SQLiteStorage(object):
             return self.getFolder(index)
 
     def updateFolder(self, index=None, name=None, text=None):
-        """
-
-        :param index: 
-        :param date: 
-        :param word: 
-        :param text: 
-        :return: 
-        """
         fields = (name, text, index)
         self._connection.execute("UPDATE Folder SET name=?, text=? WHERE id=?", fields)
         self._connection.commit()
 
     def removeFolder(self, index=None, name=None, text=None):
-        """
-
-        :param index: 
-        :param date: 
-        :param word: 
-        :param text: 
-        :return: 
-        """
         for note in self.notesByFolderIndex(index):
             self.updateNoteFolder(note.index, None)
         self._connection.execute("DELETE FROM Folder WHERE id=?", [index])
@@ -246,10 +156,6 @@ class SQLiteStorage(object):
 
     @property
     def notes(self):
-        """
-
-        :return: 
-        """
         query = "SELECT * FROM Note ORDER BY name ASC"
         cursor = self._connection.cursor()
         for row in cursor.execute(query):
@@ -257,23 +163,13 @@ class SQLiteStorage(object):
             yield Note(index, folder, date, name, text)
 
     def notesByFolder(self, folder=None, search=None):
-        """
-
-        :return: 
-        """
         if folder is None and search is None:
             return None
-
         if search is None or not len(search):
             return self.notesByFolderIndex(folder.index)
-
         return self.notesByFolderIndexAndString(folder.index, search)
 
     def notesByFolderIndex(self, folder=None):
-        """
-
-        :return: 
-        """
         query = "SELECT * FROM Note WHERE folder=? OR folder IS NULL ORDER BY name ASC"
         cursor = self._connection.cursor()
         for row in cursor.execute(query, [folder]):
@@ -281,12 +177,6 @@ class SQLiteStorage(object):
             yield Note(index, folder, date, name, text)
 
     def notesByFolderIndexAndString(self, folder=None, string=None):
-        """
-        
-        :param folder: 
-        :param string: 
-        :return: 
-        """
         query = "SELECT * FROM Note " \
                 "WHERE (folder=? OR folder IS NULL) " \
                 "AND (Note.name LIKE ? OR Note.text LIKE ?) " \
@@ -299,10 +189,6 @@ class SQLiteStorage(object):
 
     @property
     def notesCount(self):
-        """
-
-        :return: 
-        """
         query = "SELECT COUNT(*) as count FROM Note"
         cursor = self._connection.cursor()
         for row in cursor.execute(query):
@@ -311,19 +197,9 @@ class SQLiteStorage(object):
 
     @notes.setter
     def notes(self, collection):
-        """
-
-        :param collection: 
-        :return: 
-        """
         pass
 
     def getNote(self, index=None):
-        """
-        
-        :param index: 
-        :return: 
-        """
         query = "SELECT * FROM Note WHERE id=?"
         cursor = self._connection.cursor()
         for row in cursor.execute(query, [index]):
@@ -331,12 +207,6 @@ class SQLiteStorage(object):
             return Note(str(index), folder, str(date), str(name), str(text))
 
     def addNote(self, name=None, text=None, folder=None):
-        """
-
-        :param word: 
-        :param translation: 
-        :return: 
-        """
         time = datetime.now()
         fields = (folder, time.strftime("%Y.%m.%d %H:%M:%S"), name, text)
         self._connection.execute("INSERT INTO Note VALUES (NULL, ?, ?, ?, ?)", fields)
@@ -348,37 +218,15 @@ class SQLiteStorage(object):
             return self.getNote(index)
 
     def updateNote(self, index=None, name=None, text=None):
-        """
-
-        :param index: 
-        :param date: 
-        :param word: 
-        :param text: 
-        :return: 
-        """
         fields = (name, text, index)
         self._connection.execute("UPDATE Note SET name=?, text=? WHERE id=?", fields)
         self._connection.commit()
 
     def updateNoteFolder(self, index=None, folderId=None):
-        """
-        
-        :param index: 
-        :param folderId: 
-        :return: 
-        """
         fields = (folderId, index)
         self._connection.execute("UPDATE Note SET folder=? WHERE id=?", fields)
         self._connection.commit()
 
     def removeNote(self, index=None, name=None, text=None):
-        """
-        
-        :param index: 
-        :param date: 
-        :param word: 
-        :param text: 
-        :return: 
-        """
         self._connection.execute("DELETE FROM Note WHERE id=?", [index])
         self._connection.commit()

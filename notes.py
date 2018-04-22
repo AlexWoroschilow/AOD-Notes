@@ -128,7 +128,7 @@ class Dashboard(QtWidgets.QWidget):
         self.content.setContentsMargins(0, 0, 0, 0)
 
         # fill tabs with widgets from different modules
-        kernel.dispatch('window.first_tab.content', (
+        kernel.dispatch('window.dashboard.content', (
             self.content, parent
         ))
 

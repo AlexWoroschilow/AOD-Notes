@@ -11,7 +11,6 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import logging
-from itertools import count
 
 
 class Event(object):
@@ -53,16 +52,9 @@ class EventListenerItem(object):
     def __eq__(self, other):
         return self.__listener == other.__listener
 
-    def __run(self, *parameters):
-        try:
-            self.__listener(*parameters)
-        except (RuntimeError, BaseException) as ex:
-            logger = logging.getLogger('dispatcher')
-            logger.exception(ex)
-
     @property
     def listener(self):
-        return self.__run
+        return self.__listener
 
     @property
     def priority(self):
@@ -121,7 +113,7 @@ class Dispatcher(object):
             return None
 
     def add_subscriber(self, subscriber):
-        logger = logging.getLogger('sc')
+        logger = logging.getLogger('dispatcher')
         logger.debug("subscriber:  %s" % subscriber.__class__.__name__)
         for name, params in subscriber.subscribed_events:
             if isinstance(params, str):
