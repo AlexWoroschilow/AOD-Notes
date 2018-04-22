@@ -136,8 +136,8 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.setLayout(layout)
 
     def _onNoteUpdateEvent(self, event=None):
-        if self._entity.index in [event.data.index]:
-            self.setEntity(event.data)
+        if self.entity.index in [event.data.index]:
+            self.entity = event.data
 
     @property
     def entity(self):
@@ -163,16 +163,16 @@ class TextEditorWidget(QtWidgets.QWidget):
 
     @inject.params(kernel='kernel')
     def _onFullScreenEvent(self, event=None, kernel=None):
-        if self._entity is not None and kernel is not None:
-            kernel.dispatch('window.notepad.note_tab', self._entity)
+        if self.entity is not None and kernel is not None:
+            kernel.dispatch('window.notepad.note_tab', self.entity)
 
     @inject.params(storage='storage')
-    def _onWindowNoteEdit(self, event=None, dispatcher=None, storage=None):
+    def _onWindowNoteEdit(self, event=None, storage=None):
         if storage is None or event.data is None:
             return None
 
         entity = event.data
-        if self._entity.index not in [entity.index]:
+        if self.entity.index not in [entity.index]:
             return None
 
         if self.writer.text is None or self.name is None:
@@ -183,16 +183,13 @@ class TextEditorWidget(QtWidgets.QWidget):
 
     @inject.params(kernel='kernel')
     def _onSaveEvent(self, event=None, kernel=None):
-        if self._entity is None or kernel is None:
+        if self.entity is None or kernel is None:
             return None
 
-        self._entity.name = self.name.text()
-        self._entity.text = self.writer.text.toHtml()
+        self.entity.name = self.name.text()
+        self.entity.text = self.writer.text.toHtml()
 
-        kernel.dispatch('window.notepad.note_update', self._entity)
-
-    def setEntity(self, entity=None):
-        self.entity = entity
+        kernel.dispatch('window.notepad.note_update', self.entity)
 
     def changed(self):
         self.changesSaved = False

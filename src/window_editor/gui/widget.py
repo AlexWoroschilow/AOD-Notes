@@ -85,7 +85,9 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
              
         self._list.list.setCurrentRow(current_index)
 
-        self._editor.setEntity(self._first if self._entity is None else self._entity)
+        self._editor.entity = self._entity
+        if self._entity is None:
+            self._editor.entity = self._first             
 
     @inject.params(kernel='kernel')
     def _onNotepadNoteNewEvent(self, event=None, kernel=None):
@@ -125,7 +127,7 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
             item = self._list.list.itemFromIndex(index)
             if item is not None and item.entity is not None:
                 kernel.dispatch('window.notepad.note_edit', item.entity)
-                self._editor.setEntity(item.entity)
+                self._editor.entity = item.entity
 
     @inject.params(kernel='kernel')
     def _onNotepadNoteDoubleClick(self, event=None, kernel=None):
@@ -138,7 +140,7 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
             return None
 
         editor = TextEditorWidget()
-        editor.setEntity(self._entity)
+        editor.entity = self._entity
 
         kernel.dispatch('window.tab', (editor, self._entity))
 
