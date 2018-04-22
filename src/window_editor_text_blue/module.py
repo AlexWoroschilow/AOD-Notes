@@ -11,6 +11,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
+import functools
 
 from PyQt5 import QtGui
 from PyQt5 import QtWidgets
@@ -20,7 +21,6 @@ from lib.plugin import Loader
 
 
 class Loader(Loader):
-    _widget = None
 
     @property
     def enabled(self):
@@ -28,23 +28,26 @@ class Loader(Loader):
 
     @inject.params(kernel='kernel')
     def boot(self, options=None, args=None, kernel=None):
-        kernel.listen('window.notepad.rightbar', self._onWindowNotepadToolbar, 0)
+        kernel.listen('window.notepad.rightbar', self._onWindowNotepadToolbar, 100)
 
     def _onWindowNotepadToolbar(self, event=None):
-        self._editor, self._toolbar = event.data
-        if self._editor is None or self._toolbar is None:
+        widget = QtWidgets.QPushButton()
+        widget.editor, widget.toolbar = event.data
+        if widget.editor is None or widget.toolbar is None:
             raise 'Editor or Toolbar object can not be empty'
 
-        self._widget = QtWidgets.QPushButton()
-        self._widget.setIcon(QtGui.QIcon("icons/h1.svg"))
-        self._widget.setToolTip(self._editor.tr('Add a header 1'))
-        self._widget.clicked.connect(self._onButtonPressed)
-        self._widget.setIconSize(QtCore.QSize(20,20))
-        self._widget.setFlat(True)
+        widget.setIcon(QtGui.QIcon("icons/font-blue.svg"))
+        widget.setToolTip("Change the text color to blue")
+        widget.setIconSize(QtCore.QSize(20, 20))
+        widget.setFlat(True)
 
-        self._toolbar.addWidget(self._widget)
+        widget.clicked.connect(functools.partial(
+            self._onButtonPressed, widget=widget
+        ))
 
-    def _onButtonPressed(self, event=None):
-        if self._editor is None or self._editor.text is None:
-            return None
-        self._editor.text.setFontPointSize(20)
+        widget.toolbar.addWidget(widget)
+
+    def _onButtonPressed(self, event=None, widget=None):
+        if widget.editor is not None and widget.editor.text is not None:
+            color = QtGui.QColor.fromRgb(0, 0, 127)
+            widget.editor.text.setTextColor(color)

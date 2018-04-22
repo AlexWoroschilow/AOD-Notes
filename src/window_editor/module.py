@@ -18,9 +18,6 @@ from .gui.widget import NotepadEditorWidget
 
 
 class Loader(Loader):
-    _entity = None
-    _editor = None
-    _folder = None
 
     @property
     def enabled(self):
@@ -28,6 +25,8 @@ class Loader(Loader):
 
     @inject.params(kernel='kernel')
     def boot(self, options=None, args=None, kernel=None):
+        self._folder = None
+
         kernel.listen('window.notepad.folder_open', self._onNotepadFolderOpen, 128)
         kernel.listen('window.notepad.folder_selected', self._onNotepadFolderSelect, 128)
         kernel.listen('window.first_tab.content', self._onWindowFirstTab, 128)

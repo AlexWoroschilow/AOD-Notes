@@ -38,19 +38,15 @@ class NoteModel(object):
 
 
 class NotepadEditorWidget(QtWidgets.QSplitter):
-    _entity = None
-    _editor = None
-    _folder = None
-    _search = None
 
     @inject.params(kernel='kernel', storage='storage')
     def __init__(self, parent=None, kernel=None, storage=None):
+        kernel.listen('window.notepad.note_update', self._onRefreshEvent, 128)
+        kernel.listen('window.notepad.note_new', self._onRefreshEvent, 128)
+        
         super(NotepadEditorWidget, self).__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
         self.setObjectName('editorWidget')
-
-        kernel.listen('window.notepad.note_update', self._onRefreshEvent, 128)
-        kernel.listen('window.notepad.note_new', self._onRefreshEvent, 128)
 
         self._list = RecordList()
         self._list.toolbar.newAction.clicked.connect(self._onNotepadNoteNewEvent)

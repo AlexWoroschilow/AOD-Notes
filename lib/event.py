@@ -50,16 +50,23 @@ class EventListenerItem(object):
         self.__listener = listener
         self.__priority = priority
 
+    def __eq__(self, other):
+        return self.__listener == other.__listener
+
+    def __run(self, *parameters):
+        try:
+            self.__listener(*parameters)
+        except (RuntimeError, BaseException) as ex:
+            logger = logging.getLogger('dispatcher')
+            logger.exception(ex)
+
     @property
     def listener(self):
-        return self.__listener
+        return self.__run
 
     @property
     def priority(self):
         return self.__priority
-
-    def __eq__(self, other):
-        return self.__listener == other.__listener
 
 
 class Dispatcher(object):
@@ -83,8 +90,7 @@ class Dispatcher(object):
             event = Event(event)
         event.name = name
 
-        logger = logging.getLogger('ed')
-        
+        logger = logging.getLogger('dispatcher')
         for index, listener_item in enumerate(self._listeners[name]):
             try:
                 listener_item.listener(event)

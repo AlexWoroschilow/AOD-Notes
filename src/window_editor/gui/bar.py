@@ -15,7 +15,6 @@ from PyQt5.Qt import Qt
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5 import QtCore
-from PyQt5 import QtSvg
 from .combo import FolderBomboBox
 
 
@@ -29,8 +28,8 @@ class ToolBarbarButton(QtWidgets.QPushButton):
 
 class ToolBarWidget(QtWidgets.QToolBar):
 
-    @inject.params(dispatcher='event_dispatcher')
-    def __init__(self, parent=None, dispatcher=None):
+    @inject.params(kernel='kernel')
+    def __init__(self, parent=None, kernel=None):
         super(ToolBarWidget, self).__init__()
         self.setContentsMargins(0, 0, 0, 0)
         self.setOrientation(Qt.Vertical)
@@ -58,15 +57,15 @@ class ToolBarWidget(QtWidgets.QToolBar):
         self.addWidget(self.removeAction)
         self.addWidget(self.refreshAction)
 
-        dispatcher.dispatch('window.notelist.toolbar', (
+        kernel.dispatch('window.notelist.toolbar', (
             parent, self
         ))
 
 
 class ToolbarWidgetLeft(QtWidgets.QToolBar):
 
-    @inject.params(dispatcher='event_dispatcher')
-    def __init__(self, parent=None, dispatcher=None):
+    @inject.params(kernel='kernel')
+    def __init__(self, parent=None, kernel=None):
         super(ToolbarWidgetLeft, self).__init__()
         self.setObjectName('editorToolbarWidgetLeft')
         self.setContentsMargins(0, 0, 0, 0)
@@ -127,15 +126,15 @@ class ToolbarWidgetLeft(QtWidgets.QToolBar):
         self.addWidget(self.previewAction)
         self.addWidget(self.fullscreenAction)
 
-        dispatcher.dispatch('window.notepad.leftbar', (
+        kernel.dispatch('window.notepad.leftbar', (
             parent, self
         ))
 
 
 class ToolBarWidgetRight(QtWidgets.QToolBar):
 
-    @inject.params(dispatcher='event_dispatcher')
-    def __init__(self, parent=None, dispatcher=None):
+    @inject.params(kernel='kernel')
+    def __init__(self, parent=None, kernel=None):
         super(ToolBarWidgetRight, self).__init__()
         self.setObjectName('editorToolBarWidgetRight')
         self.setOrientation(Qt.Vertical)
@@ -183,7 +182,7 @@ class ToolBarWidgetRight(QtWidgets.QToolBar):
         self.addWidget(self.fontColor)
         self.addWidget(self.backColor)
 
-        dispatcher.dispatch('window.notepad.rightbar', (
+        kernel.dispatch('window.notepad.rightbar', (
             parent, self
         ))
 

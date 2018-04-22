@@ -26,10 +26,6 @@ from builtins import int
 class LabelTop(QtWidgets.QLabel):
 
     def __init__(self, parent=None):
-        """
-        
-        :param parent: 
-        """
         super(LabelTop, self).__init__(parent)
         self.setStyleSheet('QLabel{ color: #000; font-size: 14px }')
 
@@ -37,20 +33,10 @@ class LabelTop(QtWidgets.QLabel):
 class LabelBottom(QtWidgets.QLabel):
 
     def __init__(self, parent=None):
-        """
-        
-        :param parent: 
-        """
         super(LabelBottom, self).__init__(parent)
         self.setStyleSheet('QLabel{ color: #c0c0c0; font-size: 10px }')
 
     def setText(self, value=None):
-        """
-        
-        :param value: 
-        :return: 
-        """
-
         self._document = QtGui.QTextDocument()
         self._document.setHtml(value)
 

@@ -55,6 +55,16 @@ class TextEditor(QtWidgets.QTextEdit):
         self.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
+        self._entity = None
+        
+    @property
+    def entity(self):
+        return self._entity
+
+    @entity.setter
+    def entity(self, value):
+        self.entity = value
+
 
 class NameEditor(QtWidgets.QLineEdit):
 
@@ -64,10 +74,6 @@ class NameEditor(QtWidgets.QLineEdit):
 
 
 class TextEditorWidget(QtWidgets.QWidget):
-    _entity = None
-    _editor = None
-    _folder = None
-    _list = None
 
     @inject.params(storage='storage', kernel='kernel')
     def __init__(self, parent=None, storage=None, kernel='kernel'):
@@ -135,7 +141,25 @@ class TextEditorWidget(QtWidgets.QWidget):
 
     @property
     def entity(self):
-        return self._entity
+        if self.writer is None:
+            return None
+        return self.writer.entity
+
+    @entity.setter
+    def entity(self, entity):
+        self.writer.entity = entity
+        if entity is None:
+            self.writer.text.setText('')
+            self.name.setText('')
+            return None
+
+        self.name.setText(entity.name)
+        self.writer.text.setText(entity.text)
+
+        if entity.folder is None:
+            return None
+
+        self.formatbar.setFolder(entity.folder)
 
     @inject.params(kernel='kernel')
     def _onFullScreenEvent(self, event=None, kernel=None):
@@ -168,29 +192,12 @@ class TextEditorWidget(QtWidgets.QWidget):
         kernel.dispatch('window.notepad.note_update', self._entity)
 
     def setEntity(self, entity=None):
-        self._entity = entity
-        if self._entity is None:
-            self.writer.text.setText('')
-            self.name.setText('')
-            return None
-
-        self.name.setText(self._entity.name)
-        self.writer.text.setText(self._entity.text)
-
-        if self._entity.folder is None:
-            return None
-
-        self.formatbar.setFolder(self._entity.folder)
+        self.entity = entity
 
     def changed(self):
         self.changesSaved = False
 
     def cursorPosition(self):
-        """
-
-        :return: 
-        """
-
         cursor = self.writer.text.textCursor()
 
         # Mortals like 1-indexed things
@@ -198,27 +205,12 @@ class TextEditorWidget(QtWidgets.QWidget):
         col = cursor.columnNumber()
 
     def toggleToolbar(self):
-        """
-
-        :return: 
-        """
         state = self.leftbar.isVisible()
         self.leftbar.setVisible(not state)
 
     def toggleFormatbar(self):
-        """
-
-        :return: 
-        """
-
         state = self.formatbar.isVisible()
         self.formatbar.setVisible(not state)
-
-    def toggleStatusbar(self):
-        """
-
-        :return: 
-        """
 
     def preview(self):
 
@@ -237,25 +229,6 @@ class TextEditorWidget(QtWidgets.QWidget):
 
         if dialog.exec_() == QtWidgets.QDialog.Accepted:
             self.writer.text.document().print_(dialog.printer())
-
-    def cursorPosition(self):
-
-        cursor = self.writer.text.textCursor()
-
-        # Mortals like 1-indexed things
-        line = cursor.blockNumber() + 1
-        col = cursor.columnNumber()
-
-    def wordCount(self):
-        """
-
-        :return: 
-        """
-        # wc = wordcount.WordCount(self)
-        #
-        # wc.getText()
-        #
-        # wc.show()
 
     def insertImage(self):
 
