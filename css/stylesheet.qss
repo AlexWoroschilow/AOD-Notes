@@ -42,8 +42,12 @@ QSplitter#foldersWidget { border: none; background-color: #414649; }
 QSplitter#foldersWidget QToolBar { border: none; background-color: #414649; }
 
 
-QLabel#LabelTop { color: #A0A0A0; font-size: 14px }
-QLabel#LabelBottom { color: #A0A0A0; font-size: 10px }
+QLabel#folderLabelTop { color: #A0A0A0; font-size: 14px }
+QLabel#folderLabelBottom { color: #A0A0A0; font-size: 10px }
+
+QLabel#notesLabelTop { color: #414649; font-size: 12px }
+QLabel#notesLabelBottom { color: #A0A0A0; font-size: 10px }
+
 
 QSplitter#editorWidget { border: none; background-color: #fff; }
 QSplitter#editorWidget QWidget#editorTextEditorWidget { border: none; }

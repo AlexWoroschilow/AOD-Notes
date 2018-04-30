@@ -1,61 +1,37 @@
 # -*- coding: utf-8 -*-
-
-import sys
-
-# PYQT5 PyQt4’s QtGui module has been split into PyQt5’s QtGui, QtPrintSupport and QtWidgets modules
-
+# Copyright 2015 Alex Woroschilow (alex.woroschilow@gmail.com)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
+import datetime
 from PyQt5 import QtWidgets
-# PYQT5 QMainWindow, QApplication, QAction, QFontComboBox, QSpinBox, QTextEdit, QMessageBox
-# PYQT5 QFileDialog, QColorDialog, QDialog
 
-from PyQt5 import QtPrintSupport
-# PYQT5 QPrintPreviewDialog, QPrintDialog
-
-from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import Qt
-import re
-from bs4 import BeautifulSoup, NavigableString
-import textwrap
 
 from .bar import ToolBarWidget
 from .text import NameEditor
-from builtins import int
 
 
 class LabelTop(QtWidgets.QLabel):
 
     def __init__(self, parent=None):
         super(LabelTop, self).__init__(parent)
-        self.setStyleSheet('QLabel{ color: #000; font-size: 14px }')
+        self.setObjectName('notesLabelTop')
 
 
 class LabelBottom(QtWidgets.QLabel):
 
     def __init__(self, parent=None):
         super(LabelBottom, self).__init__(parent)
-        self.setStyleSheet('QLabel{ color: #c0c0c0; font-size: 10px }')
-
-    def setText(self, value=None):
-        self._document = QtGui.QTextDocument()
-        self._document.setHtml(value)
-
-        text = self._document.toPlainText()
-        if not len(text):
-            return None
-
-        width = 150
-        text = self._document.toPlainText().replace('\r', ' ').replace('\n', ' ')
-        return super(LabelBottom, self).setText('%s...' % textwrap.fill(text[0:width], int(width / 5)))
-
-    def resizeEvent(self, event):
-        width = event.size().width()
-        if width is None:
-            return None
-
-        text = self._document.toPlainText().replace('\r', ' ').replace('\n', ' ')
-        super(LabelBottom, self).setText('%s...' % textwrap.fill(text[0:width], int(width / 5)))
-        super(LabelBottom, self).resizeEvent(event)
+        self.setObjectName('notesLabelBottom')
 
 
 class QCustomQWidget(QtWidgets.QWidget):
@@ -94,44 +70,30 @@ class QCustomQWidget(QtWidgets.QWidget):
 class NoteItem(QtWidgets.QListWidgetItem):
 
     def __init__(self, entity=None, widget=None):
-        """
-        
-        :param index: 
-        :param name: 
-        :param text: 
-        """
         super(NoteItem, self).__init__()
         
-        widget.setTextDown(entity.text)
         widget.setTextUp(entity.name)
+        
+        date = datetime.datetime.now()
+        widget.setTextDown(date.strftime("%d.%m.%Y %H:%M"))
+        
         self._entity = entity
         self._widget = widget
 
     @property
     def widget(self):
-        """
-        
-        :return: 
-        """
         return self._widget
 
     @property
     def entity(self):
-        """
-
-        :return: 
-        """
         return self._entity
 
     @entity.setter
     def entity(self, entity=None):
-        """
-
-        :return: 
-        """
-
         self._widget.setTextUp(entity.name)
-        self._widget.setTextDown(entity.text)
+        
+        date = datetime.datetime.now()
+        self._widget.setTextDown(date.strftime("%d.%m.%Y %H:%M"))
         self._entity = entity
 
     def resizeEvent(self, event):
@@ -208,10 +170,6 @@ class RecordList(QtWidgets.QSplitter):
 
     @property
     def entity(self):
-        """
-
-        :return: 
-        """
         for index in self.list.selectedIndexes():
             item = self.list.itemFromIndex(index)
             if item is not None and item.entity is not None:
@@ -220,18 +178,9 @@ class RecordList(QtWidgets.QSplitter):
 
     @property
     def folder(self):
-        """
-        
-        :return: 
-        """
         return self._folder
 
     def setFolder(self, folder=None):
-        """
-        
-        :param folder: 
-        :return: 
-        """
         if folder is None:
             self.folderEditor.setVisible(False)
             return None
@@ -241,38 +190,18 @@ class RecordList(QtWidgets.QSplitter):
         self.folderEditor.setVisible(True)
 
     def addLine(self, entity=None):
-        """
-
-        :param name: 
-        :param descrption: 
-        :return: 
-        """
         self.list.addLine(entity)
 
     def selectedIndexes(self):
-        """
-
-        :return: 
-        """
         return self.list.selectedIndexes()
 
     def itemFromIndex(self, index=None):
-        """
-
-        :param index: 
-        :return: 
-        """
         if index is None:
             return None
 
         return self.list.itemFromIndex(index)
 
     def takeItem(self, index=None):
-        """
-
-        :param item: 
-        :return: 
-        """
         if index is None:
             return None
 

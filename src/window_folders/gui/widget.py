@@ -1,11 +1,22 @@
 # -*- coding: utf-8 -*-
+# Copyright 2015 Alex Woroschilow (alex.woroschilow@gmail.com)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import random
+import datetime
 
-import sys
-import re
 from PyQt5 import QtWidgets
-from PyQt5 import QtPrintSupport
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
+
 from .bar import ToolbarbarWidget
 
 
@@ -13,14 +24,14 @@ class LabelTop(QtWidgets.QLabel):
 
     def __init__(self, parent=None):
         super(LabelTop, self).__init__(parent)
-        self.setObjectName('LabelTop')
+        self.setObjectName('folderLabelTop')
 
 
 class LabelBottom(QtWidgets.QLabel):
 
     def __init__(self, parent=None):
         super(LabelBottom, self).__init__(parent)
-        self.setObjectName('LabelBottom')
+        self.setObjectName('folderLabelBottom')
 
 
 class QCustomQWidget(QtWidgets.QWidget):
@@ -40,79 +51,44 @@ class QCustomQWidget(QtWidgets.QWidget):
         self.setLayout(self.textQVBoxLayout)
 
     def setTextUp(self, text=None):
-        """
-        
-        :param text: 
-        :return: 
-        """
         self.textUpQLabel.setText(text)
 
     def setTextDown(self, text=None):
-        """
-        
-        :param text: 
-        :return: 
-        """
         self.textDownQLabel.setText(text)
 
     def setIcon(self, imagePath=None):
-        """
-        
-        :param imagePath: 
-        :return: 
-        """
         self.iconQLabel.setPixmap(QtGui.QPixmap(imagePath))
 
 
 class FolderItem(QtWidgets.QListWidgetItem):
 
     def __init__(self, entity=None, widget=None):
-        """
-
-        :param parent: 
-        """
         super(FolderItem, self).__init__()
-        
-        widget.setTextDown(entity.text)
-        widget.setTextUp(entity.name)
-        self._entity = entity
         self._widget = widget
-        self._folder = entity
+        
+        self.folder = entity
 
     @property
     def widget(self):
-        """
-
-        :return: 
-        """
         return self._widget
 
     @property
     def folder(self):
-        """
-        
-        :return: 
-        """
-        return self._folder
+        return self._entity
 
     @folder.setter
     def folder(self, entity=None):
-        """
-
-        :return:
-        """
-        self._widget.setTextUp(entity.name)
-        self._widget.setTextDown(entity.text)
         self._entity = entity
+
+        self._widget.setTextUp(entity.name)
+        
+        count = random.randrange(0, 100)
+        self._widget.setTextDown('%d records cound' % count)
 
 
 class ItemList(QtWidgets.QListWidget):
 
     def __init__(self, parent=None):
-        """
-        
-        :param parent: 
-        """
         super(ItemList, self).__init__(parent)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -120,13 +96,6 @@ class ItemList(QtWidgets.QListWidget):
         self.setObjectName('foldersList')
 
     def addLine(self, folder=None):
-        """
-        
-        :param name: 
-        :param descrption: 
-        :return: 
-        """
-
         item = FolderItem(folder, QCustomQWidget())
         item.setSizeHint(item.widget.sizeHint())
 

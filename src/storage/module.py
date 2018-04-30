@@ -10,6 +10,7 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import os
 import inject
 
 from lib.plugin import Loader
@@ -23,7 +24,19 @@ class Loader(Loader):
         return True
 
     def config(self, binder=None):
-        binder.bind('storage', SQLiteStorage("storage.dhf"))
+        binder.bind_to_constructor('storage', self._bind_storage)
+
+    @inject.params(kernel='kernel')
+    def _bind_storage(self, kernel=None):
+        if kernel.options.storage is None:
+            raise "Storage destination can not be empty"
+        storage = kernel.options.storage
+        folder = os.path.dirname(storage)
+        if not os.path.exists(storage):
+            if not os.path.exists(folder):
+                os.makedirs(folder)
+                
+        return SQLiteStorage(kernel.options.storage)
 
     @inject.params(kernel='kernel')
     def boot(self, options=None, args=None, kernel=None):

@@ -136,6 +136,9 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.setLayout(layout)
 
     def _onNoteUpdateEvent(self, event=None):
+        if self.entity is None or event.data is None:
+            return None
+        
         if self.entity.index in [event.data.index]:
             self.entity = event.data
 

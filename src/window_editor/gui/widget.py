@@ -113,7 +113,6 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
             item = self._list.itemFromIndex(index)
             if item is not None and item.entity is not None:
                 kernel.dispatch('window.notepad.note_remove', item.entity)
-                self._list.takeItem(index)
 
     @inject.params(kernel='kernel')
     def _onFolderUpdated(self, event=None, kernel=None):
@@ -144,18 +143,6 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
 
         kernel.dispatch('window.tab', (editor, self._entity))
 
-    @inject.params(storage='storage')
-    def _onRefreshEvent(self, event=None, dispatcher=None, storage=None):
-        if self._folder is None:
-            return None
-
-        current = self._list.list.currentIndex()
-        self._list.list.clear()
-        for entity in storage.notesByFolder(self._folder):
-            self._list.addLine(entity)
-            
-        if self._list.list.item(current.row()) not in [0]:
-            self._list.list.setCurrentIndex(current)
-        
-        self._list.setFolder(self._folder)
-
+    @inject.params(kernel='kernel')
+    def _onRefreshEvent(self, event=None, kernel=None):
+        kernel.dispatch('window.notepad_list.refresh')

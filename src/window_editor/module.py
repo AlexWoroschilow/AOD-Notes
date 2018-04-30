@@ -27,42 +27,48 @@ class Loader(Loader):
         kernel.listen('window.notepad.folder_open', self._onNotepadFolderOpen, 128)
         kernel.listen('window.notepad.folder_selected', self._onNotepadFolderSelect, 128)
         kernel.listen('window.dashboard.content', self._onWindowDashboard, 128)
+
+        kernel.listen('window.notepad.folder_selected', self._onRefresh, 128)
+        kernel.listen('window.notepad_list.refresh', self._onRefresh, 128)
+        kernel.listen('window.notepad.note_remove', self._onRefresh, 128)
+        kernel.listen('window.notepad.note_new', self._onRefresh, 128)
+
         kernel.listen('application.start', self._onWindowStart)
 
-        self._editor = None
+        self._widget = None
         self._folder = None
         self._first = None
 
     @inject.params(storage='storage', kernel='kernel')
     def _onWindowStart(self, event=None, kernel=None, storage=None):
-        self._editor = NotepadEditorWidget()
+        self._widget = NotepadEditorWidget()
 
         if self._folder is None:
             return None
 
         self._first = None
-        self._editor.list.clear()
+        self._widget._list.clear()
         for entity in storage.notesByFolder(self._folder):
             self._first = entity if self._first is None else self._first 
-            self._editor._list.addLine(entity)
-        self._editor._list.setFolder(self._folder)
+            self._widget._list.addLine(entity)
+        self._widget._list.setFolder(self._folder)
 
         kernel.dispatch('window.notepad.note_edit', self._first)
 
     def _onWindowDashboard(self, event=None, dispatcher=None):
         container, parent = event.data
-        if self._editor is None:
+        if self._widget is None:
             return None
 
-        container.addWidget(self._editor)
+        container.addWidget(self._widget)
 
-    @inject.params(storage='storage')
-    def _onNotepadFolderSelect(self, event=None, storage=None):
+    @inject.params(storage='storage', kernel='kernel',)
+    def _onNotepadFolderSelect(self, event=None, storage=None, kernel=None):
         self._folder, self._search, self._entity = event.data
-        if self._editor is None:
+        if self._widget is None:
             return None
         
-        self._editor.setContent((self._folder, self._entity, self._search))
+        self._widget.setContent((self._folder, self._entity, self._search))
 
     @inject.params(kernel='kernel', storage='storage')
     def _onNotepadFolderOpen(self, event=None, kernel=None, storage=None):
@@ -74,3 +80,22 @@ class Loader(Loader):
         editor.setContent((self._folder, None, self._search))
         kernel.dispatch('window.tab', (editor, self._folder))
 
+    @inject.params(kernel='kernel', storage='storage')
+    def _onRefresh(self, event=None, kernel=None, storage=None):
+        current = self._widget._list.list.currentIndex()
+        self._widget._list.list.clear()
+
+        for entity in storage.notesByFolder(self._folder):
+            self._widget._list.addLine(entity)
+            
+        if self._widget._list.list.item(current.row()) not in [0]:
+            self._widget._list.list.setCurrentIndex(current)
+        
+        self._widget._list.setFolder(self._folder)
+        
+        message = self._widget.tr('%d records found in the folder "%s"' % (
+            self._widget._list.list.count(), self._folder.name
+        ))
+         
+        kernel.dispatch('window.status', (message, 10))
+         

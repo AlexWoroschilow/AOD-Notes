@@ -77,6 +77,9 @@ class Loader(Loader):
         if self._first is None:
             return None
 
+        message = self._widget.tr('%d folders found' % self._widget.list.count())
+        kernel.dispatch('window.status', (message, 10))
+
         kernel.dispatch('window.notepad.folder_selected', (
             self._first, self._search, None
         ))
@@ -93,8 +96,8 @@ class Loader(Loader):
             if item is not None and item.folder is not None:
                 kernel.dispatch('window.notepad.folder_new', item.folder)
 
-    @inject.params(dispatcher='event_dispatcher')
-    def _onFolderRemoveEvent(self, event=None, dispatcher=None):
+    @inject.params(kernel='kernel')
+    def _onFolderRemoveEvent(self, event=None, kernel=None):
         message = self._widget.tr("Are you sure you want to remove this Folder?")
         reply = QtWidgets.QMessageBox.question(self._widget, 'Remove folder', message, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
         if reply == QtWidgets.QMessageBox.No:
@@ -105,11 +108,14 @@ class Loader(Loader):
             if item is None and item.folder is None:
                 continue
 
-            dispatcher.dispatch('window.notepad.folder_remove', item.folder)
+            kernel.dispatch('window.notepad.folder_remove', item.folder)
             self._widget.takeItem(index)
+            
+        message = self._widget.tr('%d folders found' % self._widget.list.count())
+        kernel.dispatch('window.status', (message, None))
 
-    @inject.params(dispatcher='event_dispatcher', storage='storage')
-    def _onRefreshEvent(self, event=None, dispatcher=None, storage=None):
+    @inject.params(kernel='kernel', storage='storage')
+    def _onRefreshEvent(self, event=None, kernel=None, storage=None):
         current = self._widget.list.currentIndex()
         
         self._widget.list.clear()
@@ -118,6 +124,9 @@ class Loader(Loader):
 
         if self._widget.list.item(current.row()) not in [0]:
             self._widget.list.setCurrentIndex(current)
+
+        message = self._widget.tr('%d folders found' % self._widget.list.count())
+        kernel.dispatch('window.status', (message, None))
 
     @inject.params(kernel='kernel')
     def _onFolderOpen(self, event=None, selection=None, kernel=None):
@@ -138,7 +147,7 @@ class Loader(Loader):
         self._widget.list.blockSignals(True)
         for row in range(0, self._widget.list.count()):
             item = self._widget.list.item(row)
-            if item.folder is None:
+            if item.folder is None or folder is None:
                 continue
             
             if item.folder.index in [folder.index]:
