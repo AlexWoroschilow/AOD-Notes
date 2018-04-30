@@ -20,20 +20,28 @@ QSplitter {
   	margin: 0px;  
 }
 
+
+QSplitter#widgetRecordList { 
+	border-right: 5px solid qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #f1f2f3, stop: 1.0 #a1a2a3);
+}
+
 QListWidget { 
 	border: none; background-color: #f1f2f3;
 }
+
+
 QListWidget::item:hover,
 QListWidget::item:selected { 
-	background: solid qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #f3f4f5, stop: 0.25 #f5f6f7, stop: 1.0 #f8f9fa);
+	border-bottom: 2px solid qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #f1f2f3, stop: 0.5 #c1c2c3, stop: 1.0 #f1f2f3);
 }
 
 QListWidget#foldersList { 
-	border: none; background: #414649; 
+	border: none; background: #414649;
+ 	border-right: 5px solid qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #414649, stop: 1.0 #313639);
 }
 QListWidget#foldersList::item:hover,
 QListWidget#foldersList::item:selected  { 
-	background: solid qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #414649, stop: 0.02 #515659, stop: 1 #515659);
+	border-bottom: 3px solid qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #414649, stop: 0.5 #515659, stop: 1.0 #414649);
 }
 
 
