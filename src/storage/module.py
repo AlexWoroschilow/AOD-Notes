@@ -12,9 +12,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
 import inject
+from datetime import datetime
 
 from lib.plugin import Loader
-from .service import SQLiteStorage
+from .sqlalchemy import Note
+from .sqlalchemy import Folder
+from .sqlalchemy import SQLAlechemyStorage
 
 
 class Loader(Loader):
@@ -36,7 +39,7 @@ class Loader(Loader):
             if not os.path.exists(folder):
                 os.makedirs(folder)
                 
-        return SQLiteStorage(kernel.options.storage)
+        return SQLAlechemyStorage(kernel.options.storage)
 
     @inject.params(kernel='kernel')
     def boot(self, options=None, args=None, kernel=None):
@@ -46,42 +49,50 @@ class Loader(Loader):
 
         kernel.listen('window.notepad.note_new', self._onNotepadNoteNew)
         kernel.listen('window.notepad.note_update', self._onNotepadNoteUpdate)
-        kernel.listen('window.notepad.note_update.folder', self._onNotepadNoteFolder)
         kernel.listen('window.notepad.note_remove', self._onNotepadNoteRemove)
 
-    @inject.params(storage='storage')
-    def _onNotepadFolderNew(self, event=None, dispather=None, storage=None):
+    @inject.params(storage='storage', logger='logger')
+    def _onNotepadFolderNew(self, event=None, storage=None, logger=None):
+        logger.debug('[storage] - _onNotepadFolderNew')
         if event.data is None:
             return None
-        event.data = storage.addFolder(event.data.name, event.data.text)
+        name, text = event.data 
+        entity = Folder(name=name, createdAt=datetime.now(), total=0)        
+        event.data = storage.create(entity)
 
-    @inject.params(storage='storage')
-    def _onNotepadFolderUpdate(self, event=None, dispather=None, storage=None):
-        folder = event.data
-        storage.updateFolder(folder.index, folder.name, folder.text)
+    @inject.params(storage='storage', logger='logger')
+    def _onNotepadFolderUpdate(self, event=None, storage=None, logger=None):
+        logger.debug('[storage] - _onNotepadFolderUpdate')
+        if event.data is None:
+            return None
+        storage.update(event.data)
 
-    @inject.params(storage='storage')
-    def _onNotepadFolderRemove(self, event=None, dispather=None, storage=None):
-        folder = event.data
-        storage.removeFolder(folder.index, folder.name, folder.text)
+    @inject.params(storage='storage', logger='logger')
+    def _onNotepadFolderRemove(self, event=None, storage=None, logger=None):
+        logger.debug('[storage] - _onNotepadFolderRemove')
+        if event.data is None:
+            return None
+        storage.delete(event.data)
 
-    @inject.params(storage='storage')
-    def _onNotepadNoteNew(self, event=None, dispather=None, storage=None):
-        entity = event.data
-        event.data = storage.addNote(entity.name, entity.text, entity.folder)
+    @inject.params(storage='storage', logger='logger')
+    def _onNotepadNoteNew(self, event=None, storage=None, logger=None):
+        logger.debug('[storage] - _onNotepadNoteNew')
+        if event.data is None:
+            return None
+        name, text, folder = event.data
+        entity = Note(name=name, text=text, folder=folder, createdAt=datetime.now())        
+        event.data = storage.create(entity)
 
-    @inject.params(storage='storage')
-    def _onNotepadNoteUpdate(self, event=None, dispather=None, storage=None):
-        entity = event.data
-        storage.updateNote(entity.index, entity.name, entity.text)
+    @inject.params(storage='storage', logger='logger')
+    def _onNotepadNoteUpdate(self, event=None, storage=None, logger=None):
+        logger.debug('[storage] - _onNotepadNoteUpdate')
+        if event.data is None:
+            return None
+        storage.update(event.data)
 
-    @inject.params(storage='storage')
-    def _onNotepadNoteRemove(self, event=None, dispather=None, storage=None):
-        note = event.data
-        storage.removeNote(note.index)
-
-    @inject.params(storage='storage')
-    def _onNotepadNoteFolder(self, event=None, dispather=None, storage=None):
-        entity, folder = event.data
-        if entity is not None and folder is not None:
-            storage.updateNoteFolder(entity.index, folder.index)
+    @inject.params(storage='storage', logger='logger')
+    def _onNotepadNoteRemove(self, event=None, storage=None, logger=None):
+        logger.debug('[storage] - _onNotepadNoteRemove')
+        if event.data is None:
+            return None
+        storage.delete(event.data)

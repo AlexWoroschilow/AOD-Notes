@@ -11,7 +11,6 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
-import datetime
 from PyQt5 import QtWidgets
 
 from PyQt5.QtCore import Qt
@@ -71,14 +70,8 @@ class NoteItem(QtWidgets.QListWidgetItem):
 
     def __init__(self, entity=None, widget=None):
         super(NoteItem, self).__init__()
-        
-        widget.setTextUp(entity.name)
-        
-        date = datetime.datetime.now()
-        widget.setTextDown(date.strftime("%d.%m.%Y %H:%M"))
-        
-        self._entity = entity
         self._widget = widget
+        self.entity = entity
 
     @property
     def widget(self):
@@ -90,10 +83,18 @@ class NoteItem(QtWidgets.QListWidgetItem):
 
     @entity.setter
     def entity(self, entity=None):
-        self._widget.setTextUp(entity.name)
+        if entity is None:
+            return None
         
-        date = datetime.datetime.now()
-        self._widget.setTextDown(date.strftime("%d.%m.%Y %H:%M"))
+        if entity.createdAt is not None:
+            datetime = entity.createdAt
+            self.widget.setTextDown(
+                datetime.strftime("%d.%m.%Y %H:%M")
+            )
+            
+        if entity.name is not None:
+            self.widget.setTextUp(entity.name)
+            
         self._entity = entity
 
     def resizeEvent(self, event):
@@ -103,10 +104,6 @@ class NoteItem(QtWidgets.QListWidgetItem):
 class ItemList(QtWidgets.QListWidget):
 
     def __init__(self, parent=None):
-        """
-        
-        :param parent: 
-        """
         super(ItemList, self).__init__(parent)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -116,13 +113,6 @@ class ItemList(QtWidgets.QListWidget):
         self.setWordWrap(True)
 
     def addLine(self, entity=None):
-        """
-        
-        :param name: 
-        :param descrption: 
-        :return: 
-        """
-
         item = NoteItem(entity, QCustomQWidget())
         item.setSizeHint(item.widget.sizeHint())
 
@@ -140,10 +130,11 @@ class ItemList(QtWidgets.QListWidget):
 
 class RecordList(QtWidgets.QSplitter):
 
-    @inject.params(dispatcher='event_dispatcher', storage='storage')
-    def __init__(self, parent=None, dispatcher=None, storage=None):
+    @inject.params(storage='storage')
+    def __init__(self, parent=None, storage=None):
         super(RecordList, self).__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
+        self.setObjectName('widgetRecordList')
 
         self._folder = None
 
@@ -180,14 +171,19 @@ class RecordList(QtWidgets.QSplitter):
     def folder(self):
         return self._folder
 
-    def setFolder(self, folder=None):
-        if folder is None:
-            self.folderEditor.setVisible(False)
+    @folder.setter
+    def folder(self, folder=None):
+        if folder is not None:
+            self._folder = folder
+            self.folderEditor.setText(folder.name)
+            self.folderEditor.setVisible(True)
             return None
+        
+        self.folderEditor.setVisible(False)
+        return None
 
-        self._folder = folder
-        self.folderEditor.setText(folder.name)
-        self.folderEditor.setVisible(True)
+    def clear(self):
+        return self.list.clear()
 
     def addLine(self, entity=None):
         self.list.addLine(entity)

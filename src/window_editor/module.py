@@ -28,19 +28,26 @@ class Loader(Loader):
         kernel.listen('window.notepad.folder_selected', self._onNotepadFolderSelect, 128)
         kernel.listen('window.dashboard.content', self._onWindowDashboard, 128)
 
-        kernel.listen('window.notepad.folder_selected', self._onRefresh, 128)
         kernel.listen('window.notepad_list.refresh', self._onRefresh, 128)
+        kernel.listen('window.notepad.note_update', self._onNotepadUpdate)
+        kernel.listen('window.notepad.note_update', self._onRefresh, 128)
         kernel.listen('window.notepad.note_remove', self._onRefresh, 128)
+        kernel.listen('window.notepad.note_new', self._onNotepadUpdate,100)
         kernel.listen('window.notepad.note_new', self._onRefresh, 128)
+        kernel.listen('window.search.request', self._onSearchRequest, 100)
 
         kernel.listen('application.start', self._onWindowStart)
 
         self._widget = None
         self._folder = None
+        self._search = None
+        self._entity = None
         self._first = None
 
-    @inject.params(storage='storage', kernel='kernel')
-    def _onWindowStart(self, event=None, kernel=None, storage=None):
+    @inject.params(storage='storage', kernel='kernel', logger='logger')
+    def _onWindowStart(self, event=None, kernel=None, storage=None, logger='logger'):
+        logger.debug('[editor] - _onWindowStart')
+
         self._widget = NotepadEditorWidget()
 
         if self._folder is None:
@@ -48,12 +55,10 @@ class Loader(Loader):
 
         self._first = None
         self._widget._list.clear()
-        for entity in storage.notesByFolder(self._folder):
+        for entity in storage.notes(folder=self._folder):
             self._first = entity if self._first is None else self._first 
             self._widget._list.addLine(entity)
         self._widget._list.setFolder(self._folder)
-
-        kernel.dispatch('window.notepad.note_edit', self._first)
 
     def _onWindowDashboard(self, event=None, dispatcher=None):
         container, parent = event.data
@@ -62,16 +67,26 @@ class Loader(Loader):
 
         container.addWidget(self._widget)
 
-    @inject.params(storage='storage', kernel='kernel',)
-    def _onNotepadFolderSelect(self, event=None, storage=None, kernel=None):
+    @inject.params(logger='logger', storage='storage')
+    def _onNotepadFolderSelect(self, event=None, logger=None, storage=None):
+        logger.info('[editor] - _onNotepadFolderSelect')
         self._folder, self._search, self._entity = event.data
         if self._widget is None:
             return None
         
-        self._widget.setContent((self._folder, self._entity, self._search))
+        self._widget._list.clear()
+        for entity in storage.notes(folder=self._folder, string=self._search):
+            self._widget._list.addLine(entity)
+        
+        self._widget.setContent((
+            self._folder,
+            self._entity,
+            self._search
+        ))
 
-    @inject.params(kernel='kernel', storage='storage')
-    def _onNotepadFolderOpen(self, event=None, kernel=None, storage=None):
+    @inject.params(kernel='kernel', logger='logger')
+    def _onNotepadFolderOpen(self, event=None, kernel=None, logger=None):
+        logger.debug('[editor] - _onNotepadFolderOpen')
         self._folder, self._search = event.data
         if self._folder is None:
             return None
@@ -80,22 +95,30 @@ class Loader(Loader):
         editor.setContent((self._folder, None, self._search))
         kernel.dispatch('window.tab', (editor, self._folder))
 
-    @inject.params(kernel='kernel', storage='storage')
-    def _onRefresh(self, event=None, kernel=None, storage=None):
-        current = self._widget._list.list.currentIndex()
-        self._widget._list.list.clear()
+    @inject.params(kernel='kernel', logger='logger')
+    def _onNotepadUpdate(self, event=None, kernel=None, logger=None):
+        self._entity = event.data
 
-        for entity in storage.notesByFolder(self._folder):
-            self._widget._list.addLine(entity)
-            
-        if self._widget._list.list.item(current.row()) not in [0]:
-            self._widget._list.list.setCurrentIndex(current)
-        
-        self._widget._list.setFolder(self._folder)
-        
-        message = self._widget.tr('%d records found in the folder "%s"' % (
-            self._widget._list.list.count(), self._folder.name
+    @inject.params(storage='storage', logger='logger')
+    def _onSearchRequest(self, event=None, storage=None, logger=None):
+        logger.debug('[editor] - _onSearchRequest')
+        self._search = event.data
+        if self._search is None:
+            return None
+
+        self._folder = None
+        self._entity = None
+         
+        self._widget.setContent((self._folder,
+            self._entity, self._search 
         ))
-         
-        kernel.dispatch('window.status', (message, 10))
-         
+
+    @inject.params(kernel='kernel', storage='storage', logger='logger')
+    def _onRefresh(self, event=None, kernel=None, storage=None, logger=None):
+        logger.debug('[editor] - _onRefresh')
+        if self._widget is None:
+            return None
+        
+        self._widget.setContent((self._folder,
+            self._entity, self._search 
+        ))

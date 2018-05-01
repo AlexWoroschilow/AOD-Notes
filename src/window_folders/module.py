@@ -17,21 +17,6 @@ from lib.plugin import Loader
 from .gui.widget import FolderList
 
 
-class FolderModel(object):
-
-    def __init__(self, name=None, text=None):
-        self._name = name
-        self._text = text
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def text(self):
-        return self._text
-
-
 class Loader(Loader):
     _first = None
     _search = None
@@ -40,6 +25,9 @@ class Loader(Loader):
     @property
     def enabled(self):
         return True
+
+    def config(self, binder=None):
+        binder.bind('folders', self)
 
     @inject.params(kernel='kernel')
     def boot(self, options=None, args=None, kernel=None):
@@ -65,7 +53,7 @@ class Loader(Loader):
 
         self._first = None
         self._widget.list.clear()
-        for folder in storage.folders:
+        for folder in storage.folders():
             if self._first is None:
                 self._first = folder
             self._widget.addLine(folder)
@@ -83,11 +71,22 @@ class Loader(Loader):
         kernel.dispatch('window.notepad.folder_selected', (
             self._first, self._search, None
         ))
+        
+    @property
+    def selected(self):
+        if self._widget is None:
+            return None
+        for index in self._widget.selectedIndexes():
+            item = self._widget.itemFromIndex(index)
+            if item is not None:
+                return item.folder
+        return None
 
     @inject.params(kernel='kernel')
     def _onFolderNewEvent(self, event=None, kernel=None):
-        model = FolderModel('New folder', 'New folder description')
-        kernel.dispatch('window.notepad.folder_new', model)
+        kernel.dispatch('window.notepad.folder_new', (
+            'New folder', 'New folder description'
+        ))
 
     @inject.params(kernel='kernel')
     def _onFolderCopyEvent(self, event=None, kernel=None):
@@ -119,7 +118,7 @@ class Loader(Loader):
         current = self._widget.list.currentIndex()
         
         self._widget.list.clear()
-        for entity in storage.folders:
+        for entity in storage.folders():
             self._widget.addLine(entity)
 
         if self._widget.list.item(current.row()) not in [0]:
@@ -150,7 +149,7 @@ class Loader(Loader):
             if item.folder is None or folder is None:
                 continue
             
-            if item.folder.index in [folder.index]:
+            if item.folder.id in [folder.id]:
                 self._widget.list.setCurrentRow(row)
                 break
         self._widget.list.blockSignals(False)
@@ -188,11 +187,7 @@ class Loader(Loader):
 
         self._first = None
         self._widget.list.clear()
-        for entity in storage.foldersByString(self._search):
+        for entity in storage.folders(string=self._search):
             if self._first is None:
                 self._first = entity
             self._widget.addLine(entity)
-
-        kernel.dispatch('window.notepad.folder_selected', (
-            self._first, self._search, None
-        ))

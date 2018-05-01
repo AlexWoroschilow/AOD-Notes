@@ -12,48 +12,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
 import inject
-from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5.Qt import Qt
 
 from lib.plugin import Loader
 from .gui.widget import SearchField
-
-
-class NoteModel(object):
-
-    def __init__(self, name=None, text=None, folder=None):
-        self._name = name
-        self._folder = folder
-        self._text = text
-
-    @property
-    def folder(self):
-        return self._folder
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def text(self):
-        return self._text
-
-
-class FolderModel(object):
-
-    def __init__(self, name=None, text=None):
-        self._name = name
-        self._text = text
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def text(self):
-        return self._text
 
 
 class Loader(Loader):
@@ -117,16 +81,18 @@ class Loader(Loader):
 
     @inject.params(kernel='kernel')
     def _onCreateFolder(self, event, kernel=None):
-        model = FolderModel('New folder', 'New folder description')
-        kernel.dispatch('window.notepad.folder_new', model)
+        kernel.dispatch('window.notepad.folder_new', (
+            'New folder', 'New folder description'
+        ))
 
-    @inject.params(kernel='kernel')
-    def _onCreateNote(self, event, kernel=None):
-        model = NoteModel('New note', 'New description', None)
-        kernel.dispatch('window.notepad.note_new', model)
+    @inject.params(kernel='kernel', folders='folders')
+    def _onCreateNote(self, event, kernel=None, folders=None):
+        kernel.dispatch('window.notepad.note_new', (
+            'New note', 'New description', folders.selected
+        ))
 
-    @inject.params(kernel='kernel')
-    def _onImportNote(self, event, kernel=None):
+    @inject.params(kernel='kernel', folders='folders')
+    def _onImportNote(self, event, kernel=None, folders=None):
         selector = QtWidgets.QFileDialog()
         if not selector.exec_():
             return None
@@ -141,9 +107,9 @@ class Loader(Loader):
                 reply = QtWidgets.QMessageBox.question(self._widget, 'Message', message, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
                 if reply == QtWidgets.QMessageBox.No:
                     continue
-            
             with open(path, 'r') as stream:
-                model = NoteModel(os.path.basename(path), stream.read())
-                kernel.dispatch('window.notepad.note_new', model)
+                kernel.dispatch('window.notepad.note_new', (
+                    os.path.basename(path), stream.read(), folders.selected
+                ))
                 stream.close()
 

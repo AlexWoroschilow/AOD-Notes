@@ -3,6 +3,10 @@ QTabBar::close-button {
     subcontrol-position: right;
 }
 
+QComboBox#folderBomboBox {
+	background-color: #ffffff;
+}
+
 QToolBar { 
 	border: none;
 	background-color: #f1f2f3; 
