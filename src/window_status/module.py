@@ -29,7 +29,7 @@ class Loader(Loader):
         kernel.listen('window.status', self._onWindowStatus)
 
     def _onWindowStatusBar(self, event):
-        self._widget = QtWidgets.QLabel("Message in statusbar")
+        self._widget = QtWidgets.QLabel()
         statusbar, window = event.data
 
         spacer = QtWidgets.QWidget();

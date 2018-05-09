@@ -10,9 +10,6 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import random
-import datetime
-
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
@@ -82,8 +79,11 @@ class FolderItem(QtWidgets.QListWidgetItem):
 
         self._widget.setTextUp(entity.name)
         
-        count = random.randrange(0, 100)
-        self._widget.setTextDown('%d records cound' % count)
+        count = len(entity.notes)
+        datetime = entity.createdAt
+        self._widget.setTextDown('%d records, %s' % (
+            count, datetime.strftime("%d.%m.%Y %H:%M") 
+        ))
 
 
 class ItemList(QtWidgets.QListWidget):

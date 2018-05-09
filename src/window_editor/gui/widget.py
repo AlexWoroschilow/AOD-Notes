@@ -15,47 +15,30 @@ from PyQt5 import QtWidgets
 
 from .text import TextEditorWidget
 from .list import RecordList
-
-
-class NoteModel(object):
-
-    def __init__(self, name=None, text=None, folder=None):
-        self._name = name
-        self._folder = folder
-        self._text = text
-
-    @property
-    def folder(self):
-        return self._folder
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def text(self):
-        return self._text
+from src import storage
 
 
 class NotepadEditorWidget(QtWidgets.QSplitter):
 
     @inject.params(kernel='kernel', storage='storage')
     def __init__(self, parent=None, kernel=None, storage=None):
-        kernel.listen('window.notepad.note_update', self._onRefreshEvent, 128)
-        kernel.listen('window.notepad.note_new', self._onRefreshEvent, 128)
-        
+        kernel.listen('window.notepad_list.refresh', self._onActionRefreshEvent, 128)
+        kernel.listen('window.notepad.note_update', self._onActionRefreshEvent, 128)
+        kernel.listen('window.notepad.note_remove', self._onActionRefreshEvent, 128)
+        kernel.listen('window.notepad.note_new', self._onActionRefreshEvent, 128)
+
         super(NotepadEditorWidget, self).__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
         self.setObjectName('editorWidget')
 
         self._list = RecordList()
-        self._list.toolbar.newAction.clicked.connect(self._onNotepadNoteNewEvent)
-        self._list.toolbar.copyAction.clicked.connect(self._onNotepadNoteCopyEvent)
-        self._list.toolbar.removeAction.clicked.connect(self._onRemoveEvent)
-        self._list.toolbar.refreshAction.clicked.connect(self._onRefreshEvent)
-        self._list.folderEditor.returnPressed.connect(self._onFolderUpdated)
-        self._list.list.doubleClicked.connect(self._onNotepadNoteDoubleClick)
-        self._list.list.selectionChanged = self._onNotepadNoteSelected
+        self._list.toolbar.newAction.clicked.connect(self._onActionNotepadNoteCreateEvent)
+        self._list.toolbar.copyAction.clicked.connect(self._onActionNotepadNoteCopyEvent)
+        self._list.toolbar.removeAction.clicked.connect(self._onActionRemoveEvent)
+        self._list.toolbar.refreshAction.clicked.connect(self._onActionRefreshEvent)
+        self._list.folderEditor.returnPressed.connect(self._onActionFolderUpdated)
+        self._list.list.doubleClicked.connect(self._onActionNotepadNoteDoubleClick)
+        self._list.list.selectionChanged = self._onActionNotepadNoteSelected
         self.addWidget(self._list)
 
         self._editor = TextEditorWidget()
@@ -64,22 +47,19 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
         self.setStretchFactor(0, 3)
         self.setStretchFactor(1, 3)
 
-    @inject.params(storage='storage')
-    def setContent(self, data=None, storage=None):
+    @inject.params(storage='storage', kernel='kernel')
+    def setContent(self, data=None, storage=None, kernel=None):
 
         self._folder, self._entity, self._search = data
  
         self._first = None
         self._list.list.clear()
-        if self._folder is None:
-            return None
  
         current_index = 0
-        self._list.setFolder(self._folder)
-        for index, entity in enumerate(storage.notesByFolder(self._folder, self._search), start=0):
+        self._list.folder = self._folder
+        for index, entity in enumerate(storage.notes(folder=self._folder, string=self._search), start=0):
             self._entity = entity if self._entity == None else self._entity
             self._list.addLine(entity)
- 
             if self._entity == entity:
                 current_index = index
              
@@ -89,20 +69,37 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
         if self._entity is None:
             self._editor.entity = self._first             
 
-    @inject.params(kernel='kernel')
-    def _onNotepadNoteNewEvent(self, event=None, kernel=None):
-        model = NoteModel('New note', 'New description', self._folder.index)
-        kernel.dispatch('window.notepad.note_new', model)
+        count = self._list.list.count()
+        message = self.tr('%d records found' % count)
+        if self._folder is not None:
+            message = self.tr('%s in the folder "%s"' % (
+                message, self._folder.name
+            ))
+         
+        kernel.dispatch('window.status', (message, 10))
 
-    @inject.params(dispatcher='kernel')
-    def _onNotepadNoteCopyEvent(self, event=None, kernel=None):
+    @inject.params(kernel='kernel', logger='logger')
+    def _onActionNotepadNoteCreateEvent(self, event=None, kernel=None, logger=None):
+        logger.debug('[editor] - _onActionNotepadNoteCreateEvent')
+        
+        kernel.dispatch('window.notepad.note_new', (
+            'New note', 'New description', self._folder
+        ))
+
+    @inject.params(kernel='kernel', logger='logger')
+    def _onActionNotepadNoteCopyEvent(self, event=None, kernel=None, logger=None):
+        logger.debug('[editor] - _onActionNotepadNoteCreateEvent')
+
         for index in self._list.selectedIndexes():
             item = self._list.itemFromIndex(index)
             if item is not None and item.entity is not None:
-                kernel.dispatch('window.notepad.note_new', item.entity)
+                entity = item.entity
+                kernel.dispatch('window.notepad.note_new', (
+                    entity.name, entity.text, entity.folder
+                ))
 
     @inject.params(kernel='kernel')
-    def _onRemoveEvent(self, event=None, kernel=None):
+    def _onActionRemoveEvent(self, event=None, kernel=None):
         message = self._list.tr("Are you sure you want to remove this Note?")
         reply = QtWidgets.QMessageBox.question(self._list, 'Remove note', message, QtWidgets.QMessageBox.Yes,
                                                QtWidgets.QMessageBox.No)
@@ -115,21 +112,20 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
                 kernel.dispatch('window.notepad.note_remove', item.entity)
 
     @inject.params(kernel='kernel')
-    def _onFolderUpdated(self, event=None, kernel=None):
+    def _onActionFolderUpdated(self, event=None, kernel=None):
         folder = self._list.folder
         folder.name = self._list.folderEditor.text()
         kernel.dispatch('window.notepad.folder_update', folder)
 
     @inject.params(kernel='kernel')
-    def _onNotepadNoteSelected(self, event=None, selection=None, kernel=None):
+    def _onActionNotepadNoteSelected(self, event=None, selection=None, kernel=None):
         for index in self._list.list.selectedIndexes():
             item = self._list.list.itemFromIndex(index)
             if item is not None and item.entity is not None:
-                kernel.dispatch('window.notepad.note_edit', item.entity)
                 self._editor.entity = item.entity
 
     @inject.params(kernel='kernel')
-    def _onNotepadNoteDoubleClick(self, event=None, kernel=None):
+    def _onActionNotepadNoteDoubleClick(self, event=None, kernel=None):
         item = self._list.itemFromIndex(event)
         if item is None and item.entity is None:
             return None
@@ -144,5 +140,6 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
         kernel.dispatch('window.tab', (editor, self._entity))
 
     @inject.params(kernel='kernel')
-    def _onRefreshEvent(self, event=None, kernel=None):
-        kernel.dispatch('window.notepad_list.refresh')
+    def _onActionRefreshEvent(self, event=None, kernel=None):
+        self.setContent((self._folder, self._entity, self._search))
+

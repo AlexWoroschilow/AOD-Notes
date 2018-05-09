@@ -250,5 +250,5 @@ class FormatbarWidget(QtWidgets.QToolBar):
             parent, self
         ))
 
-    def setFolder(self, value=None):
-        self.folder.setFolder(int(value))
+    def setFolder(self, entity=None):
+        self.folder.setFolder(entity)

@@ -57,8 +57,17 @@ class Entity(object):
 
 class Folder(Entity):
 
-    def __init__(self, index=None, date=None, name=None, text=None):
+    def __init__(self, index=None, total=None, date=None, name=None, text=None):
         super(Folder, self).__init__(index, date, name, text)
+        self._total = total
+
+    @property
+    def total(self):
+        return self._total
+
+    @total.setter
+    def total(self, value):
+        self._total = value
 
 
 class Note(Entity):
@@ -90,34 +99,34 @@ class SQLiteStorage(object):
     def __init_database(self, database=None):
         self._connection = sqlite3.connect(database, check_same_thread=False)
         self._connection.text_factory = str
-        self._connection.execute("CREATE TABLE Folder (id INTEGER PRIMARY KEY, date TEXT, name TEXT, text TEXT)")
+        self._connection.execute("CREATE TABLE Folder (id INTEGER PRIMARY KEY AUTOINCREMENT, total INTEGER, date TEXT, name TEXT, text TEXT)")
         self._connection.execute("CREATE INDEX IDX_FOLDER_NAME ON Folder(name)")
         self._connection.execute("CREATE INDEX IDX_FOLDER_DATE ON Folder(date)")
         self._connection.execute("CREATE INDEX IDX_FOLDER_INDEX ON Folder(id)")
 
-        self._connection.execute("CREATE TABLE Note (id INTEGER PRIMARY KEY, folder INTEGER, date TEXT, name TEXT, text TEXT)")
+        self._connection.execute("CREATE TABLE Note (id INTEGER PRIMARY KEY AUTOINCREMENT, folder INTEGER, date TEXT, name TEXT, text TEXT)")
         self._connection.execute("CREATE INDEX IDX_NOTE_FOLDER ON Note(folder)")
         self._connection.execute("CREATE INDEX IDX_NOTE_NAME ON Note(name)")
         self._connection.execute("CREATE INDEX IDX_NOTE_DATE ON Note(date)")
         self._connection.execute("CREATE INDEX IDX_NOTE_INDEX ON Note(id)")
 
     def getFolder(self, index=None):
-        query = "SELECT * FROM Folder WHERE id=?"
+        query = "SELECT id, total, date, name, text FROM Folder WHERE id=?"
         cursor = self._connection.cursor()
         for row in cursor.execute(query, [index]):
-            index, date, name, text = row
-            return Folder(index, date, name, text)
+            index, total, date, name, text = row
+            return Folder(index, total, date, name, text)
 
     @property
     def folders(self):
-        query = "SELECT * FROM Folder ORDER BY name ASC"
+        query = "SELECT id, total, date, name, text FROM Folder ORDER BY name ASC"
         cursor = self._connection.cursor()
         for row in cursor.execute(query):
-            index, date, name, text = row
-            yield Folder(str(index), str(date), str(name), str(text))
+            index, total, date, name, text = row
+            yield Folder(index, total, date, name, text)
 
     def foldersByString(self, string=None):
-        query = "SELECT Folder.* FROM Folder " \
+        query = "SELECT Folder.id, Folder.total, Folder.date, Folder.name, Folder.text FROM Folder " \
                 "LEFT JOIN Note ON Note.folder = Folder.id " \
                 "WHERE Note.name LIKE ? OR Note.text LIKE ? " \
                 "GROUP BY Folder.id " \
@@ -125,8 +134,8 @@ class SQLiteStorage(object):
 
         cursor = self._connection.cursor()
         for row in cursor.execute(query, ["%%%s%%" % string, "%%%s%%" % string]):
-            index, date, name, text = row
-            yield Folder(str(index), str(date), str(name), str(text))
+            index, total, date, name, text = row
+            yield Folder(index, total, date, name, text)
 
     @folders.setter
     def folders(self, collection):
@@ -134,8 +143,8 @@ class SQLiteStorage(object):
 
     def addFolder(self, name=None, text=None):
         time = datetime.now()
-        fields = (time.strftime("%Y.%m.%d %H:%M:%S"), name, text)
-        self._connection.execute("INSERT INTO Folder VALUES (NULL, ?, ?, ?)", fields)
+        fields = (0, time.strftime("%Y.%m.%d %H:%M:%S"), name, text)
+        self._connection.execute("INSERT INTO Folder (total, date, name, text) VALUES (?, ?, ?, ?)", fields)
         self._connection.commit()
 
         cursor = self._connection.cursor()

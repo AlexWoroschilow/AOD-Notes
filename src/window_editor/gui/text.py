@@ -13,7 +13,6 @@
 import inject
 from PyQt5.QtCore import Qt
 
-from PyQt5 import QtCore
 from PyQt5 import QtPrintSupport
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
@@ -81,8 +80,6 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.setObjectName('editorTextEditorWidget')
         self.setContentsMargins(0, 0, 0, 0)
 
-        kernel.listen('window.notepad.note_update', self._onNoteUpdateEvent, 128)
-
         self.changesSaved = True
         self.filename = ""
         self._index = None
@@ -92,6 +89,9 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.writer = TextWriter(self)
         self.writer.text.cursorPositionChanged.connect(self.cursorPosition)
         self.writer.text.textChanged.connect(self.changed)
+
+        self.statusbar = QtWidgets.QLabel()
+        self.statusbar.setAlignment(Qt.AlignCenter)
 
         self.leftbar = ToolbarWidgetLeft(self.writer)
         self.leftbar.saveAction.clicked.connect(self._onSaveEvent)
@@ -115,6 +115,7 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.formatbar.indentAction.clicked.connect(self.indent)
         self.formatbar.dedentAction.clicked.connect(self.dedent)
         self.formatbar.imageAction.clicked.connect(self.insertImage)
+        self.formatbar.folder.currentIndexChanged.connect(self._OnFolderChanged)
 
         self.rightbar = ToolBarWidgetRight(self.writer)
         self.rightbar.italicAction.clicked.connect(self.italic)
@@ -132,15 +133,10 @@ class TextEditorWidget(QtWidgets.QWidget):
         layout.addWidget(self.rightbar, 1, 2, 3, 1)
         layout.addWidget(self.formatbar, 1, 1)
         layout.addWidget(self.writer, 2, 1)
+        layout.addWidget(self.statusbar, 3, 1)
+
 
         self.setLayout(layout)
-
-    def _onNoteUpdateEvent(self, event=None):
-        if self.entity is None or event.data is None:
-            return None
-        
-        if self.entity.index in [event.data.index]:
-            self.entity = event.data
 
     @property
     def entity(self):
@@ -166,8 +162,21 @@ class TextEditorWidget(QtWidgets.QWidget):
 
     @inject.params(kernel='kernel')
     def _onFullScreenEvent(self, event=None, kernel=None):
+        if self.entity is None:
+            return None
+        
+        editor = TextEditorWidget()
+        editor.entity = self.entity
+
+        kernel.dispatch('window.tab', (editor, self.entity))
+
+    @inject.params(kernel='kernel')
+    def _OnFolderChanged(self, event=None, kernel=None):
         if self.entity is not None and kernel is not None:
-            kernel.dispatch('window.notepad.note_tab', self.entity)
+            self.entity.folder = self.formatbar.folder.itemData(
+                self.formatbar.folder.currentIndex()
+            )
+            kernel.dispatch('window.notepad.note_update', self.entity)
 
     @inject.params(storage='storage')
     def _onWindowNoteEdit(self, event=None, storage=None):
@@ -203,6 +212,9 @@ class TextEditorWidget(QtWidgets.QWidget):
         # Mortals like 1-indexed things
         line = cursor.blockNumber() + 1
         col = cursor.columnNumber()
+
+        self.statusbar.setText("Line: {}, Column: {}".format(line, col))
+
 
     def toggleToolbar(self):
         state = self.leftbar.isVisible()
