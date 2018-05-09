@@ -139,7 +139,25 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
 
         kernel.dispatch('window.tab', (editor, self._entity))
 
-    @inject.params(kernel='kernel')
-    def _onActionRefreshEvent(self, event=None, kernel=None):
-        self.setContent((self._folder, self._entity, self._search))
+    @inject.params(storage='storage', kernel='kernel')
+    def _onActionRefreshEvent(self, event=None, kernel=None, storage=None):
+
+        current = self._list.list.currentRow()
+        
+        self._list.list.clear()
+        for index, entity in enumerate(storage.notes(folder=self._folder, string=self._search), start=0):
+            self._list.addLine(entity)
+            
+        if current >= self._list.list.count():
+            current = current - 1 if current > 0 else 0
+        self._list.list.setCurrentRow(current)
+
+        count = self._list.list.count()
+        message = self.tr('%d records found' % count)
+        if self._folder is not None:
+            message = self.tr('%s in the folder "%s"' % (
+                message, self._folder.name
+            ))
+         
+        kernel.dispatch('window.status', (message, 10))
 
