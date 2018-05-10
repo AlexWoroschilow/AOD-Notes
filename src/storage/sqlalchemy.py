@@ -49,7 +49,6 @@ class Note(Base):
     __tablename__ = 'Note'
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    name = Column(String)
     createdAt = Column(DateTime)
     text = Column(String)
     tags = Column(String)
