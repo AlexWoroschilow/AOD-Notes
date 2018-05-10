@@ -35,7 +35,6 @@ class Loader(Loader):
         # the request string will be given as a data object to the event
         kernel.listen('window.search.request', self._onSearchRequest, 100)
         kernel.listen('window.dashboard.content', self._onWindowFirstTab, 100)
-        kernel.listen('window.notepad.note_update.folder', self._onNotepadFolderUpdate, 128)
         kernel.listen('window.notepad.folder_update', self._onFolderUpdated, 128)
         kernel.listen('window.notepad.folder_new', self._onRefreshEvent, 128)
 
@@ -138,25 +137,6 @@ class Loader(Loader):
             kernel.dispatch('window.notepad.folder_open', (
                 self._first, self._search
             ))
-
-    @inject.params(kernel='kernel')
-    def _onNotepadFolderUpdate(self, event=None, kernel=None):
-        note, folder = event.data
-
-        self._widget.list.blockSignals(True)
-        for row in range(0, self._widget.list.count()):
-            item = self._widget.list.item(row)
-            if item.folder is None or folder is None:
-                continue
-            
-            if item.folder.id in [folder.id]:
-                self._widget.list.setCurrentRow(row)
-                break
-        self._widget.list.blockSignals(False)
-
-        kernel.dispatch('window.notepad.folder_selected', (
-            folder, self._search, note
-        ))
 
     @inject.params(kernel='kernel')
     def _onFolderSelected(self, event=None, selection=None, kernel=None):

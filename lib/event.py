@@ -90,6 +90,7 @@ class Dispatcher(object):
             except (Exception, RuntimeError) as ex:
                 logger.exception('Remove %s from pool: %s' % (name, ex))
                 self._listeners[name].pop(index)
+                continue
         return event
 
     def add_listener(self, event_name, listener, priority=0):

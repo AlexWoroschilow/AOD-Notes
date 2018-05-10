@@ -21,19 +21,24 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
 
     @inject.params(kernel='kernel', storage='storage')
     def __init__(self, parent=None, kernel=None, storage=None):
-        
+        kernel.listen('window.notepad.note_update', self._onActionUpdateEvent, 128)
+        kernel.listen('window.notepad_list.refresh', self._onActionRefreshEvent, 128)
+        kernel.listen('window.notepad.note_remove', self._onActionRefreshEvent, 128)
+        kernel.listen('window.notepad.note_new', self._onActionRefreshEvent, 128)
+
         super(NotepadEditorWidget, self).__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
         self.setObjectName('editorWidget')
 
         self._list = RecordList()
-        self._list.toolbar.newAction.clicked.connect(self._onNotepadNoteCreateEvent)
-        self._list.toolbar.copyAction.clicked.connect(self._onNotepadNoteCopyEvent)
-        self._list.toolbar.removeAction.clicked.connect(self._onRemoveEvent)
-        self._list.toolbar.refreshAction.clicked.connect(self._onRefreshEvent)
-        self._list.folderEditor.returnPressed.connect(self._onFolderUpdated)
-        self._list.list.doubleClicked.connect(self._onNotepadNoteDoubleClick)
-        self._list.list.selectionChanged = self._onNotepadNoteSelected
+        self._list.toolbar.newAction.clicked.connect(self._onActionNotepadNoteCreateEvent)
+        self._list.toolbar.copyAction.clicked.connect(self._onActionNotepadNoteCopyEvent)
+        self._list.toolbar.removeAction.clicked.connect(self._onActionRemoveEvent)
+        self._list.toolbar.refreshAction.clicked.connect(self._onActionRefreshEvent)
+        self._list.folderEditor.returnPressed.connect(self._onActionFolderUpdated)
+        self._list.list.doubleClicked.connect(self._onActionNotepadNoteDoubleClick)
+        self._list.list.selectionChanged = self._onActionNotepadNoteSelected
+
         self.addWidget(self._list)
 
         self._editor = TextEditorWidget()
@@ -74,16 +79,16 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
         kernel.dispatch('window.status', (message, 10))
 
     @inject.params(kernel='kernel', logger='logger')
-    def _onNotepadNoteCreateEvent(self, event=None, kernel=None, logger=None):
-        logger.debug('[editor] - _onNotepadNoteCreateEvent')
+    def _onActionNotepadNoteCreateEvent(self, event=None, kernel=None, logger=None):
+        logger.debug('[editor] - _onActionNotepadNoteCreateEvent')
         
         kernel.dispatch('window.notepad.note_new', (
             'New note', 'New description', self._folder
         ))
 
     @inject.params(kernel='kernel', logger='logger')
-    def _onNotepadNoteCopyEvent(self, event=None, kernel=None, logger=None):
-        logger.debug('[editor] - _onNotepadNoteCreateEvent')
+    def _onActionNotepadNoteCopyEvent(self, event=None, kernel=None, logger=None):
+        logger.debug('[editor] - _onActionNotepadNoteCreateEvent')
 
         for index in self._list.selectedIndexes():
             item = self._list.itemFromIndex(index)
@@ -94,7 +99,7 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
                 ))
 
     @inject.params(kernel='kernel')
-    def _onRemoveEvent(self, event=None, kernel=None):
+    def _onActionRemoveEvent(self, event=None, kernel=None):
         message = self._list.tr("Are you sure you want to remove this Note?")
         reply = QtWidgets.QMessageBox.question(self._list, 'Remove note', message, QtWidgets.QMessageBox.Yes,
                                                QtWidgets.QMessageBox.No)
@@ -107,20 +112,20 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
                 kernel.dispatch('window.notepad.note_remove', item.entity)
 
     @inject.params(kernel='kernel')
-    def _onFolderUpdated(self, event=None, kernel=None):
+    def _onActionFolderUpdated(self, event=None, kernel=None):
         folder = self._list.folder
         folder.name = self._list.folderEditor.text()
         kernel.dispatch('window.notepad.folder_update', folder)
 
     @inject.params(kernel='kernel')
-    def _onNotepadNoteSelected(self, event=None, selection=None, kernel=None):
+    def _onActionNotepadNoteSelected(self, event=None, selection=None, kernel=None):
         for index in self._list.list.selectedIndexes():
             item = self._list.list.itemFromIndex(index)
             if item is not None and item.entity is not None:
                 self._editor.entity = item.entity
 
     @inject.params(kernel='kernel')
-    def _onNotepadNoteDoubleClick(self, event=None, kernel=None):
+    def _onActionNotepadNoteDoubleClick(self, event=None, kernel=None):
         item = self._list.itemFromIndex(event)
         if item is None and item.entity is None:
             return None
@@ -134,7 +139,33 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
 
         kernel.dispatch('window.tab', (editor, self._entity))
 
-    @inject.params(kernel='kernel')
-    def _onRefreshEvent(self, event=None, kernel=None):
-        kernel.dispatch('window.notepad_list.refresh')
+    @inject.params(storage='storage', kernel='kernel')
+    def _onActionRefreshEvent(self, event=None, kernel=None, storage=None):
+
+        current = self._list.list.currentRow()
+        
+        self._list.list.clear()
+        for index, entity in enumerate(storage.notes(folder=self._folder, string=self._search), start=0):
+            self._list.addLine(entity)
+            
+        if current >= self._list.list.count():
+            current = current - 1 if current > 0 else 0
+        self._list.list.setCurrentRow(current)
+
+        count = self._list.list.count()
+        message = self.tr('%d records found' % count)
+        if self._folder is not None:
+            message = self.tr('%s in the folder "%s"' % (
+                message, self._folder.name
+            ))
+         
+        kernel.dispatch('window.status', (message, 10))
+
+    @inject.params(storage='storage', kernel='kernel')
+    def _onActionUpdateEvent(self, event=None, kernel=None, storage=None):
+        entity, widget = event.data
+        for index in range(0, self._list.list.count()):
+            item = self._list.list.item(index)
+            if item is not None and item.entity == entity:
+                item.entity = entity
 

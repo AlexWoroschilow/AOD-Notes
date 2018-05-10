@@ -27,7 +27,7 @@ Base = declarative_base()
 
 class Folder(Base):
     __tablename__ = 'Folder'
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     total = Column(Integer)
     name = Column(String)
     createdAt = Column(DateTime)

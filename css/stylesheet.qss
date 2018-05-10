@@ -73,7 +73,7 @@ QSplitter#editorWidget QWidget#editorRecordListWidget QTextEdit { border: none; 
 
 QSplitter#editorWidget QLineEdit#editorNameEditor { padding-left: 5px;  margin: 10px 20px 0px 10px; background-color: #f1f2f3; font-size: 18px; }
 
-QLineEdit#searchSearchField { font-size: 12px; padding: 3px; }
+QLineEdit#searchSearchField { font-size: 12px; padding: 3px; margin: 5px 0px 0px 0px; }
 QScrollArea#editorQScrollArea {background-color: #fff; }
 
 QWidget#editorTextEditorWidget { border: none; background-color: #000; }

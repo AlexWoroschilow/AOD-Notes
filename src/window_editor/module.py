@@ -26,16 +26,9 @@ class Loader(Loader):
     def boot(self, options=None, args=None, kernel=None):
         kernel.listen('window.notepad.folder_open', self._onNotepadFolderOpen, 128)
         kernel.listen('window.notepad.folder_selected', self._onNotepadFolderSelect, 128)
-        kernel.listen('window.dashboard.content', self._onWindowDashboard, 128)
 
-        kernel.listen('window.notepad_list.refresh', self._onRefresh, 128)
-        kernel.listen('window.notepad.note_update', self._onNotepadUpdate)
-        kernel.listen('window.notepad.note_update', self._onRefresh, 128)
-        kernel.listen('window.notepad.note_remove', self._onRefresh, 128)
-        kernel.listen('window.notepad.note_new', self._onNotepadUpdate,100)
-        kernel.listen('window.notepad.note_new', self._onRefresh, 128)
         kernel.listen('window.search.request', self._onSearchRequest, 100)
-
+        kernel.listen('window.dashboard.content', self._onWindowDashboard, 128)
         kernel.listen('application.start', self._onWindowStart)
 
         self._widget = None
@@ -95,10 +88,6 @@ class Loader(Loader):
         editor.setContent((self._folder, None, self._search))
         kernel.dispatch('window.tab', (editor, self._folder))
 
-    @inject.params(kernel='kernel', logger='logger')
-    def _onNotepadUpdate(self, event=None, kernel=None, logger=None):
-        self._entity = event.data
-
     @inject.params(storage='storage', logger='logger')
     def _onSearchRequest(self, event=None, storage=None, logger=None):
         logger.debug('[editor] - _onSearchRequest')
@@ -109,16 +98,6 @@ class Loader(Loader):
         self._folder = None
         self._entity = None
          
-        self._widget.setContent((self._folder,
-            self._entity, self._search 
-        ))
-
-    @inject.params(kernel='kernel', storage='storage', logger='logger')
-    def _onRefresh(self, event=None, kernel=None, storage=None, logger=None):
-        logger.debug('[editor] - _onRefresh')
-        if self._widget is None:
-            return None
-        
         self._widget.setContent((self._folder,
             self._entity, self._search 
         ))

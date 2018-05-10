@@ -86,9 +86,10 @@ class Loader(Loader):
     @inject.params(storage='storage', logger='logger')
     def _onNotepadNoteUpdate(self, event=None, storage=None, logger=None):
         logger.debug('[storage] - _onNotepadNoteUpdate')
-        if event.data is None:
+        entity, widget = event.data 
+        if entity is None:
             return None
-        storage.update(event.data)
+        storage.update(entity)
 
     @inject.params(storage='storage', logger='logger')
     def _onNotepadNoteRemove(self, event=None, storage=None, logger=None):
