@@ -182,6 +182,9 @@ class RecordList(QtWidgets.QSplitter):
         self.folderEditor.setVisible(False)
         return None
 
+    def count(self):
+        return self.list.count()
+
     def clear(self):
         return self.list.clear()
 
@@ -202,3 +205,16 @@ class RecordList(QtWidgets.QSplitter):
             return None
 
         self.list.takeItem(index.row())
+
+    def item(self, index=None):
+        if index is None:
+            return None
+        return self.list.item(index)
+
+    def currentRow(self):
+        return self.list.currentRow()
+
+    def setCurrentRow(self, row=None):
+        if row is None or self.list is None:
+            return None
+        return self.list.setCurrentRow(row)

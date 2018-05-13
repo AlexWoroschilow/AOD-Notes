@@ -39,6 +39,11 @@ class TextWriter(QtWidgets.QScrollArea):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
+    def setText(self, text=None):
+        if text is None or self.text is None:
+            return None 
+        self.text.setText(text)
+
 
 class TextEditor(QtWidgets.QTextEdit):
 
@@ -78,8 +83,6 @@ class TextEditorWidget(QtWidgets.QWidget):
     def __init__(self, parent=None, storage=None, kernel='kernel'):
         super(TextEditorWidget, self).__init__(parent)
         
-        kernel.listen('window.notepad.note_update', self._onActionNotepadUpdate, 100)
-        
         self.setObjectName('editorTextEditorWidget')
         self.setContentsMargins(0, 0, 0, 0)
 
@@ -118,7 +121,7 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.formatbar.indentAction.clicked.connect(self.indent)
         self.formatbar.dedentAction.clicked.connect(self.dedent)
         self.formatbar.imageAction.clicked.connect(self.insertImage)
-        self.formatbar.folder.currentIndexChanged.connect(self._OnFolderChanged)
+        self.formatbar.folderSelector.currentIndexChanged.connect(self._OnFolderChanged)
 
         self.rightbar = ToolBarWidgetRight(self.writer)
         self.rightbar.italicAction.clicked.connect(self.italic)
@@ -150,20 +153,18 @@ class TextEditorWidget(QtWidgets.QWidget):
     def entity(self, entity):
         self.writer.entity = entity
         if entity is None:
-            self.writer.text.setText('')
+            self.writer.setText('')
             self.name.setText('')
             return None
 
         self.name.setText(entity.name)
-        self.writer.text.setText(entity.text)
+        self.writer.setText(entity.text)
 
-        if entity.folder is None:
-            return None
-
-        self.formatbar.setFolder(entity.folder)
+        if entity.folder is not None:
+            self.formatbar.folder = entity.folder
 
     @inject.params(kernel='kernel', logger='logger')
-    def _onActionNotepadUpdate(self, event=None, kernel=None, logger=None):
+    def onActionNotepadUpdate(self, event=None, kernel=None, logger=None):
         entity, widget = event.data
         if entity is None or widget == self:
             return None
@@ -183,9 +184,7 @@ class TextEditorWidget(QtWidgets.QWidget):
     @inject.params(kernel='kernel')
     def _OnFolderChanged(self, event=None, kernel=None):
         if self.entity is not None and kernel is not None:
-            self.entity.folder = self.formatbar.folder.itemData(
-                self.formatbar.folder.currentIndex()
-            )
+            self.entity.folder = self.formatbar.folder
             kernel.dispatch('window.notepad.note_update', (self.entity, self))
 
     @inject.params(storage='storage')
@@ -205,8 +204,10 @@ class TextEditorWidget(QtWidgets.QWidget):
 
     @inject.params(kernel='kernel')
     def _onSaveEvent(self, event=None, kernel=None):
-        if self.entity is None or kernel is None:
-            return None
+        if self.entity is None and kernel is not None:
+            return kernel.dispatch('window.notepad.note_new', (
+                self.name.text(), self.writer.text.toHtml(), self._folder
+            ))
 
         self.entity.name = self.name.text()
         self.entity.text = self.writer.text.toHtml()

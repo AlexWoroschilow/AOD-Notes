@@ -24,12 +24,11 @@ class Loader(Loader):
 
     @inject.params(kernel='kernel')
     def boot(self, options=None, args=None, kernel=None):
+        kernel.listen('application.start', self._onWindowStart)
+        kernel.listen('window.dashboard.content', self._onWindowDashboard, 128)
         kernel.listen('window.notepad.folder_open', self._onNotepadFolderOpen, 128)
         kernel.listen('window.notepad.folder_selected', self._onNotepadFolderSelect, 128)
-
         kernel.listen('window.search.request', self._onSearchRequest, 100)
-        kernel.listen('window.dashboard.content', self._onWindowDashboard, 128)
-        kernel.listen('application.start', self._onWindowStart)
 
         self._widget = None
         self._folder = None
@@ -37,35 +36,43 @@ class Loader(Loader):
         self._entity = None
         self._first = None
 
-    @inject.params(storage='storage', kernel='kernel', logger='logger')
-    def _onWindowStart(self, event=None, kernel=None, storage=None, logger='logger'):
-        logger.debug('[editor] - _onWindowStart')
-
+    @inject.params(kernel='kernel')
+    def _onWindowStart(self, event=None, kernel=None):
+        
         self._widget = NotepadEditorWidget()
+        kernel.listen('window.notepad.note_update', self._widget.onActionUpdateEvent, 128)
+        kernel.listen('window.notepad_list.refresh', self._widget.onActionRefreshEvent, 128)
+        kernel.listen('window.notepad.note_remove', self._widget.onActionRefreshEvent, 128)
+        kernel.listen('window.notepad.note_new', self._widget.onActionRefreshEvent, 128)
+        kernel.listen('window.notepad.folder_update', self._widget.onActionFolderUpdate, 128)
 
+    @inject.params(kernel='kernel', logger='logger')
+    def _onNotepadFolderOpen(self, event=None, kernel=None, logger=None):
+        self._folder, self._search = event.data
         if self._folder is None:
             return None
 
-        self._first = None
-        self._widget._list.clear()
-        for entity in storage.notes(folder=self._folder):
-            self._first = entity if self._first is None else self._first 
-            self._widget._list.addLine(entity)
-        self._widget._list.setFolder(self._folder)
+        editor = NotepadEditorWidget()
+        kernel.listen('window.notepad.note_update', editor.onActionUpdateEvent, 128)
+        kernel.listen('window.notepad_list.refresh', editor.onActionRefreshEvent, 128)
+        kernel.listen('window.notepad.note_remove', editor.onActionRefreshEvent, 128)
+        kernel.listen('window.notepad.note_new', editor.onActionRefreshEvent, 128)
+        kernel.listen('window.notepad.folder_update', editor.onActionFolderUpdate, 128)
+        
+        editor.setContent((self._folder, None, self._search))
+        kernel.dispatch('window.tab', (editor, self._folder))
 
     def _onWindowDashboard(self, event=None):
         container, parent = event.data
         if container is None or parent is None:
             return None
-        if self._widget is None:
-            return None
-        container.addWidget(self._widget)
+        if self._widget is not None:
+            container.addWidget(self._widget)
 
     @inject.params(logger='logger', storage='storage')
     def _onNotepadFolderSelect(self, event=None, logger=None, storage=None):
-        logger.info('[editor] - _onNotepadFolderSelect')
         self._folder, self._search, self._entity = event.data
-        if self._widget is None:
+        if self._widget is None or self._folder is None:
             return None
         
         self._widget._list.clear()
@@ -78,21 +85,8 @@ class Loader(Loader):
             self._search
         ))
 
-    @inject.params(kernel='kernel', logger='logger')
-    def _onNotepadFolderOpen(self, event=None, kernel=None, logger=None):
-        logger.debug('[editor] - _onNotepadFolderOpen')
-        self._folder, self._search = event.data
-        if self._folder is None:
-            return None
-
-        editor = NotepadEditorWidget()
-        editor.entity = self._folder
-        editor.setContent((self._folder, None, self._search))
-        kernel.dispatch('window.tab', (editor, self._folder))
-
     @inject.params(storage='storage', logger='logger')
     def _onSearchRequest(self, event=None, storage=None, logger=None):
-        logger.debug('[editor] - _onSearchRequest')
         self._search = event.data
         if self._search is None:
             return None

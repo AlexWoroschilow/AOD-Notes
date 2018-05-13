@@ -59,6 +59,9 @@ class Loader(Loader):
         self._widget.list.setCurrentRow(0)
 
         container, parent = event.data
+        if container is None or parent is None:
+            return None
+        
         container.addWidget(self._widget)
 
         if self._first is None:

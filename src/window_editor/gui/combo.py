@@ -44,6 +44,24 @@ class FolderBomboBox(QtWidgets.QComboBox):
                 continue
             self.setItemText(index, folder.name)
 
+    @property
+    def entity(self):
+        if self.count() == 0:
+            return None
+        index = self.currentIndex()
+        return self.itemData(index)
+
+    @entity.setter
+    def entity(self, entity=None):
+        if entity is None:
+            return None
+        self.blockSignals(True)
+        for index in range(0, self.count()):
+            folder = self.itemData(index)
+            if folder is not None and entity == folder:
+                self.setCurrentIndex(index)
+        self.blockSignals(False)
+
     @inject.params(storage='storage')
     def _OnRefresh(self, event=None, storage=None):
         entity, widget = event.data
@@ -61,18 +79,3 @@ class FolderBomboBox(QtWidgets.QComboBox):
             if current_folder != folder:
                 continue
             self.setCurrentIndex(index)
-
-    def setFolder(self, value=None):
-        self.blockSignals(True)
-        self._setFolder(value)
-        self.blockSignals(False)
-
-    def _setFolder(self, entity=None):
-        if entity is None:
-            return None
-        for index in range(0, self.count()):
-            folder = self.itemData(index)
-            if entity != folder:
-                continue
-            return self.setCurrentIndex(index)
-
