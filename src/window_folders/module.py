@@ -151,13 +151,16 @@ class Loader(Loader):
             ))
 
     def _onFolderUpdated(self, event=None):
+        entity, widget = event.data
+        if entity is None or widget is None:
+            return None
         if len(self._widget.list.selectedIndexes()):
             for index in self._widget.list.selectedIndexes():
                 item = self._widget.list.itemFromIndex(index)
-                item.folder = event.data
+                item.folder = entity
             return None
         item = self._widget.list.item(0)
-        item.folder = event.data
+        item.folder = entity
 
     @inject.params(kernel='kernel', storage='storage')
     def _onSearchRequest(self, event=None, kernel=None, storage=None):

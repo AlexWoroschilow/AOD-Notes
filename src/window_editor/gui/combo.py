@@ -26,12 +26,30 @@ class FolderBomboBox(QtWidgets.QComboBox):
         for folder in storage.folders():
             self.addItem(folder.name, folder)
 
-        kernel.listen('window.notepad.folder_update', self._OnFolderUpdate, 128)
-        kernel.listen('window.notepad.folder_remove', self._OnFolderUpdate, 128)
-        kernel.listen('window.notepad.folder_new', self._OnFolderUpdate, 128)
+        kernel.listen('window.notepad.folder_update', self._OnUpdate, 128)
+        kernel.listen('window.notepad.folder_remove', self._OnRefresh, 128)
+        kernel.listen('window.notepad.folder_new', self._OnRefresh, 128)
 
     @inject.params(storage='storage')
-    def _OnFolderUpdate(self, event=None, storage=None):
+    def _OnUpdate(self, event=None, storage=None):
+        entity, widget = event.data
+        if entity is None or widget is None:
+            return None
+        
+        for index in range(0, self.count()):
+            folder = self.itemData(index)
+            if folder is None:
+                continue
+            if folder != entity:
+                continue
+            self.setItemText(index, folder.name)
+
+    @inject.params(storage='storage')
+    def _OnRefresh(self, event=None, storage=None):
+        entity, widget = event.data
+        if entity is None or widget is None:
+            return None
+        
         current_folder = None
         current_index = self.currentIndex();
         if current_index is not None:

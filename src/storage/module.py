@@ -63,9 +63,10 @@ class Loader(Loader):
     @inject.params(storage='storage', logger='logger')
     def _onNotepadFolderUpdate(self, event=None, storage=None, logger=None):
         logger.debug('[storage] - _onNotepadFolderUpdate')
-        if event.data is None:
+        entity, widget = event.data
+        if entity is None or widget is None:
             return None
-        storage.update(event.data)
+        storage.update(entity)
 
     @inject.params(storage='storage', logger='logger')
     def _onNotepadFolderRemove(self, event=None, storage=None, logger=None):

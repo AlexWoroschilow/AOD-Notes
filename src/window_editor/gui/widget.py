@@ -26,6 +26,8 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
         kernel.listen('window.notepad.note_remove', self._onActionRefreshEvent, 128)
         kernel.listen('window.notepad.note_new', self._onActionRefreshEvent, 128)
 
+        kernel.listen('window.notepad.folder_update', self._onActionFolderUpdate, 128)
+
         super(NotepadEditorWidget, self).__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
         self.setObjectName('editorWidget')
@@ -46,6 +48,13 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
         
         self.setStretchFactor(0, 3)
         self.setStretchFactor(1, 3)
+
+    def _onActionFolderUpdate(self, event):
+        entity, widget = event.data
+        if entity is None or widget is None:
+            return None
+        if self._list.folder == entity:
+            self._list.folder = entity
 
     @inject.params(storage='storage', kernel='kernel')
     def setContent(self, data=None, storage=None, kernel=None):
@@ -115,7 +124,7 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
     def _onActionFolderUpdated(self, event=None, kernel=None):
         folder = self._list.folder
         folder.name = self._list.folderEditor.text()
-        kernel.dispatch('window.notepad.folder_update', folder)
+        kernel.dispatch('window.notepad.folder_update', (folder, self))
 
     @inject.params(kernel='kernel')
     def _onActionNotepadNoteSelected(self, event=None, selection=None, kernel=None):
@@ -164,6 +173,9 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
     @inject.params(storage='storage', kernel='kernel')
     def _onActionUpdateEvent(self, event=None, kernel=None, storage=None):
         entity, widget = event.data
+        if entity is None or widget is None:
+            return None
+
         for index in range(0, self._list.list.count()):
             item = self._list.list.item(index)
             if item is not None and item.entity == entity:

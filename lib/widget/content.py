@@ -38,6 +38,10 @@ class WindowContentDashboard(QtWidgets.QWidget):
 
         self.setLayout(layout)
 
+    @property
+    def entity(self):
+        return None
+
 
 class WindowContent(QtWidgets.QTabWidget):
 
@@ -53,6 +57,22 @@ class WindowContent(QtWidgets.QTabWidget):
         self.setTabsClosable(True)
 
         kernel.listen('window.tab', self._onTabOpen)
+        kernel.listen('window.notepad.note_update', self._onNoteUpdateEvent, 128)
+        kernel.listen('window.notepad.folder_update', self._onNoteUpdateEvent, 128)
+
+    def _onNoteUpdateEvent(self, event):
+        entity, widget = event.data
+        if entity is None or widget is None:
+            return None 
+        for index in range(0, self.count()):
+            widget = self.widget(index)
+            if widget.entity is None:
+                continue
+            if type(widget.entity) != type(entity):
+                continue            
+            if widget.entity != entity:
+                continue
+            self.setTabText(index, entity.name)
 
     def _onTabOpen(self, event=None, dispatcher=None):
         widget, entity = event.data

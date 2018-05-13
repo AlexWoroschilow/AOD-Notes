@@ -53,11 +53,12 @@ class Loader(Loader):
             self._widget._list.addLine(entity)
         self._widget._list.setFolder(self._folder)
 
-    def _onWindowDashboard(self, event=None, dispatcher=None):
+    def _onWindowDashboard(self, event=None):
         container, parent = event.data
+        if container is None or parent is None:
+            return None
         if self._widget is None:
             return None
-
         container.addWidget(self._widget)
 
     @inject.params(logger='logger', storage='storage')
@@ -85,6 +86,7 @@ class Loader(Loader):
             return None
 
         editor = NotepadEditorWidget()
+        editor.entity = self._folder
         editor.setContent((self._folder, None, self._search))
         kernel.dispatch('window.tab', (editor, self._folder))
 
