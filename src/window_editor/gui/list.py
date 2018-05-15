@@ -16,7 +16,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 
 from .bar import ToolBarWidget
-from .text import NameEditor
+from .line import NameEditor
 
 
 class LabelTop(QtWidgets.QLabel):
@@ -204,7 +204,7 @@ class RecordList(QtWidgets.QSplitter):
         if index is None:
             return None
 
-        self.list.takeItem(index.row())
+        self.list.takeItem(index)
 
     def item(self, index=None):
         if index is None:

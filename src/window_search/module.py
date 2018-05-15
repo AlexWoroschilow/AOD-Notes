@@ -82,7 +82,7 @@ class Loader(Loader):
     @inject.params(kernel='kernel')
     def _onCreateFolder(self, event, kernel=None):
         kernel.dispatch('window.notepad.folder_new', (
-            'New folder', 'New folder description'
+            ('New folder', 'New folder description'), self
         ))
 
     @inject.params(kernel='kernel', folders='folders')

@@ -22,27 +22,17 @@ class FolderBomboBox(QtWidgets.QComboBox):
         super(FolderBomboBox, self).__init__()
         self.setObjectName('folderBomboBox')
         self._note = None
+        
+        if kernel is None or storage is None:
+            return None 
 
         for folder in storage.folders():
             self.addItem(folder.name, folder)
 
-        kernel.listen('window.notepad.folder_update', self._OnUpdate, 128)
-        kernel.listen('window.notepad.folder_remove', self._OnRefresh, 128)
-        kernel.listen('window.notepad.folder_new', self._OnRefresh, 128)
-
-    @inject.params(storage='storage')
-    def _OnUpdate(self, event=None, storage=None):
-        entity, widget = event.data
-        if entity is None or widget is None:
-            return None
-        
-        for index in range(0, self.count()):
-            folder = self.itemData(index)
-            if folder is None:
-                continue
-            if folder != entity:
-                continue
-            self.setItemText(index, folder.name)
+        kernel.listen('window.notepad.folder_update', self._OnFolderUpdate, 128)
+        kernel.listen('window.notepad.folder_selected', self._OnFolderSelected, 128)
+        kernel.listen('window.notepad.folder_remove', self._OnFolderRemove, 128)
+        kernel.listen('window.notepad.folder_new', self._OnFolderNew, 128)
 
     @property
     def entity(self):
@@ -62,20 +52,38 @@ class FolderBomboBox(QtWidgets.QComboBox):
                 self.setCurrentIndex(index)
         self.blockSignals(False)
 
-    @inject.params(storage='storage')
-    def _OnRefresh(self, event=None, storage=None):
+    def _OnFolderNew(self, event=None):
         entity, widget = event.data
         if entity is None or widget is None:
             return None
-        
-        current_folder = None
-        current_index = self.currentIndex();
-        if current_index is not None:
-            current_folder = self.itemData(current_index) 
-        
-        self.clear()
-        for index, folder in enumerate(storage.folders(), start=0):
-            self.addItem(folder.name, folder)
-            if current_folder != folder:
+        self.addItem(entity.name, entity)
+
+    def _OnFolderUpdate(self, event=None):
+        entity, widget = event.data
+        if entity is None or widget is None:
+            return None
+        for index in range(0, self.count()):
+            folder = self.itemData(index)
+            if folder is None:
                 continue
-            self.setCurrentIndex(index)
+            if folder != entity:
+                continue
+            self.setItemText(index, folder.name)
+
+    def _OnFolderRemove(self, event=None):
+        entity, widget = event.data
+        if entity is None or widget is None:
+            return None
+        for index in range(0, self.count()):
+            folder = self.itemData(index)
+            if folder == entity:
+                self.removeItem(index)
+
+    def _OnFolderSelected(self, event):
+        selected, string, note = event.data
+        if selected is None :
+            return None
+        for index in range(0, self.count()):
+            folder = self.itemData(index)
+            if folder == selected:
+                self.setCurrentIndex(index)

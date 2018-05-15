@@ -11,32 +11,37 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 from PyQt5.QtCore import Qt
-
 from PyQt5 import QtWidgets
-from PyQt5 import QtGui
+
+from .text import TextEditor
 
 
-class TextEditor(QtWidgets.QTextEdit):
+class TextWriter(QtWidgets.QScrollArea):
 
     def __init__(self, parent=None):
-        super(TextEditor, self).__init__(parent)
-        self.setObjectName('editorTextEditor')
-        self.setWordWrapMode(QtGui.QTextOption.WordWrap)
-        self.setViewportMargins(40, 20, 20, 20)
-        self.setAcceptRichText(True)
-        self.setAcceptDrops(True)
-        self.setFontPointSize(14)
-
-        self.setFrameShape(QtWidgets.QFrame.NoFrame)
+        super(TextWriter, self).__init__(parent)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setAlignment(Qt.AlignHCenter)
+        self.setObjectName('editorQScrollArea')
+        self.setContentsMargins(0, 0, 0, 0)
 
-        self._entity = None
+        self.text = TextEditor(self)
+        self.setWidgetResizable(True)
+        self.setWidget(self.text)
         
+        self._entity = None
+
     @property
     def entity(self):
         return self._entity
-
+    
     @entity.setter
-    def entity(self, value):
-        self.entity = value
+    def entity(self, entity=None):
+        self._entity = entity
+        if self.text is not None and entity is not None:
+            return self.text.setText(entity.text)
+        return self.text.setText('')
 
+    def html(self):
+        return self.text.toHtml()

@@ -11,179 +11,386 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
+from PyQt5.QtCore import Qt
+
+from PyQt5 import QtPrintSupport
 from PyQt5 import QtWidgets
+from PyQt5 import QtGui
 
-from .text import TextEditorWidget
-from .list import RecordList
+from .bar import ToolbarWidgetLeft
+from .bar import ToolBarWidgetRight
+from .bar import FormatbarWidget
+
+from .line import NameEditor
+from .scroll import TextWriter
 
 
-class NotepadEditorWidget(QtWidgets.QSplitter):
+class TextEditorWidget(QtWidgets.QWidget):
 
-    @inject.params(kernel='kernel')
-    def __init__(self, parent=None, kernel=None):
-
-        super(NotepadEditorWidget, self).__init__(parent)
+    def __init__(self, parent=None):
+        super(TextEditorWidget, self).__init__(parent)
+        self.setObjectName('editorTextEditorWidget')
         self.setContentsMargins(0, 0, 0, 0)
-        self.setObjectName('editorWidget')
 
-        self._list = RecordList()
-        self._list.toolbar.newAction.clicked.connect(self.onActionNotepadNoteCreateEvent)
-        self._list.toolbar.copyAction.clicked.connect(self.onActionNotepadNoteCopyEvent)
-        self._list.toolbar.removeAction.clicked.connect(self.onActionRemoveEvent)
-        self._list.toolbar.refreshAction.clicked.connect(self.onActionRefreshEvent)
-        self._list.folderEditor.returnPressed.connect(self.onActionFolderUpdated)
-        self._list.list.doubleClicked.connect(self.onActionNotepadNoteDoubleClick)
-        self._list.list.selectionChanged = self.onActionNotepadNoteSelected
+        self.name = NameEditor()
 
-        self.addWidget(self._list)
+        self.writer = TextWriter(self)
+        self.writer.text.cursorPositionChanged.connect(self.cursorPosition)
+        # self.writer.text.textChanged.connect(self.changed)
 
-        self._editor = TextEditorWidget()
-        kernel.listen('window.notepad.note_update', self._editor.onActionNotepadUpdate, 100)
-        
-        self.addWidget(self._editor)
-        
-        self.setStretchFactor(0, 3)
-        self.setStretchFactor(1, 3)
+        self.statusbar = QtWidgets.QLabel()
+        self.statusbar.setAlignment(Qt.AlignCenter)
+
+        self.leftbar = ToolbarWidgetLeft(self.writer)
+        self.leftbar.fullscreenAction.clicked.connect(parent.onActionNotepadNoteDoubleClick)
+        self.leftbar.saveAction.clicked.connect(self._onSaveEvent)
+        self.leftbar.printAction.clicked.connect(self.printHandler)
+        self.leftbar.previewAction.clicked.connect(self.preview)
+        self.leftbar.cutAction.clicked.connect(self.writer.text.cut)
+        self.leftbar.copyAction.clicked.connect(self.writer.text.copy)
+        self.leftbar.pasteAction.clicked.connect(self.writer.text.paste)
+        self.leftbar.undoAction.clicked.connect(self.writer.text.undo)
+        self.leftbar.redoAction.clicked.connect(self.writer.text.redo)
+
+        self.formatbar = FormatbarWidget(self.writer)
+        self.formatbar.fontSize.valueChanged.connect(lambda size: self.writer.text.setFontPointSize(size))
+        self.formatbar.bulletAction.clicked.connect(self.bulletList)
+        self.formatbar.numberedAction.clicked.connect(self.numberList)
+        self.formatbar.alignLeft.clicked.connect(self.alignLeft)
+        self.formatbar.alignCenter.clicked.connect(self.alignCenter)
+        self.formatbar.alignRight.clicked.connect(self.alignRight)
+        self.formatbar.alignJustify.clicked.connect(self.alignJustify)
+        self.formatbar.indentAction.clicked.connect(self.indent)
+        self.formatbar.dedentAction.clicked.connect(self.dedent)
+        self.formatbar.imageAction.clicked.connect(self.insertImage)
+        self.formatbar.folderSelector.currentIndexChanged.connect(self._OnFolderChanged)
+
+        self.rightbar = ToolBarWidgetRight(self.writer)
+        self.rightbar.italicAction.clicked.connect(self.italic)
+        self.rightbar.boldAction.clicked.connect(self.bold)
+        self.rightbar.strikeAction.clicked.connect(self.strike)
+        self.rightbar.superAction.clicked.connect(self.superScript)
+        self.rightbar.subAction.clicked.connect(self.subScript)
+        self.rightbar.backColor.clicked.connect(self.highlight)
+
+        layout = QtWidgets.QGridLayout()
+        layout.setContentsMargins(0, 10, 0, 0)
+
+        layout.addWidget(self.leftbar, 0, 0, 5, 1)
+        layout.addWidget(self.name, 0, 1, 1, 2)
+        layout.addWidget(self.rightbar, 1, 2, 3, 1)
+        layout.addWidget(self.formatbar, 1, 1)
+        layout.addWidget(self.writer, 2, 1)
+        layout.addWidget(self.statusbar, 3, 1)
+
+        self.setLayout(layout)
 
     @property
     def entity(self):
-        return self._folder
+        if self.writer is None:
+            return None
+        return self.writer.entity
 
     @entity.setter
     def entity(self, entity=None):
-        self._folder = entity
-        return self
-
-    @inject.params(storage='storage', kernel='kernel')
-    def setContent(self, data=None, storage=None, kernel=None):
-        self._folder, self._entity, self._search = data
- 
-        self._first = None
-        self._list.list.clear()
- 
-        current_index = 0
-        self._list.folder = self._folder
-        for index, entity in enumerate(storage.notes(folder=self._folder, string=self._search), start=0):
-            self._entity = entity if self._entity == None else self._entity
-            self._list.addLine(entity)
-            if self._entity == entity:
-                current_index = index
-             
-        self._list.list.setCurrentRow(current_index)
-
-        self._editor.entity = self._entity
-        if self._entity is None:
-            self._editor.entity = self._first             
-
-        count = self._list.count()
-        message = self.tr('%d records found' % count)
-        if self._folder is not None:
-            message = self.tr('%s in the folder "%s"' % (
-                message, self._folder.name
-            ))
-         
-        kernel.dispatch('window.status', (message, 10))
+        if entity is not None and entity.folder is not None:
+            self.formatbar.folder = entity.folder
+        self.writer.entity = entity
+        self.name.entity = entity
 
     @inject.params(kernel='kernel', logger='logger')
-    def onActionNotepadNoteCreateEvent(self, event=None, kernel=None, logger=None):
-        logger.debug('[editor] - _onActionNotepadNoteCreateEvent')
-        
-        kernel.dispatch('window.notepad.note_new', (
-            'New note', 'New description', self._folder
+    def onActionNotepadUpdate(self, event=None, kernel=None, logger=None):
+        entity, widget = event.data
+        if entity is None or widget == self:
+            return None
+        if self.entity == entity:
+            self.entity = entity
+
+    @inject.params(kernel='kernel')
+    def _OnFolderChanged(self, event=None, kernel=None):
+        if self.entity is not None and kernel is not None:
+            self.entity.folder = self.formatbar.folder
+            kernel.dispatch('window.notepad.note_update', (self.entity, self))
+
+    @inject.params(storage='storage')
+    def _onWindowNoteEdit(self, event=None, storage=None):
+        if storage is None or event.data is None:
+            return None
+
+        entity = event.data
+        if self.entity.index not in [entity.index]:
+            return None
+
+        if self.writer.text is None or self.name is None:
+            return None
+
+        self.writer.entity = entity
+        self.name.entity = entity
+
+    @inject.params(kernel='kernel')
+    def _onSaveEvent(self, event=None, kernel=None):
+        if self.entity is None and kernel is not None:
+            name = self.name.text() 
+            text = self.writer.html() 
+            return kernel.dispatch('window.notepad.note_new', (
+                name, text, self.formatbar.folder
+            ))
+
+        self.entity.name = self.name.text()
+        self.entity.text = self.writer.text.toHtml()
+
+        kernel.dispatch('window.notepad.note_update', (
+            self.entity, self
         ))
 
-    @inject.params(kernel='kernel', logger='logger')
-    def onActionNotepadNoteCopyEvent(self, event=None, kernel=None, logger=None):
-        logger.debug('[editor] - _onActionNotepadNoteCreateEvent')
+    def cursorPosition(self):
+        cursor = self.writer.text.textCursor()
 
-        for index in self._list.selectedIndexes():
-            item = self._list.itemFromIndex(index)
-            if item is not None and item.entity is not None:
-                entity = item.entity
-                kernel.dispatch('window.notepad.note_new', (
-                    entity.name, entity.text, entity.folder
-                ))
+        # Mortals like 1-indexed things
+        line = cursor.blockNumber() + 1
+        col = cursor.columnNumber()
 
-    @inject.params(kernel='kernel')
-    def onActionRemoveEvent(self, event=None, kernel=None):
-        message = self._list.tr("Are you sure you want to remove this Note?")
-        reply = QtWidgets.QMessageBox.question(self._list, 'Remove note', message, QtWidgets.QMessageBox.Yes,
-                                               QtWidgets.QMessageBox.No)
-        if reply == QtWidgets.QMessageBox.No:
-            return None
+        self.statusbar.setText("Line: {}, Column: {}".format(line, col))
 
-        for index in self._list.selectedIndexes():
-            item = self._list.itemFromIndex(index)
-            if item is not None and item.entity is not None:
-                kernel.dispatch('window.notepad.note_remove', item.entity)
+    def toggleToolbar(self):
+        state = self.leftbar.isVisible()
+        self.leftbar.setVisible(not state)
 
-    def onActionFolderUpdate(self, event):
-        entity, widget = event.data
-        if entity is None or widget is None:
-            return None
+    def toggleFormatbar(self):
+        state = self.formatbar.isVisible()
+        self.formatbar.setVisible(not state)
 
-        if self._list.folder == entity:
-            self._list.folder = entity
+    def preview(self):
 
-    @inject.params(kernel='kernel')
-    def onActionFolderUpdated(self, event=None, kernel=None):
-        folder = self._list.folder
-        folder.name = self._list.folderEditor.text()
-        kernel.dispatch('window.notepad.folder_update', (folder, self))
+        # Open preview dialog
+        preview = QtPrintSupport.QPrintPreviewDialog()
 
-    @inject.params(kernel='kernel')
-    def onActionNotepadNoteSelected(self, event=None, selection=None, kernel=None):
-        for index in self._list.selectedIndexes():
-            item = self._list.itemFromIndex(index)
-            if item is not None and item.entity is not None:
-                self._editor.entity = item.entity
+        # If a print is requested, open print dialog
+        preview.paintRequested.connect(lambda p: self.writer.text.print_(p))
 
-    @inject.params(kernel='kernel')
-    def onActionNotepadNoteDoubleClick(self, event=None, kernel=None):
-        item = self._list.itemFromIndex(event)
-        if item is None and item.entity is None:
-            return None
+        preview.exec_()
 
-        self._entity = item.entity
-        if self._entity is None:
-            return None
+    def printHandler(self):
 
-        editor = TextEditorWidget()
-        editor.entity = self._entity
-        kernel.listen('window.notepad.note_update', editor.onActionNotepadUpdate, 100)
+        # Open printing dialog
+        dialog = QtPrintSupport.QPrintDialog()
 
-        kernel.dispatch('window.tab', (editor, self._entity))
+        if dialog.exec_() == QtWidgets.QDialog.Accepted:
+            self.writer.text.document().print_(dialog.printer())
 
-    @inject.params(storage='storage', kernel='kernel')
-    def onActionRefreshEvent(self, event=None, kernel=None, storage=None):
+    def insertImage(self):
 
-        current = self._list.currentRow()
-        
-        self._list.list.clear()
-        for entity in storage.notes(folder=self._folder, string=self._search):
-            self._list.addLine(entity)
-            
-        if current >= self._list.count():
-            current = current - 1 if current > 0 else 0
-        self._list.setCurrentRow(current)
+        # Get image file name
+        # PYQT5 Returns a tuple in PyQt5
+        filename = \
+        QtWidgets.QFileDialog.getOpenFileName(self, 'Insert image', ".", "Images (*.png *.xpm *.jpg *.bmp *.gif)")[0]
 
-        count = self._list.count()
-        message = self.tr('%d records found' % count)
-        if self._folder is not None:
-            message = self.tr('%s in the folder "%s"' % (
-                message, self._folder.name
-            ))
-         
-        kernel.dispatch('window.status', (message, 10))
+        if filename:
 
-    @inject.params(storage='storage', kernel='kernel')
-    def onActionUpdateEvent(self, event=None, kernel=None, storage=None):
-        entity, widget = event.data
-        if entity is None or widget is None:
-            return None
+            # Create image object
+            image = QtGui.QImage(filename)
 
-        for index in range(0, self._list.count()):
-            item = self._list.item(index)
-            if item is not None and item.entity == entity:
-                item.entity = entity
+            # Error if unloadable
+            if image.isNull():
 
+                popup = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Critical,
+                                              "Image load error",
+                                              "Could not load image file!",
+                                              QtWidgets.QMessageBox.Ok,
+                                              self)
+                popup.show()
+
+            else:
+
+                cursor = self.writer.text.textCursor()
+
+                cursor.insertImage(image, filename)
+
+    def fontColorChanged(self):
+
+        # Get a color from the text dialog
+        color = QtWidgets.QColorDialog.getColor()
+
+        # Set it as the new text color
+        self.writer.text.setTextColor(color)
+
+    def highlight(self):
+
+        color = QtWidgets.QColorDialog.getColor()
+
+        self.writer.text.setTextBackgroundColor(color)
+
+    def bold(self):
+
+        if self.writer.text.fontWeight() == QtGui.QFont.Bold:
+            self.writer.text.setFontWeight(QtGui.QFont.Normal)
+        else:
+            self.writer.text.setFontWeight(QtGui.QFont.Bold)
+
+    def italic(self):
+
+        state = self.writer.text.fontItalic()
+        self.writer.text.setFontItalic(not state)
+
+    def underline(self):
+
+        state = self.writer.text.fontUnderline()
+
+        self.writer.text.setFontUnderline(not state)
+
+    def strike(self):
+
+        # Grab the text's format
+        fmt = self.writer.text.currentCharFormat()
+
+        # Set the fontStrikeOut property to its opposite
+        fmt.setFontStrikeOut(not fmt.fontStrikeOut())
+
+        # And set the next char format
+        self.writer.text.setCurrentCharFormat(fmt)
+
+    def superScript(self):
+
+        # Grab the current format
+        fmt = self.writer.text.currentCharFormat()
+
+        # And get the vertical alignment property
+        align = fmt.verticalAlignment()
+
+        # Toggle the state
+        if align == QtGui.QTextCharFormat.AlignNormal:
+
+            fmt.setVerticalAlignment(QtGui.QTextCharFormat.AlignSuperScript)
+
+        else:
+
+            fmt.setVerticalAlignment(QtGui.QTextCharFormat.AlignNormal)
+
+        # Set the new format
+        self.writer.text.setCurrentCharFormat(fmt)
+
+    def subScript(self):
+
+        # Grab the current format
+        fmt = self.writer.text.currentCharFormat()
+
+        # And get the vertical alignment property
+        align = fmt.verticalAlignment()
+
+        # Toggle the state
+        if align == QtGui.QTextCharFormat.AlignNormal:
+            fmt.setVerticalAlignment(QtGui.QTextCharFormat.AlignSubScript)
+        else:
+            fmt.setVerticalAlignment(QtGui.QTextCharFormat.AlignNormal)
+
+        # Set the new format
+        self.writer.text.setCurrentCharFormat(fmt)
+
+    def alignLeft(self):
+        self.writer.text.setAlignment(Qt.AlignLeft)
+
+    def alignRight(self):
+        self.writer.text.setAlignment(Qt.AlignRight)
+
+    def alignCenter(self):
+        self.writer.text.setAlignment(Qt.AlignCenter)
+
+    def alignJustify(self):
+        self.writer.text.setAlignment(Qt.AlignJustify)
+
+    def indent(self):
+
+        # Grab the cursor
+        cursor = self.writer.text.textCursor()
+
+        if cursor.hasSelection():
+
+            # Store the current line/block number
+            temp = cursor.blockNumber()
+
+            # Move to the selection's end
+            cursor.setPosition(cursor.anchor())
+
+            # Calculate range of selection
+            diff = cursor.blockNumber() - temp
+
+            direction = QtGui.QTextCursor.Up if diff > 0 else QtGui.QTextCursor.Down
+
+            # Iterate over lines (diff absolute value)
+            for n in range(abs(diff) + 1):
+                # Move to start of each line
+                cursor.movePosition(QtGui.QTextCursor.StartOfLine)
+
+                # Insert tabbing
+                cursor.insertText("\t")
+
+                # And move back up
+                cursor.movePosition(direction)
+
+        # If there is no selection, just insert a tab
+        else:
+
+            cursor.insertText("\t")
+
+    def handleDedent(self, cursor):
+
+        cursor.movePosition(QtGui.QTextCursor.StartOfLine)
+
+        # Grab the current line
+        line = cursor.block().text()
+
+        # If the line starts with a tab character, delete it
+        if line.startswith("\t"):
+
+            # Delete next character
+            cursor.deleteChar()
+
+        # Otherwise, delete all spaces until a non-space character is met
+        else:
+            for char in line[:8]:
+
+                if char != " ":
+                    break
+
+                cursor.deleteChar()
+
+    def dedent(self):
+
+        cursor = self.writer.text.textCursor()
+
+        if cursor.hasSelection():
+
+            # Store the current line/block number
+            temp = cursor.blockNumber()
+
+            # Move to the selection's last line
+            cursor.setPosition(cursor.anchor())
+
+            # Calculate range of selection
+            diff = cursor.blockNumber() - temp
+
+            direction = QtGui.QTextCursor.Up if diff > 0 else QtGui.QTextCursor.Down
+
+            # Iterate over lines
+            for n in range(abs(diff) + 1):
+                self.handleDedent(cursor)
+
+                # Move up
+                cursor.movePosition(direction)
+
+        else:
+            self.handleDedent(cursor)
+
+    def bulletList(self):
+
+        cursor = self.writer.text.textCursor()
+
+        # Insert bulleted list
+        cursor.insertList(QtGui.QTextListFormat.ListDisc)
+
+    def numberList(self):
+
+        cursor = self.writer.text.textCursor()
+
+        # Insert list with numbers
+        cursor.insertList(QtGui.QTextListFormat.ListDecimal)

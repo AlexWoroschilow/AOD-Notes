@@ -10,33 +10,26 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-from PyQt5.QtCore import Qt
 
 from PyQt5 import QtWidgets
-from PyQt5 import QtGui
 
 
-class TextEditor(QtWidgets.QTextEdit):
+class NameEditor(QtWidgets.QLineEdit):
 
     def __init__(self, parent=None):
-        super(TextEditor, self).__init__(parent)
-        self.setObjectName('editorTextEditor')
-        self.setWordWrapMode(QtGui.QTextOption.WordWrap)
-        self.setViewportMargins(40, 20, 20, 20)
-        self.setAcceptRichText(True)
-        self.setAcceptDrops(True)
-        self.setFontPointSize(14)
-
-        self.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        super(NameEditor, self).__init__(parent)
+        self.setObjectName('editorNameEditor')
 
         self._entity = None
-        
+
     @property
     def entity(self):
         return self._entity
-
+    
     @entity.setter
-    def entity(self, value):
-        self.entity = value
+    def entity(self, entity=None):
+        self._entity = entity
+        if self.text is not None and entity is not None:
+            return self.setText(entity.name)
+        return self.setText('') 
 

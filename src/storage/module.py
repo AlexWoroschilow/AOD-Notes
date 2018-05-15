@@ -53,12 +53,13 @@ class Loader(Loader):
 
     @inject.params(storage='storage', logger='logger')
     def _onNotepadFolderNew(self, event=None, storage=None, logger=None):
-        logger.debug('[storage] - _onNotepadFolderNew')
-        if event.data is None:
+        entity, widget = event.data
+        if entity is None or widget is None:
             return None
-        name, text = event.data 
+        
+        name, text = entity 
         entity = Folder(name=name, createdAt=datetime.now(), total=0)        
-        event.data = storage.create(entity)
+        event.data = (storage.create(entity), widget)
 
     @inject.params(storage='storage', logger='logger')
     def _onNotepadFolderUpdate(self, event=None, storage=None, logger=None):
@@ -70,10 +71,10 @@ class Loader(Loader):
 
     @inject.params(storage='storage', logger='logger')
     def _onNotepadFolderRemove(self, event=None, storage=None, logger=None):
-        logger.debug('[storage] - _onNotepadFolderRemove')
-        if event.data is None:
+        entity, widget = event.data
+        if entity is None or widget is None:
             return None
-        storage.delete(event.data)
+        storage.delete(entity)
 
     @inject.params(storage='storage', logger='logger')
     def _onNotepadNoteNew(self, event=None, storage=None, logger=None):

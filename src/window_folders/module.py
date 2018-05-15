@@ -87,7 +87,7 @@ class Loader(Loader):
     @inject.params(kernel='kernel')
     def _onFolderNewEvent(self, event=None, kernel=None):
         kernel.dispatch('window.notepad.folder_new', (
-            'New folder', 'New folder description'
+            ('New folder', 'New folder description'), self
         ))
 
     @inject.params(kernel='kernel')
@@ -95,7 +95,9 @@ class Loader(Loader):
         for index in self._widget.list.selectedIndexes():
             item = self._widget.list.itemFromIndex(index)
             if item is not None and item.folder is not None:
-                kernel.dispatch('window.notepad.folder_new', item.folder)
+                kernel.dispatch('window.notepad.folder_new', (
+                    (item.folder.name, 'New folder description'), self
+                ))
 
     @inject.params(kernel='kernel')
     def _onFolderRemoveEvent(self, event=None, kernel=None):
@@ -109,7 +111,7 @@ class Loader(Loader):
             if item is None and item.folder is None:
                 continue
 
-            kernel.dispatch('window.notepad.folder_remove', item.folder)
+            kernel.dispatch('window.notepad.folder_remove', (item.folder, self))
             self._widget.takeItem(index)
             
         message = self._widget.tr('%d folders found' % self._widget.list.count())

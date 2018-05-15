@@ -13,7 +13,8 @@
 import inject
 
 from lib.plugin import Loader
-from .gui.widget import NotepadEditorWidget
+
+from .gui.splitter import NotepadEditorWidget
 
 
 class Loader(Loader):
@@ -40,11 +41,6 @@ class Loader(Loader):
     def _onWindowStart(self, event=None, kernel=None):
         
         self._widget = NotepadEditorWidget()
-        kernel.listen('window.notepad.note_update', self._widget.onActionUpdateEvent, 128)
-        kernel.listen('window.notepad_list.refresh', self._widget.onActionRefreshEvent, 128)
-        kernel.listen('window.notepad.note_remove', self._widget.onActionRefreshEvent, 128)
-        kernel.listen('window.notepad.note_new', self._widget.onActionRefreshEvent, 128)
-        kernel.listen('window.notepad.folder_update', self._widget.onActionFolderUpdate, 128)
 
     @inject.params(kernel='kernel', logger='logger')
     def _onNotepadFolderOpen(self, event=None, kernel=None, logger=None):
@@ -53,11 +49,6 @@ class Loader(Loader):
             return None
 
         editor = NotepadEditorWidget()
-        kernel.listen('window.notepad.note_update', editor.onActionUpdateEvent, 128)
-        kernel.listen('window.notepad_list.refresh', editor.onActionRefreshEvent, 128)
-        kernel.listen('window.notepad.note_remove', editor.onActionRefreshEvent, 128)
-        kernel.listen('window.notepad.note_new', editor.onActionRefreshEvent, 128)
-        kernel.listen('window.notepad.folder_update', editor.onActionFolderUpdate, 128)
         
         editor.setContent((self._folder, None, self._search))
         kernel.dispatch('window.tab', (editor, self._folder))
