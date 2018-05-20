@@ -38,10 +38,11 @@ class Loader(Loader):
         kernel.listen('window.notepad.folder_update', self._onFolderUpdated, 128)
         kernel.listen('window.notepad.folder_new', self._onRefreshEvent, 128)
 
-    @inject.params(kernel='kernel', storage='storage')
-    def _onWindowFirstTab(self, event=None, kernel=None, storage=None):
+    @inject.params(kernel='kernel', storage='storage', config='config')
+    def _onWindowFirstTab(self, event=None, kernel=None, storage=None, config=None):
         
         self._widget = FolderList()
+        self._widget.toolbar.setVisible(bool(config.get('folders.leftbar')))
         self._widget.toolbar.newAction.clicked.connect(self._onFolderNewEvent)
         self._widget.toolbar.copyAction.clicked.connect(self._onFolderCopyEvent)
         self._widget.toolbar.refreshAction.clicked.connect(self._onRefreshEvent)

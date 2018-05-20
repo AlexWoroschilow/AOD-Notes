@@ -13,6 +13,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
+import functools
 
 abspath = os.path.abspath(__file__)
 os.chdir(os.path.dirname(abspath))
@@ -36,6 +37,14 @@ class Application(QtWidgets.QApplication):
         QtWidgets.QApplication.__init__(self, sys.argv)
         self._kernel = Kernel(options, args)
 
+    @inject.params(config='config')
+    def _onResize(self, event, config=None):
+        size = event.size()
+        if self._widget is not None and size is not None :
+            config.set('window.height', '%s' % size.height())
+            config.set('window.width', '%s' % size.width())
+        return super(MainWindow, self._widget).resizeEvent(event)
+
     @inject.params(kernel='kernel', logger='logger')
     def exec_(self, kernel=None, logger=None):
         
@@ -46,21 +55,25 @@ class Application(QtWidgets.QApplication):
         kernel.dispatch('application.start')
 
         return super(Application, self).exec_()
-
-    def onWindowToggle(self, event=None):
+    
+    @inject.params(config='config')
+    def onWindowToggle(self, event=None, config=None):
         if self._widget is not None:
             return self._widget.close()
 
         self._widget = MainWindow()
+        self._widget.resizeEvent = self._onResize
+        self._widget.resize(int(config.get('window.width')),
+            int(config.get('window.height')))
         return self._widget.show()
 
 
 if __name__ == "__main__":
     parser = optparse.OptionParser()
     
-    storage_default = '%s/.config/CloudNotes/storage.dhf' % os.environ.get('HOME')
-    parser.add_option("--storage", default=storage_default, dest="storage", help="Select the storage destination")
     parser.add_option("--loglevel", default=logging.DEBUG, dest="loglevel", help="Loggin level")
+    config = os.path.expanduser('~/.config/CloudNotes/notes.conf')
+    parser.add_option("--config", default=config, dest="config", help="Loggin level")
     
     (options, args) = parser.parse_args()
     

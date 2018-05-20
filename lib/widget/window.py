@@ -26,7 +26,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, parent=None, kernel=None, logger=None):
         super(MainWindow, self).__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
-
+        
         if os.path.exists('css/stylesheet.qss'):
             with open('css/stylesheet.qss') as stream:
                 self.setStyleSheet(stream.read())

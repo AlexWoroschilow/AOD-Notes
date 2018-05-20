@@ -29,17 +29,16 @@ class Loader(Loader):
     def config(self, binder=None):
         binder.bind_to_constructor('storage', self._bind_storage)
 
-    @inject.params(kernel='kernel')
-    def _bind_storage(self, kernel=None):
-        if kernel.options.storage is None:
-            raise "Storage destination can not be empty"
-        storage = kernel.options.storage
+    @inject.params(config='config')
+    def _bind_storage(self, config=None):
+        storage = config.get('storage.database')
+        if len(storage) and storage.find('~') >= 0:
+            storage = os.path.expanduser(storage)
         folder = os.path.dirname(storage)
         if not os.path.exists(storage):
             if not os.path.exists(folder):
                 os.makedirs(folder)
-                
-        return SQLAlechemyStorage(kernel.options.storage)
+        return SQLAlechemyStorage(storage)
 
     @inject.params(kernel='kernel')
     def boot(self, options=None, args=None, kernel=None):

@@ -19,14 +19,15 @@ from .widget import TextEditorWidget
 
 class NotepadEditorWidget(QtWidgets.QSplitter):
 
-    @inject.params(kernel='kernel')
-    def __init__(self, parent=None, kernel=None):
+    @inject.params(kernel='kernel', config='config')
+    def __init__(self, parent=None, kernel=None, config=None):
 
         super(NotepadEditorWidget, self).__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
         self.setObjectName('editorWidget')
 
         self._list = RecordList()
+        self._list.toolbar.setVisible(bool(config.get('notes.leftbar')))
         self._list.toolbar.newAction.clicked.connect(self.onActionNotepadNoteCreateEvent)
         self._list.toolbar.copyAction.clicked.connect(self.onActionNotepadNoteCopyEvent)
         self._list.toolbar.removeAction.clicked.connect(self.onActionRemoveEvent)

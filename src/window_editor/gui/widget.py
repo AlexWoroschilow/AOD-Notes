@@ -27,7 +27,8 @@ from .scroll import TextWriter
 
 class TextEditorWidget(QtWidgets.QWidget):
 
-    def __init__(self, parent=None):
+    @inject.params(config='config')
+    def __init__(self, parent=None, config=None):
         super(TextEditorWidget, self).__init__(parent)
         self.setObjectName('editorTextEditorWidget')
         self.setContentsMargins(0, 0, 0, 0)
@@ -42,6 +43,7 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.statusbar.setAlignment(Qt.AlignCenter)
 
         self.leftbar = ToolbarWidgetLeft(self.writer)
+        self.leftbar.setVisible(bool(config.get('editor.leftbar')))
         self.leftbar.fullscreenAction.clicked.connect(parent.onActionNotepadNoteDoubleClick)
         self.leftbar.saveAction.clicked.connect(self._onSaveEvent)
         self.leftbar.printAction.clicked.connect(self.printHandler)
@@ -53,6 +55,7 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.leftbar.redoAction.clicked.connect(self.writer.text.redo)
 
         self.formatbar = FormatbarWidget(self.writer)
+        self.formatbar.setVisible(bool(config.get('editor.formatbar')))
         self.formatbar.fontSize.valueChanged.connect(lambda size: self.writer.text.setFontPointSize(size))
         self.formatbar.bulletAction.clicked.connect(self.bulletList)
         self.formatbar.numberedAction.clicked.connect(self.numberList)
@@ -66,6 +69,7 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.formatbar.folderSelector.currentIndexChanged.connect(self._OnFolderChanged)
 
         self.rightbar = ToolBarWidgetRight(self.writer)
+        self.rightbar.setVisible(bool(config.get('editor.rightbar')))
         self.rightbar.italicAction.clicked.connect(self.italic)
         self.rightbar.boldAction.clicked.connect(self.bold)
         self.rightbar.strikeAction.clicked.connect(self.strike)

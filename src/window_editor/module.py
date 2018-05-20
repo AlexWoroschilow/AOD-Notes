@@ -42,14 +42,14 @@ class Loader(Loader):
         
         self._widget = NotepadEditorWidget()
 
-    @inject.params(kernel='kernel', logger='logger')
-    def _onNotepadFolderOpen(self, event=None, kernel=None, logger=None):
+    @inject.params(kernel='kernel')
+    def _onNotepadFolderOpen(self, event=None, kernel=None):
         self._folder, self._search = event.data
         if self._folder is None:
             return None
 
         editor = NotepadEditorWidget()
-        
+
         editor.setContent((self._folder, None, self._search))
         kernel.dispatch('window.tab', (editor, self._folder))
 
