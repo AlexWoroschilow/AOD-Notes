@@ -13,6 +13,8 @@
 import os
 import inject
 from datetime import datetime
+import textwrap
+from bs4 import BeautifulSoup
 
 from lib.plugin import Loader
 from .sqlalchemy import Note
@@ -81,7 +83,8 @@ class Loader(Loader):
         if event.data is None:
             return None
         name, text, folder = event.data
-        entity = Note(name=name, text=text, folder=folder, createdAt=datetime.now())        
+
+        entity = Note(name=name, text=text, folder=folder,createdAt=datetime.now())
         event.data = storage.create(entity)
 
     @inject.params(storage='storage', logger='logger')
@@ -90,6 +93,9 @@ class Loader(Loader):
         entity, widget = event.data 
         if entity is None:
             return None
+        
+        text = entity.description.replace('\r', ' ').replace('\n', ' ')
+        entity.description = '%s...' % textwrap.fill(text[0:200], 80)
         storage.update(entity)
 
     @inject.params(storage='storage', logger='logger')

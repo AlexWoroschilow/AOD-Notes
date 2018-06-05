@@ -142,6 +142,7 @@ class TextEditorWidget(QtWidgets.QWidget):
 
         self.entity.name = self.name.text()
         self.entity.text = self.writer.text.toHtml()
+        self.entity.description = self.writer.text.toPlainText()
 
         kernel.dispatch('window.notepad.note_update', (
             self.entity, self

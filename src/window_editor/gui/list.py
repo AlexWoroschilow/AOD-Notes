@@ -17,20 +17,9 @@ from PyQt5.QtCore import Qt
 
 from .bar import ToolBarWidget
 from .line import NameEditor
-
-
-class LabelTop(QtWidgets.QLabel):
-
-    def __init__(self, parent=None):
-        super(LabelTop, self).__init__(parent)
-        self.setObjectName('notesLabelTop')
-
-
-class LabelBottom(QtWidgets.QLabel):
-
-    def __init__(self, parent=None):
-        super(LabelBottom, self).__init__(parent)
-        self.setObjectName('notesLabelBottom')
+from .label import LabelTop
+from .label import LabelDescription
+from .label import LabelBottom
 
 
 class QCustomQWidget(QtWidgets.QWidget):
@@ -38,31 +27,45 @@ class QCustomQWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(QCustomQWidget, self).__init__(parent)
         self.textQVBoxLayout = QtWidgets.QVBoxLayout()
-        self.textQVBoxLayout.setContentsMargins(10, 10, 0, 10)
 
-        self.textUpQLabel = LabelTop()
-        self.textQVBoxLayout.addWidget(self.textUpQLabel)
+        self.name = LabelTop()
+        self.textQVBoxLayout.addWidget(self.name)
 
         self.textDownQLabel = LabelBottom()
         self.textQVBoxLayout.addWidget(self.textDownQLabel)
 
+        self.description = LabelDescription()
+        self.textQVBoxLayout.addWidget(self.description)
+
         self.setLayout(self.textQVBoxLayout)
 
-    def setTextUp(self, text=None):
-        self.textUpQLabel.setText(text)
+    @property
+    def entity(self):
+        pass
 
-    def getTextUp(self):
-        return self.textUpQLabel.text()
+    @entity.setter
+    def entity(self, entity=None):
+        
+        if entity.name is not None:
+            self.name.setText(entity.name)
+        
+        if entity.description is not None and len(entity.description):
+            self.description.setText(entity.description)
+        else:
+            self.description.setVisible(False)
+        
+        if entity.createdAt is not None:
+            datetime = entity.createdAt
+            self.textDownQLabel.setText(
+                datetime.strftime("%d.%m.%Y %H:%M")
+            )
 
-    def setTextDown(self, text=None):
-        self.textDownQLabel.setText(text)
-
-    def getTextDown(self):
-        return self.textDownQLabel.text()
+        return self.name.text()
 
     def resizeEvent(self, event):
         width = event.size().width()
-        self.textDownQLabel.setFixedWidth(width - 20)
+        self.name.setFixedWidth(width - 20)
+        self.description.setFixedWidth(width - 20)
         super(QCustomQWidget, self).resizeEvent(event)
 
 
@@ -85,16 +88,7 @@ class NoteItem(QtWidgets.QListWidgetItem):
     def entity(self, entity=None):
         if entity is None:
             return None
-        
-        if entity.createdAt is not None:
-            datetime = entity.createdAt
-            self.widget.setTextDown(
-                datetime.strftime("%d.%m.%Y %H:%M")
-            )
-            
-        if entity.name is not None:
-            self.widget.setTextUp(entity.name)
-            
+        self.widget.entity = entity
         self._entity = entity
 
     def resizeEvent(self, event):
@@ -145,10 +139,10 @@ class RecordList(QtWidgets.QSplitter):
         layout.setContentsMargins(0, 10, 0, 0)
         
         self.folderEditor = NameEditor()
-        layout.addWidget(self.folderEditor, 0, 1, 1, 1)
+        layout.addWidget(self.folderEditor, 0, 0)
         
         self.list = ItemList()
-        layout.addWidget(self.list, 1, 1)
+        layout.addWidget(self.list, 1, 0)
 
         content = QtWidgets.QWidget()
         content.setContentsMargins(0, 0, 0, 0)

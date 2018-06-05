@@ -51,6 +51,7 @@ class Note(Base):
     name = Column(String)
     createdAt = Column(DateTime)
     text = Column(String)
+    description = Column(String)
     tags = Column(String)
     folderId = Column(Integer, ForeignKey('Folder.id'))
     

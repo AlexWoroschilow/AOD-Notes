@@ -66,10 +66,6 @@ class Loader(Loader):
         if self._widget is None or self._folder is None:
             return None
         
-        self._widget._list.clear()
-        for entity in storage.notes(folder=self._folder, string=self._search):
-            self._widget._list.addLine(entity)
-        
         self._widget.setContent((
             self._folder,
             self._entity,

@@ -77,9 +77,9 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
             self._list.addLine(entity)
             if self._editor.entity == entity:
                 current_index = index
-             
+                
         self._list.list.setCurrentRow(current_index)
-
+        
         self._editor.entity = self._editor.entity
         if self._editor.entity is None:
             self._editor.entity = self._first             
