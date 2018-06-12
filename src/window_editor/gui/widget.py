@@ -112,10 +112,31 @@ class TextEditorWidget(QtWidgets.QWidget):
 
     @inject.params(kernel='kernel')
     def _OnFolderChanged(self, event=None, kernel=None):
-        if self.entity is not None and kernel is not None:
-            self.entity.folder = self.formatbar.folder
-            kernel.dispatch('window.notepad.note_update', (self.entity, self))
+        if self.entity is None or kernel is None:
+            return None
+        
+        cache = self.entity.folder
+        folder = self.formatbar.folder
+        
+        self.entity.folder = self.formatbar.folder
+        kernel.dispatch('note_update', (
+            self.entity, self
+        ))
 
+        if folder is None:
+            return None
+
+        kernel.dispatch('folder_%s_update' % folder.id, (
+            folder, self
+        ))
+        
+        if cache is None:
+            return None
+        
+        kernel.dispatch('folder_%s_update' % cache.id, (
+            cache, self
+        ))
+            
     @inject.params(storage='storage')
     def _onWindowNoteEdit(self, event=None, storage=None):
         if storage is None or event.data is None:
@@ -136,7 +157,7 @@ class TextEditorWidget(QtWidgets.QWidget):
         if self.entity is None and kernel is not None:
             name = self.name.text() 
             text = self.writer.html() 
-            return kernel.dispatch('window.notepad.note_new', (
+            return kernel.dispatch('note_new', (
                 name, text, self.formatbar.folder
             ))
 
@@ -144,8 +165,16 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.entity.text = self.writer.text.toHtml()
         self.entity.description = self.writer.text.toPlainText()
 
-        kernel.dispatch('window.notepad.note_update', (
+        kernel.dispatch('note_update', (
             self.entity, self
+        ))
+        
+        folder = self.entity.folder
+        if folder is None:
+            return None
+        
+        kernel.dispatch('folder_%s_update' % folder.id, (
+            folder, self
         ))
 
     def cursorPosition(self):

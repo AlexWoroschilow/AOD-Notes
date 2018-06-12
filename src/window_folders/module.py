@@ -35,8 +35,7 @@ class Loader(Loader):
         # the request string will be given as a data object to the event
         kernel.listen('window.search.request', self._onSearchRequest, 100)
         kernel.listen('window.dashboard.content', self._onWindowFirstTab, 100)
-        kernel.listen('window.notepad.folder_update', self._onFolderUpdated, 128)
-        kernel.listen('window.notepad.folder_new', self._onRefreshEvent, 128)
+        kernel.listen('folder_new', self._onRefreshEvent, 128)
 
     @inject.params(kernel='kernel', storage='storage', config='config')
     def _onWindowFirstTab(self, event=None, kernel=None, storage=None, config=None):
@@ -87,7 +86,7 @@ class Loader(Loader):
 
     @inject.params(kernel='kernel')
     def _onFolderNewEvent(self, event=None, kernel=None):
-        kernel.dispatch('window.notepad.folder_new', (
+        kernel.dispatch('folder_new', (
             ('New folder', 'New folder description'), self
         ))
 
@@ -96,7 +95,7 @@ class Loader(Loader):
         for index in self._widget.list.selectedIndexes():
             item = self._widget.list.itemFromIndex(index)
             if item is not None and item.folder is not None:
-                kernel.dispatch('window.notepad.folder_new', (
+                kernel.dispatch('folder_new', (
                     (item.folder.name, 'New folder description'), self
                 ))
 
@@ -112,7 +111,13 @@ class Loader(Loader):
             if item is None and item.folder is None:
                 continue
 
-            kernel.dispatch('window.notepad.folder_remove', (item.folder, self))
+            folder = item.folder
+            if folder is None:
+                continue
+
+            kernel.dispatch('window.notepad.folder_%s_remove' % folder.id, (folder, self))
+            kernel.dispatch('folder_remove', (folder, self))
+
             self._widget.takeItem(index)
             
         message = self._widget.tr('%d folders found' % self._widget.list.count())
@@ -155,18 +160,6 @@ class Loader(Loader):
             kernel.dispatch('window.notepad.folder_selected', (
                 self._first, self._search, None
             ))
-
-    def _onFolderUpdated(self, event=None):
-        entity, widget = event.data
-        if entity is None or widget is None:
-            return None
-        if len(self._widget.list.selectedIndexes()):
-            for index in self._widget.list.selectedIndexes():
-                item = self._widget.list.itemFromIndex(index)
-                item.folder = entity
-            return None
-        item = self._widget.list.item(0)
-        item.folder = entity
 
     @inject.params(kernel='kernel', storage='storage')
     def _onSearchRequest(self, event=None, kernel=None, storage=None):

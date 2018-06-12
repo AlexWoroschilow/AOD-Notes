@@ -47,12 +47,12 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
         if kernel is None or self._editor is None:
             return None
         
-        kernel.listen('window.notepad.folder_update', self.onActionFolderUpdate, 128)
+        kernel.listen('folder_update', self.onActionFolderUpdate, 128)
         kernel.listen('window.notepad_list.refresh', self.onActionRefreshEvent, 128)
-        kernel.listen('window.notepad.note_update', self._editor.onActionNotepadUpdate, 100)
-        kernel.listen('window.notepad.note_update', self.onActionUpdateEvent, 128)
-        kernel.listen('window.notepad.note_remove', self.onActionNoteRemove, 100)
-        kernel.listen('window.notepad.note_new', self.onActionNoteCreate, 128)
+        kernel.listen('note_update', self._editor.onActionNotepadUpdate, 100)
+        kernel.listen('note_update', self.onActionUpdateEvent, 128)
+        kernel.listen('note_remove', self.onActionNoteRemove, 100)
+        kernel.listen('note_new', self.onActionNoteCreate, 128)
 
     @property
     def entity(self):
@@ -95,19 +95,18 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
 
     @inject.params(kernel='kernel', logger='logger')
     def onActionNotepadNoteCreateEvent(self, event=None, kernel=None, logger=None):
-        kernel.dispatch('window.notepad.note_new', (
-            'New note', 'New description', self._folder
-        ))
-
+        event = ('New note', 'New description', self._folder)
+        kernel.dispatch('note_new', event)
+        
     @inject.params(kernel='kernel')
     def onActionNotepadNoteCopyEvent(self, event=None, kernel=None):
         for index in self._list.selectedIndexes():
             item = self._list.itemFromIndex(index)
-            if item is not None and item.entity is not None:
-                entity = item.entity
-                kernel.dispatch('window.notepad.note_new', (
-                    entity.name, entity.text, entity.folder
-                ))
+            if item is None or item.entity is None:
+                continue
+            
+            event = (item.entity.name, item.entity.text, item.entity.folder)
+            kernel.dispatch('note_new', event)
 
     @inject.params(kernel='kernel')
     def onActionRemoveEvent(self, event=None, kernel=None):
@@ -115,10 +114,13 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
         reply = QtWidgets.QMessageBox.question(self._list, 'Remove note', message, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
         if reply == QtWidgets.QMessageBox.No:
             return None
+        
         for index in self._list.selectedIndexes():
             item = self._list.itemFromIndex(index)
-            if item is not None and item.entity is not None:
-                kernel.dispatch('window.notepad.note_remove', item.entity)
+            if item is None or item.entity is None:
+                continue
+            
+            kernel.dispatch('note_remove', item.entity)
 
     def onActionFolderUpdate(self, event):
         entity, widget = event.data
@@ -131,7 +133,8 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
     def onActionFolderUpdated(self, event=None, kernel=None):
         folder = self._list.folder
         folder.name = self._list.folderEditor.text()
-        kernel.dispatch('window.notepad.folder_update', (folder, self))
+        kernel.dispatch('folder_update', (folder, self))
+        kernel.dispatch('folder_%s_update' % folder.id, (folder, self))
 
     @inject.params(kernel='kernel')
     def onActionNotepadNoteSelected(self, event=None, selection=None, kernel=None):
@@ -205,7 +208,7 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
         
         editor = TextEditorWidget(self)
         editor.entity = item.entity
-        kernel.listen('window.notepad.note_update', editor.onActionNotepadUpdate, 100)
+        kernel.listen('note_update', editor.onActionNotepadUpdate, 100)
 
         kernel.dispatch('window.tab', (editor, self._editor.entity))
 

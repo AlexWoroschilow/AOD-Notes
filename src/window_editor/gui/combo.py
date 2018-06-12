@@ -29,10 +29,10 @@ class FolderBomboBox(QtWidgets.QComboBox):
         for folder in storage.folders():
             self.addItem(folder.name, folder)
 
-        kernel.listen('window.notepad.folder_update', self._OnFolderUpdate, 128)
+        kernel.listen('folder_update', self._OnFolderUpdate, 128)
         kernel.listen('window.notepad.folder_selected', self._OnFolderSelected, 128)
-        kernel.listen('window.notepad.folder_remove', self._OnFolderRemove, 128)
-        kernel.listen('window.notepad.folder_new', self._OnFolderNew, 128)
+        kernel.listen('folder_remove', self._OnFolderRemove, 128)
+        kernel.listen('folder_new', self._OnFolderNew, 128)
 
     @property
     def entity(self):

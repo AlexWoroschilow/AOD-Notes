@@ -81,13 +81,13 @@ class Loader(Loader):
 
     @inject.params(kernel='kernel')
     def _onCreateFolder(self, event, kernel=None):
-        kernel.dispatch('window.notepad.folder_new', (
+        kernel.dispatch('folder_new', (
             ('New folder', 'New folder description'), self
         ))
 
     @inject.params(kernel='kernel', folders='folders')
     def _onCreateNote(self, event, kernel=None, folders=None):
-        kernel.dispatch('window.notepad.note_new', (
+        kernel.dispatch('note_new', (
             'New note', 'New description', folders.selected
         ))
 
@@ -108,7 +108,7 @@ class Loader(Loader):
                 if reply == QtWidgets.QMessageBox.No:
                     continue
             with open(path, 'r') as stream:
-                kernel.dispatch('window.notepad.note_new', (
+                kernel.dispatch('note_new', (
                     os.path.basename(path), stream.read(), folders.selected
                 ))
                 stream.close()

@@ -10,12 +10,15 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import inject
+
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 
 from .label import LabelTop
 from .label import LabelBottom
+
 
 class QCustomQWidget(QtWidgets.QWidget):
 
@@ -45,12 +48,16 @@ class QCustomQWidget(QtWidgets.QWidget):
 
 class FolderItem(QtWidgets.QListWidgetItem):
 
-    def __init__(self, entity=None, widget=None):
+    @inject.params(kernel='kernel')
+    def __init__(self, entity=None, widget=None, kernel=None):
         super(FolderItem, self).__init__()
         self._widget = widget
         
         self.folder = entity
 
+        if kernel is not None and entity is not None and entity.id is not None:
+            kernel.listen('folder_%s_update' % entity.id, self._onFolderUpdated)
+            
     @property
     def widget(self):
         return self._widget
@@ -67,9 +74,12 @@ class FolderItem(QtWidgets.QListWidgetItem):
         
         count = len(entity.notes)
         datetime = entity.createdAt
-        self._widget.setTextDown('%d records, %s' % (
-            count, datetime.strftime("%d.%m.%Y %H:%M") 
-        ))
+        
+        text_down = '%d records, %s' % (count, datetime.strftime("%d.%m.%Y %H:%M"))
+        self._widget.setTextDown(text_down)
+
+    def _onFolderUpdated(self, event=None):
+        self.folder, widget = event.data
 
 
 class ItemList(QtWidgets.QListWidget):

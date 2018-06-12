@@ -57,8 +57,8 @@ class WindowContent(QtWidgets.QTabWidget):
         self.setTabsClosable(True)
 
         kernel.listen('window.tab', self._onTabOpen)
-        kernel.listen('window.notepad.note_update', self._onNoteUpdateEvent, 128)
-        kernel.listen('window.notepad.folder_update', self._onNoteUpdateEvent, 128)
+        kernel.listen('note_update', self._onNoteUpdateEvent, 128)
+        kernel.listen('folder_update', self._onNoteUpdateEvent, 128)
 
     def _onNoteUpdateEvent(self, event):
         entity, widget = event.data

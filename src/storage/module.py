@@ -44,13 +44,13 @@ class Loader(Loader):
 
     @inject.params(kernel='kernel')
     def boot(self, options=None, args=None, kernel=None):
-        kernel.listen('window.notepad.folder_new', self._onNotepadFolderNew, 0)
-        kernel.listen('window.notepad.folder_update', self._onNotepadFolderUpdate, 0)
-        kernel.listen('window.notepad.folder_remove', self._onNotepadFolderRemove, 0)
+        kernel.listen('folder_new', self._onNotepadFolderNew, 0)
+        kernel.listen('folder_update', self._onNotepadFolderUpdate, 0)
+        kernel.listen('folder_remove', self._onNotepadFolderRemove, 0)
 
-        kernel.listen('window.notepad.note_new', self._onNotepadNoteNew)
-        kernel.listen('window.notepad.note_update', self._onNotepadNoteUpdate)
-        kernel.listen('window.notepad.note_remove', self._onNotepadNoteRemove)
+        kernel.listen('note_new', self._onNotepadNoteNew)
+        kernel.listen('note_update', self._onNotepadNoteUpdate)
+        kernel.listen('note_remove', self._onNotepadNoteRemove)
 
     @inject.params(storage='storage', logger='logger')
     def _onNotepadFolderNew(self, event=None, storage=None, logger=None):
@@ -77,18 +77,24 @@ class Loader(Loader):
             return None
         storage.delete(entity)
 
-    @inject.params(storage='storage', logger='logger')
-    def _onNotepadNoteNew(self, event=None, storage=None, logger=None):
+    @inject.params(storage='storage', kernel='kernel', logger='logger')
+    def _onNotepadNoteNew(self, event=None, storage=None, kernel=None, logger=None):
         logger.debug('[storage] - _onNotepadNoteNew')
         if event.data is None:
             return None
         name, text, folder = event.data
 
-        entity = Note(name=name, text=text, folder=folder,createdAt=datetime.now())
+        entity = Note(name=name, text=text, folder=folder, createdAt=datetime.now())
         event.data = storage.create(entity)
+        
+        if folder is None or kernel is None:
+            return None
+        
+        event = (folder, self)
+        kernel.dispatch('folder_%s_update' % folder.id, event)
 
-    @inject.params(storage='storage', logger='logger')
-    def _onNotepadNoteUpdate(self, event=None, storage=None, logger=None):
+    @inject.params(storage='storage', kernel='kernel', logger='logger')
+    def _onNotepadNoteUpdate(self, event=None, storage=None, kernel=None, logger=None):
         logger.debug('[storage] - _onNotepadNoteUpdate')
         entity, widget = event.data 
         if entity is None:
@@ -98,9 +104,23 @@ class Loader(Loader):
         entity.description = '%s...' % textwrap.fill(text[0:200], 80)
         storage.update(entity)
 
-    @inject.params(storage='storage', logger='logger')
-    def _onNotepadNoteRemove(self, event=None, storage=None, logger=None):
+        folder = entity.folder 
+        if folder is None or kernel is None:
+            return None
+
+        event = (folder, self)
+        kernel.dispatch('folder_%s_update' % folder.id, event)
+
+    @inject.params(storage='storage', kernel='kernel', logger='logger')
+    def _onNotepadNoteRemove(self, event=None, storage=None, kernel=None, logger=None):
         logger.debug('[storage] - _onNotepadNoteRemove')
         if event.data is None:
             return None
+        folder = event.data.folder
         storage.delete(event.data)
+        
+        if folder is None or kernel is None:
+            return None
+        
+        event = (folder, self)
+        kernel.dispatch('folder_%s_update' % folder.id, event)
