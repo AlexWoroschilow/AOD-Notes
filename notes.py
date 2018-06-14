@@ -48,10 +48,10 @@ class Application(QtWidgets.QApplication):
     def exec_(self, kernel=None, logger=None):
         
         kernel.listen('window.toggle', self.onWindowToggle)
-        kernel.listen('application.start', self.onWindowToggle)
+        kernel.listen('application_start', self.onWindowToggle)
         kernel.listen('window.exit', self.exit)
         
-        kernel.dispatch('application.start')
+        kernel.dispatch('application_start')
 
         return super(Application, self).exec_()
     

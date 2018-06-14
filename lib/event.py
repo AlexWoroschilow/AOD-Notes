@@ -87,9 +87,9 @@ class Dispatcher(object):
         for index, listener_item in enumerate(self._listeners[name]):
             try:
                 listener_item.listener(event)
-            except (Exception, RuntimeError) as ex:
-                logger.exception('Remove %s from pool: %s' % (name, ex))
+            except RuntimeError:
                 self._listeners[name].pop(index)
+                logger.exception('Remove %s from pool' % (name))
                 continue
         return event
 

@@ -65,7 +65,7 @@ class Loader(Loader):
 
     @inject.params(dispather='event_dispatcher')
     def _OnSearchRequestEvent(self, event=None, dispather=None):
-        dispather.dispatch('window.search.request', self._widget.text())
+        dispather.dispatch('search_request', self._widget.text())
 
     @inject.params(dispather='event_dispatcher')
     def _onShortcutSearchStart(self, event=None, dispather=None):

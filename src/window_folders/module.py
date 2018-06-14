@@ -33,8 +33,8 @@ class Loader(Loader):
     def boot(self, options=None, args=None, kernel=None):
         # listen for the search request from the search module
         # the request string will be given as a data object to the event
-        kernel.listen('window.search.request', self._onSearchRequest, 100)
-        kernel.listen('window.dashboard.content', self._onWindowFirstTab, 100)
+        kernel.listen('search_request', self._onSearchRequest, 100)
+        kernel.listen('dashboard_content', self._onWindowFirstTab, 100)
         kernel.listen('folder_new', self._onRefreshEvent, 128)
 
     @inject.params(kernel='kernel', storage='storage', config='config')
@@ -70,7 +70,7 @@ class Loader(Loader):
         message = self._widget.tr('%d folders found' % self._widget.list.count())
         kernel.dispatch('window.status', (message, 10))
 
-        kernel.dispatch('window.notepad.folder_selected', (
+        kernel.dispatch('folder_select', (
             self._first, self._search, None
         ))
         
@@ -145,7 +145,7 @@ class Loader(Loader):
                 continue
 
             self._first = item.folder
-            kernel.dispatch('window.notepad.folder_open', (
+            kernel.dispatch('folder_open', (
                 self._first, self._search
             ))
 
@@ -157,7 +157,7 @@ class Loader(Loader):
                 continue
 
             self._first = item.folder
-            kernel.dispatch('window.notepad.folder_selected', (
+            kernel.dispatch('folder_select', (
                 self._first, self._search, None
             ))
 

@@ -10,7 +10,6 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import inject
 from PyQt5.QtCore import Qt
 
 from PyQt5 import QtPrintSupport
@@ -27,36 +26,33 @@ from .scroll import TextWriter
 
 class TextEditorWidget(QtWidgets.QWidget):
 
-    @inject.params(config='config')
     def __init__(self, parent=None, config=None):
         super(TextEditorWidget, self).__init__(parent)
         self.setObjectName('editorTextEditorWidget')
         self.setContentsMargins(0, 0, 0, 0)
 
-        self.name = NameEditor()
+        self._name = NameEditor()
 
-        self.writer = TextWriter(self)
-        self.writer.text.cursorPositionChanged.connect(self.cursorPosition)
-        # self.writer.text.textChanged.connect(self.changed)
+        self._text = TextWriter(self)
+        self._text.text.cursorPositionChanged.connect(self.cursorPosition)
 
         self.statusbar = QtWidgets.QLabel()
         self.statusbar.setAlignment(Qt.AlignCenter)
 
-        self.leftbar = ToolbarWidgetLeft(self.writer)
+        self.leftbar = ToolbarWidgetLeft(self._text)
         self.leftbar.setVisible(bool(config.get('editor.leftbar')))
-        self.leftbar.fullscreenAction.clicked.connect(parent.onActionNotepadNoteDoubleClick)
-        self.leftbar.saveAction.clicked.connect(self._onSaveEvent)
+        
         self.leftbar.printAction.clicked.connect(self.printHandler)
         self.leftbar.previewAction.clicked.connect(self.preview)
-        self.leftbar.cutAction.clicked.connect(self.writer.text.cut)
-        self.leftbar.copyAction.clicked.connect(self.writer.text.copy)
-        self.leftbar.pasteAction.clicked.connect(self.writer.text.paste)
-        self.leftbar.undoAction.clicked.connect(self.writer.text.undo)
-        self.leftbar.redoAction.clicked.connect(self.writer.text.redo)
+        self.leftbar.cutAction.clicked.connect(self._text.text.cut)
+        self.leftbar.copyAction.clicked.connect(self._text.text.copy)
+        self.leftbar.pasteAction.clicked.connect(self._text.text.paste)
+        self.leftbar.undoAction.clicked.connect(self._text.text.undo)
+        self.leftbar.redoAction.clicked.connect(self._text.text.redo)
 
-        self.formatbar = FormatbarWidget(self.writer)
+        self.formatbar = FormatbarWidget(self._text)
         self.formatbar.setVisible(bool(config.get('editor.formatbar')))
-        self.formatbar.fontSize.valueChanged.connect(lambda size: self.writer.text.setFontPointSize(size))
+        self.formatbar.fontSize.valueChanged.connect(lambda size: self._text.text.setFontPointSize(size))
         self.formatbar.bulletAction.clicked.connect(self.bulletList)
         self.formatbar.numberedAction.clicked.connect(self.numberList)
         self.formatbar.alignLeft.clicked.connect(self.alignLeft)
@@ -66,9 +62,8 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.formatbar.indentAction.clicked.connect(self.indent)
         self.formatbar.dedentAction.clicked.connect(self.dedent)
         self.formatbar.imageAction.clicked.connect(self.insertImage)
-        self.formatbar.folderSelector.currentIndexChanged.connect(self._OnFolderChanged)
 
-        self.rightbar = ToolBarWidgetRight(self.writer)
+        self.rightbar = ToolBarWidgetRight(self._text)
         self.rightbar.setVisible(bool(config.get('editor.rightbar')))
         self.rightbar.italicAction.clicked.connect(self.italic)
         self.rightbar.boldAction.clicked.connect(self.bold)
@@ -81,109 +76,85 @@ class TextEditorWidget(QtWidgets.QWidget):
         layout.setContentsMargins(0, 10, 0, 0)
 
         layout.addWidget(self.leftbar, 0, 0, 5, 1)
-        layout.addWidget(self.name, 0, 1, 1, 2)
+        layout.addWidget(self._name, 0, 1, 1, 2)
         layout.addWidget(self.rightbar, 1, 2, 3, 1)
         layout.addWidget(self.formatbar, 1, 1)
-        layout.addWidget(self.writer, 2, 1)
+        layout.addWidget(self._text, 2, 1)
         layout.addWidget(self.statusbar, 3, 1)
 
         self.setLayout(layout)
+        
+        self._note = None
+
+    @property
+    def name(self):
+        if self._name is None:
+            return None
+        return self._name.text() 
+
+    @property
+    def text(self):
+        if self._text is None:
+            return None
+        if self._text.text is None:
+            return None
+        return self._text.text.toHtml()
+
+    @property
+    def description(self):
+        if self._text is None:
+            return None
+        if self._text.text is None:
+            return None
+        return self._text.text.toPlainText()
+
+    @property
+    def folder(self):
+        if self.formatbar is None:
+            return None
+        return self.formatbar.folder
+
+    @folder.setter
+    def folder(self, folder=None):
+        if self.formatbar is not None:
+            self.formatbar.folder = folder 
+        return self
+
+    @property
+    def note(self):
+        if self._note is None:
+            return None
+        return self._note
+
+    @note.setter
+    def note(self, entity=None):
+        self._note = entity
+        if entity is None:
+            self._text.text.setHtml('')
+            self._name.setText('')
+            return self
+            
+        if entity.folder is not None:
+            self.folder = entity.folder
+            
+        self._name.setText(entity.name)
+        self._text.text.setHtml(entity.text)
+        
+        return self
 
     @property
     def entity(self):
-        if self.writer is None:
-            return None
-        return self.writer.entity
+        return self.note
 
     @entity.setter
     def entity(self, entity=None):
-        if entity is not None and entity.folder is not None:
-            self.formatbar.folder = entity.folder
-        self.writer.entity = entity
-        self.name.entity = entity
-
-    @inject.params(kernel='kernel', logger='logger')
-    def onActionNotepadUpdate(self, event=None, kernel=None, logger=None):
-        entity, widget = event.data
-        if entity is None or widget == self:
-            return None
-        if self.entity == entity:
-            self.entity = entity
-
-    @inject.params(kernel='kernel')
-    def _OnFolderChanged(self, event=None, kernel=None):
-        if self.entity is None or kernel is None:
-            return None
-        
-        cache = self.entity.folder
-        folder = self.formatbar.folder
-        
-        self.entity.folder = self.formatbar.folder
-        kernel.dispatch('note_update', (
-            self.entity, self
-        ))
-
-        if folder is None:
-            return None
-
-        kernel.dispatch('folder_%s_update' % folder.id, (
-            folder, self
-        ))
-        
-        if cache is None:
-            return None
-        
-        kernel.dispatch('folder_%s_update' % cache.id, (
-            cache, self
-        ))
-            
-    @inject.params(storage='storage')
-    def _onWindowNoteEdit(self, event=None, storage=None):
-        if storage is None or event.data is None:
-            return None
-
-        entity = event.data
-        if self.entity.index not in [entity.index]:
-            return None
-
-        if self.writer.text is None or self.name is None:
-            return None
-
-        self.writer.entity = entity
-        self.name.entity = entity
-
-    @inject.params(kernel='kernel')
-    def _onSaveEvent(self, event=None, kernel=None):
-        if self.entity is None and kernel is not None:
-            name = self.name.text() 
-            text = self.writer.html() 
-            return kernel.dispatch('note_new', (
-                name, text, self.formatbar.folder
-            ))
-
-        self.entity.name = self.name.text()
-        self.entity.text = self.writer.text.toHtml()
-        self.entity.description = self.writer.text.toPlainText()
-
-        kernel.dispatch('note_update', (
-            self.entity, self
-        ))
-        
-        folder = self.entity.folder
-        if folder is None:
-            return None
-        
-        kernel.dispatch('folder_%s_update' % folder.id, (
-            folder, self
-        ))
+        self.note = entity
+        return self
 
     def cursorPosition(self):
-        cursor = self.writer.text.textCursor()
-
-        # Mortals like 1-indexed things
+        cursor = self._text.text.textCursor()
         line = cursor.blockNumber() + 1
         col = cursor.columnNumber()
-
         self.statusbar.setText("Line: {}, Column: {}".format(line, col))
 
     def toggleToolbar(self):
@@ -195,236 +166,130 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.formatbar.setVisible(not state)
 
     def preview(self):
-
-        # Open preview dialog
         preview = QtPrintSupport.QPrintPreviewDialog()
-
-        # If a print is requested, open print dialog
-        preview.paintRequested.connect(lambda p: self.writer.text.print_(p))
-
+        preview.paintRequested.connect(lambda p: self._text.text.print_(p))
         preview.exec_()
 
     def printHandler(self):
-
-        # Open printing dialog
         dialog = QtPrintSupport.QPrintDialog()
-
         if dialog.exec_() == QtWidgets.QDialog.Accepted:
-            self.writer.text.document().print_(dialog.printer())
+            self._text.text.document().print_(dialog.printer())
 
     def insertImage(self):
-
-        # Get image file name
-        # PYQT5 Returns a tuple in PyQt5
         filename = \
         QtWidgets.QFileDialog.getOpenFileName(self, 'Insert image', ".", "Images (*.png *.xpm *.jpg *.bmp *.gif)")[0]
-
         if filename:
-
-            # Create image object
             image = QtGui.QImage(filename)
-
-            # Error if unloadable
             if image.isNull():
-
                 popup = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Critical,
                                               "Image load error",
                                               "Could not load image file!",
                                               QtWidgets.QMessageBox.Ok,
                                               self)
                 popup.show()
-
             else:
-
-                cursor = self.writer.text.textCursor()
-
+                cursor = self._text.text.textCursor()
                 cursor.insertImage(image, filename)
 
     def fontColorChanged(self):
-
-        # Get a color from the text dialog
         color = QtWidgets.QColorDialog.getColor()
-
-        # Set it as the new text color
-        self.writer.text.setTextColor(color)
+        self._text.text.setTextColor(color)
 
     def highlight(self):
-
         color = QtWidgets.QColorDialog.getColor()
-
-        self.writer.text.setTextBackgroundColor(color)
+        self._text.text.setTextBackgroundColor(color)
 
     def bold(self):
-
-        if self.writer.text.fontWeight() == QtGui.QFont.Bold:
-            self.writer.text.setFontWeight(QtGui.QFont.Normal)
+        if self._text.text.fontWeight() == QtGui.QFont.Bold:
+            self._text.text.setFontWeight(QtGui.QFont.Normal)
         else:
-            self.writer.text.setFontWeight(QtGui.QFont.Bold)
+            self._text.text.setFontWeight(QtGui.QFont.Bold)
 
     def italic(self):
-
-        state = self.writer.text.fontItalic()
-        self.writer.text.setFontItalic(not state)
+        state = self._text.text.fontItalic()
+        self._text.text.setFontItalic(not state)
 
     def underline(self):
-
-        state = self.writer.text.fontUnderline()
-
-        self.writer.text.setFontUnderline(not state)
+        state = self._text.text.fontUnderline()
+        self._text.text.setFontUnderline(not state)
 
     def strike(self):
-
-        # Grab the text's format
-        fmt = self.writer.text.currentCharFormat()
-
-        # Set the fontStrikeOut property to its opposite
+        fmt = self._text.text.currentCharFormat()
         fmt.setFontStrikeOut(not fmt.fontStrikeOut())
-
-        # And set the next char format
-        self.writer.text.setCurrentCharFormat(fmt)
+        self._text.text.setCurrentCharFormat(fmt)
 
     def superScript(self):
-
-        # Grab the current format
-        fmt = self.writer.text.currentCharFormat()
-
-        # And get the vertical alignment property
+        fmt = self._text.text.currentCharFormat()
         align = fmt.verticalAlignment()
-
-        # Toggle the state
         if align == QtGui.QTextCharFormat.AlignNormal:
-
             fmt.setVerticalAlignment(QtGui.QTextCharFormat.AlignSuperScript)
-
         else:
-
             fmt.setVerticalAlignment(QtGui.QTextCharFormat.AlignNormal)
-
-        # Set the new format
-        self.writer.text.setCurrentCharFormat(fmt)
+        self._text.text.setCurrentCharFormat(fmt)
 
     def subScript(self):
-
-        # Grab the current format
-        fmt = self.writer.text.currentCharFormat()
-
-        # And get the vertical alignment property
+        fmt = self._text.text.currentCharFormat()
         align = fmt.verticalAlignment()
-
-        # Toggle the state
         if align == QtGui.QTextCharFormat.AlignNormal:
             fmt.setVerticalAlignment(QtGui.QTextCharFormat.AlignSubScript)
         else:
             fmt.setVerticalAlignment(QtGui.QTextCharFormat.AlignNormal)
-
-        # Set the new format
-        self.writer.text.setCurrentCharFormat(fmt)
+        self._text.text.setCurrentCharFormat(fmt)
 
     def alignLeft(self):
-        self.writer.text.setAlignment(Qt.AlignLeft)
+        self._text.text.setAlignment(Qt.AlignLeft)
 
     def alignRight(self):
-        self.writer.text.setAlignment(Qt.AlignRight)
+        self._text.text.setAlignment(Qt.AlignRight)
 
     def alignCenter(self):
-        self.writer.text.setAlignment(Qt.AlignCenter)
+        self._text.text.setAlignment(Qt.AlignCenter)
 
     def alignJustify(self):
-        self.writer.text.setAlignment(Qt.AlignJustify)
+        self._text.text.setAlignment(Qt.AlignJustify)
 
     def indent(self):
-
-        # Grab the cursor
-        cursor = self.writer.text.textCursor()
-
+        cursor = self._text.text.textCursor()
         if cursor.hasSelection():
-
-            # Store the current line/block number
             temp = cursor.blockNumber()
-
-            # Move to the selection's end
             cursor.setPosition(cursor.anchor())
-
-            # Calculate range of selection
             diff = cursor.blockNumber() - temp
-
             direction = QtGui.QTextCursor.Up if diff > 0 else QtGui.QTextCursor.Down
-
-            # Iterate over lines (diff absolute value)
             for n in range(abs(diff) + 1):
-                # Move to start of each line
                 cursor.movePosition(QtGui.QTextCursor.StartOfLine)
-
-                # Insert tabbing
                 cursor.insertText("\t")
-
-                # And move back up
                 cursor.movePosition(direction)
-
-        # If there is no selection, just insert a tab
         else:
-
             cursor.insertText("\t")
 
     def handleDedent(self, cursor):
-
         cursor.movePosition(QtGui.QTextCursor.StartOfLine)
-
-        # Grab the current line
         line = cursor.block().text()
-
-        # If the line starts with a tab character, delete it
         if line.startswith("\t"):
-
-            # Delete next character
             cursor.deleteChar()
-
-        # Otherwise, delete all spaces until a non-space character is met
         else:
             for char in line[:8]:
-
                 if char != " ":
                     break
-
                 cursor.deleteChar()
 
     def dedent(self):
-
-        cursor = self.writer.text.textCursor()
-
+        cursor = self._text.text.textCursor()
         if cursor.hasSelection():
-
-            # Store the current line/block number
             temp = cursor.blockNumber()
-
-            # Move to the selection's last line
             cursor.setPosition(cursor.anchor())
-
-            # Calculate range of selection
             diff = cursor.blockNumber() - temp
-
             direction = QtGui.QTextCursor.Up if diff > 0 else QtGui.QTextCursor.Down
-
-            # Iterate over lines
             for n in range(abs(diff) + 1):
                 self.handleDedent(cursor)
-
-                # Move up
                 cursor.movePosition(direction)
-
         else:
             self.handleDedent(cursor)
 
     def bulletList(self):
-
-        cursor = self.writer.text.textCursor()
-
-        # Insert bulleted list
+        cursor = self._text.text.textCursor()
         cursor.insertList(QtGui.QTextListFormat.ListDisc)
 
     def numberList(self):
-
-        cursor = self.writer.text.textCursor()
-
-        # Insert list with numbers
+        cursor = self._text.text.textCursor()
         cursor.insertList(QtGui.QTextListFormat.ListDecimal)

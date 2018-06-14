@@ -100,8 +100,9 @@ class Loader(Loader):
         if entity is None:
             return None
         
-        text = entity.description.replace('\r', ' ').replace('\n', ' ')
-        entity.description = '%s...' % textwrap.fill(text[0:200], 80)
+        if entity.description is not None and len(entity.description):
+            text = entity.description.replace('\r', ' ').replace('\n', ' ')
+            entity.description = '%s...' % textwrap.fill(text[0:200], 80)
         storage.update(entity)
 
         folder = entity.folder 

@@ -32,16 +32,5 @@ class TextWriter(QtWidgets.QScrollArea):
         
         self._entity = None
 
-    @property
-    def entity(self):
-        return self._entity
-    
-    @entity.setter
-    def entity(self, entity=None):
-        self._entity = entity
-        if self.text is not None and entity is not None:
-            return self.text.setText(entity.text)
-        return self.text.setText('')
-
     def html(self):
         return self.text.toHtml()

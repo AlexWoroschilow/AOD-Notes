@@ -28,13 +28,13 @@ class QCustomQWidget(QtWidgets.QWidget):
         super(QCustomQWidget, self).__init__(parent)
         self.textQVBoxLayout = QtWidgets.QVBoxLayout()
 
-        self.name = LabelTop()
+        self.name = LabelTop(self)
         self.textQVBoxLayout.addWidget(self.name)
 
-        self.textDownQLabel = LabelBottom()
+        self.textDownQLabel = LabelBottom(self)
         self.textQVBoxLayout.addWidget(self.textDownQLabel)
 
-        self.description = LabelDescription()
+        self.description = LabelDescription(self)
         self.textQVBoxLayout.addWidget(self.description)
 
         self.setLayout(self.textQVBoxLayout)
@@ -71,10 +71,14 @@ class QCustomQWidget(QtWidgets.QWidget):
 
 class NoteItem(QtWidgets.QListWidgetItem):
 
-    def __init__(self, entity=None, widget=None):
+    @inject.params(kernel='kernel')
+    def __init__(self, entity=None, widget=None, kernel=None):
         super(NoteItem, self).__init__()
         self._widget = widget
         self.entity = entity
+
+        if kernel is not None and entity is not None and entity.id is not None:
+            kernel.listen('note_%s_update' % entity.id, self._onNoteUpdated)
 
     @property
     def widget(self):
@@ -93,6 +97,9 @@ class NoteItem(QtWidgets.QListWidgetItem):
 
     def resizeEvent(self, event):
         self._widget.resizeEvent(event)
+
+    def _onNoteUpdated(self, event=None):
+        self.entity, widget = event.data
 
 
 class ItemList(QtWidgets.QListWidget):
@@ -124,7 +131,6 @@ class ItemList(QtWidgets.QListWidget):
 
 class RecordList(QtWidgets.QSplitter):
 
-    @inject.params(storage='storage')
     def __init__(self, parent=None, storage=None):
         super(RecordList, self).__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
