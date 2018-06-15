@@ -39,7 +39,7 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.statusbar = QtWidgets.QLabel()
         self.statusbar.setAlignment(Qt.AlignCenter)
 
-        self.leftbar = ToolbarWidgetLeft(self._text)
+        self.leftbar = ToolbarWidgetLeft()
         self.leftbar.setVisible(bool(config.get('editor.leftbar')))
         
         self.leftbar.printAction.clicked.connect(self.printHandler)
@@ -50,7 +50,7 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.leftbar.undoAction.clicked.connect(self._text.text.undo)
         self.leftbar.redoAction.clicked.connect(self._text.text.redo)
 
-        self.formatbar = FormatbarWidget(self._text)
+        self.formatbar = FormatbarWidget()
         self.formatbar.setVisible(bool(config.get('editor.formatbar')))
         self.formatbar.fontSize.valueChanged.connect(lambda size: self._text.text.setFontPointSize(size))
         self.formatbar.bulletAction.clicked.connect(self.bulletList)
@@ -63,7 +63,7 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.formatbar.dedentAction.clicked.connect(self.dedent)
         self.formatbar.imageAction.clicked.connect(self.insertImage)
 
-        self.rightbar = ToolBarWidgetRight(self._text)
+        self.rightbar = ToolBarWidgetRight()
         self.rightbar.setVisible(bool(config.get('editor.rightbar')))
         self.rightbar.italicAction.clicked.connect(self.italic)
         self.rightbar.boldAction.clicked.connect(self.bold)

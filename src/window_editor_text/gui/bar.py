@@ -10,8 +10,6 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import inject
-
 from PyQt5.Qt import Qt
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
@@ -22,8 +20,7 @@ from .combo import FolderComboBox
 
 class ToolbarWidgetLeft(QtWidgets.QToolBar):
 
-    @inject.params(kernel='kernel')
-    def __init__(self, parent=None, kernel=None):
+    def __init__(self):
         super(ToolbarWidgetLeft, self).__init__()
         self.setObjectName('editorToolbarWidgetLeft')
         self.setContentsMargins(0, 0, 0, 0)
@@ -84,15 +81,10 @@ class ToolbarWidgetLeft(QtWidgets.QToolBar):
         self.addWidget(self.previewAction)
         self.addWidget(self.fullscreenAction)
 
-        kernel.dispatch('window.notepad.leftbar', (
-            parent, self
-        ))
-
 
 class ToolBarWidgetRight(QtWidgets.QToolBar):
 
-    @inject.params(kernel='kernel')
-    def __init__(self, parent=None, kernel=None):
+    def __init__(self):
         super(ToolBarWidgetRight, self).__init__()
         self.setObjectName('editorToolBarWidgetRight')
         self.setOrientation(Qt.Vertical)
@@ -140,15 +132,10 @@ class ToolBarWidgetRight(QtWidgets.QToolBar):
         self.addWidget(self.fontColor)
         self.addWidget(self.backColor)
 
-        kernel.dispatch('window.notepad.rightbar', (
-            parent, self
-        ))
-
 
 class FormatbarWidget(QtWidgets.QToolBar):
 
-    @inject.params(kernel='kernel')
-    def __init__(self, parent=None, kernel=None):
+    def __init__(self):
         super(FormatbarWidget, self).__init__()
         self.setContentsMargins(0, 0, 0, 0)
         self.setObjectName('editorFormatBarWidget')
@@ -209,10 +196,6 @@ class FormatbarWidget(QtWidgets.QToolBar):
         self.addWidget(self.indentAction)
         self.addWidget(self.dedentAction)
         self.addWidget(self.imageAction)
-
-        kernel.dispatch('window.notepad.formatbar', (
-            parent, self
-        ))
 
     @property
     def folder(self):

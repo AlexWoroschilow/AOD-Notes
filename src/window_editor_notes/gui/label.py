@@ -36,20 +36,15 @@ class LabelDescription(QtWidgets.QPlainTextEdit):
 
     def __init__(self, parent=None):
         super(LabelDescription, self).__init__(parent)
-        self.setWordWrapMode(QtGui.QTextOption.WrapAnywhere)
         self.setObjectName('notesLabelDescription')
-        self.setMaximumHeight(80)
-        self.setWordWrapMode(QtGui.QTextOption.WordWrap)
-
-        self.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.setLineWrapMode(QtWidgets.QPlainTextEdit.WidgetWidth)
+        self.setWordWrapMode(QtGui.QTextOption.WrapAnywhere)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-
-        size_policy = self.sizePolicy()
-        size_policy.setVerticalPolicy(QtWidgets.QSizePolicy.Minimum)
-        self.setSizePolicy(size_policy)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setMaximumHeight(80)
 
         self.setReadOnly(True)
-                    
+        
     def setText(self, text=None):
         super(LabelDescription, self).setPlainText(text)
         

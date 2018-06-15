@@ -38,14 +38,14 @@ class Application(QtWidgets.QApplication):
 
     @inject.params(config='config')
     def _onResize(self, event, config=None):
-        size = event.size()
-        if self._widget is not None and size is not None :
-            config.set('window.height', '%s' % size.height())
-            config.set('window.width', '%s' % size.width())
+        width = event.size().width()
+        height = event.size().height()
+        config.set('window.width', '%s' % width)
+        config.set('window.height', '%s' % height)
         return super(MainWindow, self._widget).resizeEvent(event)
 
-    @inject.params(kernel='kernel', logger='logger')
-    def exec_(self, kernel=None, logger=None):
+    @inject.params(kernel='kernel')
+    def exec_(self, kernel=None):
         
         kernel.listen('window.toggle', self.onWindowToggle)
         kernel.listen('application_start', self.onWindowToggle)
@@ -61,9 +61,12 @@ class Application(QtWidgets.QApplication):
             return self._widget.close()
 
         self._widget = MainWindow()
+        
+        width = int(config.get('window.width'))
+        height = int(config.get('window.height'))
+
+        self._widget.resize(width, height)
         self._widget.resizeEvent = self._onResize
-        self._widget.resize(int(config.get('window.width')),
-            int(config.get('window.height')))
         return self._widget.show()
 
 

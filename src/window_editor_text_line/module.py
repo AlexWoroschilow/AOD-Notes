@@ -14,8 +14,6 @@ import inject
 import functools
 
 from PyQt5 import QtGui
-from PyQt5 import QtWidgets
-from PyQt5 import QtCore
 
 from lib.plugin import Loader
 

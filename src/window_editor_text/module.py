@@ -25,33 +25,38 @@ class Loader(Loader):
         return True
     
     def config(self, binder=None):
-        binder.bind_to_constructor('widget.editor', self._constructor_widget_editor)
-        binder.bind_to_provider('widget.editor_provider', self._constructor_widget_editor)
+        binder.bind_to_constructor('widget.editor', self._constructor_editor)
+        binder.bind_to_provider('widget.editor_provider', self._constructor_editor)
 
     @inject.params(config='config', kernel='kernel')
-    def _constructor_widget_editor(self, parent=None, config=None, kernel=None):
+    def _constructor_editor(self, parent=None, config=None, kernel=None):
 
         widget = TextEditorWidget(parent, config)
         
-        widget.leftbar.saveAction.clicked.connect(functools.partial(
-            self.onActionSave, widget=widget
-        ))
+        event = (widget, widget.leftbar)
+        kernel.dispatch('window.notepad.leftbar', event)
+
+        event = (widget, widget.rightbar)
+        kernel.dispatch('window.notepad.rightbar', event)
+
+        event = (widget, widget.formatbar)
+        kernel.dispatch('window.notepad.formatbar', event)
+
+        action = functools.partial(self.onActionSave, widget=widget) 
+        widget.leftbar.saveAction.clicked.connect(action)
         
-        widget.leftbar.fullscreenAction.clicked.connect(functools.partial(
-            self.onActionFullScreen, widget=widget
-        ))
+        action = functools.partial(self.onActionFullScreen, widget=widget)
+        widget.leftbar.fullscreenAction.clicked.connect(action)
         
-        widget.formatbar.folderSelector.currentIndexChanged.connect(functools.partial(
-            self.onActionFolderChange, widget=widget
-        ))
+        action = functools.partial(self.onActionFolderChange, widget=widget)
+        widget.formatbar.folderSelector.currentIndexChanged.connect(action)
 
         kernel.listen('folder_update', widget.formatbar.folderSelector.onFolderUpdate, 128)
         kernel.listen('folder_remove', widget.formatbar.folderSelector.onFolderRemove, 128)
         kernel.listen('folder_new', widget.formatbar.folderSelector.onFolderNew, 128)
 
-        kernel.listen('note_update', functools.partial(
-            self.onActionNoteUpdate, current=widget
-        ), 128)
+        action = functools.partial(self.onActionNoteUpdate, current=widget) 
+        kernel.listen('note_update', action, 128)
         
         return widget
 

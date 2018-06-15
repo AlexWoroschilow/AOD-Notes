@@ -11,6 +11,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
+import functools
 from PyQt5 import QtWidgets
 
 from PyQt5.QtCore import Qt
@@ -28,11 +29,11 @@ class QCustomQWidget(QtWidgets.QWidget):
         super(QCustomQWidget, self).__init__(parent)
         self.textQVBoxLayout = QtWidgets.QVBoxLayout()
 
-        self.name = LabelTop(self)
+        self.name = LabelTop()
         self.textQVBoxLayout.addWidget(self.name)
 
-        self.textDownQLabel = LabelBottom(self)
-        self.textQVBoxLayout.addWidget(self.textDownQLabel)
+        self.date = LabelBottom(self)
+        self.textQVBoxLayout.addWidget(self.date)
 
         self.description = LabelDescription(self)
         self.textQVBoxLayout.addWidget(self.description)
@@ -56,7 +57,7 @@ class QCustomQWidget(QtWidgets.QWidget):
         
         if entity.createdAt is not None:
             datetime = entity.createdAt
-            self.textDownQLabel.setText(
+            self.date.setText(
                 datetime.strftime("%d.%m.%Y %H:%M")
             )
 
@@ -77,9 +78,6 @@ class NoteItem(QtWidgets.QListWidgetItem):
         self._widget = widget
         self.entity = entity
 
-        if kernel is not None and entity is not None and entity.id is not None:
-            kernel.listen('note_%s_update' % entity.id, self._onNoteUpdated)
-
     @property
     def widget(self):
         return self._widget
@@ -98,9 +96,6 @@ class NoteItem(QtWidgets.QListWidgetItem):
     def resizeEvent(self, event):
         self._widget.resizeEvent(event)
 
-    def _onNoteUpdated(self, event=None):
-        self.entity, widget = event.data
-
 
 class ItemList(QtWidgets.QListWidget):
 
@@ -113,21 +108,33 @@ class ItemList(QtWidgets.QListWidget):
         self.setMinimumWidth(200)
         self.setWordWrap(True)
 
-    def addLine(self, entity=None):
+    @inject.params(kernel='kernel')
+    def addLine(self, entity=None, kernel=None):
         item = NoteItem(entity, QCustomQWidget())
         item.setSizeHint(item.widget.sizeHint())
 
         self.addItem(item)
         self.setItemWidget(item, item.widget)
+        
+        kernel.listen('note_%s_update' % entity.id, functools.partial(
+            self.onActionNoteUpdate, item=item            
+        ))
+        
+    def onActionNoteUpdate(self, event, item):
+        note, parent = event.data
+        if note is None:
+            return None
 
-    def resizeEvent(self, event):
-        for i in range(0, self.count()):
-            item = self.item(i)
-            if item is None:
-                continue
-            item.resizeEvent(event)
-        super(ItemList, self).resizeEvent(event)
-
+        try:
+            item.widget.name.setText(note.name)
+            item.widget.description.setText(note.description)
+        except RuntimeError:
+            item.widget.name = LabelTop() 
+            item.widget.name.setText(note.name)
+            
+            item.widget.description = LabelDescription() 
+            item.widget.description.setText(note.description)
+            item.widget.updateGeometrie()
 
 class RecordList(QtWidgets.QSplitter):
 
