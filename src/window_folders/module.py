@@ -11,6 +11,8 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
+import functools
+
 from PyQt5 import QtWidgets
 
 from lib.plugin import Loader
@@ -22,92 +24,108 @@ class Loader(Loader):
     _search = None
     _widget = None
 
+    @inject.params(config='config')
+    def _constructor_folders(self, config=None):
+        
+        widget = FolderList()
+        
+        widget.toolbar.setVisible(bool(config.get('folders.leftbar')))
+        
+        action = functools.partial(self.onActionFolderNew, widget=widget)
+        widget.toolbar.newAction.clicked.connect(action)
+        
+        action = functools.partial(self.onActionFolderCopy, widget=widget)
+        widget.toolbar.copyAction.clicked.connect(action)
+
+        action = functools.partial(self.onActionRefresh, widget=widget)
+        widget.toolbar.refreshAction.clicked.connect(action)
+
+        action = functools.partial(self.onActionFolderRemove, widget=widget)
+        widget.toolbar.removeAction.clicked.connect(action)
+
+        action = functools.partial(self.onActionFolderOpen, widget=widget)
+        widget.list.doubleClicked.connect(action)
+        
+        widget.list.selectionChanged = functools.partial(
+            self.onActionFolderSelect, widget=widget
+        )
+        
+        return widget
+
     @property
     def enabled(self):
         return True
 
     def config(self, binder=None):
+        binder.bind_to_constructor('widget.folders', self._constructor_folders)
         binder.bind('folders', self)
 
-    @inject.params(kernel='kernel')
-    def boot(self, options=None, args=None, kernel=None):
+    @inject.params(kernel='kernel', widget='widget.folders')
+    def boot(self, options=None, args=None, kernel=None, widget=None):
         # listen for the search request from the search module
         # the request string will be given as a data object to the event
-        kernel.listen('search_request', self._onSearchRequest, 100)
-        kernel.listen('dashboard_content', self._onWindowFirstTab, 100)
-        kernel.listen('folder_new', self._onRefreshEvent, 128)
+        action = functools.partial(self.onActionSearchRequest, widget=widget)
+        kernel.listen('search_request', action, 100)
 
-    @inject.params(kernel='kernel', storage='storage', config='config')
-    def _onWindowFirstTab(self, event=None, kernel=None, storage=None, config=None):
-        
-        self._widget = FolderList()
-        self._widget.toolbar.setVisible(bool(config.get('folders.leftbar')))
-        self._widget.toolbar.newAction.clicked.connect(self._onFolderNewEvent)
-        self._widget.toolbar.copyAction.clicked.connect(self._onFolderCopyEvent)
-        self._widget.toolbar.refreshAction.clicked.connect(self._onRefreshEvent)
-        self._widget.toolbar.removeAction.clicked.connect(self._onFolderRemoveEvent)
+        action = functools.partial(self.onActionFirstTab, widget=widget)
+        kernel.listen('dashboard_content', action, 100)
 
-        self._widget.list.doubleClicked.connect(self._onFolderOpen)
-        self._widget.list.selectionChanged = self._onFolderSelected
+        action = functools.partial(self.onActionRefresh, widget=widget)
+        kernel.listen('folder_new', action, 128)
+
+    @inject.params(kernel='kernel', storage='storage')
+    def onActionFirstTab(self, event=None, kernel=None, storage=None, widget=None):
 
         self._first = None
-        self._widget.list.clear()
+        widget.list.clear()
         for folder in storage.folders():
             if self._first is None:
                 self._first = folder
-            self._widget.addLine(folder)
-        self._widget.list.setCurrentRow(0)
+            widget.addLine(folder)
+        widget.list.setCurrentRow(0)
 
         container, parent = event.data
         if container is None or parent is None:
             return None
         
-        container.addWidget(self._widget)
+        container.addWidget(widget)
 
         if self._first is None:
             return None
 
-        message = self._widget.tr('%d folders found' % self._widget.list.count())
-        kernel.dispatch('window.status', (message, 10))
+        event = (widget.tr('%d folders found' % widget.list.count()), 10)
+        kernel.dispatch('window.status', event)
 
-        kernel.dispatch('folder_select', (
-            self._first, self._search, None
-        ))
+        event = (self._first, self._search, None)
+        kernel.dispatch('folder_select', event)
         
     @property
-    def selected(self):
-        if self._widget is None:
+    @inject.params(widget='widget.folders')
+    def selected(self, widget=None):
+        if widget is None:
             return None
-        for index in self._widget.selectedIndexes():
-            item = self._widget.itemFromIndex(index)
-            if item is not None:
-                return item.folder
-        return None
+        return widget.selected
 
     @inject.params(kernel='kernel')
-    def _onFolderNewEvent(self, event=None, kernel=None):
-        kernel.dispatch('folder_new', (
-            ('New folder', 'New folder description'), self
-        ))
+    def onActionFolderNew(self, event=None, widget=None, kernel=None):
+        
+        event = (('New folder', 'New folder description'), self)
+        kernel.dispatch('folder_new', event)
 
     @inject.params(kernel='kernel')
-    def _onFolderCopyEvent(self, event=None, kernel=None):
-        for index in self._widget.list.selectedIndexes():
-            item = self._widget.list.itemFromIndex(index)
-            if item is not None and item.folder is not None:
-                kernel.dispatch('folder_new', (
-                    (item.folder.name, 'New folder description'), self
-                ))
+    def onActionFolderCopy(self, event=None, widget=None, kernel=None):
+        event = ((self.selected.name, 'New folder description'), self)
+        kernel.dispatch('folder_new', event)
 
     @inject.params(kernel='kernel')
-    def _onFolderRemoveEvent(self, event=None, kernel=None):
-        message = self._widget.tr("Are you sure you want to remove this Folder?")
-        reply = QtWidgets.QMessageBox.question(self._widget, 'Remove folder', message, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
+    def onActionFolderRemove(self, event=None, widget=None, kernel=None):
+        message = widget.tr("Are you sure you want to remove this Folder?")
+        reply = QtWidgets.QMessageBox.question(widget, 'Remove folder', message, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
         if reply == QtWidgets.QMessageBox.No:
             return None
 
-        for index in self._widget.selectedIndexes():
-            item = self._widget.itemFromIndex(index)
+        for index in widget.selectedIndexes():
+            item = widget.itemFromIndex(index)
             if item is None and item.folder is None:
                 continue
 
@@ -115,61 +133,49 @@ class Loader(Loader):
             if folder is None:
                 continue
 
-            kernel.dispatch('window.notepad.folder_%s_remove' % folder.id, (folder, self))
-            kernel.dispatch('folder_remove', (folder, self))
+            event = (folder, self)
+            if folder.id is not None and folder.id:
+                kernel.dispatch('folder_%s_remove' % folder.id, event)
+            kernel.dispatch('folder_remove', event)
 
-            self._widget.takeItem(index)
+            widget.takeItem(index)
             
-        message = self._widget.tr('%d folders found' % self._widget.list.count())
-        kernel.dispatch('window.status', (message, None))
+        event = (widget.tr('%d folders found' % widget.list.count()), None)
+        kernel.dispatch('window.status', event)
 
     @inject.params(kernel='kernel', storage='storage')
-    def _onRefreshEvent(self, event=None, kernel=None, storage=None):
-        current = self._widget.list.currentIndex()
+    def onActionRefresh(self, event=None, kernel=None, storage=None, widget=None):
+        current = widget.list.currentIndex()
         
-        self._widget.list.clear()
+        widget.list.clear()
         for entity in storage.folders():
-            self._widget.addLine(entity)
+            widget.addLine(entity)
 
-        if self._widget.list.item(current.row()) not in [0]:
-            self._widget.list.setCurrentIndex(current)
+        if widget.list.item(current.row()) not in [0]:
+            widget.list.setCurrentIndex(current)
 
-        message = self._widget.tr('%d folders found' % self._widget.list.count())
-        kernel.dispatch('window.status', (message, None))
-
-    @inject.params(kernel='kernel')
-    def _onFolderOpen(self, event=None, selection=None, kernel=None):
-        for index in self._widget.selectedIndexes():
-            item = self._widget.itemFromIndex(index)
-            if item is None or item.folder is None:
-                continue
-
-            self._first = item.folder
-            kernel.dispatch('folder_open', (
-                self._first, self._search
-            ))
+        event = (widget.tr('%d folders found' % widget.list.count()), None)
+        kernel.dispatch('window.status', event)
 
     @inject.params(kernel='kernel')
-    def _onFolderSelected(self, event=None, selection=None, kernel=None):
-        for index in self._widget.selectedIndexes():
-            item = self._widget.itemFromIndex(index)
-            if item is None or item.folder is None:
-                continue
+    def onActionFolderOpen(self, event=None, selection=None, widget=None, kernel=None):
+        event = (self.selected, self._search)
+        kernel.dispatch('folder_open', event)
 
-            self._first = item.folder
-            kernel.dispatch('folder_select', (
-                self._first, self._search, None
-            ))
+    @inject.params(kernel='kernel')
+    def onActionFolderSelect(self, event=None, selection=None, widget=None, kernel=None):
+        event = (self.selected, self._search, None)
+        kernel.dispatch('folder_select', event)
 
     @inject.params(kernel='kernel', storage='storage')
-    def _onSearchRequest(self, event=None, kernel=None, storage=None):
+    def onActionSearchRequest(self, event=None, kernel=None, storage=None, widget=None):
         self._search = event.data
         if self._search is None:
             return None
 
         self._first = None
-        self._widget.list.clear()
+        widget.list.clear()
         for entity in storage.folders(string=self._search):
             if self._first is None:
                 self._first = entity
-            self._widget.addLine(entity)
+            widget.addLine(entity)

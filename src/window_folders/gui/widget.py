@@ -33,6 +33,15 @@ class FolderList(QtWidgets.QSplitter):
         self.setCollapsible(0, True)
         self.setCollapsible(1, False)
 
+    @property
+    def selected(self):
+        for index in self.selectedIndexes():
+            item = self.itemFromIndex(index)
+            if item is None:
+                return None
+            return item.folder
+        return None
+
     def addLine(self, folder=None):
         self.list.addLine(folder)
 

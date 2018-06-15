@@ -13,6 +13,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
+import functools 
 
 abspath = os.path.abspath(__file__)
 os.chdir(os.path.dirname(abspath))
@@ -38,10 +39,8 @@ class Application(QtWidgets.QApplication):
 
     @inject.params(config='config')
     def _onResize(self, event, config=None):
-        width = event.size().width()
-        height = event.size().height()
-        config.set('window.width', '%s' % width)
-        config.set('window.height', '%s' % height)
+        config.set('window.width', '%s' % event.size().width())
+        config.set('window.height', '%s' % event.size().height())
         return super(MainWindow, self._widget).resizeEvent(event)
 
     @inject.params(kernel='kernel')

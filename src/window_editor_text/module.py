@@ -105,7 +105,8 @@ class Loader(Loader):
     def onActionFolderChange(self, event=None, widget=None, kernel=None):
         if widget is None:
             return None
-        
+        if widget.note is None:
+            return None
         cache = widget.note.folder
         folder = widget.folder
         

@@ -38,7 +38,7 @@ class WindowHeader(QtWidgets.QWidget):
         toolbar.setFloatable(False)
         toolbar.setMovable(False)
 
-        dispatcher.dispatch('window.header.content', (
+        dispatcher.dispatch('header_content', (
             toolbar, self
         ))
 
