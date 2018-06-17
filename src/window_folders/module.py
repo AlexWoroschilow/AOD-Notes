@@ -17,6 +17,7 @@ from PyQt5 import QtWidgets
 
 from lib.plugin import Loader
 from .gui.widget import FolderList
+from .gui.text import TextEditor
 
 
 class Loader(Loader):
@@ -45,7 +46,11 @@ class Loader(Loader):
 
         action = functools.partial(self.onActionFolderOpen, widget=widget)
         widget.list.doubleClicked.connect(action)
-        
+
+        widget.tags.mouseDoubleClickEvent = functools.partial(
+            self.onActionTagSelect, widget=widget.tags
+        )
+
         widget.list.selectionChanged = functools.partial(
             self.onActionFolderSelect, widget=widget
         )
@@ -179,3 +184,13 @@ class Loader(Loader):
             if self._first is None:
                 self._first = entity
             widget.addLine(entity)
+
+    @inject.params(kernel='kernel', widget_search='widget.search')
+    def onActionTagSelect(self, event, widget=None, kernel=None, widget_search=None):
+        super(TextEditor, widget).mouseDoubleClickEvent(event)
+        cursor = widget.textCursor()
+        if cursor is None:
+            return None
+        widget_search.setText(cursor.selectedText())
+        kernel.dispatch('search_request', widget_search.text())
+        

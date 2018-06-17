@@ -15,6 +15,7 @@ from PyQt5 import QtWidgets
 from .bar import ToolbarbarWidget
 from .list import ItemList
 
+from .text import TextEditor
 
 class FolderList(QtWidgets.QSplitter):
 
@@ -28,7 +29,19 @@ class FolderList(QtWidgets.QSplitter):
 
         self.list = ItemList()
         self.list.setMinimumWidth(180)
-        self.addWidget(self.list)
+
+        containerLayout = QtWidgets.QVBoxLayout()
+        containerLayout.setContentsMargins(0, 0, 0, 0)
+        containerLayout.addWidget(self.list)
+        
+        self.tags = TextEditor() 
+        containerLayout.addWidget(self.tags)
+
+        container = QtWidgets.QWidget()
+        container.setContentsMargins(0, 0, 0, 0)
+        container.setLayout(containerLayout)
+        
+        self.addWidget(container)
         
         self.setCollapsible(0, True)
         self.setCollapsible(1, False)

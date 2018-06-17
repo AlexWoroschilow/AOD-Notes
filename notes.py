@@ -38,11 +38,11 @@ class Application(QtWidgets.QApplication):
     def exec_(self, kernel=None, widget=None):
         
         kernel.listen('window_exit', self.exit)
-        action = functools.partial(self.onWindowToggle, widget=widget)
         
+        action = functools.partial(self.onWindowToggle, widget=widget)
         kernel.listen('window_toggle', action)
-        action = functools.partial(self.onWindowToggle, widget=widget)
         
+        action = functools.partial(self.onWindowToggle, widget=widget)
         kernel.listen('window_start', action)
         
         kernel.dispatch('window_start')

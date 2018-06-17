@@ -1,16 +1,7 @@
-QTabBar::close-button {
-    image: url(icons/close.svg);
-    subcontrol-position: right;
-}
-
-QComboBox#folderBomboBox {
-	background-color: #ffffff;
-}
-
-QToolBar { 
-	border: none;
-	background-color: #f1f2f3; 
-}
+QTabBar::close-button { image: url(icons/close.svg); subcontrol-position: right; }
+QComboBox#folderBomboBox { background-color: #ffffff; }
+QTextEdit#tagsTextEditor { background-color: #414649; color: #A0A0A0; }
+QToolBar {  border: none; background-color: #f1f2f3; }
 QTabWidget::pane {
 	border-top: 5px solid qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #f1f2f3, stop: 1.0 #414649);
 	border-bottom: 5px solid qlineargradient(x1: 0, y1: 1, x2: 0, y2: 0, stop: 0 #f1f2f3, stop: 1.0 #414649);
@@ -34,15 +25,8 @@ QListWidget {
 }
 
 
-QListWidget::item:hover,
-QListWidget::item:selected { 
-	border-bottom: 1px dotted #c1c2c3;
-}
-
-QListWidget#foldersList { 
-	border: none; background: #414649;
- 	border-right: 2px solid qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #414649, stop: 1.0 #313639);
-}
+QListWidget::item:hover, QListWidget::item:selected { border-bottom: 1px dotted #c1c2c3; }
+QListWidget#foldersList {  border: none; background: #414649; border-right: 2px solid qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #414649, stop: 1.0 #313639); }
 QListWidget#foldersList::item:hover,
 QListWidget#foldersList::item:selected  { 
 	border-bottom: 1px dotted #A0A0A0;
@@ -60,6 +44,8 @@ QLabel#folderLabelBottom { color: #A0A0A0; font-size: 10px }
 QLabel#notesLabelTop { color: #414649; font-size: 12px }
 QLabel#notesLabelBottom { color: #A0A0A0; font-size: 10px }
 QPlainTextEdit#notesLabelDescription { color: #A0A0A0; font-size: 10px; background-color: #f1f2f3; border: none; }
+
+
 
 
 QSplitter#editorWidget { border: none; background-color: #fff; }
