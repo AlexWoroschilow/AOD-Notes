@@ -13,7 +13,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
-import functools 
+import functools
 
 abspath = os.path.abspath(__file__)
 os.chdir(os.path.dirname(abspath))
@@ -26,47 +26,33 @@ import optparse
 from PyQt5 import QtWidgets
 
 from lib.kernel import Kernel
-from lib.widget.window import MainWindow
 
 
 class Application(QtWidgets.QApplication):
-    _widget = None
-    _kernel = None
 
     def __init__(self, options=None, args=None):
         QtWidgets.QApplication.__init__(self, sys.argv)
         self._kernel = Kernel(options, args)
 
-    @inject.params(config='config')
-    def _onResize(self, event, config=None):
-        config.set('window.width', '%s' % event.size().width())
-        config.set('window.height', '%s' % event.size().height())
-        return super(MainWindow, self._widget).resizeEvent(event)
-
-    @inject.params(kernel='kernel')
-    def exec_(self, kernel=None):
+    @inject.params(kernel='kernel', widget='window')
+    def exec_(self, kernel=None, widget=None):
         
-        kernel.listen('window.toggle', self.onWindowToggle)
-        kernel.listen('application_start', self.onWindowToggle)
-        kernel.listen('window.exit', self.exit)
+        kernel.listen('window_exit', self.exit)
+        action = functools.partial(self.onWindowToggle, widget=widget)
         
-        kernel.dispatch('application_start')
+        kernel.listen('window_toggle', action)
+        action = functools.partial(self.onWindowToggle, widget=widget)
+        
+        kernel.listen('window_start', action)
+        
+        kernel.dispatch('window_start')
 
         return super(Application, self).exec_()
     
-    @inject.params(config='config')
-    def onWindowToggle(self, event=None, config=None):
-        if self._widget is not None:
-            return self._widget.close()
-
-        self._widget = MainWindow()
-        
-        width = int(config.get('window.width'))
-        height = int(config.get('window.height'))
-
-        self._widget.resize(width, height)
-        self._widget.resizeEvent = self._onResize
-        return self._widget.show()
+    def onWindowToggle(self, event=None, widget=None):
+        if widget.isVisible():
+            return widget.close()
+        return widget.show()
 
 
 if __name__ == "__main__":

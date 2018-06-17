@@ -94,7 +94,7 @@ class Loader(Loader):
             return None
 
         event = (widget.tr('%d folders found' % widget.list.count()), 10)
-        kernel.dispatch('window.status', event)
+        kernel.dispatch('window_status', event)
 
         event = (self._first, self._search, None)
         kernel.dispatch('folder_select', event)
@@ -141,7 +141,7 @@ class Loader(Loader):
             widget.takeItem(index)
             
         event = (widget.tr('%d folders found' % widget.list.count()), None)
-        kernel.dispatch('window.status', event)
+        kernel.dispatch('window_status', event)
 
     @inject.params(kernel='kernel', storage='storage')
     def onActionRefresh(self, event=None, kernel=None, storage=None, widget=None):
@@ -155,7 +155,7 @@ class Loader(Loader):
             widget.list.setCurrentIndex(current)
 
         event = (widget.tr('%d folders found' % widget.list.count()), None)
-        kernel.dispatch('window.status', event)
+        kernel.dispatch('window_status', event)
 
     @inject.params(kernel='kernel')
     def onActionFolderOpen(self, event=None, selection=None, widget=None, kernel=None):

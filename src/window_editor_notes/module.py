@@ -179,7 +179,7 @@ class Loader(Loader):
                 message, widget.folder.name
             ))
          
-        kernel.dispatch('window.status', (message, 10))
+        kernel.dispatch('window_status', (message, 10))
 
     @inject.params(widget='widget.notes')
     def onWindowDashboard(self, event=None, widget=None):
@@ -205,13 +205,13 @@ class Loader(Loader):
         count = widget.list.count()
         if widget.folder is None:
             event = (widget.tr('%d records found' % count), 10)
-            return kernel.dispatch('window.status', event)
+            return kernel.dispatch('window_status', event)
 
         event = (widget.tr('%s in the folder "%s"' % (
             widget.tr('%d records found' % count), widget.folder.name
         )), 10)
         
-        return kernel.dispatch('window.status', event)
+        return kernel.dispatch('window_status', event)
 
     @inject.params(kernel='kernel', storage='storage', editor='widget.notes_provider')
     def onNotepadFolderOpen(self, event=None, kernel=None, storage=None, editor=None):

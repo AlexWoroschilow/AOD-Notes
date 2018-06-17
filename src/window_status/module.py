@@ -11,7 +11,8 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
-import threading
+import functools
+
 from PyQt5 import QtWidgets
 
 from lib.plugin import Loader
@@ -19,27 +20,26 @@ from lib.plugin import Loader
 
 class Loader(Loader):
 
+    @inject.params(kernel='kernel')
+    def _constructor_statusbar(self, kernel=None):
+
+        widget = QtWidgets.QLabel()
+        
+        kernel.listen('window_status', functools.partial(
+            self.onActionStatus, widget=widget
+        ))
+        
+        return widget
+        
     @property
     def enabled(self):
         return True
 
-    @inject.params(kernel='kernel')
-    def boot(self, options=None, args=None, kernel=None):
-        kernel.listen('window.statusbar', self._onWindowStatusBar)
-        kernel.listen('window.status', self._onWindowStatus)
+    def config(self, binder=None):
+        binder.bind_to_constructor('widget.statusbar', self._constructor_statusbar)
 
-    def _onWindowStatusBar(self, event):
-        self._widget = QtWidgets.QLabel()
-        statusbar, window = event.data
-
-        spacer = QtWidgets.QWidget();
-        spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred);
-        statusbar.addWidget(spacer);
-
-        statusbar.addWidget(self._widget);
-
-    def _onWindowStatus(self, event):
+    def onActionStatus(self, event, widget=None):
         message, timeout = event.data
-        if self._widget is None:
-            return None
-        self._widget.setText(message)
+        print(message, timeout)
+        if widget is not None:
+            widget.setText(message)
