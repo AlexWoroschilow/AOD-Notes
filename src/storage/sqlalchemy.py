@@ -115,9 +115,9 @@ class SQLAlechemyStorage(object):
         if string is not None:
             return query.filter(
                 Folder.name.like('%%%s%%' % string)
-            ).all()
+            ).order_by(Folder.name.asc()).all()
         
-        return query.all()
+        return query.order_by(Folder.name.asc()).all()
 
     def notes(self, folder=None, string=None):
         
@@ -132,7 +132,7 @@ class SQLAlechemyStorage(object):
             return query.filter(or_(
                 Note.name.like('%%%s%%' % string),
                 Note.text.like('%%%s%%' % string)
-            )).all()
+            )).order_by(Note.name.asc()).all()
 
         if folder is not None and string is not None:
             return query.filter(
@@ -141,7 +141,7 @@ class SQLAlechemyStorage(object):
                     Note.name.like('%%%s%%' % string),
                     Note.text.like('%%%s%%' % string)
                 )
-            ).all()
+            ).order_by(Note.name.asc()).all()
         
         return query.all()
 

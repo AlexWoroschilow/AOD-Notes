@@ -189,6 +189,7 @@ class TextEditorWidget(QtWidgets.QWidget):
                 popup.show()
             else:
                 cursor = self._text.text.textCursor()
+                image = image.scaled(800, 600, Qt.KeepAspectRatio)
                 cursor.insertImage(image, filename)
 
     def fontColorChanged(self):
