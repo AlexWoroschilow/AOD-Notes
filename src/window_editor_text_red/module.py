@@ -45,6 +45,5 @@ class Loader(Loader):
         widget.toolbar.addWidget(widget)
 
     def _onButtonPressed(self, event=None, widget=None):
-        if widget.editor is not None and widget.editor.text is not None:
-            color = QtGui.QColor.fromRgb(127, 0, 0)
-            widget.editor.text.setTextColor(color)
+        if widget is not None and widget.editor is not None:
+            widget.editor.setTextColor(QtGui.QColor.fromRgb(127, 0, 0))

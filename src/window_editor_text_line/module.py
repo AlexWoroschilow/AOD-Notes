@@ -46,5 +46,5 @@ class Loader(Loader):
         widget.toolbar.addWidget(widget)
 
     def _onButtonPressed(self, event=None, widget=None):
-        if widget.editor is not None and widget.editor.text is not None:
-            widget.editor.text.setFontPointSize(20)
+        if widget is not None and widget.editor is not None:
+            widget.editor.setFontPointSize(20)

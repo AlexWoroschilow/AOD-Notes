@@ -192,9 +192,20 @@ class TextEditorWidget(QtWidgets.QWidget):
                 image = image.scaled(800, 600, Qt.KeepAspectRatio)
                 cursor.insertImage(image, filename)
 
+    def insertHtml(self, html=None):
+        if self._text is not None and html is not None:
+            self._text.text.insertHtml(html)
+
+    def setTextColor(self, color=None):
+        if self._text is not None and color is not None:
+            self._text.text.setTextColor(color)
+
+    def setFontPointSize(self, size=None):
+        if self._text is not None and size is not None:
+            self._text.text.setFontPointSize(size)
+
     def fontColorChanged(self):
-        color = QtWidgets.QColorDialog.getColor()
-        self._text.text.setTextColor(color)
+        self.setTextColor(QtWidgets.QColorDialog.getColor())
 
     def highlight(self):
         color = QtWidgets.QColorDialog.getColor()
