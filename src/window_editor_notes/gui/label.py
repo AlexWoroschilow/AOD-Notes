@@ -11,16 +11,14 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 from PyQt5 import QtWidgets
-from PyQt5 import QtGui
-from PyQt5.QtCore import Qt
 
 
 class LabelTop(QtWidgets.QLabel):
 
     def __init__(self, parent=None):
         super(LabelTop, self).__init__(parent)
-        self.setWordWrap(QtGui.QTextOption.WrapAnywhere)
         self.setObjectName('notesLabelTop')
+        self.setMaximumHeight(50)
         self.setWordWrap(True)
 
 
@@ -29,22 +27,18 @@ class LabelBottom(QtWidgets.QLabel):
     def __init__(self, parent=None):
         super(LabelBottom, self).__init__(parent)
         self.setObjectName('notesLabelBottom')
-        self.setWordWrap(True)
+        self.setMaximumHeight(20)
 
 
-class LabelDescription(QtWidgets.QPlainTextEdit):
+class LabelDescription(QtWidgets.QLabel):
 
     def __init__(self, parent=None):
         super(LabelDescription, self).__init__(parent)
         self.setObjectName('notesLabelDescription')
-        self.setLineWrapMode(QtWidgets.QPlainTextEdit.WidgetWidth)
-        self.setWordWrapMode(QtGui.QTextOption.WrapAnywhere)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setMaximumWidth(100)
         self.setMaximumHeight(80)
-
-        self.setReadOnly(True)
+        self.setWordWrap(True)
         
     def setText(self, text=None):
-        super(LabelDescription, self).setPlainText(text)
+        super(LabelDescription, self).setText(text)
         
