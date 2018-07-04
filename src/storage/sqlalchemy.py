@@ -11,7 +11,6 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import json
-import base64
 
 from sqlalchemy import Column 
 from sqlalchemy import String
@@ -47,15 +46,29 @@ class Folder(Base):
             return True
         return self.id != entity.id
 
+    def toDict(self):
+        return {
+            'name': self.name,
+            'unique': self.id,
+            'total': self.total
+        }
+
+    def toJson(self):
+        return json.dumps(
+            self.toDict()
+        )
+
 
 class Note(Base):
     __tablename__ = 'Note'
     id = Column(Integer, primary_key=True)
     name = Column(String)
+    unique = Column(String)
     createdAt = Column(DateTime)
     text = Column(String)
     description = Column(String)
     tags = Column(String)
+    version = Column(Integer)
     folderId = Column(Integer, ForeignKey('Folder.id'))
     
     folder = relationship("Folder", backref="Note")
@@ -69,13 +82,23 @@ class Note(Base):
         if entity is None:
             return True
         return self.id != entity.id
+
+    def toDict(self):
+        return {
+            'name': self.name,
+            'folder': self.folder.toDict(),
+            'description': self.description,
+            'unique': self.unique,
+            'version': self.version,
+            'text': self.text,
+            'tags': self.tags,
+        }
     
     def toJson(self):
-        return json.dumps({
-            'name': self.name,
-            'description': self.description,
-            'text': self.text,
-        })
+        return json.dumps(
+            self.toDict()
+        )
+
 
 class SQLAlechemyStorage(object):
     _engine = None
@@ -98,6 +121,9 @@ class SQLAlechemyStorage(object):
             autocommit=False, autoflush=False, bind=engine
         ))
         return self._session
+
+    def synchronise(self, object=None):
+        print(object)
 
     def create(self, entity=None):
         session = self._session_create(self._engine)

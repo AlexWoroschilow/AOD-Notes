@@ -12,8 +12,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
 import inject
-from datetime import datetime
 import textwrap
+import time
+import random 
+import string 
+
+from datetime import datetime
 from bs4 import BeautifulSoup
 
 from lib.plugin import Loader
@@ -84,7 +88,12 @@ class Loader(Loader):
             return None
         name, text, folder = event.data
 
-        entity = Note(name=name, text=text, folder=folder, createdAt=datetime.now())
+        entity = Note(
+            name=name, text=text, folder=folder,
+            createdAt=datetime.now(), version=int(time.time()),
+            unique=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(32))
+        )
+        
         event.data = storage.create(entity)
         
         if folder is None or kernel is None:
@@ -103,6 +112,9 @@ class Loader(Loader):
         if entity.description is not None and len(entity.description):
             text = entity.description.replace('\r', ' ').replace('\n', ' ')
             entity.description = '%s...' % textwrap.fill(text[0:200], 80)
+
+        entity.version = int(time.time())
+
         storage.update(entity)
 
         folder = entity.folder 

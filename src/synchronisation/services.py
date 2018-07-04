@@ -10,20 +10,58 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import os
 import json
-import base64
-import time
+import inject       
+
+from watchdog.events import FileSystemEventHandler
 
 
-class SynchronisationService(object):
+class SynchronisationService(FileSystemEventHandler):
 
     def __init__(self, destination=None):
         self._destination = destination
 
+    @property
+    def destination(self):
+        return self._destination
+
+    @inject.params(storage='storage')
+    def synchronise(self, path=None, storage=None):
+        with open(path, 'r') as stream:
+            
+            storage.synchronise(
+                json.loads(stream.read())                
+            )
+            
+            stream.close()
+
     def dump(self, unique, json):
-        timestamp = int(time.time())
-        with open('%s/%s.v%i' % (self._destination, unique, timestamp), 'w') as dump:
+        
+        self._file_last = '%s/%s' % (
+            self._destination, unique
+        )
+        
+        with open(self._file_last, 'w') as dump:
             dump.write(json)
-            dump.close
-        print(json)
+            dump.close()
+
+    def on_moved(self, event):
+        super(SynchronisationService, self).on_moved(event)
+
+    def on_created(self, event):
+        super(SynchronisationService, self).on_created(event)
+
+    def on_deleted(self, event):
+        super(SynchronisationService, self).on_deleted(event)
+        # if self._file_last == event.src_path:
+            # return None 
+        if not event.is_directory:
+            self.synchronise(event.src_path)
+
+    def on_modified(self, event):
+        super(SynchronisationService, self).on_modified(event)
+        # if self._file_last == event.src_path:
+            # return None 
+        if not event.is_directory:
+            self.synchronise(event.src_path)
+

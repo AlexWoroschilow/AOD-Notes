@@ -14,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
 import functools
+import time
 
 abspath = os.path.abspath(__file__)
 os.chdir(os.path.dirname(abspath))
@@ -24,6 +25,7 @@ import logging
 import optparse
 
 from PyQt5 import QtWidgets
+from PyQt5 import QtCore
 
 from lib.kernel import Kernel
 
@@ -55,6 +57,33 @@ class Application(QtWidgets.QApplication):
         return widget.show()
 
 
+class ApplicationThread(QtCore.QThread):
+
+    exit = QtCore.pyqtSignal(object)
+
+    def __init__(self, args=None, source=None):
+        super(ApplicationThread, self).__init__()
+        self._source = source
+        self._args = args
+
+    @inject.params(synchronisation='synchronisation')
+    def run(self, synchronisation=None):
+
+        from watchdog.observers import Observer
+        
+        observer = Observer()
+        observer.schedule(synchronisation, synchronisation.destination, recursive=True)
+        observer.start()
+
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            observer.stop()
+
+        observer.join()
+
+
 if __name__ == "__main__":
     parser = optparse.OptionParser()
     
@@ -68,4 +97,9 @@ if __name__ == "__main__":
     logging.basicConfig(level=options.loglevel, format=log_format)
 
     application = Application(options, args)
+
+    application_thread = ApplicationThread(args, '')
+    application_thread.exit.connect(sys.exit)
+    application_thread.start()
+
     sys.exit(application.exec_())

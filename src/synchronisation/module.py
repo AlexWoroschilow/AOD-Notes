@@ -44,16 +44,16 @@ class Loader(Loader):
 
     @inject.params(storage='synchronisation', kernel='kernel', logger='logger')
     def _onNoteNew(self, event=None, storage=None, kernel=None, logger=None):
-        note, widget = event.data
-        storage.dump(note.id, note.toJson())
+        note = event.data
+        storage.dump(note.unique, note.toJson())
 
     @inject.params(storage='synchronisation', kernel='kernel', logger='logger')
     def _onNoteUpdate(self, event=None, storage=None, kernel=None, logger=None):
         note, widget = event.data
-        storage.dump(note.id, note.toJson())
+        storage.dump(note.unique, note.toJson())
 
     @inject.params(storage='synchronisation', kernel='kernel', logger='logger')
     def _onNoteRemove(self, event=None, storage=None, kernel=None, logger=None):
-        note, widget = event.data
-        storage.dump(note.id, note.toJson())
+        note = event.data
+        storage.dump(note.unique, note.toJson())
 
