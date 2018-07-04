@@ -16,7 +16,6 @@ import functools
 from PyQt5 import QtGui
 
 from lib.plugin import Loader
-
 from lib.widget.button import ToolBarButton
 
 
@@ -28,16 +27,16 @@ class Loader(Loader):
 
     @inject.params(kernel='kernel')
     def boot(self, options=None, args=None, kernel=None):
-        kernel.listen('window.notepad.rightbar', self._onWindowNotepadToolbar, 0)
+        kernel.listen('window.notepad.formatbar', self._onWindowNotepadToolbar, 110)
 
     def _onWindowNotepadToolbar(self, event=None):
         widget = ToolBarButton()
         widget.editor, widget.toolbar = event.data
         if widget.editor is None or widget.toolbar is None:
             raise 'Editor or Toolbar object can not be empty'
-
-        widget.setIcon(QtGui.QIcon("icons/h1.svg"))
-        widget.setToolTip(widget.tr('Add a header 1'))
+        
+        widget.setIcon(QtGui.QIcon("icons/line.svg"))
+        widget.setToolTip(widget.tr('Add a line'))
         
         widget.clicked.connect(functools.partial(
             self._onButtonPressed, widget=widget
@@ -47,4 +46,4 @@ class Loader(Loader):
 
     def _onButtonPressed(self, event=None, widget=None):
         if widget is not None and widget.editor is not None:
-            widget.editor.setFontPointSize(20)
+            widget.editor.insertHtml('<hr>< /hr>')
