@@ -42,8 +42,8 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.leftbar = ToolbarWidgetLeft()
         self.leftbar.setVisible(bool(config.get('editor.leftbar')))
         
-        self.leftbar.printAction.clicked.connect(self.printHandler)
-        self.leftbar.previewAction.clicked.connect(self.preview)
+        self.leftbar.printAction.clicked.connect(self.onActionPrint)
+        self.leftbar.previewAction.clicked.connect(self.onActionPreview)
         self.leftbar.cutAction.clicked.connect(self._text.text.cut)
         self.leftbar.copyAction.clicked.connect(self._text.text.copy)
         self.leftbar.pasteAction.clicked.connect(self._text.text.paste)
@@ -53,24 +53,26 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.formatbar = FormatbarWidget()
         self.formatbar.setVisible(bool(config.get('editor.formatbar')))
         self.formatbar.fontSize.valueChanged.connect(lambda size: self._text.text.setFontPointSize(size))
-        self.formatbar.bulletAction.clicked.connect(self.bulletList)
-        self.formatbar.numberedAction.clicked.connect(self.numberList)
-        self.formatbar.alignLeft.clicked.connect(self.alignLeft)
-        self.formatbar.alignCenter.clicked.connect(self.alignCenter)
-        self.formatbar.alignRight.clicked.connect(self.alignRight)
-        self.formatbar.alignJustify.clicked.connect(self.alignJustify)
-        self.formatbar.indentAction.clicked.connect(self.indent)
-        self.formatbar.dedentAction.clicked.connect(self.dedent)
-        self.formatbar.imageAction.clicked.connect(self.insertImage)
+        self.formatbar.bulletAction.clicked.connect(self.onActionBulletList)
+        self.formatbar.numberedAction.clicked.connect(self.onActionNumberList)
+        self.formatbar.alignLeft.clicked.connect(self.onActionAlignLeft)
+        self.formatbar.alignCenter.clicked.connect(self.onActionAlignCenter)
+        self.formatbar.alignRight.clicked.connect(self.onActionAlignRight)
+        self.formatbar.alignJustify.clicked.connect(self.onActionAlignJustify)
+        self.formatbar.indentAction.clicked.connect(self.onActionIndent)
+        self.formatbar.dedentAction.clicked.connect(self.onActionDedent)
+        self.formatbar.imageAction.clicked.connect(self.onActionInsertImage)
 
         self.rightbar = ToolBarWidgetRight()
         self.rightbar.setVisible(bool(config.get('editor.rightbar')))
-        self.rightbar.italicAction.clicked.connect(self.italic)
-        self.rightbar.boldAction.clicked.connect(self.bold)
-        self.rightbar.strikeAction.clicked.connect(self.strike)
-        self.rightbar.superAction.clicked.connect(self.superScript)
-        self.rightbar.subAction.clicked.connect(self.subScript)
-        self.rightbar.backColor.clicked.connect(self.highlight)
+        self.rightbar.italicAction.clicked.connect(self.onActionItalic)
+        self.rightbar.superAction.clicked.connect(self.onActionSuperScript)
+        self.rightbar.strikeAction.clicked.connect(self.onActionStrike)
+        self.rightbar.fontColor.clicked.connect(self.onActionFontColor)
+        self.rightbar.backColor.clicked.connect(self.onActionHighlight)
+        self.rightbar.subAction.clicked.connect(self.onActionSubScript)
+        self.rightbar.boldAction.clicked.connect(self.onActionBold)
+        
 
         layout = QtWidgets.QGridLayout()
         layout.setContentsMargins(0, 10, 0, 0)
@@ -157,25 +159,17 @@ class TextEditorWidget(QtWidgets.QWidget):
         col = cursor.columnNumber()
         self.statusbar.setText("Line: {}, Column: {}".format(line, col))
 
-    def toggleToolbar(self):
-        state = self.leftbar.isVisible()
-        self.leftbar.setVisible(not state)
-
-    def toggleFormatbar(self):
-        state = self.formatbar.isVisible()
-        self.formatbar.setVisible(not state)
-
-    def preview(self):
+    def onActionPreview(self):
         preview = QtPrintSupport.QPrintPreviewDialog()
         preview.paintRequested.connect(lambda p: self._text.text.print_(p))
         preview.exec_()
 
-    def printHandler(self):
+    def onActionPrint(self):
         dialog = QtPrintSupport.QPrintDialog()
         if dialog.exec_() == QtWidgets.QDialog.Accepted:
             self._text.text.document().print_(dialog.printer())
 
-    def insertImage(self):
+    def onActionInsertImage(self):
         filename = \
         QtWidgets.QFileDialog.getOpenFileName(self, 'Insert image', ".", "Images (*.png *.xpm *.jpg *.bmp *.gif)")[0]
         if filename:
@@ -204,33 +198,33 @@ class TextEditorWidget(QtWidgets.QWidget):
         if self._text is not None and size is not None:
             self._text.text.setFontPointSize(size)
 
-    def fontColorChanged(self):
+    def onActionFontColor(self):
         self.setTextColor(QtWidgets.QColorDialog.getColor())
 
-    def highlight(self):
+    def onActionHighlight(self):
         color = QtWidgets.QColorDialog.getColor()
         self._text.text.setTextBackgroundColor(color)
 
-    def bold(self):
+    def onActionBold(self):
         if self._text.text.fontWeight() == QtGui.QFont.Bold:
             self._text.text.setFontWeight(QtGui.QFont.Normal)
         else:
             self._text.text.setFontWeight(QtGui.QFont.Bold)
 
-    def italic(self):
+    def onActionItalic(self):
         state = self._text.text.fontItalic()
         self._text.text.setFontItalic(not state)
 
-    def underline(self):
+    def onActionUnderline(self):
         state = self._text.text.fontUnderline()
         self._text.text.setFontUnderline(not state)
 
-    def strike(self):
+    def onActionStrike(self):
         fmt = self._text.text.currentCharFormat()
         fmt.setFontStrikeOut(not fmt.fontStrikeOut())
         self._text.text.setCurrentCharFormat(fmt)
 
-    def superScript(self):
+    def onActionSuperScript(self):
         fmt = self._text.text.currentCharFormat()
         align = fmt.verticalAlignment()
         if align == QtGui.QTextCharFormat.AlignNormal:
@@ -239,7 +233,7 @@ class TextEditorWidget(QtWidgets.QWidget):
             fmt.setVerticalAlignment(QtGui.QTextCharFormat.AlignNormal)
         self._text.text.setCurrentCharFormat(fmt)
 
-    def subScript(self):
+    def onActionSubScript(self):
         fmt = self._text.text.currentCharFormat()
         align = fmt.verticalAlignment()
         if align == QtGui.QTextCharFormat.AlignNormal:
@@ -248,19 +242,19 @@ class TextEditorWidget(QtWidgets.QWidget):
             fmt.setVerticalAlignment(QtGui.QTextCharFormat.AlignNormal)
         self._text.text.setCurrentCharFormat(fmt)
 
-    def alignLeft(self):
+    def onActionAlignLeft(self):
         self._text.text.setAlignment(Qt.AlignLeft)
 
-    def alignRight(self):
+    def onActionAlignRight(self):
         self._text.text.setAlignment(Qt.AlignRight)
 
-    def alignCenter(self):
+    def onActionAlignCenter(self):
         self._text.text.setAlignment(Qt.AlignCenter)
 
-    def alignJustify(self):
+    def onActionAlignJustify(self):
         self._text.text.setAlignment(Qt.AlignJustify)
 
-    def indent(self):
+    def onActionIndent(self):
         cursor = self._text.text.textCursor()
         if cursor.hasSelection():
             temp = cursor.blockNumber()
@@ -285,7 +279,7 @@ class TextEditorWidget(QtWidgets.QWidget):
                     break
                 cursor.deleteChar()
 
-    def dedent(self):
+    def onActionDedent(self):
         cursor = self._text.text.textCursor()
         if cursor.hasSelection():
             temp = cursor.blockNumber()
@@ -298,10 +292,10 @@ class TextEditorWidget(QtWidgets.QWidget):
         else:
             self.handleDedent(cursor)
 
-    def bulletList(self):
+    def onActionBulletList(self):
         cursor = self._text.text.textCursor()
         cursor.insertList(QtGui.QTextListFormat.ListDisc)
 
-    def numberList(self):
+    def onActionNumberList(self):
         cursor = self._text.text.textCursor()
         cursor.insertList(QtGui.QTextListFormat.ListDecimal)

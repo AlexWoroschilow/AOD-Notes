@@ -10,6 +10,9 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import json
+import base64
+
 from sqlalchemy import Column 
 from sqlalchemy import String
 from sqlalchemy import Integer
@@ -66,7 +69,13 @@ class Note(Base):
         if entity is None:
             return True
         return self.id != entity.id
-
+    
+    def toJson(self):
+        return json.dumps({
+            'name': self.name,
+            'description': self.description,
+            'text': self.text,
+        })
 
 class SQLAlechemyStorage(object):
     _engine = None

@@ -121,7 +121,7 @@ class ToolBarWidgetRight(QtWidgets.QToolBar):
 
         self.backColor = ToolBarButton()
         self.backColor.setIcon(QtGui.QIcon("icons/highlight.png"))
-        self.backColor.setToolTip("Print document")
+        self.backColor.setToolTip("Print background color")
 
         self.addWidget(self.boldAction)
         self.addWidget(self.italicAction)
