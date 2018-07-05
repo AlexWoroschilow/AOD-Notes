@@ -56,6 +56,7 @@ class Loader(Loader):
         kernel.listen('folder_new', widget.formatbar.folderSelector.onFolderNew, 128)
 
         action = functools.partial(self.onActionNoteUpdate, current=widget) 
+        kernel.listen('note_synchronize', action, 128)
         kernel.listen('note_update', action, 128)
         
         return widget

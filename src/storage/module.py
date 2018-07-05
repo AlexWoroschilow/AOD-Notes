@@ -54,6 +54,7 @@ class Loader(Loader):
 
         kernel.listen('note_new', self._onNotepadNoteNew)
         kernel.listen('note_update', self._onNotepadNoteUpdate)
+        kernel.listen('note_synchronize', self._onNotepadNoteUpdate)
         kernel.listen('note_remove', self._onNotepadNoteRemove)
 
     @inject.params(storage='storage', logger='logger')

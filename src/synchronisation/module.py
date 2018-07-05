@@ -39,8 +39,8 @@ class Loader(Loader):
     def boot(self, options=None, args=None, kernel=None):
 
         kernel.listen('note_new', self._onNoteNew, 128)
-        kernel.listen('note_update', self._onNoteUpdate, 128)
         kernel.listen('note_remove', self._onNoteRemove, 128)
+        kernel.listen('note_update', self._onNoteUpdate, 128)
 
     @inject.params(storage='synchronisation', kernel='kernel', logger='logger')
     def _onNoteNew(self, event=None, storage=None, kernel=None, logger=None):

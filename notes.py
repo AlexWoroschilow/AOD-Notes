@@ -50,6 +50,30 @@ class Application(QtWidgets.QApplication):
         kernel.dispatch('window_start')
 
         return super(Application, self).exec_()
+
+    @inject.params(kernel='kernel', widget='window', storage='storage')    
+    def sync_(self, entity=None, kernel=None, widget=None, storage=None):
+        if kernel is None or entity is None:
+            return None
+         
+        note = storage.note(entity['unique'])
+        if note is None and note:
+            return None
+
+        note.name = entity['name']
+        note.version = entity['version']
+        note.description = entity['description']
+        note.text = entity['text']
+        note.tags = entity['tags']
+
+        event = (note, widget)
+        kernel.dispatch('note_synchronize', event)
+
+        event = (note, widget)
+        kernel.dispatch('note_%s_synchronize' % note.id, event)
+        
+        if note.version == entity['version']:
+            return None
     
     def onWindowToggle(self, event=None, widget=None):
         if widget.isVisible():
@@ -60,6 +84,7 @@ class Application(QtWidgets.QApplication):
 class ApplicationThread(QtCore.QThread):
 
     exit = QtCore.pyqtSignal(object)
+    sync = QtCore.pyqtSignal(object)
 
     def __init__(self, args=None, source=None):
         super(ApplicationThread, self).__init__()
@@ -70,6 +95,8 @@ class ApplicationThread(QtCore.QThread):
     def run(self, synchronisation=None):
 
         from watchdog.observers import Observer
+        
+        synchronisation.thread = self
         
         observer = Observer()
         observer.schedule(synchronisation, synchronisation.destination, recursive=True)
@@ -99,6 +126,7 @@ if __name__ == "__main__":
     application = Application(options, args)
 
     application_thread = ApplicationThread(args, '')
+    application_thread.sync.connect(application.sync_)
     application_thread.exit.connect(sys.exit)
     application_thread.start()
 

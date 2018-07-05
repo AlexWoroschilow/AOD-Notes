@@ -58,6 +58,7 @@ class WindowContent(QtWidgets.QTabWidget):
 
         kernel.listen('window.tab', self._onTabOpen)
         kernel.listen('note_update', self._onNoteUpdateEvent, 128)
+        kernel.listen('note_synchronize', self._onNoteUpdateEvent, 128)
         kernel.listen('folder_update', self._onNoteUpdateEvent, 128)
 
     def _onNoteUpdateEvent(self, event):

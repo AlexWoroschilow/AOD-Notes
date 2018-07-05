@@ -119,6 +119,11 @@ class ItemList(QtWidgets.QListWidget):
         kernel.listen('note_%s_update' % entity.id, functools.partial(
             self.onActionNoteUpdate, item=item            
         ))
+
+        kernel.listen('note_%s_synchronize' % entity.id, functools.partial(
+            self.onActionNoteUpdate, item=item            
+        ))
+
         
     def onActionNoteUpdate(self, event, item):
         note, parent = event.data

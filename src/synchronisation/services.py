@@ -11,7 +11,6 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import json
-import inject       
 
 from watchdog.events import FileSystemEventHandler
 
@@ -20,28 +19,38 @@ class SynchronisationService(FileSystemEventHandler):
 
     def __init__(self, destination=None):
         self._destination = destination
+        self._current = None
+        self._thread = None        
+
+    @property
+    def thread(self):
+        return self._thread
+
+    @thread.setter
+    def thread(self, value):
+        self._thread = value
 
     @property
     def destination(self):
         return self._destination
 
-    @inject.params(storage='storage')
-    def synchronise(self, path=None, storage=None):
+    def synchronise(self, path=None):
+        if self.thread is None:
+            return None
+        
         with open(path, 'r') as stream:
-            
-            storage.synchronise(
-                json.loads(stream.read())                
-            )
-            
+            entity = json.loads(stream.read())
+            if entity is not None and entity:
+                self.thread.sync.emit(entity)
             stream.close()
 
-    def dump(self, unique, json):
+    def dump(self, unique=None, json=None):
         
-        self._file_last = '%s/%s' % (
-            self._destination, unique
+        self._current = '%s/%s' % (
+            self.destination, unique
         )
         
-        with open(self._file_last, 'w') as dump:
+        with open(self._current, 'w') as dump:
             dump.write(json)
             dump.close()
 
@@ -53,15 +62,15 @@ class SynchronisationService(FileSystemEventHandler):
 
     def on_deleted(self, event):
         super(SynchronisationService, self).on_deleted(event)
-        # if self._file_last == event.src_path:
-            # return None 
+        if self._current == event.src_path:
+            return None 
         if not event.is_directory:
             self.synchronise(event.src_path)
 
     def on_modified(self, event):
         super(SynchronisationService, self).on_modified(event)
-        # if self._file_last == event.src_path:
-            # return None 
+        if self._current == event.src_path:
+            return None 
         if not event.is_directory:
             self.synchronise(event.src_path)
 

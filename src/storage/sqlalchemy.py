@@ -154,6 +154,13 @@ class SQLAlechemyStorage(object):
         
         return query.order_by(Folder.name.asc()).all()
 
+    def note(self, unique=None):
+        session = self._session_create(self._engine)
+        query = session.query(Note)
+        return query.filter(
+            Note.unique == unique
+        ).order_by(Note.name.asc()).first()
+
     def notes(self, folder=None, string=None):
         
         session = self._session_create(self._engine)
