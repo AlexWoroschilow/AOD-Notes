@@ -47,21 +47,40 @@ class QCustomQWidget(QtWidgets.QWidget):
     @entity.setter
     def entity(self, entity=None):
         
-        if entity.name is not None:
-            self.name.setText(entity.name)
-        
-        if entity.description is not None and len(entity.description):
-            self.description.setText(entity.description)
-        else:
-            self.description.setVisible(False)
-        
-        if entity.createdAt is not None:
-            datetime = entity.createdAt
-            self.date.setText(
-                datetime.strftime("%d.%m.%Y %H:%M")
-            )
+        try:
+            if entity.name is not None:
+                self.name.setText(entity.name)
+            
+            if entity.description is not None and len(entity.description):
+                self.description.setText(entity.description)
+            else:
+                self.description.setVisible(False)
+            
+            if entity.createdAt is not None:
+                datetime = entity.createdAt
+                self.date.setText(datetime.strftime("%d.%m.%Y %H:%M"))
+
+        except (RuntimeError, TypeError, NameError):
+
+            self.name = LabelTop()
+            self.description = LabelDescription() 
+            self.date = LabelBottom()
+            
+            if entity.name is not None and entity.name:
+                self.name.setText(entity.name)
+            
+            if entity.createdAt is not None and entity.createdAt:
+                datetime = entity.createdAt.strftime("%d.%m.%Y %H:%M")
+                self.date.setText(datetime)
+                         
+            if entity.description is not None and entity.description:
+                self.description.setText(entity.description)
 
         return self.name.text()
+
+    def setName(self, value=None):
+        if value is not None:
+            self.name.setText(value)
 
     def resizeEvent(self, event):
         width = event.size().width()
@@ -116,30 +135,16 @@ class ItemList(QtWidgets.QListWidget):
         self.addItem(item)
         self.setItemWidget(item, item.widget)
         
-        kernel.listen('note_%s_update' % entity.id, functools.partial(
+        kernel.listen(entity.unique, functools.partial(
             self.onActionNoteUpdate, item=item            
         ))
-
-        kernel.listen('note_%s_synchronize' % entity.id, functools.partial(
-            self.onActionNoteUpdate, item=item            
-        ))
-
         
     def onActionNoteUpdate(self, event, item):
         note, parent = event.data
         if note is None:
             return None
+        item.widget.entity = note
 
-        try:
-            item.widget.name.setText(note.name)
-            item.widget.description.setText(note.description)
-        except RuntimeError:
-            item.widget.name = LabelTop() 
-            item.widget.name.setText(note.name)
-            
-            item.widget.description = LabelDescription() 
-            item.widget.description.setText(note.description)
-            item.widget.updateGeometrie()
 
 class RecordList(QtWidgets.QSplitter):
 

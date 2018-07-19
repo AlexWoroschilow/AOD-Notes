@@ -10,6 +10,8 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import inject
+import functools
 from PyQt5.QtCore import Qt
 
 from PyQt5 import QtPrintSupport
@@ -72,7 +74,6 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.rightbar.backColor.clicked.connect(self.onActionHighlight)
         self.rightbar.subAction.clicked.connect(self.onActionSubScript)
         self.rightbar.boldAction.clicked.connect(self.onActionBold)
-        
 
         layout = QtWidgets.QGridLayout()
         layout.setContentsMargins(0, 10, 0, 0)
@@ -129,20 +130,37 @@ class TextEditorWidget(QtWidgets.QWidget):
         return self._note
 
     @note.setter
-    def note(self, entity=None):
+    @inject.params(kernel='kernel')
+    def note(self, entity=None, kernel=None):
+        if self._note is not None and self._note.unique is not None: 
+            kernel.unlisten(self._note.unique, self.onActionNoteUpdate)
+            
         self._note = entity
-        if entity is None:
+        
+        if entity is None or not entity:
             self._text.text.setHtml('')
             self._name.setText('')
             return self
             
         if entity.folder is not None:
             self.folder = entity.folder
-            
+
         self._name.setText(entity.name)
         self._text.text.setHtml(entity.text)
         
+        if self._note is not None and self._note.unique is not None: 
+            kernel.listen(self._note.unique, self.onActionNoteUpdate)
+        
         return self
+        
+    def onActionNoteUpdate(self, event):
+        entity, parent = event.data
+        if entity is None:
+            return None
+        if entity.folder is not None:
+            self.folder = entity.folder
+        self._name.setText(entity.name)
+        self._text.text.setHtml(entity.text)
 
     @property
     def entity(self):
@@ -158,6 +176,10 @@ class TextEditorWidget(QtWidgets.QWidget):
         line = cursor.blockNumber() + 1
         col = cursor.columnNumber()
         self.statusbar.setText("Line: {}, Column: {}".format(line, col))
+
+    def onActionUpdateNote(self, event, widget=None):
+        note, widget = event.data
+        self.note = note 
 
     def onActionPreview(self):
         preview = QtPrintSupport.QPrintPreviewDialog()

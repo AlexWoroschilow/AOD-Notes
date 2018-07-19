@@ -90,3 +90,8 @@ class Kernel(object):
     def listen(self, name=None, action=None, priority=0):
         dispatcher = self.get('event_dispatcher')
         dispatcher.add_listener(name, action, priority)
+
+    def unlisten(self, name=None, action=None):
+        dispatcher = self.get('event_dispatcher')
+        dispatcher.remove_listener(name, action)
+

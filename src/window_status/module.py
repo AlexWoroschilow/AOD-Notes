@@ -40,6 +40,5 @@ class Loader(Loader):
 
     def onActionStatus(self, event, widget=None):
         message, timeout = event.data
-        print(message, timeout)
         if widget is not None:
             widget.setText(message)

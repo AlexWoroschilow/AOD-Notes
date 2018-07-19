@@ -10,6 +10,7 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import os
 import json
 
 from watchdog.events import FileSystemEventHandler
@@ -34,15 +35,15 @@ class SynchronisationService(FileSystemEventHandler):
     def destination(self):
         return self._destination
 
-    def synchronise(self, path=None):
+    def read(self, path=None):
         if self.thread is None:
             return None
         
         with open(path, 'r') as stream:
             entity = json.loads(stream.read())
-            if entity is not None and entity:
-                self.thread.sync.emit(entity)
             stream.close()
+            return entity
+        return None
 
     def dump(self, unique=None, json=None):
         
@@ -56,21 +57,23 @@ class SynchronisationService(FileSystemEventHandler):
 
     def on_moved(self, event):
         super(SynchronisationService, self).on_moved(event)
+        pass
 
     def on_created(self, event):
         super(SynchronisationService, self).on_created(event)
-
-    def on_deleted(self, event):
-        super(SynchronisationService, self).on_deleted(event)
-        if self._current == event.src_path:
-            return None 
-        if not event.is_directory:
-            self.synchronise(event.src_path)
+        if not event.is_directory and os.path.exists(event.src_path):
+            entity = self.read(event.src_path)
+            if entity is not None and entity:
+                self.thread.create.emit(entity)
 
     def on_modified(self, event):
         super(SynchronisationService, self).on_modified(event)
-        if self._current == event.src_path:
-            return None 
-        if not event.is_directory:
-            self.synchronise(event.src_path)
+        if not event.is_directory and os.path.exists(event.src_path):
+            entity = self.read(event.src_path)
+            if entity is not None and entity:
+                self.thread.update.emit(entity)
 
+    def on_deleted(self, event):
+        super(SynchronisationService, self).on_deleted(event)
+        if not event.is_directory and os.path.exists(event.src_path):
+            print('on_deleted', event.src_path)

@@ -45,9 +45,15 @@ class Loader(Loader):
         action = functools.partial(self.onActionFullScreen, widget=widget)
         widget.list.list.doubleClicked.connect(action)
 
+        widget.list.list.selectionChanged = functools.partial(
+            self.onActionSelectionChanged, widget=widget
+        )
+
         kernel.listen('folder_update', widget.onActionFolderUpdate, 128)
         kernel.listen('note_remove', widget.onActionNoteRemove, 100)
         kernel.listen('note_new', widget.onActionNoteCreate, 128)
+        action = functools.partial(self.onActionRefresh, widget=widget)        
+        kernel.listen('notes_refresh', action, 100)
         
         return widget
 
@@ -73,10 +79,16 @@ class Loader(Loader):
         
         action = functools.partial(self.onActionFullScreen, widget=widget)
         widget.list.list.doubleClicked.connect(action)
+
+        widget.list.list.selectionChanged = functools.partial(
+            self.onActionSelectionChanged, widget=widget
+        )
         
         kernel.listen('folder_update', widget.onActionFolderUpdate, 128)
         kernel.listen('note_remove', widget.onActionNoteRemove, 100)
         kernel.listen('note_new', widget.onActionNoteCreate, 128)
+        action = functools.partial(self.onActionRefresh, widget=widget)        
+        kernel.listen('notes_refresh', action, 100)
         
         return widget
 
@@ -99,6 +111,18 @@ class Loader(Loader):
         self._folder = None
         self._search = None
         self._note = None
+        
+    @inject.params(kernel='kernel', editor='widget.editor')
+    def onActionSelectionChanged(self, event=None, selection=None, kernel=None, widget=None, editor=None):
+        for index in widget.list.list.selectedIndexes():
+            item = widget.list.list.itemFromIndex(index)
+            if item is None or item.entity is None:
+                continue
+                
+            editor.note = item.entity
+            
+            action = functools.partial(editor.onActionUpdateNote, widget=widget)
+            kernel.listen(item.entity.unique, action)
 
     @inject.params(kernel='kernel', editor_new='widget.editor_provider')
     def onActionFullScreen(self, event=None, widget=None, kernel=None, editor_new=None):
@@ -127,7 +151,7 @@ class Loader(Loader):
         kernel.dispatch('folder_update', event)
         if folder.id is not None:
             event = (folder, widget)
-            kernel.dispatch('folder_%s_update' % folder.id, event)
+            kernel.dispatch(folder.id, event)
 
     @inject.params(kernel='kernel')
     def onActionNoteCreate(self, event=None, widget=None, kernel=None):
@@ -228,6 +252,10 @@ class Loader(Loader):
                 self._note = note    
         if self._note is not None:
             editor.note = self._note
+
+#             action = functools.partial(editor.onActionUpdateNote, widget=editor)
+#             kernel.listen(self._note.unique, action)
+            
         editor.folder = self._folder
 
         event = (editor, self._folder)

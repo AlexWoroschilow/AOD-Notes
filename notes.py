@@ -51,29 +51,15 @@ class Application(QtWidgets.QApplication):
 
         return super(Application, self).exec_()
 
-    @inject.params(kernel='kernel', widget='window', storage='storage')    
-    def sync_(self, entity=None, kernel=None, widget=None, storage=None):
-        if kernel is None or entity is None:
-            return None
-         
-        note = storage.note(entity['unique'])
-        if note is None and note:
-            return None
+    @inject.params(kernel='kernel')    
+    def update(self, entity=None, kernel=None):
+        if kernel is not None and entity is not None:
+            kernel.dispatch('synchronisation_update', entity)
 
-        note.name = entity['name']
-        note.version = entity['version']
-        note.description = entity['description']
-        note.text = entity['text']
-        note.tags = entity['tags']
-
-        event = (note, widget)
-        kernel.dispatch('note_synchronize', event)
-
-        event = (note, widget)
-        kernel.dispatch('note_%s_synchronize' % note.id, event)
-        
-        if note.version == entity['version']:
-            return None
+    @inject.params(kernel='kernel')    
+    def create(self, entity=None, kernel=None):
+        if kernel is not None and entity is not None:
+            kernel.dispatch('synchronisation_create', entity)
     
     def onWindowToggle(self, event=None, widget=None):
         if widget.isVisible():
@@ -84,16 +70,19 @@ class Application(QtWidgets.QApplication):
 class ApplicationThread(QtCore.QThread):
 
     exit = QtCore.pyqtSignal(object)
-    sync = QtCore.pyqtSignal(object)
+    update = QtCore.pyqtSignal(object)
+    create = QtCore.pyqtSignal(object)
 
     def __init__(self, args=None, source=None):
         super(ApplicationThread, self).__init__()
         self._source = source
         self._args = args
 
-    @inject.params(synchronisation='synchronisation')
-    def run(self, synchronisation=None):
-
+    @inject.params(synchronisation='synchronisation', config='config')
+    def run(self, synchronisation=None, config=None):
+        if bool(config.get('synchronisation.enabled')) == False:
+            return None
+        
         from watchdog.observers import Observer
         
         synchronisation.thread = self
@@ -104,7 +93,7 @@ class ApplicationThread(QtCore.QThread):
 
         try:
             while True:
-                time.sleep(1)
+                time.sleep(5)
         except KeyboardInterrupt:
             observer.stop()
 
@@ -126,7 +115,9 @@ if __name__ == "__main__":
     application = Application(options, args)
 
     application_thread = ApplicationThread(args, '')
-    application_thread.sync.connect(application.sync_)
+    application_thread.update.connect(application.update)
+    application_thread.create.connect(application.create)
+
     application_thread.exit.connect(sys.exit)
     application_thread.start()
 

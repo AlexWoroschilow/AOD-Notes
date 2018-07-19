@@ -63,10 +63,9 @@ class Loader(Loader):
 
     def onActionNoteUpdate(self, event=None, current=None):
         note, widget = event.data
-        if widget == current or note is None :
+        if widget == current:
             return None
-        if current.note == note:
-            current.note = note
+        current.note = note
 
     @inject.params(kernel='kernel')
     def onActionSave(self, event=None, widget=None, kernel=None):
@@ -83,7 +82,7 @@ class Loader(Loader):
         kernel.dispatch('note_update', event)
         
         if widget.note.id is not None and widget.note.id:
-            kernel.dispatch('note_%s_update' % widget.note.id, event)
+            kernel.dispatch(widget.note.unique, event)
         
         folder = widget.note.folder
         if folder is None:
@@ -91,7 +90,7 @@ class Loader(Loader):
 
         if folder.id is not None and folder.id:
             event = (folder, widget)
-            kernel.dispatch('folder_%s_update' % folder.id, event)
+            kernel.dispatch(folder.id, event)
 
     @inject.params(kernel='kernel', widget_new='widget.editor_provider')
     def onActionFullScreen(self, event=None, widget=None, kernel=None, widget_new=None):
@@ -116,16 +115,16 @@ class Loader(Loader):
         event = (widget.note, self)
         kernel.dispatch('note_update', event)
         if widget.note.id is not None and widget.note.id:
-            kernel.dispatch('note_%s_update' % widget.note.id, event)
+            kernel.dispatch(widget.note.unique, event)
 
         if folder is None:
             return None
 
         event = (folder, self)
-        kernel.dispatch('folder_%s_update' % folder.id, event)
+        kernel.dispatch(folder.id, event)
         
         if cache is None:
             return None
         
         event = (cache, self)
-        kernel.dispatch('folder_%s_update' % cache.id, event)
+        kernel.dispatch(cache.id, event)

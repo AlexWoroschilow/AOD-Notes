@@ -56,7 +56,7 @@ class FolderItem(QtWidgets.QListWidgetItem):
         self.folder = entity
 
         if kernel is not None and entity is not None and entity.id is not None:
-            kernel.listen('folder_%s_update' % entity.id, self._onFolderUpdated)
+            kernel.listen(entity.id, self._onFolderUpdated)
             
     @property
     def widget(self):

@@ -30,7 +30,6 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
 
         self.list = RecordList()
         self.list.toolbar.setVisible(bool(config.get('notes.leftbar')))
-        self.list.list.selectionChanged = self.onActionSelectionChanged
 
         self.addWidget(self.list)
 
@@ -73,7 +72,7 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
     def note(self, entity=None):
         self._note = entity
         if self._editor is not None:
-            self._editor.entity = entity
+            self._editor.note = entity
         return self
 
     def clear(self):
@@ -92,18 +91,12 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
         if self.list.folder == entity:
             self.list.folder = entity
 
-    def onActionSelectionChanged(self, event=None, selection=None):
-        for index in self.list.selectedIndexes():
-            item = self.list.itemFromIndex(index)
-            if item is not None and item.entity is not None:
-                self._editor.entity = item.entity
-
     def onActionNoteRemove(self, event=None):
         entity = event.data
         if self._editor is None or entity is None:
             return None
-        if self._editor.entity == event.data:
-            self._editor.entity = None
+        if self._editor.note == event.data:
+            self._editor.note = None
         index = self.list.currentRow()
         if index is None:
             return None

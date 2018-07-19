@@ -46,6 +46,11 @@ class ConfigService(object):
 
             self._parser.add_section('storage')
             self._parser.set('storage', 'database', '~/.config/CloudNotes/storage.dhf')
+            
+            self._parser.add_section('synchronisation')
+            self._parser.set('synchronisation', 'folder', '~/CloudFitbaseDe/CloudNotes')
+            self._parser.set('synchronisation', 'enabled', '1')
+            
             self._parser.write(stream)
             stream.close()
             

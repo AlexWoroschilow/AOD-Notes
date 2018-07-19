@@ -76,22 +76,20 @@ class Note(Base):
     def __eq__(self, entity=None):
         if entity is None:
             return False
-        return self.id == entity.id
+        return self.unique == entity.unique
     
     def __ne__(self, entity):
         if entity is None:
             return True
-        return self.id != entity.id
+        return self.unique != entity.unique
 
     def toDict(self):
         return {
-            'name': self.name,
-            'folder': self.folder.toDict(),
-            'description': self.description,
-            'unique': self.unique,
-            'version': self.version,
-            'text': self.text,
-            'tags': self.tags,
+            'folder': None if self.folder is None else self.folder.toDict(),
+            'note': { 'name': self.name, 'description': self.description,
+                'unique': self.unique, 'version': self.version,
+                'text': self.text, 'tags': self.tags,
+            },
         }
     
     def toJson(self):
@@ -122,9 +120,6 @@ class SQLAlechemyStorage(object):
         ))
         return self._session
 
-    def synchronise(self, object=None):
-        print(object)
-
     def create(self, entity=None):
         session = self._session_create(self._engine)
         session.add(entity)
@@ -137,6 +132,7 @@ class SQLAlechemyStorage(object):
         session = self._session_create(self._engine)
         session.commit()
         session.flush()
+        return entity
 
     def delete(self, entity=None):
         session = self._session_create(self._engine)
@@ -153,6 +149,13 @@ class SQLAlechemyStorage(object):
             ).order_by(Folder.name.asc()).all()
         
         return query.order_by(Folder.name.asc()).all()
+
+    def folder(self, name=None):
+        session = self._session_create(self._engine)
+        query = session.query(Folder)
+        return query.filter(
+            Folder.name == name
+        ).order_by(Folder.name.asc()).first()
 
     def note(self, unique=None):
         session = self._session_create(self._engine)

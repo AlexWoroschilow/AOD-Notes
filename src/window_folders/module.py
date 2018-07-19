@@ -78,6 +78,9 @@ class Loader(Loader):
         action = functools.partial(self.onActionRefresh, widget=widget)
         kernel.listen('folder_new', action, 128)
 
+        action = functools.partial(self.onActionRefresh, widget=widget)
+        kernel.listen('folders_refresh', action, 128)
+
     @inject.params(kernel='kernel', storage='storage')
     def onActionFirstTab(self, event=None, kernel=None, storage=None, widget=None):
 
@@ -164,13 +167,11 @@ class Loader(Loader):
 
     @inject.params(kernel='kernel')
     def onActionFolderOpen(self, event=None, selection=None, widget=None, kernel=None):
-        event = (self.selected, self._search)
-        kernel.dispatch('folder_open', event)
+        kernel.dispatch('folder_open', (self.selected, self._search))
 
     @inject.params(kernel='kernel')
     def onActionFolderSelect(self, event=None, selection=None, widget=None, kernel=None):
-        event = (self.selected, self._search, None)
-        kernel.dispatch('folder_select', event)
+        kernel.dispatch('folder_select', (self.selected, self._search, None))
 
     @inject.params(kernel='kernel', storage='storage')
     def onActionSearchRequest(self, event=None, kernel=None, storage=None, widget=None):
@@ -188,9 +189,9 @@ class Loader(Loader):
     @inject.params(kernel='kernel', widget_search='widget.search')
     def onActionTagSelect(self, event, widget=None, kernel=None, widget_search=None):
         super(TextEditor, widget).mouseDoubleClickEvent(event)
-        #cursor = widget.textCursor()
-        #if cursor is None:
+        # cursor = widget.textCursor()
+        # if cursor is None:
         #    return None
-        #widget_search.setText(cursor.selectedText())
-        #kernel.dispatch('search_request', widget_search.text())
+        # widget_search.setText(cursor.selectedText())
+        # kernel.dispatch('search_request', widget_search.text())
         
