@@ -112,17 +112,14 @@ class Loader(Loader):
         self._search = None
         self._note = None
         
-    @inject.params(kernel='kernel', editor='widget.editor')
-    def onActionSelectionChanged(self, event=None, selection=None, kernel=None, widget=None, editor=None):
+    @inject.params(kernel='kernel')
+    def onActionSelectionChanged(self, event=None, selection=None, kernel=None, widget=None):
         for index in widget.list.list.selectedIndexes():
             item = widget.list.list.itemFromIndex(index)
             if item is None or item.entity is None:
                 continue
                 
-            editor.note = item.entity
-            
-            action = functools.partial(editor.onActionUpdateNote, widget=widget)
-            kernel.listen(item.entity.unique, action)
+            widget.note = item.entity
 
     @inject.params(kernel='kernel', editor_new='widget.editor_provider')
     def onActionFullScreen(self, event=None, widget=None, kernel=None, editor_new=None):
@@ -237,28 +234,25 @@ class Loader(Loader):
         
         return kernel.dispatch('window_status', event)
 
-    @inject.params(kernel='kernel', storage='storage', editor='widget.notes_provider')
-    def onNotepadFolderOpen(self, event=None, kernel=None, storage=None, editor=None):
+    @inject.params(kernel='kernel', storage='storage', widget='widget.notes_provider')
+    def onNotepadFolderOpen(self, event=None, kernel=None, storage=None, widget=None):
         self._folder, self._search = event.data
         if self._folder is None:
             return None
 
         self._note = None    
 
-        editor.clear()
+        widget.clear()
         for note in storage.notes(folder=self._folder, string=self._search):
-            editor.add_note(note)
+            widget.add_note(note)
             if self._note is None:
                 self._note = note    
         if self._note is not None:
-            editor.note = self._note
+            widget.note = self._note
 
-#             action = functools.partial(editor.onActionUpdateNote, widget=editor)
-#             kernel.listen(self._note.unique, action)
-            
-        editor.folder = self._folder
+        widget.folder = self._folder
 
-        event = (editor, self._folder)
+        event = (widget, self._folder)
         kernel.dispatch('window.tab', event)
 
     @inject.params(storage='storage', widget='widget.notes')
