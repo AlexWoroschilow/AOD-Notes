@@ -86,16 +86,8 @@ class SynchronisationThread(QtCore.QThread):
         
         from watchdog.observers import Observer
         
-        destination = os.path.expanduser(
-            config.get('synchronisation.folder')
-        )
-        
-        if not os.path.exists(destination):
-            if not os.path.exists(destination):
-                os.makedirs(destination)
-        
         observer = Observer()
-        observer.schedule(synchronisation, destination, recursive=True)
+        observer.schedule(synchronisation, synchronisation.destination, recursive=True)
         observer.start()
 
         try:

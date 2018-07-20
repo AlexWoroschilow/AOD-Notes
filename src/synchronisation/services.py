@@ -18,7 +18,8 @@ from watchdog.events import FileSystemEventHandler
 
 class SynchronisationService(FileSystemEventHandler):
 
-    def __init__(self):
+    def __init__(self, destination=None):
+        self._destination = destination
         self._current = None
         self._thread = None        
 
@@ -29,6 +30,10 @@ class SynchronisationService(FileSystemEventHandler):
     @thread.setter
     def thread(self, value):
         self._thread = value
+
+    @property
+    def destination(self):
+        return self._destination
 
     def read(self, path=None):
         if self.thread is None:
