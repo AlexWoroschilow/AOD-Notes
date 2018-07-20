@@ -32,6 +32,7 @@ class Folder(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     total = Column(Integer)
     name = Column(String)
+    unique = Column(String)
     createdAt = Column(DateTime)
 
     notes = relationship("Note", backref="Folder")
@@ -49,7 +50,7 @@ class Folder(Base):
     def toDict(self):
         return {
             'name': self.name,
-            'unique': self.id,
+            'unique': self.id if self.unique is None else self.unique,
             'total': self.total
         }
 

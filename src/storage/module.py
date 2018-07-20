@@ -73,6 +73,7 @@ class Loader(Loader):
             
         folder = storage.create(Folder(
                     name=candidate['name'],
+                    unique=candidate['unique'],
                     total=candidate['total'],
                     createdAt=datetime.now()
                 ))   
@@ -130,14 +131,18 @@ class Loader(Loader):
         if folder is not None and folder_created == False:
             kernel.dispatch(folder.id, (folder, None))
 
+    @property
+    def unique_string(self):
+        return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(32))
+
     @inject.params(storage='storage', logger='logger')
     def _onFolderNew(self, event=None, storage=None, logger=None):
         entity, widget = event.data
         if entity is None or widget is None:
             return None
         
-        name, text = entity 
-        entity = Folder(name=name, createdAt=datetime.now(), total=0)        
+        name, text = entity
+        entity = Folder(name=name, createdAt=datetime.now(), total=0, unique=self.unique_string)        
         event.data = (storage.create(entity), widget)
 
     @inject.params(storage='storage', logger='logger')
@@ -165,7 +170,7 @@ class Loader(Loader):
         entity = Note(
             name=name, text=text, folder=folder,
             createdAt=datetime.now(), version=int(time.time()),
-            unique=''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(32))
+            unique=self.unique_string
         )
         
         event.data = storage.create(entity)

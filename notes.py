@@ -67,28 +67,35 @@ class Application(QtWidgets.QApplication):
         return widget.show()
 
 
-class ApplicationThread(QtCore.QThread):
+class SynchronisationThread(QtCore.QThread):
 
     exit = QtCore.pyqtSignal(object)
     update = QtCore.pyqtSignal(object)
     create = QtCore.pyqtSignal(object)
 
     def __init__(self, args=None, source=None):
-        super(ApplicationThread, self).__init__()
+        super(SynchronisationThread, self).__init__()
         self._source = source
         self._args = args
 
     @inject.params(synchronisation='synchronisation', config='config')
     def run(self, synchronisation=None, config=None):
+        synchronisation.thread = self
         if bool(config.get('synchronisation.enabled')) == False:
             return None
         
         from watchdog.observers import Observer
         
-        synchronisation.thread = self
+        destination = os.path.expanduser(
+            config.get('synchronisation.folder')
+        )
+        
+        if not os.path.exists(destination):
+            if not os.path.exists(destination):
+                os.makedirs(destination)
         
         observer = Observer()
-        observer.schedule(synchronisation, synchronisation.destination, recursive=True)
+        observer.schedule(synchronisation, destination, recursive=True)
         observer.start()
 
         try:
@@ -114,7 +121,7 @@ if __name__ == "__main__":
 
     application = Application(options, args)
 
-    application_thread = ApplicationThread(args, '')
+    application_thread = SynchronisationThread(args, '')
     application_thread.update.connect(application.update)
     application_thread.create.connect(application.create)
 

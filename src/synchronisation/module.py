@@ -10,7 +10,6 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import os
 import inject
 
 from lib.plugin import Loader
@@ -25,7 +24,7 @@ class Loader(Loader):
         return True
     
     def config(self, binder=None):
-        binder.bind_to_constructor('synchronisation', self._constructor_synchronisation)
+        binder.bind('synchronisation', SynchronisationService())
 
     @inject.params(kernel='kernel')
     def boot(self, options=None, args=None, kernel=None):
@@ -35,14 +34,6 @@ class Loader(Loader):
         kernel.listen('note_new', self._onNoteNew, 128)
         kernel.listen('note_remove', self._onNoteRemove, 128)
         kernel.listen('note_update', self._onNoteUpdate, 128)
-
-    @inject.params(config='config')
-    def _constructor_synchronisation(self, config=None):
-        destination = os.path.expanduser(config.get('synchronisation.folder'))
-        if not os.path.exists(destination):
-            if not os.path.exists(destination):
-                os.makedirs(destination)
-        return SynchronisationService(destination)
 
     @inject.params(storage='synchronisation', config='config')
     def _onNoteNew(self, event=None, storage=None, config=None):
