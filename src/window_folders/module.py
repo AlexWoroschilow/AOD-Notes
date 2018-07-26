@@ -21,18 +21,32 @@ from .gui.text import TextEditor
 
 
 class Loader(Loader):
-    _first = None
+    
     _search = None
-    _widget = None
 
-    @inject.params(config='config')
-    def _constructor_folders(self, config=None):
+    @property
+    def enabled(self):
+        """
+        This is the core-functionaliry plugin,
+        should be enabled by default
+        """
+        return True
+
+    def config(self, binder=None):
+        """
+        Initialize the widget of this plugin as a service
+        this widget will be used in the main window 
+        """
+        binder.bind_to_constructor('widget.folders', self._constructor_folders)
+
+    @inject.params(kernel='kernel', config='config', storage='storage')
+    def _constructor_folders(self, kernel=None, storage=None, config=None):
         
-        widget = FolderList()
+        widget = FolderList(storage)
         
         widget.toolbar.setVisible(bool(config.get('folders.leftbar')))
         
-        action = functools.partial(self.onActionFolderNew, widget=widget)
+        action = functools.partial(self.onActionFolderCreate, widget=widget)
         widget.toolbar.newAction.clicked.connect(action)
         
         action = functools.partial(self.onActionFolderCopy, widget=widget)
@@ -47,151 +61,67 @@ class Loader(Loader):
         action = functools.partial(self.onActionFolderOpen, widget=widget)
         widget.list.doubleClicked.connect(action)
 
+        action = functools.partial(self.onActionFolderSelect, widget=widget)
+        widget.list.clicked.connect(action)
+
         widget.tags.mouseDoubleClickEvent = functools.partial(
             self.onActionTagSelect, widget=widget.tags
         )
-
-        widget.list.selectionChanged = functools.partial(
-            self.onActionFolderSelect, widget=widget
-        )
         
-        return widget
-
-    @property
-    def enabled(self):
-        return True
-
-    def config(self, binder=None):
-        binder.bind_to_constructor('widget.folders', self._constructor_folders)
-        binder.bind('folders', self)
-
-    @inject.params(kernel='kernel', widget='widget.folders')
-    def boot(self, options=None, args=None, kernel=None, widget=None):
         # listen for the search request from the search module
         # the request string will be given as a data object to the event
         action = functools.partial(self.onActionSearchRequest, widget=widget)
         kernel.listen('search_request', action, 100)
-
-        action = functools.partial(self.onActionFirstTab, widget=widget)
-        kernel.listen('dashboard_content', action, 100)
 
         action = functools.partial(self.onActionRefresh, widget=widget)
         kernel.listen('folder_new', action, 128)
 
         action = functools.partial(self.onActionRefresh, widget=widget)
         kernel.listen('folders_refresh', action, 128)
-
-    @inject.params(kernel='kernel', storage='storage')
-    def onActionFirstTab(self, event=None, kernel=None, storage=None, widget=None):
-
-        self._first = None
-        widget.list.clear()
-        for folder in storage.folders():
-            if self._first is None:
-                self._first = folder
-            widget.addLine(folder)
-        widget.list.setCurrentRow(0)
-
-        container, parent = event.data
-        if container is None or parent is None:
-            return None
         
-        container.addWidget(widget)
+        return widget
 
-        if self._first is None:
-            return None
+    @inject.params(kernel='kernel', logger='logger')
+    def onActionFolderCreate(self, event=None, widget=None, kernel=None, logger=None):
+        logger.debug('[folders] folder create event')
+        kernel.dispatch('folder_new', ('New folder', 'New folder description'))
+        widget.reload(self._search)
 
-        event = (widget.tr('%d folders found' % widget.list.count()), 10)
-        kernel.dispatch('window_status', event)
-
-        event = (self._first, self._search, None)
-        kernel.dispatch('folder_select', event)
-        
-    @property
-    @inject.params(widget='widget.folders')
-    def selected(self, widget=None):
-        if widget is None:
-            return None
-        return widget.selected
-
-    @inject.params(kernel='kernel')
-    def onActionFolderNew(self, event=None, widget=None, kernel=None):
-        
-        event = (('New folder', 'New folder description'), self)
-        kernel.dispatch('folder_new', event)
-
-    @inject.params(kernel='kernel')
-    def onActionFolderCopy(self, event=None, widget=None, kernel=None):
-        event = ((self.selected.name, 'New folder description'), self)
-        kernel.dispatch('folder_new', event)
+    @inject.params(kernel='kernel', logger='logger')
+    def onActionFolderCopy(self, event=None, widget=None, kernel=None, logger=None):
+        logger.debug('[folders] folder copy event: %s' % widget.selected.name)
+        kernel.dispatch('folder_new', ("%s-copy" % widget.selected.name, 'New folder description'))
+        widget.reload(self._search)
 
     @inject.params(kernel='kernel')
     def onActionFolderRemove(self, event=None, widget=None, kernel=None):
         message = widget.tr("Are you sure you want to remove this Folder?")
         reply = QtWidgets.QMessageBox.question(widget, 'Remove folder', message, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
-        if reply == QtWidgets.QMessageBox.No:
-            return None
+        if reply == QtWidgets.QMessageBox.Yes:
+            kernel.dispatch('folder_remove', widget.selected)
+        widget.reload(self._search)
 
-        for index in widget.selectedIndexes():
-            item = widget.itemFromIndex(index)
-            if item is None and item.folder is None:
-                continue
-
-            folder = item.folder
-            if folder is None:
-                continue
-
-            event = (folder, self)
-            if folder.id is not None and folder.id:
-                kernel.dispatch('folder_%s_remove' % folder.id, event)
-            kernel.dispatch('folder_remove', event)
-
-            widget.takeItem(index)
-            
-        event = (widget.tr('%d folders found' % widget.list.count()), None)
-        kernel.dispatch('window_status', event)
-
-    @inject.params(kernel='kernel', storage='storage')
+    @inject.params(kernel='kernel')
     def onActionRefresh(self, event=None, kernel=None, storage=None, widget=None):
-        current = widget.list.currentIndex()
-        
-        widget.list.clear()
-        for entity in storage.folders():
-            widget.addLine(entity)
+        widget.reload(self._search)
 
-        if widget.list.item(current.row()) not in [0]:
-            widget.list.setCurrentIndex(current)
+    @inject.params(kernel='kernel', logger='logger')
+    def onActionFolderOpen(self, event=None, selection=None, widget=None, kernel=None, logger=None):
+        logger.debug('[folders] folder selected: %s' % widget.selected.name)
+        kernel.dispatch('folder_gointo', widget.selected)
 
-        event = (widget.tr('%d folders found' % widget.list.count()), None)
-        kernel.dispatch('window_status', event)
-
-    @inject.params(kernel='kernel')
-    def onActionFolderOpen(self, event=None, selection=None, widget=None, kernel=None):
-        kernel.dispatch('folder_open', (self.selected, self._search))
-
-    @inject.params(kernel='kernel')
-    def onActionFolderSelect(self, event=None, selection=None, widget=None, kernel=None):
-        kernel.dispatch('folder_select', (self.selected, self._search, None))
+    @inject.params(kernel='kernel', logger='logger')
+    def onActionFolderSelect(self, event=None, selection=None, widget=None, kernel=None, logger=None):
+        logger.debug('[folders] folder selected: %s' % widget.selected.name)
+        kernel.dispatch('folder_current', widget.selected)
 
     @inject.params(kernel='kernel', storage='storage')
     def onActionSearchRequest(self, event=None, kernel=None, storage=None, widget=None):
         self._search = event.data
-        if self._search is None:
-            return None
+        if self._search is not None:
+            widget.reload(self._search)
 
-        self._first = None
-        widget.list.clear()
-        for entity in storage.folders(string=self._search):
-            if self._first is None:
-                self._first = entity
-            widget.addLine(entity)
-
-    @inject.params(kernel='kernel', widget_search='widget.search')
-    def onActionTagSelect(self, event, widget=None, kernel=None, widget_search=None):
+    @inject.params(kernel='kernel')
+    def onActionTagSelect(self, event, widget=None, kernel=None):
         super(TextEditor, widget).mouseDoubleClickEvent(event)
-        # cursor = widget.textCursor()
-        # if cursor is None:
-        #    return None
-        # widget_search.setText(cursor.selectedText())
-        # kernel.dispatch('search_request', widget_search.text())
         

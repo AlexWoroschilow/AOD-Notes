@@ -17,8 +17,8 @@ from PyQt5 import QtWidgets
 
 class WindowContentDashboard(QtWidgets.QWidget):
 
-    @inject.params(kernel='kernel', logger='logger')
-    def __init__(self, parent=None, kernel=None, logger=None):
+    @inject.params(folders='widget.folders', notes='widget.notes')
+    def __init__(self, parent=None, folders=None, notes=None):
         super(WindowContentDashboard, self).__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
         self.setObjectName('dashboard')
@@ -29,10 +29,8 @@ class WindowContentDashboard(QtWidgets.QWidget):
         self.content = QtWidgets.QSplitter()
         self.content.setContentsMargins(0, 0, 0, 0)
 
-        # fill tabs with widgets from different modules
-        kernel.dispatch('dashboard_content', (
-            self.content, parent
-        ))
+        self.content.addWidget(folders)
+        self.content.addWidget(notes)
 
         layout.addWidget(self.content)
 
@@ -62,9 +60,7 @@ class WindowContent(QtWidgets.QTabWidget):
         kernel.listen('folder_update', self._onNoteUpdateEvent, 128)
 
     def _onNoteUpdateEvent(self, event):
-        entity, widget = event.data
-        if entity is None or widget is None:
-            return None 
+        entity = event.data
         for index in range(0, self.count()):
             widget = self.widget(index)
             if widget.entity is None:
@@ -76,11 +72,11 @@ class WindowContent(QtWidgets.QTabWidget):
             self.setTabText(index, entity.name)
 
     def _onTabOpen(self, event=None, dispatcher=None):
-        widget, entity = event.data
-        if widget is None or entity is None:
+        widget, name = event.data
+        if widget is None :
             return None
 
-        self.addTab(widget, entity.name)
+        self.addTab(widget, name)
         self.setCurrentIndex(self.indexOf(widget))
 
     def _onTabClose(self, index=None):

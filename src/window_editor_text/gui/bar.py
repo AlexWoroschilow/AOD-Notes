@@ -140,7 +140,7 @@ class FormatbarWidget(QtWidgets.QToolBar):
         self.setContentsMargins(0, 0, 0, 0)
         self.setObjectName('editorFormatBarWidget')
 
-        self.folderSelector = FolderComboBox()
+        # self.folderSelector = FolderComboBox()
 
         self.fontSize = QtWidgets.QSpinBox(self)
         self.fontSize.setSuffix(" pt")
@@ -182,7 +182,6 @@ class FormatbarWidget(QtWidgets.QToolBar):
         self.dedentAction.setIcon(QtGui.QIcon("icons/outdent.svg"))
         self.dedentAction.setToolTip("Dedent Area")
 
-        self.addWidget(self.folderSelector)
         self.addWidget(self.fontSize)
 
         self.addWidget(self.alignLeft)
@@ -199,13 +198,9 @@ class FormatbarWidget(QtWidgets.QToolBar):
 
     @property
     def folder(self):
-        if self.folderSelector is None:
-            return None
-        return self.folderSelector.entity
+        pass
 
     @folder.setter
     def folder(self, entity=None):
-        if self.folderSelector is None or entity is None:
-            return None
-        self.folderSelector.entity = entity
+        pass
 

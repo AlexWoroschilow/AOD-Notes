@@ -154,11 +154,7 @@ class TextEditorWidget(QtWidgets.QWidget):
         return self
         
     def onActionNoteUpdate(self, event):
-        entity, parent = event.data
-        if entity is None:
-            return None
-        if entity.folder is not None:
-            self.folder = entity.folder
+        entity = event.data
         self._name.setText(entity.name)
         self._text.text.setHtml(entity.text)
 

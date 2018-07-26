@@ -39,10 +39,12 @@ class ToolBarWidget(QtWidgets.QToolBar):
 
         self.removeAction = ToolBarButton()
         self.removeAction.setIcon(QtGui.QIcon("icons/remove.svg"))
+        self.removeAction.setShortcut("Del")
         self.removeAction.setToolTip("Remove selected document")
 
         self.refreshAction = ToolBarButton()
         self.refreshAction.setIcon(QtGui.QIcon("icons/refresh.svg"))
+        self.refreshAction.setShortcut("F5")
         self.refreshAction.setToolTip("Refresh list")
 
         self.addWidget(self.newAction)

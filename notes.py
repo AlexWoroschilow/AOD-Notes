@@ -78,25 +78,8 @@ class SynchronisationThread(QtCore.QThread):
         self._source = source
         self._args = args
 
-    @inject.params(synchronisation='synchronisation', config='config')
     def run(self, synchronisation=None, config=None):
-        synchronisation.thread = self
-        if bool(config.get('synchronisation.enabled')) == False:
-            return None
-        
-        from watchdog.observers import Observer
-        
-        observer = Observer()
-        observer.schedule(synchronisation, synchronisation.destination, recursive=True)
-        observer.start()
-
-        try:
-            while True:
-                time.sleep(5)
-        except KeyboardInterrupt:
-            observer.stop()
-
-        observer.join()
+        pass
 
 
 if __name__ == "__main__":

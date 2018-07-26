@@ -17,7 +17,10 @@ from .list import RecordList
 
 class NotepadEditorWidget(QtWidgets.QSplitter):
 
-    def __init__(self, kernel=None, config=None, editor=None):
+    def __init__(self, storage=None, config=None, editor=None):
+        self.storage = storage
+        self.string = None
+
         self._editor = editor
         self._folder = None
         self._search = None
@@ -75,21 +78,42 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
             self._editor.note = entity
         return self
 
+    @property
+    def current(self):
+        """
+        Get current selected document
+        if no document was selected return 
+        the first document in the list
+        """
+        for index in self.list.list.selectedIndexes():
+            item = self.list.list.itemFromIndex(index)
+            if item is not None and item.entity is not None:
+                return item.entity
+        item = self.list.item(0)
+        if item is not None and item.entity is not None:
+            return item.entity
+        return None
+
+    def reload(self, folder=None, string=None):
+        self.folder = folder if folder is not None else self.folder 
+        self.string = string if string is not None else self.string 
+
+        cache = self.list.currentRow()
+        self.list.list.clear()
+        for entity in self.storage.notes(folder=self.folder, string=self.string):
+            self.list.addLine(entity)
+        if cache >= self.list.count():
+            cache = cache - 1 if cache > 0 else 0
+        self.list.setCurrentRow(cache)
+
     def clear(self):
         if self.list is None:
             return None
         self.list.clear()
 
-    def add_note(self, note=None):
-        if self.list is not None and note is not None:
-            self.list.addLine(note)
-
     def onActionFolderUpdate(self, event):
-        entity, widget = event.data
-        if entity is None or widget is None:
-            return None
-        if self.list.folder == entity:
-            self.list.folder = entity
+        if self.list.folder == event.data:
+            self.list.folder = event.data
 
     def onActionNoteRemove(self, event=None):
         entity = event.data
@@ -103,11 +127,4 @@ class NotepadEditorWidget(QtWidgets.QSplitter):
         self.list.takeItem(index)
 
     def onActionNoteCreate(self, event=None):
-        entity = event.data
-        if entity is None:
-            return None
-        self.list.addLine(entity)
-        total = self.list.count()
-        if total is None and total <= 0:
-            return None 
-        self.list.setCurrentRow(total - 1)
+        self.reload(None, None)

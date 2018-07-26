@@ -17,12 +17,15 @@ from .list import ItemList
 
 from .text import TextEditor
 
+
 class FolderList(QtWidgets.QSplitter):
 
-    def __init__(self, parent=None):
-        super(FolderList, self).__init__(parent)
+    def __init__(self, storage=None):
+        super(FolderList, self).__init__()
         self.setContentsMargins(0, 0, 0, 0)
         self.setObjectName('foldersWidget')
+
+        self.storage = storage
 
         self.toolbar = ToolbarbarWidget()
         self.addWidget(self.toolbar)
@@ -45,18 +48,29 @@ class FolderList(QtWidgets.QSplitter):
         
         self.setCollapsible(0, True)
         self.setCollapsible(1, False)
+        
+        self.reload()
+
+    def reload(self, string=None):
+        self.list.clear()
+        for folder in self.storage.folders(string):
+            self.list.addLine(folder)
+        self.list.setCurrentRow(0)
 
     @property
     def selected(self):
+        return self.current
+
+    @property
+    def current(self):
         for index in self.selectedIndexes():
             item = self.itemFromIndex(index)
-            if item is None:
-                return None
+            if item is not None:
+                return item.folder
+        item = self.list.item(0)
+        if item is not None and item.entity is not None:
             return item.folder
         return None
-
-    def addLine(self, folder=None):
-        self.list.addLine(folder)
 
     def selectedIndexes(self):
         return self.list.selectedIndexes()

@@ -69,17 +69,13 @@ class FolderItem(QtWidgets.QListWidgetItem):
     @folder.setter
     def folder(self, entity=None):
         self._entity = entity
-
         self._widget.setTextUp(entity.name)
-        
-        count = len(entity.notes)
         datetime = entity.createdAt
-        
-        text_down = '%d records, %s' % (count, datetime.strftime("%d.%m.%Y %H:%M"))
+        text_down = 'Created at: %s' % datetime.strftime("%d.%m.%Y %H:%M")
         self._widget.setTextDown(text_down)
 
     def _onFolderUpdated(self, event=None):
-        self.folder, widget = event.data
+        self.folder = event.data
 
 
 class ItemList(QtWidgets.QListWidget):

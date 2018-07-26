@@ -24,6 +24,20 @@ from .gui.widget import SearchField
 
 class Loader(Loader):
 
+    @property
+    def enabled(self):
+        return True
+
+    def config(self, binder=None):
+        binder.bind_to_constructor('widget.search', self._constructor_search)
+        binder.bind_to_constructor('widget.create_folder', self._constructor_create_folder)
+        binder.bind_to_constructor('widget.create_note', self._constructor_create_note)
+        binder.bind_to_constructor('widget.import_note', self._constructor_import_note)
+
+    @inject.params(dispatcher='event_dispatcher')
+    def boot(self, options=None, args=None, dispatcher=None):
+        dispatcher.add_listener('header_content', self.onActionHeader)
+
     @inject.params(config='config')
     def _constructor_search(self, config=None):
         widget = SearchField()
@@ -40,9 +54,7 @@ class Loader(Loader):
     @inject.params(config='config')
     def _constructor_create_folder(self, config=None):
         widget = QtWidgets.QAction(QtGui.QIcon("icons/plus.svg"), 'Create folder')
-
-        action = functools.partial(self.onActionFolderCreate, widget=widget)
-        widget.triggered.connect(action)
+        widget.triggered.connect(self.onActionFolderCreate)
 
         return widget
 
@@ -50,9 +62,7 @@ class Loader(Loader):
     def _constructor_create_note(self, config=None):
 
         widget = QtWidgets.QAction(QtGui.QIcon("icons/plus.svg"), 'Create document')
-
-        action = functools.partial(self.onActionNoteCreate, widget=widget)
-        widget.triggered.connect(action)
+        widget.triggered.connect(self.onActionNoteCreate)
 
         return widget
 
@@ -60,33 +70,9 @@ class Loader(Loader):
     def _constructor_import_note(self, config=None):
 
         widget = QtWidgets.QAction(QtGui.QIcon("icons/import.svg"), 'Import document')
-
-        action = functools.partial(self.onActionNoteImport, widget=widget)
-        widget.triggered.connect(action)
+        widget.triggered.connect(self.onActionNoteImport)
 
         return widget
-
-    @inject.params(config='config')
-    def _constructor_settings(self, config=None):
-
-        widget = QtWidgets.QAction(QtGui.QIcon("icons/settings.svg"), None)
-
-        return widget
-
-    @property
-    def enabled(self):
-        return True
-
-    def config(self, binder=None):
-        binder.bind_to_constructor('widget.search', self._constructor_search)
-        binder.bind_to_constructor('widget.create_folder', self._constructor_create_folder)
-        binder.bind_to_constructor('widget.create_note', self._constructor_create_note)
-        binder.bind_to_constructor('widget.import_note', self._constructor_import_note)
-        binder.bind_to_constructor('widget.settings', self._constructor_settings)
-
-    @inject.params(dispatcher='event_dispatcher')
-    def boot(self, options=None, args=None, dispatcher=None):
-        dispatcher.add_listener('header_content', self.onActionHeader)
 
     @inject.params(widget_search='widget.search', widget_create_folder='widget.create_folder', widget_create_note='widget.create_note', widget_import_note='widget.import_note', widget_settings='widget.settings')
     def onActionHeader(self, event=None, widget_search=None, widget_create_folder=None, widget_create_note=None, widget_import_note=None, widget_settings=None):
@@ -103,35 +89,29 @@ class Loader(Loader):
         self._container.addWidget(spacer)
         
         self._container.addWidget(widget_search)
-        self._container.addAction(widget_settings)
 
     @inject.params(kernel='kernel')
     def onActionSearchRequest(self, event=None, kernel=None, widget=None):
         kernel.dispatch('search_request', widget.text())
 
     def onActionSearchShortcut(self, event=None, widget=None):
-        if widget is None:
-            return None
         widget.setFocusPolicy(Qt.StrongFocus)
         widget.setFocus()
 
-    @inject.params(storage='storage')
-    def _onNotepadFolderNew(self, event=None, dispather=None, storage=None):
-        name, description = event.data
-        storage.addFolder(name, description)
+    @inject.params(kernel='kernel', logger='logger')
+    def onActionFolderCreate(self, event, kernel=None, widget=None, logger=None):
+        logger.debug('[search] folder create event')
+        kernel.dispatch('folder_new', ('New folder', 'New folder description'))
 
-    @inject.params(kernel='kernel')
-    def onActionFolderCreate(self, event, kernel=None, widget=None):
-        event = (('New folder', 'New folder description'), self)
-        kernel.dispatch('folder_new', event)
+    @inject.params(kernel='kernel', widget='widget.folders', logger='logger')
+    def onActionNoteCreate(self, event, kernel=None, widget=None, logger=None):
+        logger.debug('[search] document create event')
+        kernel.dispatch('note_new', ('New note', 'New description', widget.current))
 
-    @inject.params(kernel='kernel', folders='folders')
-    def onActionNoteCreate(self, event, kernel=None, folders=None, widget=None):
-        event = ('New note', 'New description', folders.selected) 
-        kernel.dispatch('note_new', event)
+    @inject.params(kernel='kernel', widget='widget.folders', logger='logger')
+    def onActionNoteImport(self, event=None, kernel=None, widget=None, logger=None):
+        logger.debug('[search] document import event')
 
-    @inject.params(kernel='kernel', folders='folders')
-    def onActionNoteImport(self, event, kernel=None, folders=None, widget=None):
         selector = QtWidgets.QFileDialog()
         if not selector.exec_():
             return None
@@ -147,7 +127,6 @@ class Loader(Loader):
                 if reply == QtWidgets.QMessageBox.No:
                     continue
             with open(path, 'r') as stream:
-                event = (os.path.basename(path), stream.read(), folders.selected)
-                kernel.dispatch('note_new', event)
+                kernel.dispatch('note_new', (os.path.basename(path), stream.read(), widget.current))
                 stream.close()
 

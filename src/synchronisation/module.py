@@ -22,19 +22,10 @@ class Loader(Loader):
 
     @property
     def enabled(self):
-        return True
+        return False
     
     def config(self, binder=None):
         binder.bind_to_constructor('synchronisation', self._constructor_synchronisation)
-
-    @inject.params(kernel='kernel')
-    def boot(self, options=None, args=None, kernel=None):
-
-        kernel.listen('folder_update', self._onFolderUpdate, 128)
-        
-        kernel.listen('note_new', self._onNoteNew, 128)
-        kernel.listen('note_remove', self._onNoteRemove, 128)
-        kernel.listen('note_update', self._onNoteUpdate, 128)
 
     @inject.params(config='config')
     def _constructor_synchronisation(self, config=None):

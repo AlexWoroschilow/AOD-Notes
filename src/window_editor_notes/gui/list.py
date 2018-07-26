@@ -20,7 +20,7 @@ from .bar import ToolBarWidget
 from .line import NameEditor
 from .label import LabelTop
 from .label import LabelDescription
-from .label import LabelBottom
+from .label import LabelBottom  
 
 
 class QCustomQWidget(QtWidgets.QWidget):
@@ -51,11 +51,10 @@ class QCustomQWidget(QtWidgets.QWidget):
             if entity.name is not None:
                 self.name.setText(entity.name)
             
-            if entity.description is not None and len(entity.description):
-                self.description.setText(entity.description)
-            else:
-                self.description.setVisible(False)
-            
+            self.description.setVisible(False)
+            # if entity.description is not None and len(entity.description):
+            #    self.description.setText(entity.description)
+            #    self.description.setVisible(True)
             if entity.createdAt is not None:
                 datetime = entity.createdAt
                 self.date.setText(datetime.strftime("%d.%m.%Y %H:%M"))
@@ -72,9 +71,11 @@ class QCustomQWidget(QtWidgets.QWidget):
             if entity.createdAt is not None and entity.createdAt:
                 datetime = entity.createdAt.strftime("%d.%m.%Y %H:%M")
                 self.date.setText(datetime)
-                         
-            if entity.description is not None and entity.description:
-                self.description.setText(entity.description)
+
+            self.description.setVisible(False)
+            # if entity.description is not None and entity.description:
+            #    self.description.setText(entity.description)
+            #    self.description.setVisible(True)
 
         return self.name.text()
 
@@ -140,10 +141,7 @@ class ItemList(QtWidgets.QListWidget):
         ))
         
     def onActionNoteUpdate(self, event, item):
-        note, parent = event.data
-        if note is None:
-            return None
-        item.widget.entity = note
+        item.widget.entity = event.data
 
 
 class RecordList(QtWidgets.QSplitter):
