@@ -15,9 +15,9 @@ import inject
 
 from lib.plugin import Loader
 
+from .filesystem import FilesystemStorage
 from .filesystem import Note
 from .filesystem import Folder
-from .filesystem import FilesystemStorage
 
 
 class Loader(Loader):
@@ -28,21 +28,12 @@ class Loader(Loader):
 
     def config(self, binder=None):
         binder.bind_to_constructor('storage', self._construct)
+        binder.bind_to_provider('storage.note', Note)
+        binder.bind_to_provider('storage.folder', Folder)
 
-    @inject.params(kernel='kernel', settings='widget.settings', config='config')
-    def _construct(self, kernel=None, settings=None, config=None):
+    @inject.params(config='config')
+    def _construct(self, config=None):
 
-        from .gui.widget import WidgetSettings
-        settings.addWidget(WidgetSettings())
-
-        kernel.listen('folder_new', self._onFolderNew, 0)
-        kernel.listen('folder_update', self._onFolderUpdate, 0)
-        kernel.listen('folder_remove', self._onFolderRemove, 0)
-
-        kernel.listen('note_new', self._onNoteNew)
-        kernel.listen('note_update', self._onNoteUpdate)
-        kernel.listen('note_remove', self._onNoteRemove)
-        
         storage = config.get('storage.database')
         if len(storage) and storage.find('~') >= 0:
             storage = os.path.expanduser(storage)
@@ -53,34 +44,3 @@ class Loader(Loader):
                 
         return FilesystemStorage(folder)
 
-    @inject.params(storage='storage', logger='logger')
-    def _onFolderNew(self, event=None, storage=None, logger=None):
-        name, text = event.data
-        logger.debug('[storage] folder create event: %s, %s' % (name, text))
-        storage.create(Folder(name=name))        
-
-    @inject.params(storage='storage', logger='logger')
-    def _onNoteNew(self, event=None, storage=None, logger=None):
-        name, text, folder = event.data
-        logger.debug('[storage] document create event: %s, %s' % (name, text))
-        event.data = storage.create(Note(name=name, text=text, folder=folder))        
-
-    @inject.params(storage='storage', logger='logger')
-    def _onFolderUpdate(self, event=None, storage=None, logger=None):
-        logger.debug('[storage] folder update event: %s' % event.data.path)
-        storage.update(event.data)
-
-    @inject.params(storage='storage', logger='logger')
-    def _onNoteUpdate(self, event=None, storage=None, logger=None):
-        logger.debug('[storage] document update event: %s' % event.data.path)
-        storage.update(event.data)
-
-    @inject.params(storage='storage', logger='logger')
-    def _onFolderRemove(self, event=None, storage=None, logger=None):
-        logger.debug('[storage] folder remove event: %s' % event.data.path)
-        storage.delete(event.data)
-
-    @inject.params(storage='storage', logger='logger')
-    def _onNoteRemove(self, event=None, storage=None, logger=None):
-        logger.debug('[storage] document remove event: %s' % event.data.path)
-        storage.delete(event.data)

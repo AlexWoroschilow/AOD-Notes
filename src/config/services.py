@@ -34,7 +34,11 @@ class ConfigService(object):
             self._parser.set('window', 'height', '600')
 
             self._parser.add_section('folders')
-            self._parser.set('folders', 'leftbar', '1')
+            self._parser.set('folders', 'toolbar', '1')
+            self._parser.set('folders', 'buttonClone', '1')
+            self._parser.set('folders', 'buttonExpand', '1')
+            self._parser.set('folders', 'buttonCollapse', '1')
+            self._parser.set('folders', 'buttonRemove', '1')
 
             self._parser.add_section('notes')
             self._parser.set('notes', 'leftbar', '1')
@@ -61,7 +65,9 @@ class ConfigService(object):
         section, option = name.split('.')
         if not self._parser.has_section(section):
             return None
-        return self._parser.get(section, option)
+        if self._parser.has_option(section, option):
+            return self._parser.get(section, option)
+        return None
 
     def set(self, name, value=None):
         section, option = name.split('.')

@@ -17,8 +17,8 @@ from PyQt5 import QtWidgets
 
 class WindowContentDashboard(QtWidgets.QWidget):
 
-    @inject.params(folders='widget.folders', notes='widget.notes')
-    def __init__(self, parent=None, folders=None, notes=None):
+    @inject.params(notepad='notepad')
+    def __init__(self, parent=None, notepad=None):
         super(WindowContentDashboard, self).__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
         self.setObjectName('dashboard')
@@ -29,8 +29,7 @@ class WindowContentDashboard(QtWidgets.QWidget):
         self.content = QtWidgets.QSplitter()
         self.content.setContentsMargins(0, 0, 0, 0)
 
-        self.content.addWidget(folders)
-        self.content.addWidget(notes)
+        self.content.addWidget(notepad)
 
         layout.addWidget(self.content)
 

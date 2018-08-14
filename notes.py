@@ -14,7 +14,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
 import functools
-import time
 
 abspath = os.path.abspath(__file__)
 os.chdir(os.path.dirname(abspath))
@@ -51,35 +50,10 @@ class Application(QtWidgets.QApplication):
 
         return super(Application, self).exec_()
 
-    @inject.params(kernel='kernel')    
-    def update(self, entity=None, kernel=None):
-        if kernel is not None and entity is not None:
-            kernel.dispatch('synchronisation_update', entity)
-
-    @inject.params(kernel='kernel')    
-    def create(self, entity=None, kernel=None):
-        if kernel is not None and entity is not None:
-            kernel.dispatch('synchronisation_create', entity)
-    
     def onWindowToggle(self, event=None, widget=None):
         if widget.isVisible():
             return widget.close()
         return widget.show()
-
-
-class SynchronisationThread(QtCore.QThread):
-
-    exit = QtCore.pyqtSignal(object)
-    update = QtCore.pyqtSignal(object)
-    create = QtCore.pyqtSignal(object)
-
-    def __init__(self, args=None, source=None):
-        super(SynchronisationThread, self).__init__()
-        self._source = source
-        self._args = args
-
-    def run(self, synchronisation=None, config=None):
-        pass
 
 
 if __name__ == "__main__":
@@ -95,12 +69,4 @@ if __name__ == "__main__":
     logging.basicConfig(level=options.loglevel, format=log_format)
 
     application = Application(options, args)
-
-    application_thread = SynchronisationThread(args, '')
-    application_thread.update.connect(application.update)
-    application_thread.create.connect(application.create)
-
-    application_thread.exit.connect(sys.exit)
-    application_thread.start()
-
     sys.exit(application.exec_())

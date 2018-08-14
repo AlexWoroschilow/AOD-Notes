@@ -19,12 +19,9 @@ from glob import glob
 
 class Folder(object):
 
-    def __init__(self, name=None, path=None):
-        self.name = name
+    def __init__(self, path=None, name=None):
         self.path = path
-        self.id = path
-        self.createdAt = datetime.now()
-        self.notes = []
+        self.name = name
 
     def __str__(self):
         return "%s" % self.path
@@ -32,21 +29,11 @@ class Folder(object):
 
 class Note(object):
 
-    def __init__(self, name=None, text=None, folder=None):
+    def __init__(self, path=None, name=None, text=None):
+        self.path = path
         self.name = name
-        self.folder = folder
-        self.path = "%s/%s" % (
-            folder.path if folder is not None else None, name
-        )
-        self.unique = self.path
-        self.id = self.path
         self.text = text
-        self.description = text
-        self.createdAt = datetime.now()
-        self.tags = None
-        self.version = None
 
-#     
     def __str__(self):
         return "%s" % self.path
 
@@ -55,116 +42,97 @@ class FilesystemStorage(object):
     
     def __init__(self, location=None):
         self._location = location
-
-    def create(self, entity=None):
-        
-        if type(entity) == Folder:
-            entity.path = "%s/%s" % (self._location, entity.name)
-            if not os.path.exists(entity.path):
-                os.makedirs(entity.path)
-            return entity
-        
-        if type(entity) == Note:
-            
-            entity.path = "%s/%s" % (
-                entity.folder.path, entity.name
-            )
-            
-            if not os.path.exists(entity.path):
-                with open(entity.path, 'w+') as stream:
-                    stream.write(entity.text)
-                    stream.close()
-                    
-            return entity
-
-    def update(self, entity=None):
-        if type(entity) == Folder:
-            return self._update_folder(entity)
-        if type(entity) == Note:
-            return self._update_document(entity)
-        return None
-
-    def _update_folder(self, entity=None):
-        destination = "%s/%s" % (
-            self._location, entity.name
-        )
-        if not os.path.exists(destination):
-            shutil.move(entity.path, destination)
-            entity.path = destination
-        return entity
         
     def _update_document(self, entity=None):
         destination = "%s/%s" % (
-            entity.folder.path, entity.name
+            os.path.dirname(entity.path),
+            entity.name
         )
+        
         if not os.path.exists(destination):
             shutil.move(entity.path, destination)
             entity.path = destination
+            
         if os.path.exists(entity.path):
             with open(entity.path, 'w+') as stream:
                 stream.write(entity.text)
                 stream.close()
+                
         return entity
 
-    def delete(self, entity=None):
+    def _create_folder(self, entity=None):
+        entity.path = "%s/%s" % (
+            entity.path,
+            entity.name,
+        )
+        
+        if not os.path.exists(entity.path):
+            os.makedirs(entity.path)            
+        return entity
+
+    def _create_document(self, entity=None):
+        if os.path.isfile(entity.path):
+            entity.path = os.path.dirname(entity.path) 
+        
+        entity.path = "%s/%s" % (
+            entity.path,
+            entity.name,
+        )
+        
+        if not os.path.exists(entity.path):
+            with open(entity.path, 'w+') as stream:
+                stream.write(entity.text)
+                stream.close()
+                
+        return entity
+
+    def create(self, entity=None):
         
         if type(entity) == Folder:
-            
-            if os.path.exists(entity.path):
-                return shutil.rmtree(entity.path)
-            
+            return self._create_folder(entity)
+        
         if type(entity) == Note:
+            return self._create_document(entity)
 
-            entity.path = "%s/%s" % (
-                entity.folder.path, entity.name
-            )
-
-            if os.path.exists(entity.path):
-                return os.remove(entity.path)
-
-    def folders(self, string=None):
-        result = []
-        for path in glob("%s/*" % self._location):
-            
-            if not os.path.isdir(path):
-                continue
-            
-            if string is not None:
-                if not path.find(string) < 0:
-                    continue
-                
-            result.append(Folder(
-                os.path.basename(path), path
-            ))
-            
-        return result
-
-    def folder(self, name=None):
         return None
 
-    def note(self, unique=None):
+    def update(self, entity=None):
+
+        if type(entity) == Folder:
+            return None
+        
+        if type(entity) == Note:
+            return self._update_document(entity)
+
         return None
 
-    def notes(self, folder=None, string=None):
-        result = []
-        for path in glob("%s/*" % folder):
-            
-            if os.path.isdir(path):
-                continue
-            
-            if string is not None:
-                if not path.find(string) < 0:
-                    continue
-                
-            with open(path, 'r') as stream:
-                result.append(Note(
-                    os.path.basename(path),
-                    stream.read(), folder
-                ))
+    def clone(self, path=None):
+        destination = "%s(copy)" % path
+        if not os.path.exists(path):
+            return None
 
-        return result
+        if os.path.isdir(path):
+            shutil.copytree(path, destination)
+        
+        if not os.path.exists(destination):
+            shutil.copy(path, destination)
 
-    @property
-    def count(self):
-        return None
+    def delete(self, path=None):
+        if not os.path.exists(path):
+            return None
+            
+        if os.path.isdir(path):
+            return shutil.rmtree(path)
+        
+        if os.path.isfile(path):
+            return os.remove(path)
+
+    def note(self, path=None):
+        if os.path.isdir(path):
+            return None
+
+        with open(path, 'r') as stream:
+            text = stream.read()
+            name = os.path.basename(path)
+            return Note(path, name, text)            
 
