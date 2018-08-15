@@ -49,7 +49,7 @@ class ConfigService(object):
             self._parser.set('editor', 'rightbar', '1')
 
             self._parser.add_section('storage')
-            self._parser.set('storage', 'database', '~/.config/CloudNotes/storage.dhf')
+            self._parser.set('storage', 'database', '~/owncloud/CloudNotes/storage.dhf')
             
             self._parser.add_section('synchronisation')
             self._parser.set('synchronisation', 'folder', '~/CloudFitbaseDe/CloudNotes')
