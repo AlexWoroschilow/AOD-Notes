@@ -71,12 +71,16 @@ class Loader(Loader):
 
         return widget
 
-    @inject.params(kernel='kernel', factory='settings_factory')
-    def _widget(self, kernel=None, factory=None):
+    @inject.params(kernel='kernel', config='config', factory='settings_factory')
+    def _widget(self, kernel=None, config=None, factory=None):
         
         factory.addWidget(self._widget_settings)
 
         widget = FolderList()
+        widget.editor.name.setVisible(int(config.get('editor.name')))
+        widget.editor.formatbar.setVisible(int(config.get('editor.formatbar')))
+        widget.editor.leftbar.setVisible(int(config.get('editor.leftbar')))
+        widget.editor.rightbar.setVisible(int(config.get('editor.rightbar')))
 
         event = (widget.editor, widget.editor.leftbar)
         kernel.dispatch('window.notepad.leftbar', event)
@@ -149,7 +153,7 @@ class Loader(Loader):
         if widget.editor is None:
             return None
 
-        path = config.get('synchronisation.folder')
+        path = config.get('storage.database')
         if widget.tree.selected is not None:
             path = widget.tree.selected
             
@@ -170,7 +174,7 @@ class Loader(Loader):
         if widget.editor is None:
             return None
         
-        path = config.get('synchronisation.folder')
+        path = config.get('storage.database')
         if widget.tree.selected is not None:
             path = widget.tree.selected
             
@@ -211,7 +215,7 @@ class Loader(Loader):
     @inject.params(storage='storage')
     def onActionSave(self, event, widget, storage):
         note = widget._note
-        note.name = widget._name.text() 
+        note.name = widget.name.text() 
         note.text = widget._text.text.toHtml() 
         if note is not None:
             storage.update(note)

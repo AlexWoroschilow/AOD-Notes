@@ -32,7 +32,7 @@ class FolderTree(QTreeView):
         self.setHorizontalScrollBarPolicy( Qt.ScrollBarAlwaysOff )
         self.setVerticalScrollBarPolicy( Qt.ScrollBarAlwaysOff )
         
-        root = config.get('synchronisation.folder')
+        root = config.get('storage.database')
 
         model = QFileSystemModel()
         model.setRootPath(root)

@@ -34,7 +34,7 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.setContentsMargins(0, 0, 0, 0)
 
         self._note = None
-        self._name = NameEditor()
+        self.name = NameEditor()
 
         self._text = TextWriter(self)
         self._text.text.cursorPositionChanged.connect(self.cursorPosition)
@@ -77,7 +77,7 @@ class TextEditorWidget(QtWidgets.QWidget):
         layout.setContentsMargins(0, 10, 0, 0)
 
         layout.addWidget(self.leftbar, 0, 0, 5, 1)
-        layout.addWidget(self._name, 0, 1, 1, 1)
+        layout.addWidget(self.name, 0, 1, 1, 1)
         layout.addWidget(self.rightbar, 1, 2, 3, 1)
         layout.addWidget(self.formatbar, 1, 1)
         layout.addWidget(self._text, 2, 1)
@@ -87,14 +87,14 @@ class TextEditorWidget(QtWidgets.QWidget):
 
     @property
     def note(self):
-        self._note.name = self._name.text() 
+        self._note.name = self.name.text() 
         self._note.text = self._text.text.toHtml() 
         return self._note
 
     @note.setter
     def note(self, note=None):
         self._note = note
-        self._name.setText(note.name)
+        self.name.setText(note.name)
         self._text.text.setHtml(note.text)
 
     def cursorPosition(self):

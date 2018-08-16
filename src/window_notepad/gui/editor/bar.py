@@ -10,7 +10,10 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import inject
+
 from PyQt5.Qt import Qt
+from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 
@@ -22,6 +25,9 @@ class ToolbarWidgetLeft(QtWidgets.QToolBar):
     def __init__(self):
         super(ToolbarWidgetLeft, self).__init__()
         self.setObjectName('editorToolbarWidgetLeft')
+        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.onActionContextMenu)
+        
         self.setContentsMargins(0, 0, 0, 0)
         self.setOrientation(Qt.Vertical)
         self.setMaximumWidth(35)
@@ -80,12 +86,19 @@ class ToolbarWidgetLeft(QtWidgets.QToolBar):
         self.addWidget(self.previewAction)
         self.addWidget(self.fullscreenAction)
 
+    @inject.params(menu='settings_menu')
+    def onActionContextMenu(self, event, menu):
+        menu.exec_(self.mapToGlobal(event))
+
 
 class ToolBarWidgetRight(QtWidgets.QToolBar):
 
     def __init__(self):
         super(ToolBarWidgetRight, self).__init__()
         self.setObjectName('editorToolBarWidgetRight')
+        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.onActionContextMenu)
+        
         self.setOrientation(Qt.Vertical)
         self.setContentsMargins(0, 0, 0, 0)
         self.setMaximumWidth(35)
@@ -131,6 +144,10 @@ class ToolBarWidgetRight(QtWidgets.QToolBar):
         self.addWidget(self.fontColor)
         self.addWidget(self.backColor)
 
+    @inject.params(menu='settings_menu')
+    def onActionContextMenu(self, event, menu):
+        menu.exec_(self.mapToGlobal(event))
+
 
 class FormatbarWidget(QtWidgets.QToolBar):
 
@@ -138,8 +155,8 @@ class FormatbarWidget(QtWidgets.QToolBar):
         super(FormatbarWidget, self).__init__()
         self.setContentsMargins(0, 0, 0, 0)
         self.setObjectName('editorFormatBarWidget')
-
-        # self.folderSelector = FolderComboBox()
+        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.onActionContextMenu)
 
         self.fontSize = QtWidgets.QSpinBox(self)
         self.fontSize.setSuffix(" pt")
@@ -203,3 +220,6 @@ class FormatbarWidget(QtWidgets.QToolBar):
     def folder(self, entity=None):
         pass
 
+    @inject.params(menu='settings_menu')
+    def onActionContextMenu(self, event, menu):
+        menu.exec_(self.mapToGlobal(event))
