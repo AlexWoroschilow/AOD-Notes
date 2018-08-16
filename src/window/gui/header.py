@@ -10,22 +10,18 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-
-import sys
 import inject
-import logging
-import optparse
 
-from PyQt5 import QtGui
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
+
 from PyQt5.QtCore import Qt
 
 
 class WindowHeader(QtWidgets.QWidget):
 
-    @inject.params(dispatcher='event_dispatcher', logger='logger')
-    def __init__(self, parent=None, dispatcher=None, logger=None):
+    @inject.params(dispatcher='event_dispatcher')
+    def __init__(self, parent=None, dispatcher=None):
         super(WindowHeader, self).__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
 
@@ -35,6 +31,7 @@ class WindowHeader(QtWidgets.QWidget):
         toolbar = parent.addToolBar('main')
         toolbar.setIconSize(QtCore.QSize(20, 20))
         toolbar.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        toolbar.setObjectName('MainToolbar')
         toolbar.setFloatable(False)
         toolbar.setMovable(False)
 
