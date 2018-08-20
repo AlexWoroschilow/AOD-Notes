@@ -32,10 +32,8 @@ class Loader(Loader):
     def boot(self, options=None, args=None, dispatcher=None):
         dispatcher.add_listener('header_content', self.onActionHeader, 128)
 
-    @inject.params(config='config')
-    def _get_button(self, config=None):
+    def _get_button(self):
 
-        from PyQt5 import QtWidgets
         from PyQt5 import QtGui
 
         widget = QtWidgets.QAction(QtGui.QIcon("icons/settings.svg"), None)
@@ -43,8 +41,7 @@ class Loader(Loader):
 
         return widget
 
-    @inject.params(config='config')
-    def _get_widget(self, config=None):
+    def _get_widget(self):
 
         from .gui.widget import WidgetSettingsFactory
 

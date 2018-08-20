@@ -19,7 +19,6 @@ from .filesystem import FilesystemStorage
 from .filesystem import Note
 from .filesystem import Folder
 
-
 class Loader(Loader):
 
     @property
@@ -30,6 +29,8 @@ class Loader(Loader):
         binder.bind_to_constructor('storage', self._construct)
         binder.bind_to_provider('storage.note', Note)
         binder.bind_to_provider('storage.folder', Folder)
+
+
 
     @inject.params(config='config')
     def _construct(self, config=None):
@@ -43,4 +44,4 @@ class Loader(Loader):
                 os.makedirs(folder)
                 
         return FilesystemStorage(folder)
-
+ 

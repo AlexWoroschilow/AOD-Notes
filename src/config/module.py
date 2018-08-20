@@ -26,6 +26,19 @@ class Loader(Loader):
     def config(self, binder=None):
         binder.bind_to_constructor('config', self._bind_config)
 
-    @inject.params(kernel='kernel')
-    def _bind_config(self, kernel=None):
+    @inject.params(kernel='kernel', factory='settings_factory')
+    def _bind_config(self, kernel=None, factory=None):
+
+        factory.addWidget(self._widget_settings)
+        factory.addWidget(self._widget_settings)
+        factory.addWidget(self._widget_settings)
+        factory.addWidget(self._widget_settings)
+        factory.addWidget(self._widget_settings)
+        
         return ConfigService(kernel.options.config)
+
+    @inject.params(config='config')
+    def _widget_settings(self, config=None):
+        from .gui.settings.widget import WidgetSettings
+        return WidgetSettings(config)
+

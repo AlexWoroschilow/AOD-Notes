@@ -9,5 +9,23 @@ QTabWidget::pane {
 	background: #fff;
 }
 
+QSplitter { border: none; background-color: #ffffff; }
 
-QSplitter { border: none; background-color: #fff; }
+SettingsScrollArea { border: none; background-color: #f1f2f3; }
+
+QWidget#WidgetSettings QWidget { 
+	padding: 10px 0px;
+}
+
+QWidget#WidgetSettings QWidget#spacer { 
+	background: #ffffff;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-bottom: 3px solid qlineargradient(x1: 0, y1: 0, x2: 0, y2: 3, stop: 0 #ffffff, stop: 1.0 #e0e9f0);
+    border-right: 3px solid qlineargradient(x1: 0, y1: 0, x2: 3, y2: 0, stop: 0 #ffffff, stop: 1.0 #e0e9f0);
+
+    border-radius: 5px;	 
+}
+
+
+
