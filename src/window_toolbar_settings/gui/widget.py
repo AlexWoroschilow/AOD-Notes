@@ -7,6 +7,8 @@ from PyQt5.QtCore import Qt
 from PyQt5 import QtGui
 from PyQt5 import QtWidgets
 
+from .scroll import SettingsScrollArea
+
 
 class WidgetSettingsFactory(object):
 
@@ -18,25 +20,8 @@ class WidgetSettingsFactory(object):
 
     @property
     def widget(self):
-        widget = WidgetSettings()
+        widget = SettingsScrollArea()
         for constructor in self.widgets:
             widget.addWidget(constructor())
         return widget
 
-
-class WidgetSettings(QtWidgets.QWidget):
-
-    def __init__(self):
-        super(WidgetSettings, self).__init__()
-        
-        self.layout = QtWidgets.QVBoxLayout()
-        
-        self.setLayout(self.layout)
-        
-    def addWidget(self, widget):
-        self.layout.addWidget(widget)
-        
-        spacer = QtWidgets.QWidget();
-        spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred);
-        self.layout.addWidget(spacer)
-        

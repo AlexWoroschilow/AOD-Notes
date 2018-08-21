@@ -15,16 +15,14 @@ class WidgetSettings(QtWidgets.QWidget):
 
     def __init__(self, config=None):
         super(WidgetSettings, self).__init__()
-        
-        self.layout = QtWidgets.QGridLayout()
-
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding);
 
         self.setStyleSheet('margin: 2px 50px; padding: 10px 20px;')
 
     
         self.layout = QtWidgets.QGridLayout()
 
-        label = QtWidgets.QLabel('Toolbar settings')
+        label = QtWidgets.QLabel('Storage settings')
         label.setStyleSheet('QLabel { font-size: 26px;}')
 
         self.layout.addWidget(label, 0, 0, 1, 3)
@@ -34,7 +32,7 @@ class WidgetSettings(QtWidgets.QWidget):
         spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding);
         self.layout.addWidget(spacer, 1, 0, 8, 4)
 
-
+        
         folders = QtWidgets.QCheckBox('Show toolbar at the folder panel')
         folders.setChecked(bool(config.get('folders.leftbar')))
         # folders.clicked.connect(self.exportData)
