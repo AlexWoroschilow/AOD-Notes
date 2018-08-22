@@ -45,9 +45,3 @@ class SettingsMenu(QtWidgets.QWidgetAction):
         container.setLayout(layout)
         
         self.setDefaultWidget(container)
-
-    @inject.params(config='config')
-    def onActionToggle(self, status, widget, variable, config):
-        config.set(variable, '%s' % status)
-        widget.setVisible(int(config.get(variable)))
-

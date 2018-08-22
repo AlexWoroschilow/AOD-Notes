@@ -45,14 +45,13 @@ class Loader(Loader):
         """
         binder.bind_to_provider('editor', self._widget_editor)
 
-    @inject.params(config='config')
-    def _widget_settings(self, config=None):
-        from .gui.settings.widget import WidgetSettings 
-        return WidgetSettings(config)
-
-    @inject.params(kernel='kernel')
-    def _widget_editor(self, kernel=None):
+    @inject.params(kernel='kernel', config='config')
+    def _widget_editor(self, kernel=None, config=None):
         widget = TextEditorWidget()
+        widget.name.setVisible(int(config.get('editor.name')))
+        widget.formatbar.setVisible(int(config.get('editor.formatbar')))
+        widget.leftbar.setVisible(int(config.get('editor.leftbar')))
+        widget.rightbar.setVisible(int(config.get('editor.rightbar')))
 
         event = (widget, widget.leftbar)
         kernel.dispatch('window.notepad.leftbar', event)
@@ -69,13 +68,14 @@ class Loader(Loader):
         action = functools.partial(self.onActionFullScreen, widget=widget)
         widget.leftbar.fullscreenAction.clicked.connect(action)
 
+        action = functools.partial(self.onActionConfigUpdatedEditor, widget=widget)
+        kernel.listen('config_updated', action)
+
         return widget
 
     @inject.params(kernel='kernel', config='config', factory='settings_factory')
     def _widget(self, kernel=None, config=None, factory=None):
         
-        factory.addWidget(self._widget_settings)
-
         widget = FolderList()
         widget.editor.name.setVisible(int(config.get('editor.name')))
         widget.editor.formatbar.setVisible(int(config.get('editor.formatbar')))
@@ -120,6 +120,9 @@ class Loader(Loader):
 
         action = functools.partial(self.onActionFolderCreate, widget=widget)
         kernel.listen('folder_new', action)
+
+        action = functools.partial(self.onActionConfigUpdated, widget=widget)
+        kernel.listen('config_updated', action)
 
         return widget
 
@@ -253,4 +256,50 @@ class Loader(Loader):
     def onActionCollaps(self, event, widget):
         if widget.tree is not None:
             widget.tree.collapseAll()
+
+    @inject.params(config='config', logger='logger')
+    def onActionConfigUpdated(self, event, config=None, widget=None, logger=None):
+        if widget is None or config is None:
+            return None
+
+        try:        
+            visible = int(config.get('folders.toolbar'))
+            widget.toolbar.setVisible(visible)
+        except (AttributeError) as ex:
+            logger.error(ex)
+
+        try:        
+            visible = int(config.get('folders.keywords'))
+            widget.tags.setVisible(visible)
+        except (AttributeError):
+            pass
+        
+        self.onActionConfigUpdatedEditor(event, widget=widget.editor)
+
+    @inject.params(config='config', logger='logger')
+    def onActionConfigUpdatedEditor(self, event, widget=None, config=None, logger=None):
+
+        try:        
+            visible = int(config.get('editor.formatbar'))
+            widget.formatbar.setVisible(visible)
+        except (AttributeError):
+            pass
+
+        try:        
+            visible = int(config.get('editor.leftbar'))
+            widget.leftbar.setVisible(visible)
+        except (AttributeError):
+            pass
+            
+        try:        
+            visible = int(config.get('editor.rightbar'))
+            widget.rightbar.setVisible(visible)
+        except (AttributeError):
+            pass
+
+        try:        
+            visible = int(config.get('editor.name'))
+            widget.name.setVisible(visible)
+        except (AttributeError):
+            pass
 
