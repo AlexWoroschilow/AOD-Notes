@@ -57,38 +57,32 @@ class Loader(Loader):
         widget = SettingsMenu(menu)
         widget.editorName.setChecked(int(config.get('editor.name')))
         widget.editorName.stateChanged.connect(functools.partial(
-            widget.onActionToggle, variable='editor.name',
-            widget=notepad.editor.name
+            self.onActionToggle, variable='editor.name',
         ))
 
         widget.editorToolbarFormat.setChecked(int(config.get('editor.formatbar')))
         widget.editorToolbarFormat.stateChanged.connect(functools.partial(
-            widget.onActionToggle, variable='editor.formatbar',
-            widget=notepad.editor.formatbar
+            self.onActionToggle, variable='editor.formatbar',
         ))
 
         widget.editorToolbarRight.setChecked(int(config.get('editor.rightbar')))
         widget.editorToolbarRight.stateChanged.connect(functools.partial(
-            widget.onActionToggle, variable='editor.rightbar',
-            widget=notepad.editor.rightbar
+            self.onActionToggle, variable='editor.rightbar',
         ))
 
         widget.editorToolbarLeft.setChecked(int(config.get('editor.leftbar')))
         widget.editorToolbarLeft.stateChanged.connect(functools.partial(
-            widget.onActionToggle, variable='editor.leftbar',
-            widget=notepad.editor.leftbar
+            self.onActionToggle, variable='editor.leftbar',
         ))
 
-        widget.tags.setChecked(int(config.get('folders.toolbarTags')))
+        widget.tags.setChecked(int(config.get('folders.keywords')))
         widget.tags.stateChanged.connect(functools.partial(
-            widget.onActionToggle, variable='folders.toolbarTags',
-            widget=notepad.tags
+            self.onActionToggle, variable='folders.keywords',
         ))
 
         widget.toolbar.setChecked(int(config.get('folders.toolbar')))
         widget.toolbar.stateChanged.connect(functools.partial(
-            widget.onActionToggle, variable='folders.toolbar',
-            widget=notepad.toolbar
+            self.onActionToggle, variable='folders.toolbar',
         ))
         
         menu.addAction(widget)
@@ -105,3 +99,7 @@ class Loader(Loader):
         logger.debug('[search] settings event')
         kernel.dispatch('window.tab', (factory.widget, 'Settings'))
 
+    @inject.params(config='config', kernel='kernel')
+    def onActionToggle(self, status, variable, config, kernel):
+        config.set(variable, '%s' % status)
+        kernel.dispatch('config_updated')

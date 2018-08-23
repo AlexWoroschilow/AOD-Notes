@@ -40,7 +40,7 @@ class FolderList(QtWidgets.QSplitter):
         containerLayout.addWidget(self.tree, 0, 1)
 
         self.tags = TagsEditor()
-        self.tags.setVisible(int(config.get('folders.toolbarTags')))
+        self.tags.setVisible(int(config.get('folders.keywords')))
         containerLayout.addWidget(self.tags, 1, 1)
 
         container = QtWidgets.QWidget()

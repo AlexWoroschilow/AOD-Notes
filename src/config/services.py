@@ -35,10 +35,6 @@ class ConfigService(object):
 
             self._parser.add_section('folders')
             self._parser.set('folders', 'toolbar', '1')
-            self._parser.set('folders', 'buttonClone', '1')
-            self._parser.set('folders', 'buttonExpand', '1')
-            self._parser.set('folders', 'buttonCollapse', '1')
-            self._parser.set('folders', 'buttonRemove', '1')
 
             self._parser.add_section('notes')
             self._parser.set('notes', 'leftbar', '1')
