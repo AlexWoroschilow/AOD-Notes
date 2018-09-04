@@ -35,6 +35,7 @@ class ConfigService(object):
 
             self._parser.add_section('folders')
             self._parser.set('folders', 'toolbar', '1')
+            self._parser.set('folders', 'keywords', '1')
 
             self._parser.add_section('notes')
             self._parser.set('notes', 'leftbar', '1')
@@ -43,6 +44,7 @@ class ConfigService(object):
             self._parser.set('editor', 'leftbar', '1')
             self._parser.set('editor', 'formatbar', '1')
             self._parser.set('editor', 'rightbar', '1')
+            self._parser.set('editor', 'name', '1')
 
             self._parser.add_section('storage')
             self._parser.set('storage', 'database', '~/owncloud/CloudNotes/storage.dhf')

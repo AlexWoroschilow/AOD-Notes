@@ -167,7 +167,7 @@ class Loader(Loader):
         note.text = 'new note description'
         note.path = path
         
-        if event.data is not None:
+        if event is not None and event.data is not None:
             note.name, note.text = event.data
             
         storage.create(note)
