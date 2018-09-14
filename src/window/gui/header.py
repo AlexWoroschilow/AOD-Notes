@@ -10,36 +10,41 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-
-import sys
 import inject
-import logging
-import optparse
 
-from PyQt5 import QtGui
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
+
 from PyQt5.QtCore import Qt
+
+
+class WidgetHeaderFactory(object):
+
+    def __init__(self):
+        self.widgets = []
+
+    def addWidget(self, widget):
+        self.widgets.append(widget)
+
+    @property
+    def widget(self):
+        widget = WindowHeader()
+        for header_widget in self.widgets:
+            if isinstance(header_widget, QtWidgets.QAction):
+                widget.header.addAction(header_widget)
+            if isinstance(header_widget, QtWidgets.QWidget):
+                widget.header.addWidget(header_widget)
+        return widget
 
 
 class WindowHeader(QtWidgets.QWidget):
 
-    @inject.params(dispatcher='event_dispatcher', logger='logger')
-    def __init__(self, parent=None, dispatcher=None, logger=None):
+    def __init__(self, parent=None):
         super(WindowHeader, self).__init__(parent)
+
         self.setContentsMargins(0, 0, 0, 0)
 
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
-            
-        toolbar = parent.addToolBar('main')
-        toolbar.setIconSize(QtCore.QSize(20, 20))
-        toolbar.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
-        toolbar.setFloatable(False)
-        toolbar.setMovable(False)
-
-        dispatcher.dispatch('header_content', (
-            toolbar, self
-        ))
-
+        
         self.setLayout(layout)

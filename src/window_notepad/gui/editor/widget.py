@@ -97,6 +97,16 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.name.setText(note.name)
         self._text.text.setHtml(note.text)
 
+    def zoomIn(self, value):
+        if self._text is None:
+            return None
+        self._text.zoomIn(value)
+        
+    def zoomOut(self, value):
+        if self._text is None:
+            return None
+        self._text.zoomOut(value)
+
     def cursorPosition(self):
         cursor = self._text.text.textCursor()
         line = cursor.blockNumber() + 1

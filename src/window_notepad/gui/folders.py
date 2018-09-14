@@ -14,6 +14,8 @@ import inject
 
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt
+
 from PyQt5.QtWidgets import QTreeView 
 from PyQt5.QtWidgets import QFileSystemModel
 
@@ -27,6 +29,8 @@ class FolderTree(QTreeView):
         self.setObjectName('FolderTree')
         self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         
         root = config.get('storage.location')
 
@@ -46,6 +50,8 @@ class FolderTree(QTreeView):
         self.setColumnHidden(2, True)
         self.setColumnHidden(3, True)
 
+    def test(self, event):
+        return False
 
     @property
     def selected(self):

@@ -14,10 +14,11 @@ from PyQt5.QtCore import Qt
 
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
+from PyQt5 import QtCore
 
 
 class TextEditor(QtWidgets.QTextEdit):
-
+    
     def __init__(self, parent=None):
         super(TextEditor, self).__init__(parent)
         self.setObjectName('editorTextEditor')
@@ -29,9 +30,9 @@ class TextEditor(QtWidgets.QTextEdit):
 
         self.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-
-        self._entity = None
         
+        self._entity = None
+
     @property
     def entity(self):
         return self._entity
@@ -39,4 +40,13 @@ class TextEditor(QtWidgets.QTextEdit):
     @entity.setter
     def entity(self, value):
         self.entity = value
+
+    def wheelEvent(self, event):
+        point = event.angleDelta() 
+        if event.modifiers() == QtCore.Qt.ControlModifier:
+            if point.y() > 0:
+                self.zoomIn(5)
+            if point.y() < 0:
+                self.zoomOut(5)
+        return super(TextEditor, self).wheelEvent(event)
 

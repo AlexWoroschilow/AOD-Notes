@@ -13,7 +13,6 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
-import functools
 
 abspath = os.path.abspath(__file__)
 os.chdir(os.path.dirname(abspath))
@@ -24,36 +23,28 @@ import logging
 import optparse
 
 from PyQt5 import QtWidgets
-from PyQt5 import QtCore
 
 from lib.kernel import Kernel
 
 
 class Application(QtWidgets.QApplication):
 
+    kernel = None
+    
     def __init__(self, options=None, args=None):
-        QtWidgets.QApplication.__init__(self, sys.argv)
-        self._kernel = Kernel(options, args)
+        super(Application, self).__init__(sys.argv)
+        
+        self.kernel = Kernel(options, args)
 
     @inject.params(kernel='kernel', widget='window')
     def exec_(self, kernel=None, widget=None):
+
+        if kernel is None and widget is None:
+            return None
         
-        kernel.listen('window_exit', self.exit)
-        
-        action = functools.partial(self.onWindowToggle, widget=widget)
-        kernel.listen('window_toggle', action)
-        
-        action = functools.partial(self.onWindowToggle, widget=widget)
-        kernel.listen('window_start', action)
-        
-        kernel.dispatch('window_start')
+        widget.show()
 
         return super(Application, self).exec_()
-
-    def onWindowToggle(self, event=None, widget=None):
-        if widget.isVisible():
-            return widget.close()
-        return widget.show()
 
 
 if __name__ == "__main__":

@@ -28,15 +28,18 @@ class Loader(Loader):
     def enabled(self):
         return True
 
-    def config(self, binder=None):
-        binder.bind_to_constructor('widget.search', self._constructor_search)
-        binder.bind_to_constructor('widget.create_folder', self._constructor_create_folder)
-        binder.bind_to_constructor('widget.create_note', self._constructor_create_note)
-        binder.bind_to_constructor('widget.import_note', self._constructor_import_note)
+    @inject.params(factory='window.header_factory')
+    def boot(self, options=None, args=None, factory=None):
 
-    @inject.params(dispatcher='event_dispatcher')
-    def boot(self, options=None, args=None, dispatcher=None):
-        dispatcher.add_listener('header_content', self.onActionHeader)
+        factory.addWidget(self._constructor_create_folder())
+        factory.addWidget(self._constructor_create_note())
+        factory.addWidget(self._constructor_import_note())
+
+        spacer = QtWidgets.QWidget();
+        spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred);
+        factory.addWidget(spacer)
+        
+        factory.addWidget(self._constructor_search())
 
     @inject.params(config='config')
     def _constructor_search(self, config=None):
@@ -73,22 +76,6 @@ class Loader(Loader):
         widget.triggered.connect(self.onActionNoteImport)
 
         return widget
-
-    @inject.params(widget_search='widget.search', widget_create_folder='widget.create_folder', widget_create_note='widget.create_note', widget_import_note='widget.import_note')
-    def onActionHeader(self, event=None, widget_search=None, widget_create_folder=None, widget_create_note=None, widget_import_note=None):
-        self._container, self._parent = event.data
-        if self._container is None:
-            return None
-
-        self._container.addAction(widget_create_folder)
-        self._container.addAction(widget_create_note)
-        self._container.addAction(widget_import_note)
-
-        spacer = QtWidgets.QWidget();
-        spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred);
-        self._container.addWidget(spacer)
-        
-        self._container.addWidget(widget_search)
 
     @inject.params(kernel='kernel')
     def onActionSearchRequest(self, event=None, kernel=None, widget=None):

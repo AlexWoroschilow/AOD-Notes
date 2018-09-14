@@ -24,13 +24,25 @@ class Loader(Loader):
         return True
 
     def config(self, binder=None):
-        binder.bind_to_constructor('settings_factory', self._get_widget)
-        binder.bind_to_constructor('button.settings', self._get_button)
+        
+        from .gui.widget import WidgetSettingsFactory
+        """
+        Store the settings widgets from te different 
+        modules in the factory and access them all the time
+        we build the settings tab
+        """
+        binder.bind('settings_factory', WidgetSettingsFactory())
+        
+        """
+        We have provide a new settings widget
+        all the time we call the menu, that why we 
+        use the provider method
+        """
         binder.bind_to_provider('settings_menu', self._get_menu)
-
-    @inject.params(dispatcher='event_dispatcher')
-    def boot(self, options=None, args=None, dispatcher=None):
-        dispatcher.add_listener('header_content', self.onActionHeader, 128)
+        
+    @inject.params(factory='window.header_factory')
+    def boot(self, options=None, args=None, factory=None):
+        factory.addWidget(self._get_button())
 
     def _get_button(self):
 
@@ -40,12 +52,6 @@ class Loader(Loader):
         widget.triggered.connect(self.onActionSettings)
 
         return widget
-
-    def _get_widget(self):
-
-        from .gui.widget import WidgetSettingsFactory
-
-        return WidgetSettingsFactory()
 
     @inject.params(config='config', notepad='notepad')
     def _get_menu(self, config, notepad):
@@ -88,11 +94,6 @@ class Loader(Loader):
         menu.addAction(widget)
         
         return menu
-
-    @inject.params(button='button.settings')
-    def onActionHeader(self, event=None, button=None):
-        self.container, self.parent = event.data
-        self.container.addAction(button)
 
     @inject.params(kernel='kernel', factory='settings_factory', logger='logger')
     def onActionSettings(self, event=None, factory=None, kernel=None, logger=None):

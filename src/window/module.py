@@ -13,54 +13,78 @@
 import inject
 import functools
 
-from PyQt5 import QtWidgets
-
 from lib.plugin import Loader
 
+from PyQt5 import QtWidgets
+from PyQt5 import QtCore
+
+from PyQt5.QtCore import Qt
+
 from .gui.window import MainWindow
+from .gui.header import WidgetHeaderFactory
 
 
 class Loader(Loader):
-
-    @inject.params(kernel='kernel', config='config', statusbar='widget.statusbar')
-    def _constructor_window(self, kernel=None, config=None, statusbar=None):
-        widget = MainWindow()
-        
-        spacer = QtWidgets.QWidget();
-        spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred);
-        widget.statusBar().addWidget(spacer);
-        
-        widget.statusBar().addWidget(statusbar);
-        
-        width = int(config.get('window.width'))
-        height = int(config.get('window.height'))
-        widget.resize(width, height)
-
-        widget.closeEvent = functools.partial(
-            self.onActionClose, widget=widget
-        )
-        
-        widget.resizeEvent = functools.partial(
-            self.onActionResize, widget=widget
-        )
-        
-        return widget
 
     @property
     def enabled(self):
         return True
 
     def config(self, binder=None):
+        """
+        Store the settings widgets from te different 
+        modules in the factory and access them all the time
+        """
+        binder.bind('window.header_factory', WidgetHeaderFactory())
+        
         binder.bind_to_constructor('window', self._constructor_window)
+        binder.bind_to_constructor('window.header', self._constructor_window_header)
+        binder.bind_to_constructor('window.footer', self._constructor_window_footer)
+
+    @inject.params(config='config', factory='window.header_factory')
+    def _constructor_window(self, config=None, factory=None):
+        
+        widget = MainWindow()
+        
+        widget.header = widget.addToolBar('main')
+        widget.header.setIconSize(QtCore.QSize(20, 20))
+        widget.header.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        widget.header.setObjectName('MainToolbar')
+        widget.header.setFloatable(False)
+        widget.header.setMovable(False)
+        
+        for header_widget in factory.widgets:
+            if isinstance(header_widget, QtWidgets.QAction):
+                widget.header.addAction(header_widget)
+            if isinstance(header_widget, QtWidgets.QWidget):
+                widget.header.addWidget(header_widget)
+
+        widget.footer = widget.statusBar()
+        
+        width = int(config.get('window.width'))
+        height = int(config.get('window.height'))
+        widget.resize(width, height)
+
+        widget.resizeEvent = functools.partial(
+            self.onActionWindowResize
+        )
+        
+        return widget
+
+    @inject.params(window='window')
+    def _constructor_window_header(self, window=None):
+        if window.header is not None:
+            return window.header
+        return None
+
+    @inject.params(window='window')
+    def _constructor_window_footer(self, window=None):
+        if window.footer is not None:
+            return window.footer
+        return None
 
     @inject.params(config='config')
-    def onActionResize(self, event=None, widget=None, config=None):
+    def onActionWindowResize(self, event=None, config=None):
         config.set('window.width', '%s' % event.size().width())
         config.set('window.height', '%s' % event.size().height())
         return event.accept()
-
-    @inject.params(kernel='kernel')
-    def onActionClose(self, event=None, widget=None, kernel=None):
-        kernel.dispatch('window_toggle')
-        return event.accept()
-
