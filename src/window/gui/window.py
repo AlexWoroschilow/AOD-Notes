@@ -34,14 +34,19 @@ class MainWindow(QtWidgets.QMainWindow):
             self.setWindowIcon(icon)
         self.setWindowTitle('Cloud notepad')
 
-        layout = QtWidgets.QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
+        self.layout = QtWidgets.QVBoxLayout()
+        self.layout.setContentsMargins(0, 0, 0, 0)
 
-        layout.addWidget(WindowHeader(self))
-        layout.addWidget(WindowContent(self))
+        self.layout.addWidget(WindowHeader(self))
+        self.layout.addWidget(WindowContent(self))
 
         content = QtWidgets.QWidget()
-        content.setLayout(layout)
+        content.setLayout(self.layout)
 
         self.setCentralWidget(content)
+        
+        spacer = QtWidgets.QWidget();
+        spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred);
+        self.statusBar().addWidget(spacer);
+        
 

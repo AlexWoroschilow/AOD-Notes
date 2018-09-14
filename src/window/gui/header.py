@@ -20,8 +20,8 @@ from PyQt5.QtCore import Qt
 
 class WindowHeader(QtWidgets.QWidget):
 
-    @inject.params(dispatcher='event_dispatcher')
-    def __init__(self, parent=None, dispatcher=None):
+    @inject.params(kernel='kernel')
+    def __init__(self, parent=None, kernel=None):
         super(WindowHeader, self).__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
 
@@ -35,7 +35,7 @@ class WindowHeader(QtWidgets.QWidget):
         toolbar.setFloatable(False)
         toolbar.setMovable(False)
 
-        dispatcher.dispatch('header_content', (
+        kernel.dispatch('header_content', (
             toolbar, self
         ))
 

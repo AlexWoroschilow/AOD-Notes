@@ -24,7 +24,10 @@ class Loader(Loader):
         return True
 
     def config(self, binder=None):
-        binder.bind_to_constructor('settings_factory', self._get_widget)
+        
+        from .gui.widget import WidgetSettingsFactory
+        binder.bind('settings_factory', WidgetSettingsFactory())
+        
         binder.bind_to_constructor('button.settings', self._get_button)
         binder.bind_to_provider('settings_menu', self._get_menu)
 
@@ -40,12 +43,6 @@ class Loader(Loader):
         widget.triggered.connect(self.onActionSettings)
 
         return widget
-
-    def _get_widget(self):
-
-        from .gui.widget import WidgetSettingsFactory
-
-        return WidgetSettingsFactory()
 
     @inject.params(config='config', notepad='notepad')
     def _get_menu(self, config, notepad):
