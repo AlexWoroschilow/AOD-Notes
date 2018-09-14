@@ -1,14 +1,8 @@
 # -*- coding: utf-8 -*-
 
 # PYQT5 PyQt4’s QtGui module has been split into PyQt5’s QtGui, QtPrintSupport and QtWidgets modules
-import inject
-from PyQt5.QtCore import Qt
 
-from PyQt5 import QtGui
 from PyQt5 import QtWidgets
-from PyQt5 import QtCore
-
-from .text import TextEditor
 
 
 class WidgetSettingsNavigator(QtWidgets.QWidget):
@@ -29,7 +23,7 @@ class WidgetSettingsNavigator(QtWidgets.QWidget):
         spacer = QtWidgets.QWidget();
         spacer.setObjectName('spacer')
         spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding);
-        self.layout.addWidget(spacer, 1, 0, 8, 4)
+        self.layout.addWidget(spacer, 1, 0, 8, 3)
 
         self.toolbar = QtWidgets.QCheckBox('Toolbar is visible')
         self.layout.addWidget(self.toolbar, 2, 0)
@@ -60,7 +54,7 @@ class WidgetSettingsEditor(QtWidgets.QWidget):
         spacer = QtWidgets.QWidget();
         spacer.setObjectName('spacer')
         spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding);
-        self.layout.addWidget(spacer, 1, 0, 8, 4)
+        self.layout.addWidget(spacer, 1, 0, 8, 3)
 
         self.name = QtWidgets.QCheckBox('Record name is visible')
         self.layout.addWidget(self.name, 2, 0)

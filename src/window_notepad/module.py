@@ -156,7 +156,7 @@ class Loader(Loader):
         if widget.editor is None:
             return None
 
-        path = config.get('storage.database')
+        path = config.get('storage.location')
         if widget.tree.selected is not None:
             path = widget.tree.selected
             
@@ -177,7 +177,7 @@ class Loader(Loader):
         if widget.editor is None:
             return None
         
-        path = config.get('storage.database')
+        path = config.get('storage.location')
         if widget.tree.selected is not None:
             path = widget.tree.selected
             

@@ -86,7 +86,7 @@ class Loader(Loader):
     def _widget_settings_storage(self, config=None):
         from .gui.settings.widget import WidgetSettingsStorage
         widget = WidgetSettingsStorage()
-        widget.location.setText(config.get('storage.database'))
+        widget.location.setText(config.get('storage.location'))
         widget.locationChoice.clicked.connect(functools.partial(
             self.onActionStorageLocationChange, widget=widget
         ))
@@ -99,7 +99,7 @@ class Loader(Loader):
         from PyQt5 import QtWidgets
         destination = str(QtWidgets.QFileDialog.getExistingDirectory(widget, "Select Directory"))
         if destination is not None and len(destination):
-            config.set('storage.database', destination)
+            config.set('storage.location', destination)
             widget.location.setText(destination)
             kernel.dispatch('config_updated')
 

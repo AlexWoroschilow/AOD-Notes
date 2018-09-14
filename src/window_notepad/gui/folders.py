@@ -28,7 +28,7 @@ class FolderTree(QTreeView):
         self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         
-        root = config.get('storage.database')
+        root = config.get('storage.location')
 
         model = QFileSystemModel()
         model.setRootPath(root)
