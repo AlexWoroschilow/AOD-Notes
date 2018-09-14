@@ -1,5 +1,5 @@
 QTreeView#FolderTree { border: none; background-color: #414649; color: #A0A0A0; }
-QToolBar#ToolBarWidget { border: none; background-color: #414649; color: #A0A0A0; }
+QToolBar#ToolBarWidget { border: none; background-color: #414649; color: #A0A0A0;  }
 QLabel#TagsEditor { border: none; background-color: #414649; color: #A0A0A0; }
 
 QTabWidget::pane {
@@ -13,6 +13,7 @@ QLineEdit { font-size: 12px; padding: 3px; margin: 5px 0px 0px 0px; }
 QWidget QTextEdit { background-color: #fff; border: 1px !important; }
 QSplitter { border: none; background-color: #fff; }
 QToolBar {  border: none; }
+QPushButton { margin: 5px; }
 QTreeView { font-size: 16px; }
 
 SettingsScrollArea { border: none; background-color: #f1f2f3; }

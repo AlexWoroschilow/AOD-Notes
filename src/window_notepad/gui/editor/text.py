@@ -45,6 +45,8 @@ class TextEditor(QtWidgets.QTextEdit):
         point = event.angleDelta() 
         if event.modifiers() == QtCore.Qt.ControlModifier:
             if point.y() > 0:
-                return self.zoomIn(5)
+                self.zoomIn(5)
             if point.y() < 0:
-                return self.zoomOut(5)
+                self.zoomOut(5)
+        return super(TextEditor, self).wheelEvent(event)
+

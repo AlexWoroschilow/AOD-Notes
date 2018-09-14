@@ -32,5 +32,15 @@ class TextWriter(QtWidgets.QScrollArea):
         
         self._entity = None
 
+    def zoomIn(self, value):
+        if self.text is None:
+            return None
+        self.text.zoomIn(value)
+        
+    def zoomOut(self, value):
+        if self.text is None:
+            return None
+        self.text.zoomOut(value)
+
     def html(self):
         return self.text.toHtml()

@@ -27,7 +27,6 @@ class ToolbarWidgetLeft(QtWidgets.QToolBar):
         self.setObjectName('editorToolbarWidgetLeft')
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.onActionContextMenu)
-        
         self.setContentsMargins(0, 0, 0, 0)
         self.setOrientation(Qt.Vertical)
         self.setMaximumWidth(35)

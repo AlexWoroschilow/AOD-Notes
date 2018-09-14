@@ -37,12 +37,6 @@ class ToolBarWidget(QtWidgets.QToolBar):
 
         self.setVisible(int(config.get('folders.toolbar')))
         
-        self.copyAction = ToolBarButton()
-        self.copyAction.setIcon(QtGui.QIcon("icons/copy-light.svg"))
-        self.copyAction.setToolTip("Clone selected folder")
-        self.copyAction.setShortcut("Ctrl+C")
-        self.addWidget(self.copyAction)
-
         self.expandAction = ToolBarButton()
         self.expandAction.setIcon(QtGui.QIcon("icons/plus-light.svg"))
         self.expandAction.setToolTip("Expand all folders")
@@ -52,6 +46,12 @@ class ToolBarWidget(QtWidgets.QToolBar):
         self.collapseAction.setIcon(QtGui.QIcon("icons/minus-light.svg"))
         self.collapseAction.setToolTip("Collaps all folders")
         self.addWidget(self.collapseAction)
+
+        self.copyAction = ToolBarButton()
+        self.copyAction.setIcon(QtGui.QIcon("icons/copy-light.svg"))
+        self.copyAction.setToolTip("Clone selected folder")
+        self.copyAction.setShortcut("Ctrl+C")
+        self.addWidget(self.copyAction)
 
         self.removeAction = ToolBarButton()
         self.removeAction.setIcon(QtGui.QIcon("icons/remove-light.svg"))

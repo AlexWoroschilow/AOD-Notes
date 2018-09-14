@@ -47,6 +47,7 @@ class Loader(Loader):
             self._onNotepadExport, widget=widget
         ))
 
+        widget.toolbar.addSeparator()
         widget.toolbar.addWidget(widget)
 
     @inject.params(kernel='kernel')
