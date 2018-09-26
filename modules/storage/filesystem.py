@@ -12,9 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
 import shutil
-from datetime import datetime
-
-from glob import glob
 
 
 class Folder(object):

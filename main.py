@@ -50,9 +50,11 @@ class Application(QtWidgets.QApplication):
 if __name__ == "__main__":
     parser = optparse.OptionParser()
     
-    parser.add_option("--loglevel", default=logging.DEBUG, dest="loglevel", help="Loggin level")
-    config = os.path.expanduser('~/.config/CloudNotes/notes.conf')
-    parser.add_option("--config", default=config, dest="config", help="Loggin level")
+    logfile = os.path.expanduser('/var/log/notes.log')
+    parser.add_option("--logfile", default=logfile, dest="logfile", help="Logfile location")
+    parser.add_option("--loglevel", default=logging.DEBUG, dest="loglevel", help="Logging level")
+    configfile = os.path.expanduser('~/.config/CloudNotes/notes.conf')
+    parser.add_option("--config", default=configfile, dest="config", help="Config file location")
     
     (options, args) = parser.parse_args()
     

@@ -45,6 +45,8 @@ class Loader(Loader):
     def _constructor_window(self, config=None, factory=None):
         
         widget = MainWindow()
+        widget.resize(int(config.get('window.width')),
+                      int(config.get('window.height')))
         
         widget.header = widget.addToolBar('main')
         widget.header.setIconSize(QtCore.QSize(20, 20))
@@ -60,10 +62,6 @@ class Loader(Loader):
                 widget.header.addWidget(header_widget)
 
         widget.footer = widget.statusBar()
-        
-        width = int(config.get('window.width'))
-        height = int(config.get('window.height'))
-        widget.resize(width, height)
 
         widget.resizeEvent = functools.partial(
             self.onActionWindowResize

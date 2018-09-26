@@ -13,32 +13,36 @@
 import inject
 
 from PyQt5 import QtCore
+from PyQt5 import QtGui
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 
-from PyQt5.QtWidgets import QTreeView 
-from PyQt5.QtWidgets import QFileSystemModel
+
+class IconProvider(QtWidgets.QFileIconProvider):
+
+    def icon(self, fileInfo):
+        if fileInfo.isDir():
+            return QtGui.QIcon("icons/folder-light.svg") 
+        return QtGui.QIcon("icons/file-light.svg") 
 
 
-class FolderTree(QTreeView):
+class FolderTree(QtWidgets.QTreeView):
 
     @inject.params(config='config')
     def __init__(self, config=None):
-        QTreeView.__init__(self)
+        QtWidgets.QTreeView.__init__(self)
         
         self.setObjectName('FolderTree')
         self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        
-        root = config.get('storage.location')
 
-        model = QFileSystemModel()
-        model.setRootPath(root)
+        model = QtWidgets.QDirModel()
+        model.setIconProvider(IconProvider())
         model.setReadOnly(False)
-        
-        index = model.index(root)
+
+        index = model.index(config.get('storage.location'))
         if index is None:
             return None
         
@@ -49,9 +53,7 @@ class FolderTree(QTreeView):
         self.setColumnHidden(1, True)
         self.setColumnHidden(2, True)
         self.setColumnHidden(3, True)
-
-    def test(self, event):
-        return False
+        self.expandAll()
 
     @property
     def selected(self):

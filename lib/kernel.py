@@ -21,7 +21,7 @@ from lib.event import Dispatcher
 
 class Kernel(object):
 
-    def __init__(self, options=None, args=None, sources="src/**/module.py"):
+    def __init__(self, options=None, args=None, sources="modules/**/module.py"):
         self._options = options
         self._sources = sources
         self._args = args
