@@ -18,8 +18,12 @@ from PyQt5 import QtGui
 from lib.plugin import Loader
 from lib.widget.button import ToolBarButton
 
+from .actions import ModuleActions
+
 
 class Loader(Loader):
+
+    actions = ModuleActions()
 
     @property
     def enabled(self):
@@ -27,9 +31,9 @@ class Loader(Loader):
 
     @inject.params(kernel='kernel')
     def boot(self, options=None, args=None, kernel=None):
-        kernel.listen('window.notepad.leftbar', self._onWindowNotepadToolbar, 512)
+        kernel.listen('window.notepad.leftbar', self._widget, 512)
 
-    def _onWindowNotepadToolbar(self, event=None):
+    def _widget(self, event=None):
         
         zoomIn = ToolBarButton()
         zoomIn.setShortcut("Ctrl+=")
@@ -40,7 +44,7 @@ class Loader(Loader):
         zoomIn.setIcon(QtGui.QIcon("icons/zoomIn.svg"))
         zoomIn.setToolTip(zoomIn.tr("Change the text color to blue"))
         zoomIn.clicked.connect(functools.partial(
-            self.onActionZoomIn, widget=zoomIn
+            self.actions.onActionZoomIn, widget=zoomIn
         ))
         
         zoomOut = ToolBarButton()
@@ -51,18 +55,10 @@ class Loader(Loader):
         zoomOut.setIcon(QtGui.QIcon("icons/zoomOut.svg"))
         zoomOut.setToolTip(zoomOut.tr("Change the text color to blue"))
         zoomOut.clicked.connect(functools.partial(
-            self.onActionZoomOut, widget=zoomOut
+            self.actions.onActionZoomOut, widget=zoomOut
         ))
         
         toolbar.addSeparator()
         toolbar.addWidget(zoomIn)
         toolbar.addWidget(zoomOut)
-
-    def onActionZoomIn(self, event=None, widget=None):
-        if widget is not None and widget.editor is not None:
-            widget.editor.zoomIn(5)
-
-    def onActionZoomOut(self, event=None, widget=None):
-        if widget is not None and widget.editor is not None:
-            widget.editor.zoomOut(5)
 

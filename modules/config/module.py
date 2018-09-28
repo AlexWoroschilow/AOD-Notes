@@ -16,19 +16,22 @@ import functools
 from lib.plugin import Loader
 
 from .services import ConfigService
+from .actions import ModuleActions
 
 
 class Loader(Loader):
+
+    actions = ModuleActions()
 
     @property
     def enabled(self):
         return True
     
     def config(self, binder=None):
-        binder.bind_to_constructor('config', self._bind_config)
+        binder.bind_to_constructor('config', self._service)
 
     @inject.params(kernel='kernel', factory='settings_factory')
-    def _bind_config(self, kernel=None, factory=None):
+    def _service(self, kernel=None, factory=None):
 
         factory.addWidget(self._widget_settings_storage)
         factory.addWidget(self._widget_settings_navigator)
@@ -40,16 +43,17 @@ class Loader(Loader):
     def _widget_settings_navigator(self, config=None):
         
         from .gui.settings.widget import WidgetSettingsNavigator
+        
         widget = WidgetSettingsNavigator()
         
         widget.toolbar.setChecked(int(config.get('folders.toolbar')))
         widget.toolbar.stateChanged.connect(functools.partial(
-            self.onActionCheckboxToggle, variable='folders.toolbar'
+            self.actions.onActionCheckboxToggle, variable='folders.toolbar'
         ))
         
         widget.keywords.setChecked(int(config.get('folders.keywords')))
         widget.keywords.stateChanged.connect(functools.partial(
-            self.onActionCheckboxToggle, variable='folders.keywords'
+            self.actions.onActionCheckboxToggle, variable='folders.keywords'
         ))
         
         return widget
@@ -58,53 +62,40 @@ class Loader(Loader):
     def _widget_settings_editor(self, config=None):
         
         from .gui.settings.widget import WidgetSettingsEditor
+        
         widget = WidgetSettingsEditor()
         
         widget.name.setChecked(int(config.get('editor.name')))
         widget.name.stateChanged.connect(functools.partial(
-            self.onActionCheckboxToggle, variable='editor.name'
+            self.actions.onActionCheckboxToggle, variable='editor.name'
         ))
 
         widget.formatbar.setChecked(int(config.get('editor.formatbar')))
         widget.formatbar.stateChanged.connect(functools.partial(
-            self.onActionCheckboxToggle, variable='editor.formatbar'
+            self.actions.onActionCheckboxToggle, variable='editor.formatbar'
         ))
 
         widget.rightbar.setChecked(int(config.get('editor.rightbar')))
         widget.rightbar.stateChanged.connect(functools.partial(
-            self.onActionCheckboxToggle, variable='editor.rightbar'
+            self.actions.onActionCheckboxToggle, variable='editor.rightbar'
         ))
         
         widget.leftbar.setChecked(int(config.get('editor.leftbar')))
         widget.leftbar.stateChanged.connect(functools.partial(
-            self.onActionCheckboxToggle, variable='editor.leftbar'
+            self.actions.onActionCheckboxToggle, variable='editor.leftbar'
         ))
         
         return widget
 
     @inject.params(config='config')
     def _widget_settings_storage(self, config=None):
+        
         from .gui.settings.widget import WidgetSettingsStorage
+        
         widget = WidgetSettingsStorage()
         widget.location.setText(config.get('storage.location'))
         widget.locationChoice.clicked.connect(functools.partial(
-            self.onActionStorageLocationChange, widget=widget
+            self.actions.onActionStorageLocationChange, widget=widget
         ))
         
         return widget
-
-    @inject.params(config='config', kernel='kernel')
-    def onActionStorageLocationChange(self, event, config, widget, kernel):
-
-        from PyQt5 import QtWidgets
-        destination = str(QtWidgets.QFileDialog.getExistingDirectory(widget, "Select Directory"))
-        if destination is not None and len(destination):
-            config.set('storage.location', destination)
-            widget.location.setText(destination)
-            kernel.dispatch('config_updated')
-
-    @inject.params(config='config', kernel='kernel')
-    def onActionCheckboxToggle(self, status, variable, config, kernel):
-        config.set(variable, '%s' % status)
-        kernel.dispatch('config_updated')
-

@@ -18,8 +18,12 @@ from PyQt5 import QtGui
 from lib.plugin import Loader
 from lib.widget.button import ToolBarButton
 
+from .actions import ModuleActions
+
 
 class Loader(Loader):
+
+    actions = ModuleActions()
 
     @property
     def enabled(self):
@@ -27,9 +31,9 @@ class Loader(Loader):
 
     @inject.params(kernel='kernel')
     def boot(self, options=None, args=None, kernel=None):
-        kernel.listen('window.notepad.rightbar', self._onWindowNotepadToolbar, 100)
+        kernel.listen('window.notepad.rightbar', self._widget, 100)
 
-    def _onWindowNotepadToolbar(self, event=None):
+    def _widget(self, event=None):
         
         widget = ToolBarButton()
         widget.editor, widget.toolbar = event.data
@@ -38,12 +42,10 @@ class Loader(Loader):
 
         widget.setIcon(QtGui.QIcon("icons/font-red.svg"))
         widget.setToolTip(widget.tr("Change the text color to red"))
-        
-        action = functools.partial(self._onButtonPressed, widget=widget)
-        widget.clicked.connect(action)
+
+        widget.clicked.connect(functools.partial(
+            self.actions.onActionButtonPressed, widget=widget
+        ))
 
         widget.toolbar.addWidget(widget)
 
-    def _onButtonPressed(self, event=None, widget=None):
-        if widget is not None and widget.editor is not None:
-            widget.editor.setTextColor(QtGui.QColor.fromRgb(127, 0, 0))

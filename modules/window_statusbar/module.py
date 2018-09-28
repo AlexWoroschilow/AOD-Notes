@@ -14,31 +14,30 @@ import inject
 import functools
 
 from PyQt5 import QtWidgets
-
 from lib.plugin import Loader
+
+from .actions import ModuleActions
 
 
 class Loader(Loader):
 
-    @inject.params(kernel='kernel')
-    def _constructor_statusbar(self, kernel=None):
+    actions = ModuleActions()
 
-        widget = QtWidgets.QLabel()
-        
-        kernel.listen('window_status', functools.partial(
-            self.onActionStatus, widget=widget
-        ))
-        
-        return widget
-        
     @property
     def enabled(self):
         return True
 
     def config(self, binder=None):
-        binder.bind_to_constructor('widget.statusbar', self._constructor_statusbar)
+        binder.bind_to_constructor('widget.statusbar', self._widget)
 
-    def onActionStatus(self, event, widget=None):
-        message, timeout = event.data
-        if widget is not None:
-            widget.setText(message)
+    @inject.params(kernel='kernel')
+    def _widget(self, kernel=None):
+
+        widget = QtWidgets.QLabel()
+        
+        kernel.listen('window_status', functools.partial(
+            self.actions.onActionStatus, widget=widget
+        ))
+        
+        return widget
+        

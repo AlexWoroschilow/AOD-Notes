@@ -23,8 +23,12 @@ from PyQt5.QtCore import Qt
 from .gui.window import MainWindow
 from .gui.header import WidgetHeaderFactory
 
+from .actions import ModuleActions
+
 
 class Loader(Loader):
+
+    actions = ModuleActions()
 
     @property
     def enabled(self):
@@ -37,16 +41,17 @@ class Loader(Loader):
         """
         binder.bind('window.header_factory', WidgetHeaderFactory())
         
-        binder.bind_to_constructor('window', self._constructor_window)
-        binder.bind_to_constructor('window.header', self._constructor_window_header)
-        binder.bind_to_constructor('window.footer', self._constructor_window_footer)
+        binder.bind_to_constructor('window', self._widget)
+        binder.bind_to_constructor('window.header', self._widget_header)
+        binder.bind_to_constructor('window.footer', self._widget_footer)
 
     @inject.params(config='config', factory='window.header_factory')
-    def _constructor_window(self, config=None, factory=None):
+    def _widget(self, config=None, factory=None):
         
         widget = MainWindow()
+        
         widget.resize(int(config.get('window.width')),
-                      int(config.get('window.height')))
+            int(config.get('window.height')))
         
         widget.header = widget.addToolBar('main')
         widget.header.setIconSize(QtCore.QSize(20, 20))
@@ -64,25 +69,19 @@ class Loader(Loader):
         widget.footer = widget.statusBar()
 
         widget.resizeEvent = functools.partial(
-            self.onActionWindowResize
+            self.actions.onActionWindowResize
         )
         
         return widget
 
     @inject.params(window='window')
-    def _constructor_window_header(self, window=None):
+    def _widget_header(self, window=None):
         if window.header is not None:
             return window.header
         return None
 
     @inject.params(window='window')
-    def _constructor_window_footer(self, window=None):
+    def _widget_footer(self, window=None):
         if window.footer is not None:
             return window.footer
         return None
-
-    @inject.params(config='config')
-    def onActionWindowResize(self, event=None, config=None):
-        config.set('window.width', '%s' % event.size().width())
-        config.set('window.height', '%s' % event.size().height())
-        return event.accept()
