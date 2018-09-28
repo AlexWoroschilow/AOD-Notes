@@ -19,6 +19,16 @@ from PyQt5 import QtWidgets
 
 class ModuleActions(object):
 
+    @inject.params(storage='storage')
+    def onActionNoteSelect(self, event, widget, storage):
+        if widget.tree is None:
+            return None
+        
+        if widget.tree.selected is not None:
+            widget.entity(storage.entity(
+                widget.tree.selected                
+            ))
+
     def onActionContextMenu(self, event, widget):
 
         menu = QtWidgets.QMenu()
@@ -27,20 +37,25 @@ class ModuleActions(object):
         if index is not None:
             name = widget.tree.model().data(index)
 
-            action = functools.partial(self.onActionFullScreen, widget=widget)
-            menu.addAction('Open note in new tab', action)
+            menu.addAction('Open note in new tab', functools.partial(
+                self.onActionFullScreen, widget=widget
+            ))
         
-            action = functools.partial(self.onActionFolderCopy, widget=widget)
-            menu.addAction('Clone \'%s\'' % name, action)
+            menu.addAction('Clone \'%s\'' % name, functools.partial(
+                self.onActionFolderCopy, widget=widget
+            ))
             
-            action = functools.partial(self.onActionFolderRemove, widget=widget)
-            menu.addAction('Remove \'%s\'' % name, action)
+            menu.addAction('Remove \'%s\'' % name, functools.partial(
+                self.onActionFolderRemove, widget=widget
+            ))
 
-        action = functools.partial(self.onActionFolderCreate, widget=widget)
-        menu.addAction('Create folder here', action)
+        menu.addAction('Create folder here', functools.partial(
+            self.onActionFolderCreate, widget=widget
+        ))
 
-        action = functools.partial(self.onActionNoteCreate, widget=widget)
-        menu.addAction('Create note here', action)
+        menu.addAction('Create note here', functools.partial(
+            self.onActionNoteCreate, widget=widget
+        ))
         
         menu.exec_(widget.tree.mapToGlobal(event))
 
@@ -83,24 +98,6 @@ class ModuleActions(object):
         storage.create(folder)
 
     @inject.params(storage='storage')
-    def onActionNoteSelect(self, event, widget, storage):
-        if widget.tree is None:
-            return None
-        
-        path = None
-        if widget.tree.selected is not None:
-            path = widget.tree.selected
-
-        if path is None:
-            return None
-
-        note = storage.note(path)
-        if note is None:
-            return None
-        
-        widget.editor.note = note
-
-    @inject.params(storage='storage')
     def onActionFolderCopy(self, event=None, widget=None, storage=None):
         if widget.tree is None:
             return None
@@ -130,8 +127,7 @@ class ModuleActions(object):
         
         editor.note = note
 
-        event = (editor, note.name)
-        kernel.dispatch('window.tab', event)
+        kernel.dispatch('window.tab', (editor, note.name))
 
     @inject.params(storage='storage')
     def onActionFolderRemove(self, event=None, widget=None, storage=None):

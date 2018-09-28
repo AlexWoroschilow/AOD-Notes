@@ -1,0 +1,290 @@
+<div id="primary">
+	<div id="content" role="main">
+
+		<article id="post-171"
+			class="post-171 page type-page status-publish hentry">
+			<header class="entry-header">
+				<center><h1 class="entry-title">Select document</h1></center>
+			</header>
+			<!-- .entry-header -->
+
+			<div class="entry-content">
+				<p>
+					The windows Hotkey widget does not accept all keys which means that
+					some Hotkeys cannot be entered directly using the Setup dialog. For
+					example the hotkeys <strong>Win+Space</strong>, <strong>Ctrl+PageUp</strong>,
+					<strong>Ctrl+Enter</strong> cannot be entered.
+				</p>
+				<p>These hotkeys can still be used but to do so VirtuaWin’s
+					virtuawin.cfg file must be manually edited.</p>
+				<ol>
+					<li>Open VirtuaWin’s setup dialog and go to the required
+						Hotkey setting, note the name of the hotkey.</li>
+					<li>Set the hotkey so the modifier for the key is correct, the
+						key is unimportant. For example if <strong>Win+Space</strong> is
+						required then set the hotkey to <strong>Win+A</strong>.
+					</li>
+					<li>Press the ‘Explore Config’ button on the Setup Expert page
+						to open an explorer listing your VirtuaWin configuration files
+						(for earlier versions of VirtuaWin without this feature you will
+						need to locate these files manually)</li>
+					<li>Close VirtuaWin setup and exit VirtuaWin.</li>
+					<li>Run Notepad and then drag the virtuawin.cfg file from the
+						Explorer window onto Notepad.</li>
+					<li>Use the following table to locate the right line to edit:<br>
+						<table cellspacing="0" cellpadding="4" border="1">
+							<tbody>
+								<tr>
+									<td valign="top"><strong>Hotkey Name</strong></td>
+									<td valign="top"><strong>Virtuawin.cfg Line</strong></td>
+								</tr>
+								<tr>
+									<td valign="top">Desktop Cycling – Next</td>
+									<td valign="top">CycleUp#</td>
+								</tr>
+								<tr>
+									<td valign="top">Desktop Cycling – Previous</td>
+									<td valign="top">CycleDown#</td>
+								</tr>
+								<tr>
+									<td valign="top">Direct Desktop Access – Desk 1<br>
+										Direct Desktop Access – Desk 2<br> Direct Desktop Access
+										– Desk 3<br> .<br> .<br> .
+									</td>
+									<td valign="top">Hot_key_1#<br> Hot_key_2#<br>
+										Hot_key_3#<br> .<br> .<br> .
+									</td>
+								</tr>
+								<tr>
+									<td valign="top">Hotkeys – window list</td>
+									<td valign="top">Hot_key_Menu#</td>
+								</tr>
+								<tr>
+									<td valign="top">Hotkeys – window menu</td>
+									<td valign="top">HotWMenu#</td>
+								</tr>
+								<tr>
+									<td valign="top">Hotkeys – dismiss window</td>
+									<td valign="top">DismissHotkey#</td>
+								</tr>
+								<tr>
+									<td valign="top">Hotkeys – sticky toggle</td>
+									<td valign="top">Sticky_key#</td>
+								</tr>
+							</tbody>
+						</table>
+					</li>
+					<li>Change the numeric value given for this key using the
+						following table:<br>
+						<table cellspacing="0" cellpadding="4" border="1">
+							<tbody>
+								<tr>
+									<td valign="top"><strong>Keyboard Key Name</strong></td>
+									<td valign="top"><strong>Virtuawin.cfg Value</strong></td>
+								</tr>
+								<tr>
+									<td valign="top">Backspace</td>
+									<td valign="top">8</td>
+								</tr>
+								<tr>
+									<td valign="top">Delete</td>
+									<td valign="top">46</td>
+								</tr>
+								<tr>
+									<td valign="top">Down</td>
+									<td valign="top">40</td>
+								</tr>
+								<tr>
+									<td valign="top">End</td>
+									<td valign="top">35</td>
+								</tr>
+								<tr>
+									<td valign="top">Enter</td>
+									<td valign="top">13</td>
+								</tr>
+								<tr>
+									<td valign="top">Escape</td>
+									<td valign="top">27</td>
+								</tr>
+								<tr>
+									<td valign="top">F10</td>
+									<td valign="top">121</td>
+								</tr>
+								<tr>
+									<td valign="top">F11</td>
+									<td valign="top">122</td>
+								</tr>
+								<tr>
+									<td valign="top">F12</td>
+									<td valign="top">123</td>
+								</tr>
+								<tr>
+									<td valign="top">F1</td>
+									<td valign="top">112</td>
+								</tr>
+								<tr>
+									<td valign="top">F2</td>
+									<td valign="top">113</td>
+								</tr>
+								<tr>
+									<td valign="top">F3</td>
+									<td valign="top">114</td>
+								</tr>
+								<tr>
+									<td valign="top">F4</td>
+									<td valign="top">115</td>
+								</tr>
+								<tr>
+									<td valign="top">F5</td>
+									<td valign="top">116</td>
+								</tr>
+								<tr>
+									<td valign="top">F6</td>
+									<td valign="top">117</td>
+								</tr>
+								<tr>
+									<td valign="top">F7</td>
+									<td valign="top">118</td>
+								</tr>
+								<tr>
+									<td valign="top">F8</td>
+									<td valign="top">119</td>
+								</tr>
+								<tr>
+									<td valign="top">F9</td>
+									<td valign="top">120</td>
+								</tr>
+								<tr>
+									<td valign="top">Home</td>
+									<td valign="top">36</td>
+								</tr>
+								<tr>
+									<td valign="top">Insert</td>
+									<td valign="top">45</td>
+								</tr>
+								<tr>
+									<td valign="top">Left</td>
+									<td valign="top">37</td>
+								</tr>
+								<tr>
+									<td valign="top">Num Lock</td>
+									<td valign="top">144</td>
+								</tr>
+								<tr>
+									<td valign="top">Numpad *</td>
+									<td valign="top">106</td>
+								</tr>
+								<tr>
+									<td valign="top">Numpad +</td>
+									<td valign="top">107</td>
+								</tr>
+								<tr>
+									<td valign="top">Numpad –</td>
+									<td valign="top">109</td>
+								</tr>
+								<tr>
+									<td valign="top">Numpad .</td>
+									<td valign="top">110</td>
+								</tr>
+								<tr>
+									<td valign="top">Numpad /</td>
+									<td valign="top">111</td>
+								</tr>
+								<tr>
+									<td valign="top">Numpad 0</td>
+									<td valign="top">96</td>
+								</tr>
+								<tr>
+									<td valign="top">Numpad 1</td>
+									<td valign="top">97</td>
+								</tr>
+								<tr>
+									<td valign="top">Numpad 2</td>
+									<td valign="top">98</td>
+								</tr>
+								<tr>
+									<td valign="top">Numpad 3</td>
+									<td valign="top">99</td>
+								</tr>
+								<tr>
+									<td valign="top">Numpad 4</td>
+									<td valign="top">100</td>
+								</tr>
+								<tr>
+									<td valign="top">Numpad 5</td>
+									<td valign="top">101</td>
+								</tr>
+								<tr>
+									<td valign="top">Numpad 6</td>
+									<td valign="top">102</td>
+								</tr>
+								<tr>
+									<td valign="top">Numpad 7</td>
+									<td valign="top">103</td>
+								</tr>
+								<tr>
+									<td valign="top">Numpad 8</td>
+									<td valign="top">104</td>
+								</tr>
+								<tr>
+									<td valign="top">Numpad 9</td>
+									<td valign="top">105</td>
+								</tr>
+								<tr>
+									<td valign="top">PageDown</td>
+									<td valign="top">34</td>
+								</tr>
+								<tr>
+									<td valign="top">PageUp</td>
+									<td valign="top">33</td>
+								</tr>
+								<tr>
+									<td valign="top">Right</td>
+									<td valign="top">39</td>
+								</tr>
+								<tr>
+									<td valign="top">Scroll Lock</td>
+									<td valign="top">145</td>
+								</tr>
+								<tr>
+									<td valign="top">Space</td>
+									<td valign="top">32</td>
+								</tr>
+								<tr>
+									<td valign="top">SysReq</td>
+									<td valign="top">44</td>
+								</tr>
+								<tr>
+									<td valign="top">Tab</td>
+									<td valign="top">9</td>
+								</tr>
+								<tr>
+									<td valign="top">Up</td>
+									<td valign="top">38</td>
+								</tr>
+							</tbody>
+						</table>
+						<p>
+							<strong>Note:</strong> Not all key and modifier combinations have
+							been tested, some may not work.
+						</p>
+					</li>
+					<li>Save the virtuawin.cfg file and exit notepad.</li>
+					<li>Start VirtuaWin, and test the key, if it does not work as
+						expected open the Setup dialog and check the hotkey settings (you
+						may have edited the wrong one or got the wrong value).</li>
+				</ol>
+			</div>
+			<!-- .entry-content -->
+			<footer class="entry-meta"> </footer>
+			<!-- .entry-meta -->
+		</article>
+		<!-- #post-171 -->
+
+		<div id="comments"></div>
+		<!-- #comments -->
+
+
+	</div>
+	<!-- #content -->
+</div>

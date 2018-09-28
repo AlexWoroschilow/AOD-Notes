@@ -124,6 +124,16 @@ class FilesystemStorage(object):
         if os.path.isfile(path):
             return os.remove(path)
 
+    def entity(self, path=None):
+        if os.path.isdir(path):
+            name = os.path.basename(path)
+            return Folder(path, name)
+
+        with open(path, 'r') as stream:
+            text = stream.read()
+            name = os.path.basename(path)
+            return Note(path, name, text)            
+
     def note(self, path=None):
         if os.path.isdir(path):
             return None

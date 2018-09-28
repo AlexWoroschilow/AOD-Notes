@@ -38,22 +38,19 @@ class FolderTree(QtWidgets.QTreeView):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-        model = QtWidgets.QDirModel()
+        model = QtWidgets.QFileSystemModel()
+        model.setRootPath(config.get('storage.location'))
         model.setIconProvider(IconProvider())
         model.setReadOnly(False)
 
-        index = model.index(config.get('storage.location'))
-        if index is None:
-            return None
-        
         self.setModel(model)
-        self.setRootIndex(index)
         self.setHeaderHidden(True)
-
+        self.setRootIndex(model.index(
+            config.get('storage.location')
+        ))
         self.setColumnHidden(1, True)
         self.setColumnHidden(2, True)
         self.setColumnHidden(3, True)
-        self.expandAll()
 
     @property
     def selected(self):

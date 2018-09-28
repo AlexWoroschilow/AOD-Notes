@@ -78,20 +78,7 @@ class Loader(Loader):
     @inject.params(kernel='kernel', config='config', factory='settings_factory')
     def _widget(self, kernel=None, config=None, factory=None):
         
-        widget = FolderList()
-        widget.editor.name.setVisible(int(config.get('editor.name')))
-        widget.editor.formatbar.setVisible(int(config.get('editor.formatbar')))
-        widget.editor.leftbar.setVisible(int(config.get('editor.leftbar')))
-        widget.editor.rightbar.setVisible(int(config.get('editor.rightbar')))
-
-        event = (widget.editor, widget.editor.leftbar)
-        kernel.dispatch('window.notepad.leftbar', event)
-
-        event = (widget.editor, widget.editor.rightbar)
-        kernel.dispatch('window.notepad.rightbar', event)
-
-        event = (widget.editor, widget.editor.formatbar)
-        kernel.dispatch('window.notepad.formatbar', event)
+        widget = FolderList(self.actions)
 
         widget.tree.customContextMenuRequested.connect(functools.partial(
             self.actions.onActionContextMenu, widget=widget
@@ -115,14 +102,6 @@ class Loader(Loader):
 
         widget.toolbar.removeAction.clicked.connect(functools.partial(
             self.actions.onActionFolderRemove, widget=widget
-        ))
-
-        widget.editor.leftbar.saveAction.clicked.connect(functools.partial(
-            self.actions.onActionSave, widget=widget.editor
-        ))
-        
-        widget.editor.leftbar.fullscreenAction.clicked.connect(functools.partial(
-            self.actions.onActionFullScreen, widget=widget
         ))
 
         kernel.listen('note_new', functools.partial(
