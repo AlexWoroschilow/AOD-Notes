@@ -82,8 +82,6 @@ class ModuleActions(object):
 
     @inject.params(storage='storage', config='config', folder='storage.folder')
     def onActionFolderCreate(self, event=None, widget=None, config=None, storage=None, folder=None):
-        if widget.editor is None:
-            return None
         
         path = config.get('storage.location')
         if widget.tree.selected is not None:
