@@ -17,13 +17,13 @@ from .text import TextView
 
 class FolderViewWidget(QtWidgets.QWidget):
 
-    def __init__(self):
+    def __init__(self, entity):
         super(FolderViewWidget, self).__init__()
         self.setObjectName('FolderViewWidget')
         self.setContentsMargins(0, 0, 0, 0)
 
         layout = QtWidgets.QVBoxLayout()
-        layout.addWidget(TextView())
+        layout.addWidget(TextView(entity))
         
         self.setLayout(layout)
         

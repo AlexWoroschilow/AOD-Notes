@@ -11,7 +11,20 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
+import glob
 import shutil
+import inject
+
+from PyQt5 import QtWidgets
+from PyQt5 import QtGui
+
+
+class IconProvider(QtWidgets.QFileIconProvider):
+
+    def icon(self, fileInfo):
+        if fileInfo.isDir():
+            return QtGui.QIcon("icons/folder-light.svg") 
+        return QtGui.QIcon("icons/file-light.svg") 
 
 
 class Folder(object):
@@ -19,6 +32,21 @@ class Folder(object):
     def __init__(self, path=None, name=None):
         self.path = path
         self.name = name
+
+    @property
+    def count(self):
+        response = []
+        for path in glob.glob('%s/*' % self.path):
+            response.append(path)
+        return len(response)
+
+    @property
+    @inject.params(storage='storage')
+    def entities(self, storage):
+        response = []
+        for path in glob.glob('%s/*' % self.path):
+            response.append(storage.entity(path))
+        return response
 
     def __str__(self):
         return "%s" % self.path
@@ -35,9 +63,14 @@ class Note(object):
         return "%s" % self.path
 
 
-class FilesystemStorage(object):
+class FilesystemStorage(QtWidgets.QFileSystemModel):
     
     def __init__(self, location=None):
+        super(FilesystemStorage, self).__init__()
+        self.setIconProvider(IconProvider())
+        self.setRootPath(location)
+        self.setReadOnly(False)
+
         self._location = location
         
     def _update_document(self, entity=None):
@@ -143,3 +176,9 @@ class FilesystemStorage(object):
             name = os.path.basename(path)
             return Note(path, name, text)            
 
+    def entities(self, path=None):
+        response = []
+        for path in glob.glob('%s/*' % path):
+            response.append(self.entity(path))
+        return response
+    

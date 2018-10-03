@@ -98,7 +98,7 @@ class FolderList(QtWidgets.QSplitter):
             return self
 
         if (entity.__class__.__name__ == 'Folder'):
-            self.container.layout().addWidget(FolderViewWidget())
+            self.container.layout().addWidget(FolderViewWidget(entity))
             return self
 
         self.container.layout().addWidget(DemoWidget())

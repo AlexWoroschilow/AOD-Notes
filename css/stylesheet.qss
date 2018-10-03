@@ -2,6 +2,12 @@ QTreeView#FolderTree { border: none; background-color: #414649; color: #A0A0A0; 
 QToolBar#ToolBarWidget { border: none; background-color: #414649; color: #A0A0A0;  }
 QLabel#TagsEditor { border: none; background-color: #414649; color: #A0A0A0; }
 
+
+QWidget#NotePreview {
+    background: #f1f2f3;
+    border-radius: 5px;	 
+}
+
 QTabWidget::pane {
 	border-top: 5px solid qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #f1f2f3, stop: 1.0 #414649);
 	border-bottom: 5px solid qlineargradient(x1: 0, y1: 1, x2: 0, y2: 0, stop: 0 #f1f2f3, stop: 1.0 #414649);

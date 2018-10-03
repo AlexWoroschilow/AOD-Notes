@@ -13,41 +13,28 @@
 import inject
 
 from PyQt5 import QtCore
-from PyQt5 import QtGui
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 
 
-class IconProvider(QtWidgets.QFileIconProvider):
-
-    def icon(self, fileInfo):
-        if fileInfo.isDir():
-            return QtGui.QIcon("icons/folder-light.svg") 
-        return QtGui.QIcon("icons/file-light.svg") 
-
-
 class FolderTree(QtWidgets.QTreeView):
 
-    @inject.params(config='config')
-    def __init__(self, config=None):
-        QtWidgets.QTreeView.__init__(self)
-        
+    @inject.params(config='config', storage='storage')
+    def __init__(self, config=None, storage=None):
+        super(FolderTree, self).__init__()
+
         self.setObjectName('FolderTree')
         self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-        model = QtWidgets.QFileSystemModel()
-        model.setRootPath(config.get('storage.location'))
-        model.setIconProvider(IconProvider())
-        model.setReadOnly(False)
-
-        self.setModel(model)
         self.setHeaderHidden(True)
-        self.setRootIndex(model.index(
-            config.get('storage.location')
-        ))
+        self.setModel(storage)
+        
+        location = config.get('storage.location') 
+        self.setRootIndex(storage.index(location))
+        
         self.setColumnHidden(1, True)
         self.setColumnHidden(2, True)
         self.setColumnHidden(3, True)
