@@ -4,6 +4,7 @@ QLabel#TagsEditor { border: none; background-color: #414649; color: #A0A0A0; }
 
 
 TextView, NotePreviewContainer { background: #ffffff; border: none; }
+QTabBar::close-button { image: url(icons/close.svg); subcontrol-position: right; }
 
 QTabWidget::pane {
 	border-top: 5px solid qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #f1f2f3, stop: 1.0 #414649);
