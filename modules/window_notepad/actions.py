@@ -20,7 +20,11 @@ from PyQt5 import QtWidgets
 class ModuleActions(object):
 
     @inject.params(storage='storage')
-    def onActionNoteSelect(self, event, widget, storage):
+    def onActionNoteRefresh(self, folder, old, new, storage, widget=None):
+        return self.onActionNoteSelect(event=(folder,), widget=widget)
+
+    @inject.params(storage='storage')
+    def onActionNoteSelect(self, event, storage, widget=None):
         if widget.tree is None:
             return None
         
@@ -61,8 +65,6 @@ class ModuleActions(object):
 
     @inject.params(storage='storage', config='config', note='storage.note')
     def onActionNoteCreate(self, event=None, widget=None, config=None, storage=None, note=None):
-        if widget.editor is None:
-            return None
 
         path = config.get('storage.location')
         if widget.tree.selected is not None:
@@ -77,7 +79,7 @@ class ModuleActions(object):
         
         if event is not None and event.data is not None:
             note.name, note.text = event.data
-            
+
         storage.create(note)
 
     @inject.params(storage='storage', config='config', folder='storage.folder')

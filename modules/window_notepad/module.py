@@ -75,10 +75,14 @@ class Loader(Loader):
 
         return widget
 
-    @inject.params(kernel='kernel', config='config', factory='settings_factory')
-    def _widget(self, kernel=None, config=None, factory=None):
+    @inject.params(kernel='kernel', config='config', storage='storage', factory='settings_factory')
+    def _widget(self, kernel=None, config=None, storage=None, factory=None):
         
         widget = FolderList(self.actions)
+
+        storage.fileRenamed.connect(functools.partial(
+            self.actions.onActionNoteRefresh, widget=widget
+        ))
 
         widget.tree.customContextMenuRequested.connect(functools.partial(
             self.actions.onActionContextMenu, widget=widget
