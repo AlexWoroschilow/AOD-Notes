@@ -3,7 +3,7 @@ QToolBar#ToolBarWidget { border: none; background-color: #414649; color: #A0A0A0
 QLabel#TagsEditor { border: none; background-color: #414649; color: #A0A0A0; }
 
 
-TextView, NotePreviewContainer { background: #ffffff; border: none; }
+TextView, DemoWidget, NotePreviewContainer, DemoViewContainer { background: #ffffff; border: none; }
 QTabBar::close-button { image: url(icons/close.svg); subcontrol-position: right; }
 
 QTabWidget::pane {

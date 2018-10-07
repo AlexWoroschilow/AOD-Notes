@@ -14,10 +14,10 @@ from PyQt5.QtCore import Qt
 from PyQt5 import QtWidgets
 
 
-class TextViewContainer(QtWidgets.QLabel):
+class DemoViewContainer(QtWidgets.QLabel):
 
     def __init__(self, parent=None):
-        super(TextViewContainer, self).__init__(parent)
+        super(DemoViewContainer, self).__init__(parent)
         self.setWordWrap(True)
 
         with open('./template/hotkeys.html', 'r') as stream:
@@ -32,7 +32,7 @@ class TextView(QtWidgets.QScrollArea):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setContentsMargins(0, 0, 0, 0)
 
-        self.text = TextViewContainer(self)
+        self.text = DemoViewContainer(self)
         self.setWidgetResizable(True)
         self.setWidget(self.text)
         

@@ -19,7 +19,6 @@ class DemoWidget(QtWidgets.QWidget):
 
     def __init__(self):
         super(DemoWidget, self).__init__()
-        self.setObjectName('FolderViewWidget')
         self.setContentsMargins(0, 0, 0, 0)
 
         layout = QtWidgets.QVBoxLayout()
