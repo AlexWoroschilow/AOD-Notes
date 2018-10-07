@@ -19,9 +19,19 @@ from PyQt5.Qt import Qt
 
 class ModuleActions(object):
 
-    @inject.params(kernel='kernel')
-    def onActionSearchRequest(self, event=None, kernel=None, widget=None):
-        kernel.dispatch('search_request', widget.text())
+    @inject.params(search='search')
+    def onActionNoteCreated(self, event, search):
+        print(event, event.data, search)
+        search.add(event.data)
+
+    @inject.params(search='search')
+    def onActionNoteUpdated(self, event, search):
+        print(event, event.data, search)
+
+    @inject.params(search='search')
+    def onActionSearchRequest(self, widget, search):
+        for entity in search.request(widget.text()):
+            print(entity)
 
     def onActionSearchShortcut(self, event=None, widget=None):
         widget.setFocusPolicy(Qt.StrongFocus)

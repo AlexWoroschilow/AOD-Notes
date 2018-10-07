@@ -44,7 +44,7 @@ class ConfigService(object):
             self._parser.set('editor', 'name', '1')
 
             self._parser.add_section('storage')
-            self._parser.set('storage', 'location', '~/owncloud/CloudNotes/storage.dhf')
+            self._parser.set('storage', 'location', '~/owncloud/CloudNotes/')
             
             self._parser.write(stream)
             stream.close()

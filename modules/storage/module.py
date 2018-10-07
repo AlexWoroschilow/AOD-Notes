@@ -28,6 +28,7 @@ class Loader(Loader):
 
     def config(self, binder=None):
         binder.bind_to_constructor('storage', self._construct)
+        
         binder.bind_to_provider('storage.note', Note)
         binder.bind_to_provider('storage.folder', Folder)
 

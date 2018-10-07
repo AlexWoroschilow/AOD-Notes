@@ -34,8 +34,15 @@ class Loader(Loader):
         """
         return True
 
-    @inject.params(factory='window.header_factory')
-    def boot(self, options=None, args=None, factory=None):
+    def config(self, binder=None):
+        """
+        Initialize the widget of this plugin as a service
+        this widget will be used in the main window 
+        """
+        binder.bind_to_constructor('search', self._service)
+
+    @inject.params(factory='window.header_factory', kernel='kernel')
+    def boot(self, options=None, args=None, factory=None, kernel=None):
 
         widget_create_folder = QtWidgets.QAction(QtGui.QIcon("icons/plus.svg"), 'Create folder')
         widget_create_folder.triggered.connect(self.actions.onActionFolderCreate)
@@ -65,4 +72,12 @@ class Loader(Loader):
         factory.addWidget(spacer)
         
         factory.addWidget(widget_search_field)
+        
+        kernel.listen('note_created', self.actions.onActionNoteCreated)
+        kernel.listen('note_updated', self.actions.onActionNoteUpdated)
+
+    @inject.params(kernel='kernel')
+    def _service(self, kernel):
+        from .service import Search
+        return Search(kernel.options)
 

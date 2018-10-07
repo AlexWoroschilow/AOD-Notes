@@ -70,39 +70,36 @@ class ModuleActions(object):
         
         menu.exec_(widget.tree.mapToGlobal(event))
 
-    @inject.params(storage='storage', config='config', note='storage.note')
-    def onActionNoteCreate(self, event=None, widget=None, config=None, storage=None, note=None):
+    @inject.params(storage='storage', note='storage.note', kernel='kernel')
+    def onActionNoteCreate(self, event, widget, storage, note, kernel):
 
-        path = config.get('storage.location')
-        if widget.tree.selected is not None:
-            path = widget.tree.selected
-            
-        if os.path.isfile(path):
-            path = os.path.dirname(path)
-
-        note.name = 'New note'
-        note.text = 'new note description'
-        note.path = path
+        folder = storage.entity(widget.tree.selected)
+        if folder is not None and folder:
+            note.folder = folder
         
-        if event is not None and event.data is not None:
+        if event.data is not None and event.data:
             note.name, note.text = event.data
 
-        storage.create(note)
+        try:
+            note = storage.create(note)
+            kernel.dispatch('note_created', note)
+        except(Exception) as ex:
+            print(ex)
 
-    @inject.params(storage='storage', config='config', folder='storage.folder')
-    def onActionFolderCreate(self, event=None, widget=None, config=None, storage=None, folder=None):
+    @inject.params(storage='storage', folder='storage.folder')
+    def onActionFolderCreate(self, event, widget, storage, folder):
+
+        destination = storage.entity(widget.tree.selected)
+        if destination is not None and destination:
+            folder.folder = destination
+
+        if event.data is not None and event.data:
+            folder.name, folder.description = event.data
         
-        path = config.get('storage.location')
-        if widget.tree.selected is not None:
-            path = widget.tree.selected
-            
-        if os.path.isfile(path):
-            path = os.path.dirname(path)
-        
-        folder.name = 'New folder'
-        folder.path = path
-        
-        storage.create(folder)
+        try:
+            storage.create(folder)
+        except(Exception) as ex:
+            print(ex)
 
     @inject.params(storage='storage')
     def onActionFolderCopy(self, event=None, widget=None, storage=None):

@@ -40,10 +40,12 @@ class FolderTree(QtWidgets.QTreeView):
         self.setColumnHidden(3, True)
 
     @property
-    def selected(self):
+    @inject.params(config='config')
+    def selected(self, config=None):
         for index in self.selectedIndexes():
-            return self.model().filePath(index)
-        return None
+            if index is not None and index:
+                return self.model().filePath(index)
+        return config.get('storage.location')
 
     @property
     def index(self):

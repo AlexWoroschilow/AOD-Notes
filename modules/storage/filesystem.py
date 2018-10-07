@@ -17,6 +17,7 @@ import inject
 
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
+from scipy.optimize._tstutils import description
 
 
 class IconProvider(QtWidgets.QFileIconProvider):
@@ -29,9 +30,24 @@ class IconProvider(QtWidgets.QFileIconProvider):
 
 class Folder(object):
 
-    def __init__(self, path=None, name=None):
-        self.path = path
+    def __init__(self, path=None, name='New folder'):
+        self.description = None
         self.name = name
+        self.path = path
+
+        self._folder = None
+
+    @property
+    def folder(self):
+        return self._folder
+
+    @folder.setter        
+    def folder(self, folder=None):
+        if folder is None:
+            return None
+        
+        self.path = folder.path
+        self._folder = folder
 
     @property
     def count(self):
@@ -54,10 +70,23 @@ class Folder(object):
 
 class Note(object):
 
-    def __init__(self, path=None, name=None, text=None):
+    def __init__(self, path=None, name='New Note', text='Note description'):
         self.path = path
         self.name = name
         self.text = text
+        self._folder = None
+    
+    @property
+    def folder(self):
+        return self._folder
+
+    @folder.setter        
+    def folder(self, folder=None):
+        if folder is None:
+            return None
+        
+        self.path = folder.path
+        self._folder = folder
 
     def __str__(self):
         return "%s" % self.path
