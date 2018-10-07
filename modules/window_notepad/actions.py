@@ -21,13 +21,21 @@ class ModuleActions(object):
 
     @inject.params(storage='storage')
     def onActionNoteRefresh(self, folder, old, new, storage, widget=None):
+        """
+        Reload the file into editor after the file name has been changed
+        It crushed the application because somethimes the aditor 
+        had not idea about the file name changs
+        """
         return self.onActionNoteSelect(event=(folder,), widget=widget)
 
     @inject.params(storage='storage')
     def onActionNoteSelect(self, event, storage, widget=None):
+        """
+        Get the selected note from the tree and 
+        open it in the text editor
+        """
         if widget.tree is None:
             return None
-        
         if widget.tree.selected is not None:
             widget.entity(storage.entity(
                 widget.tree.selected                
@@ -41,24 +49,23 @@ class ModuleActions(object):
         if index is not None:
             name = widget.tree.model().data(index)
 
-            menu.addAction('Open note in new tab', functools.partial(
+            menu.addAction('Open in a new tab', functools.partial(
                 self.onActionFullScreen, widget=widget
             ))
-        
-            menu.addAction('Clone \'%s\'' % name, functools.partial(
-                self.onActionFolderCopy, widget=widget
-            ))
-            
+            menu.addSeparator()
             menu.addAction('Remove \'%s\'' % name, functools.partial(
                 self.onActionFolderRemove, widget=widget
             ))
+            menu.addAction('Clone \'%s\'' % name, functools.partial(
+                self.onActionFolderCopy, widget=widget
+            ))
+            menu.addSeparator()
 
-        menu.addAction('Create folder here', functools.partial(
-            self.onActionFolderCreate, widget=widget
-        ))
-
-        menu.addAction('Create note here', functools.partial(
+        menu.addAction('Create new document', functools.partial(
             self.onActionNoteCreate, widget=widget
+        ))
+        menu.addAction('Create new group', functools.partial(
+            self.onActionFolderCreate, widget=widget
         ))
         
         menu.exec_(widget.tree.mapToGlobal(event))

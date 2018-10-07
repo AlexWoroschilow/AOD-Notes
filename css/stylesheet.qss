@@ -1,7 +1,7 @@
 QTreeView#FolderTree { border: none; background-color: #414649; color: #A0A0A0; }
 QToolBar#ToolBarWidget { border: none; background-color: #414649; color: #A0A0A0;  }
 QLabel#TagsEditor { border: none; background-color: #414649; color: #A0A0A0; }
-
+QTabBar::close-button { image: url(icons/close.svg); subcontrol-position: right; }
 
 QWidget#NotePreview {
     background: #f1f2f3;
