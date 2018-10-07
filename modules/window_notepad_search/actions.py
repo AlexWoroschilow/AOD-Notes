@@ -19,19 +19,13 @@ from PyQt5.Qt import Qt
 
 class ModuleActions(object):
 
-    @inject.params(search='search')
-    def onActionNoteCreated(self, event, search):
-        print(event, event.data, search)
-        search.add(event.data)
-
-    @inject.params(search='search')
-    def onActionNoteUpdated(self, event, search):
-        print(event, event.data, search)
-
-    @inject.params(search='search')
-    def onActionSearchRequest(self, widget, search):
-        for entity in search.request(widget.text()):
-            print(entity)
+    @inject.params(search='search', storage='storage')
+    def onActionSearchRequest(self, widget, search, storage):
+        filters = []
+        for hit in search.request(widget.text()):
+            filters.append(hit['title'])
+        storage.setNameFilterDisables(False)
+        storage.setNameFilters(filters)
 
     def onActionSearchShortcut(self, event=None, widget=None):
         widget.setFocusPolicy(Qt.StrongFocus)
@@ -44,6 +38,18 @@ class ModuleActions(object):
     @inject.params(kernel='kernel')
     def onActionNoteCreate(self, event, kernel=None):
         kernel.dispatch('note_new')
+
+    @inject.params(search='search')
+    def onActionNoteCreated(self, event, search):
+        return search.add(event.data)
+
+    @inject.params(search='search')
+    def onActionNoteUpdated(self, event, search):
+        return search.update(event.data)
+
+    @inject.params(search='search')
+    def onActionNoteRemove(self, event, search):
+        return search.remove(event.data)
 
     @inject.params(kernel='kernel', logger='logger')
     def onActionNoteImport(self, event=None, kernel=None, logger=None):
@@ -64,6 +70,8 @@ class ModuleActions(object):
                 if reply == QtWidgets.QMessageBox.No:
                     continue
             with open(path, 'r') as stream:
-                kernel.dispatch('note_new', (os.path.basename(path), stream.read()))
+                name = os.path.basename(path)
+                text = stream.read()
+                kernel.dispatch('note_new', (name, text))
                 stream.close()
 

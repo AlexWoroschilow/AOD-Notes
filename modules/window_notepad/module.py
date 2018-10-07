@@ -93,7 +93,7 @@ class Loader(Loader):
         ))
         
         widget.toolbar.copyAction.clicked.connect(functools.partial(
-            self.actions.onActionFolderCopy, widget=widget
+            self.actions.onActionClone, widget=widget
         ))
 
         widget.toolbar.expandAction.clicked.connect(functools.partial(
@@ -105,7 +105,7 @@ class Loader(Loader):
         ))
 
         widget.toolbar.removeAction.clicked.connect(functools.partial(
-            self.actions.onActionFolderRemove, widget=widget
+            self.actions.onActionRemove, widget=widget
         ))
 
         kernel.listen('note_new', functools.partial(

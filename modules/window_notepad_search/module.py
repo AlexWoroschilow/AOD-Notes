@@ -74,7 +74,8 @@ class Loader(Loader):
         factory.addWidget(widget_search_field)
         
         kernel.listen('note_created', self.actions.onActionNoteCreated)
-        kernel.listen('note_updated', self.actions.onActionNoteUpdated)
+        kernel.listen('note_udpated', self.actions.onActionNoteUpdated)
+        kernel.listen('note_remove', self.actions.onActionNoteRemove)
 
     @inject.params(kernel='kernel')
     def _service(self, kernel):

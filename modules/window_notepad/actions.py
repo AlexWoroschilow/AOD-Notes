@@ -41,23 +41,23 @@ class ModuleActions(object):
                 widget.tree.selected                
             ))
 
-    def onActionContextMenu(self, event, widget):
+    @inject.params(storage='storage')
+    def onActionContextMenu(self, event, widget, storage):
 
         menu = QtWidgets.QMenu()
 
-        index = widget.tree.index 
-        if index is not None:
-            name = widget.tree.model().data(index)
+        if widget.tree.index is not None:
+            name = storage.data(widget.tree.index)
 
             menu.addAction('Open in a new tab', functools.partial(
                 self.onActionFullScreen, widget=widget
             ))
             menu.addSeparator()
             menu.addAction('Remove \'%s\'' % name, functools.partial(
-                self.onActionFolderRemove, widget=widget
+                self.onActionRemove, widget=widget
             ))
             menu.addAction('Clone \'%s\'' % name, functools.partial(
-                self.onActionFolderCopy, widget=widget
+                self.onActionClone, widget=widget
             ))
             menu.addSeparator()
 
@@ -70,8 +70,8 @@ class ModuleActions(object):
         
         menu.exec_(widget.tree.mapToGlobal(event))
 
-    @inject.params(storage='storage', note='storage.note', kernel='kernel')
-    def onActionNoteCreate(self, event, widget, storage, note, kernel):
+    @inject.params(storage='storage', note='storage.note', kernel='kernel', logger='logger')
+    def onActionNoteCreate(self, event, widget, storage, note, kernel, logger):
 
         folder = storage.entity(widget.tree.selected)
         if folder is not None and folder:
@@ -84,10 +84,10 @@ class ModuleActions(object):
             note = storage.create(note)
             kernel.dispatch('note_created', note)
         except(Exception) as ex:
-            print(ex)
+            logger.exception(ex.message)
 
-    @inject.params(storage='storage', folder='storage.folder')
-    def onActionFolderCreate(self, event, widget, storage, folder):
+    @inject.params(storage='storage', folder='storage.folder', logger='logger')
+    def onActionFolderCreate(self, event, widget, storage, folder, logger):
 
         destination = storage.entity(widget.tree.selected)
         if destination is not None and destination:
@@ -99,23 +99,27 @@ class ModuleActions(object):
         try:
             storage.create(folder)
         except(Exception) as ex:
-            print(ex)
+            logger.exception(ex.message)
 
     @inject.params(storage='storage')
-    def onActionFolderCopy(self, event=None, widget=None, storage=None):
+    def onActionClone(self, event=None, widget=None, storage=None):
         if widget.tree is None:
             return None
         path = widget.tree.selected
         if path is not None:
             storage.clone(path)
 
-    @inject.params(storage='storage')
-    def onActionSave(self, event, widget, storage):
+    @inject.params(storage='storage', kernel='kernel', logger='logger')
+    def onActionSave(self, event, widget, storage, kernel, logger):
         note = widget._note
         note.name = widget.name.text() 
-        note.text = widget._text.text.toHtml() 
-        if note is not None:
-            storage.update(note)
+        note.text = widget._text.text.toHtml()
+         
+        try:
+            note = storage.update(note)
+            kernel.dispatch('note_udpated', note)
+        except(Exception) as ex:
+            logger.exception(ex.message)
         
     @inject.params(kernel='kernel', storage='storage', editor='editor')
     def onActionFullScreen(self, event=None, widget=None, kernel=None, storage=None, editor=None):
@@ -133,14 +137,27 @@ class ModuleActions(object):
 
         kernel.dispatch('window.tab', (editor, note.name))
 
-    @inject.params(storage='storage')
-    def onActionFolderRemove(self, event=None, widget=None, storage=None):
-        message = widget.tr("Are you sure you want to remove this Folder?")
+    @inject.params(storage='storage', kernel='kernel')
+    def onActionRemove(self, event, widget, storage, kernel):
+        entity = storage.entity(widget.tree.selected)
+        if entity is None or not entity:
+            return None
+
+        message = widget.tr("Are you sure you want to remove this element: %s ?" % entity.name)
         reply = QtWidgets.QMessageBox.question(widget, 'Remove folder', message, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
         if reply == QtWidgets.QMessageBox.Yes:
-            path = widget.tree.selected
-            if path is not None: 
-                storage.delete(path)
+            try:
+                
+                if (entity.__class__.__name__ == 'Note'):
+                    kernel.dispatch('note_remove', entity)
+                    
+                if (entity.__class__.__name__ == 'Folder'):
+                    for child in storage.entities(entity.__str__()):
+                        kernel.dispatch('note_remove', child)
+                    
+                storage.delete(entity.__str__())
+            except(Exception) as ex:
+                print(ex)
 
     def onActionExpand(self, event=None, widget=None):
         if widget.tree is not None:

@@ -17,7 +17,7 @@ import inject
 
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
-from scipy.optimize._tstutils import description
+from PyQt5 import QtCore
 
 
 class IconProvider(QtWidgets.QFileIconProvider):
@@ -99,7 +99,6 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         self.setIconProvider(IconProvider())
         self.setRootPath(location)
         self.setReadOnly(False)
-
         self._location = location
         
     def _update_document(self, entity=None):
@@ -208,6 +207,9 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
     def entities(self, path=None):
         response = []
         for path in glob.glob('%s/*' % path):
+            if os.path.isdir(path):
+                response = response + self.entities(path)
+                continue
             response.append(self.entity(path))
         return response
     
