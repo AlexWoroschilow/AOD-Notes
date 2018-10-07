@@ -82,14 +82,14 @@ class Loader(Loader):
     def _service(self, kernel, config, storage):
         from .service import Search
         
-        destination = '%s/index' % os.path.dirname(kernel.options.config)
-        
         service = Search()
-        if service.exists(destination):
-            return service.previous(destination)
+        
+        destination = os.path.dirname(kernel.options.config)
+        if service.exists('%s/index' % destination):
+            return service.previous('%s/index' % destination)
 
-        destination = config.get('storage.location')
-        for entity in storage.entities(destination):
+        service.previous('%s/index' % destination)
+        for entity in storage.entities(config.get('storage.location')):
             service.append(entity)
         return service
 

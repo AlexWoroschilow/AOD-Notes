@@ -24,7 +24,7 @@ class Search(object):
     def __init__(self):
         pass
 
-    def initialize(self, destination):
+    def create(self, destination):
         self.ix = index.create_in(destination, Schema(
             title=TEXT(stored=True),
             path=ID(stored=True),

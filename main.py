@@ -23,7 +23,11 @@ import logging
 import optparse
 import configparser
 import pdfkit
+from whoosh import index
+from whoosh import fields
+from whoosh import qparser
 
+ 
 from PyQt5 import QtWidgets
 
 from lib.kernel import Kernel
