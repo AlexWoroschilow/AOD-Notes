@@ -33,7 +33,6 @@ class NotePreviewWidget(QtWidgets.QWidget):
     def __init__(self, entity=None):
         super(NotePreviewWidget, self).__init__()
         self.setContentsMargins(20, 20, 20, 20)
-        self.setObjectName('NotePreview')
         
         label = QtWidgets.QGridLayout()
         label.setContentsMargins(0, 10, 0, 10)
