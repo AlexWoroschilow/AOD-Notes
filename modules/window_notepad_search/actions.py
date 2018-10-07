@@ -41,7 +41,7 @@ class ModuleActions(object):
 
     @inject.params(search='search')
     def onActionNoteCreated(self, event, search):
-        return search.add(event.data)
+        return search.append(event.data)
 
     @inject.params(search='search')
     def onActionNoteUpdated(self, event, search):

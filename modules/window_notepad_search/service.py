@@ -14,39 +14,35 @@ import os
 import inject 
 
 from whoosh.fields import Schema, TEXT, ID
-from whoosh.qparser import QueryParser
+from whoosh.qparser import MultifieldParser
 
 from whoosh import index
 
 
 class Search(object):
 
-    @inject.params(config='config', storage='storage')
-    def __init__(self, options, config, storage):
+    def __init__(self):
+        pass
 
-        destination = '%s/index' % os.path.dirname(options.config)
-        
-        if not os.path.exists(destination):
-            os.mkdir(destination)
-            
-        if index.exists_in(destination):
-            self.ix = index.open_dir(destination)
-            return None 
-        
+    def initialize(self, destination):
         self.ix = index.create_in(destination, Schema(
             title=TEXT(stored=True),
             path=ID(stored=True),
             content=TEXT(stored=True)
         ))
+        return self
         
-        self.writer = self.ix.writer()
-        destination = config.get('storage.location')
-        for entity in storage.entities(destination):
-            self.writer.add_document(title=entity.name, path=entity.path, content=entity.text)
-        self.writer.commit()
-        return None
+    def exists(self, destination):
+        if os.path.exists(destination):
+            return index.exists_in(destination)
+        return False
 
-    def add(self, entity=None):
+    def previous(self, destination):
+        if self.exists(destination):
+            self.ix = index.open_dir(destination)
+        return self
+
+    def append(self, entity=None):
         self.writer = self.ix.writer()
         self.writer.add_document(title=entity.name, path=entity.path, content=entity.text)
         self.writer.commit()
@@ -66,6 +62,10 @@ class Search(object):
 
     def request(self, string=None):
         with self.ix.searcher() as searcher:
-            query = QueryParser('content', self.ix.schema).parse(string)
+            
+            query = MultifieldParser([
+                "title", "content"
+            ], self.ix.schema).parse(string)
+            
             for result in searcher.search(query):
                 yield result

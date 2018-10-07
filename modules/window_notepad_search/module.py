@@ -10,6 +10,7 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import os
 import inject
 import functools
 
@@ -77,8 +78,18 @@ class Loader(Loader):
         kernel.listen('note_udpated', self.actions.onActionNoteUpdated)
         kernel.listen('note_remove', self.actions.onActionNoteRemove)
 
-    @inject.params(kernel='kernel')
-    def _service(self, kernel):
+    @inject.params(kernel='kernel', config='config', storage='storage')
+    def _service(self, kernel, config, storage):
         from .service import Search
-        return Search(kernel.options)
+        
+        destination = '%s/index' % os.path.dirname(kernel.options.config)
+        
+        service = Search()
+        if service.exists(destination):
+            return service.previous(destination)
+
+        destination = config.get('storage.location')
+        for entity in storage.entities(destination):
+            service.append(entity)
+        return service
 
