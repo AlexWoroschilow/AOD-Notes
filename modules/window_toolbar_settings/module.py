@@ -52,7 +52,7 @@ class Loader(Loader):
         widget = QtWidgets.QAction(QtGui.QIcon("icons/settings.svg"), None)
         widget.triggered.connect(self.actions.onActionSettings)
 
-        factory.addWidget(widget)
+        factory.addWidget(widget, 128)
 
     @inject.params(config='config', notepad='notepad')
     def _widget(self, config, notepad):

@@ -60,7 +60,9 @@ class Loader(Loader):
         widget.header.setFloatable(False)
         widget.header.setMovable(False)
         
-        for header_widget in factory.widgets:
+        print(factory.widgets)
+        for bunch in factory.widgets:
+            header_widget, priority = bunch
             if isinstance(header_widget, QtWidgets.QAction):
                 widget.header.addAction(header_widget)
             if isinstance(header_widget, QtWidgets.QWidget):

@@ -50,22 +50,22 @@ class ModuleActions(object):
             name = storage.data(widget.tree.index)
 
             menu.addAction('Open in a new tab', functools.partial(
-                self.onActionFullScreen, widget=widget
+                self.onActionFullScreen, event=None, widget=widget
             ))
             menu.addSeparator()
             menu.addAction('Remove \'%s\'' % name, functools.partial(
-                self.onActionRemove, widget=widget
+                self.onActionRemove, event=None, widget=widget
             ))
             menu.addAction('Clone \'%s\'' % name, functools.partial(
-                self.onActionClone, widget=widget
+                self.onActionClone, event=None, widget=widget
             ))
             menu.addSeparator()
 
         menu.addAction('Create new document', functools.partial(
-            self.onActionNoteCreate, widget=widget
+            self.onActionNoteCreate, event=None, widget=widget
         ))
         menu.addAction('Create new group', functools.partial(
-            self.onActionFolderCreate, widget=widget
+            self.onActionFolderCreate, event=None, widget=widget
         ))
         
         menu.exec_(widget.tree.mapToGlobal(event))
@@ -77,7 +77,7 @@ class ModuleActions(object):
         if folder is not None and folder:
             note.folder = folder
         
-        if event.data is not None and event.data:
+        if event is not None and event.data is not None:
             note.name, note.text = event.data
 
         try:
@@ -93,7 +93,7 @@ class ModuleActions(object):
         if destination is not None and destination:
             folder.folder = destination
 
-        if event.data is not None and event.data:
+        if event is not None and event.data is not None:
             folder.name, folder.description = event.data
         
         try:

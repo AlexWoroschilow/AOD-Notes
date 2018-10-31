@@ -19,32 +19,9 @@ from PyQt5.QtCore import Qt
 
 
 class WidgetHeaderFactory(object):
+    widgets = []
 
-    def __init__(self):
-        self.widgets = []
-
-    def addWidget(self, widget):
-        self.widgets.append(widget)
-
-    @property
-    def widget(self):
-        widget = WindowHeader()
-        for header_widget in self.widgets:
-            if isinstance(header_widget, QtWidgets.QAction):
-                widget.header.addAction(header_widget)
-            if isinstance(header_widget, QtWidgets.QWidget):
-                widget.header.addWidget(header_widget)
-        return widget
-
-
-class WindowHeader(QtWidgets.QWidget):
-
-    def __init__(self, parent=None):
-        super(WindowHeader, self).__init__(parent)
-
-        self.setContentsMargins(0, 0, 0, 0)
-
-        layout = QtWidgets.QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
+    def addWidget(self, widget, priority=1):
+        self.widgets.append((widget, priority))
+        self.widgets.sort(key=lambda x: x[1])
         
-        self.setLayout(layout)
