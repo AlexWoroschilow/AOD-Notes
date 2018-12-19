@@ -42,8 +42,7 @@ class Loader(Loader):
         widget.setIcon(QtGui.QIcon("icons/html.svg"))
         widget.setToolTip(widget.tr("Export document to HTML"))
         
-        widget.clicked.connect(functools.partial(
-            self.actions.onActionButtonPressed, widget=widget
-        ))
+        action = functools.partial(self.actions.onActionButtonPressed, widget=widget)
+        widget.clicked.connect(action)
 
         widget.toolbar.addWidget(widget)

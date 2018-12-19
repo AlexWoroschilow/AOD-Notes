@@ -17,7 +17,7 @@ class NotePreviewTitle(QtWidgets.QLabel):
 
     def __init__(self, text):
         super(NotePreviewTitle, self).__init__(text)
-        self.setMaximumWidth(100)
+        self.setMaximumWidth(150)
         self.setWordWrap(True)
 
 
@@ -30,23 +30,19 @@ class NotePreviewDescription(QtWidgets.QLabel):
 
 class NotePreviewWidget(QtWidgets.QWidget):
 
-    def __init__(self, entity=None):
+    def __init__(self, name, content):
         super(NotePreviewWidget, self).__init__()
-        self.setContentsMargins(20, 20, 20, 20)
+        self.setContentsMargins(0, 0, 0, 0)
         
         label = QtWidgets.QGridLayout()
         label.setContentsMargins(0, 10, 0, 10)
         
-        title = NotePreviewTitle(entity.name)
+        title = NotePreviewTitle(name)
         label.addWidget(title, 0, 0, 1, 1)
 
         description = NotePreviewDescription()
         label.addWidget(description, 0, 1, 10, 5)
         
-        if (entity.__class__.__name__ == 'Note'):
-            description.setText(entity.text)
-
-        if (entity.__class__.__name__ == 'Folder'):
-            description.setText(', '.join([note.name for note in entity.entities]))
+        description.setText(content)
         
         self.setLayout(label)

@@ -18,10 +18,7 @@ from PyQt5 import QtWidgets
 
 class ModuleActions(object):
 
-    def onActionButtonPressed(self, event=None, widget=None):
-        if widget.editor is None or widget.editor.note is None:
-            return None
-
+    def onActionButtonPressed(self, event, widget):
         selector = QtWidgets.QFileDialog()
         if not selector.exec_():
             return None
@@ -29,7 +26,7 @@ class ModuleActions(object):
         for path in selector.selectedFiles():
 
             document = QtGui.QTextDocument()
-            document.setHtml(widget.editor.note.text)
+            document.setHtml(widget.editor.getHtml())
 
             if not os.path.exists(path):
                 with open(path, 'w+') as stream:

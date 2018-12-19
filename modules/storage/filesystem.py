@@ -19,77 +19,7 @@ from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5 import QtCore
 
-
-class IconProvider(QtWidgets.QFileIconProvider):
-
-    def icon(self, fileInfo):
-        if fileInfo.isDir():
-            return QtGui.QIcon("icons/folder-light.svg") 
-        return QtGui.QIcon("icons/file-light.svg") 
-
-
-class Folder(object):
-
-    def __init__(self, path=None, name='New folder'):
-        self.description = None
-        self.name = name
-        self.path = path
-
-        self._folder = None
-
-    @property
-    def folder(self):
-        return self._folder
-
-    @folder.setter        
-    def folder(self, folder=None):
-        if folder is None:
-            return None
-        
-        self.path = folder.path
-        self._folder = folder
-
-    @property
-    def count(self):
-        response = []
-        for path in glob.glob('%s/*' % self.path):
-            response.append(path)
-        return len(response)
-
-    @property
-    @inject.params(storage='storage')
-    def entities(self, storage):
-        response = []
-        for path in glob.glob('%s/*' % self.path):
-            response.append(storage.entity(path))
-        return response
-
-    def __str__(self):
-        return "%s" % self.path
-
-
-class Note(object):
-
-    def __init__(self, path=None, name='New Note', text='Note description'):
-        self.path = path
-        self.name = name
-        self.text = text
-        self._folder = None
-    
-    @property
-    def folder(self):
-        return self._folder
-
-    @folder.setter        
-    def folder(self, folder=None):
-        if folder is None:
-            return None
-        
-        self.path = folder.path
-        self._folder = folder
-
-    def __str__(self):
-        return "%s" % self.path
+from .gui.icons import IconProvider
 
 
 class FilesystemStorage(QtWidgets.QFileSystemModel):
@@ -101,137 +31,78 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         self.setReadOnly(False)
         self._location = location
         
-        self.fileRenamed.connect(self.test)
+        # self.fileRenamed.connect(self.test)
          
-    def test(self, path, old, new):
-        print(self.data(self.index("{}/{}".format(path, old))))
-        print(path, old, new)
+#    def test(self, path, old, new):
+#        print(self.data(self.index("{}/{}".format(path, old))))
+#        print(path, old, new)
         
-    def _update_document(self, entity=None):
-        destination = "%s/%s" % (
-            os.path.dirname(entity.path),
-            entity.name
-        )
-        
-        if not os.path.exists(destination):
-            shutil.move(entity.path, destination)
-            entity.path = destination
-            
-        if os.path.exists(entity.path):
-            with open(entity.path, 'w+') as stream:
-                stream.write(entity.text)
-                stream.close()
-                
-        return entity
+    def isDir(self, index):
+        source = self.filePath(index)
+        return os.path.isdir(source)
 
-    def _create_folder(self, entity=None):
-        
-        if self.isDir(self.index(entity.path)):
-            self.mkdir(self.index(entity.path), entity.name)
+    def isFile(self, index):
+        source = self.filePath(index)
+        return os.path.isfile(source)
 
-        entity.path = "{}/{}".format(
-            entity.path, entity.name
-        )
-                        
-        return entity
-
-    def _create_document(self, entity=None):
-        if os.path.isfile(entity.path):
-            entity.path = os.path.dirname(entity.path) 
-        
-        entity.path = "%s/%s" % (
-            entity.path,
-            entity.name,
-        )
-        
-        if not os.path.exists(entity.path):
-            with open(entity.path, 'w+') as stream:
-                stream.write(entity.text)
-                stream.close()
-                
-        return entity
-
-    def mkdir(self, *args, **kwargs):
-        print('QFileSystemModel.mkdir')
-        return QtWidgets.QFileSystemModel.mkdir(self, *args, **kwargs)
-
-    def rmdir(self, *args, **kwargs):
-        print('QFileSystemModel.rmdir')
-        return QtWidgets.QFileSystemModel.rmdir(self, *args, **kwargs)
-
-    def remove(self, *args, **kwargs):
-        print('QFileSystemModel.remove')
-        return QtWidgets.QFileSystemModel.remove(self, *args, **kwargs)
-
-    def create(self, entity=None):
-        
-        if type(entity) == Folder:
-            return self._create_folder(entity)
-        
-        if type(entity) == Note:
-            return self._create_document(entity)
-
+    def fileContent(self, index):
+        source = self.filePath(index)
+        if not os.path.isfile(source):
+            return None
+        with open(source, 'r') as stream:
+            return stream.read()
         return None
-
-    def update(self, entity=None):
-
-        if type(entity) == Folder:
+    
+    def setFileContent(self, index, content):
+        destination = self.filePath(index)
+        if not os.path.isfile(destination):
             return None
+        with open(destination, 'w+') as stream:
+            stream.write(content)
+            stream.close()
+            return True
+        return False
         
-        if type(entity) == Note:
-            return self._update_document(entity)
-
-        return None
-
-    def touch(self, path, name):
-        pass
-
-    def clone(self, path=None):
-        destination = "%s(copy)" % path
-        if not os.path.exists(path):
+    def touch(self, index, name):
+        destination_root = self.filePath(index)
+        if not os.path.isdir(destination_root):
             return None
 
-        if os.path.isdir(path):
-            shutil.copytree(path, destination)
+        destination_file = "{}/{}".format(destination_root, name)
+        if os.path.isfile(destination_file):
+            return self.index(destination_file)
+
+        open(destination_file, 'w+').close()
+        return self.index(destination_file)
+
+    def clone(self, index=None):
+        source = self.filePath(index)
+        if not os.path.exists(source):
+            return None
+
+        if os.path.isdir(source):
+            destination = "{}(clone)".format(source)
+            shutil.copytree(source, destination)
+            return True
         
-        if not os.path.exists(destination):
-            shutil.copy(path, destination)
+        destination = "{}(clone)".format(source)
+        shutil.copy(source, destination)
+        return True
 
-    def delete(self, path=None):
-        if not os.path.exists(path):
-            return None
-            
-        if os.path.isdir(path):
-            return self.rmdir(self.index(path))
-        
-        if os.path.isfile(path):
-            return os.remove(path)
-
-    def entity(self, path=None):
-        if os.path.isdir(path):
-            name = os.path.basename(path)
-            return Folder(path, name)
-
-        with open(path, 'r') as stream:
-            text = stream.read()
-            name = os.path.basename(path)
-            return Note(path, name, text)            
-
-    def note(self, path=None):
-        if os.path.isdir(path):
+    def entities(self, index=None):
+        source = self.filePath(index)
+        if not os.path.exists(source):
             return None
 
-        with open(path, 'r') as stream:
-            text = stream.read()
-            name = os.path.basename(path)
-            return Note(path, name, text)            
-
-    def entities(self, path=None):
         response = []
-        for path in glob.glob('%s/*' % path):
-            if os.path.isdir(path):
-                response = response + self.entities(path)
+        for path in glob.glob('{}/*'.format(source)):
+            index = self.index(path)
+            if index is None or not index:
                 continue
-            response.append(self.entity(path))
+                        
+            if os.path.isdir(path):
+                response = response + self.entities(index)
+                continue
+            response.append(index)
         return response
     

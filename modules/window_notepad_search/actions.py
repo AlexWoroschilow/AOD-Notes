@@ -51,10 +51,8 @@ class ModuleActions(object):
     def onActionNoteRemove(self, event, search):
         return search.remove(event.data)
 
-    @inject.params(kernel='kernel', logger='logger')
-    def onActionNoteImport(self, event=None, kernel=None, logger=None):
-        logger.debug('[search] document import event')
-
+    @inject.params(logger='logger', storage='storage', config='config')
+    def onActionNoteImport(self, event, logger, storage, config):
         selector = QtWidgets.QFileDialog()
         if not selector.exec_():
             return None
@@ -69,9 +67,15 @@ class ModuleActions(object):
                 reply = QtWidgets.QMessageBox.question(self._widget, 'Message', message, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
                 if reply == QtWidgets.QMessageBox.No:
                     continue
-            with open(path, 'r') as stream:
-                name = os.path.basename(path)
-                text = stream.read()
-                kernel.dispatch('note_new', (name, text))
-                stream.close()
+            with open(path, 'r') as source:
+                index = storage.index(config.get('storage.location'))
+                if index is None or not index:
+                    return None
+                
+                index = storage.touch(index, os.path.basename(path))
+                if index is None or not index:
+                    return None
+                
+                storage.setFileContent(index, source.read())
+                source.close()
 

@@ -46,78 +46,61 @@ class Loader(Loader):
 
     @inject.params(kernel='kernel', config='config')
     def _widget_editor(self, kernel=None, config=None):
+        
         widget = TextEditorWidget()
-        widget.name.setVisible(int(config.get('editor.name')))
-        widget.formatbar.setVisible(int(config.get('editor.formatbar')))
+        
         widget.leftbar.setVisible(int(config.get('editor.leftbar')))
+        widget.formatbar.setVisible(int(config.get('editor.formatbar')))
         widget.rightbar.setVisible(int(config.get('editor.rightbar')))
 
-        event = (widget, widget.leftbar)
-        kernel.dispatch('window.notepad.leftbar', event)
+        kernel.dispatch('window.notepad.leftbar', (widget, widget.leftbar))
+        kernel.dispatch('window.notepad.rightbar', (widget, widget.rightbar))
+        kernel.dispatch('window.notepad.formatbar', (widget, widget.formatbar))
 
-        event = (widget, widget.rightbar)
-        kernel.dispatch('window.notepad.rightbar', event)
-
-        event = (widget, widget.formatbar)
-        kernel.dispatch('window.notepad.formatbar', event)
-
-        widget.leftbar.saveAction.clicked.connect(functools.partial(
-            self.actions.onActionSave, widget=widget
-        ))
+        action = functools.partial(self.actions.onActionSave, widget=widget)
+        widget.leftbar.saveAction.clicked.connect(action)
         
-        widget.leftbar.fullscreenAction.clicked.connect(functools.partial(
-            self.actions.onActionFullScreen, widget=widget
-        ))
+        action = functools.partial(self.actions.onActionFullScreen, widget=widget)
+        widget.leftbar.fullscreenAction.clicked.connect(action)
 
-        kernel.listen('config_updated', functools.partial(
-            self.actions.onActionConfigUpdatedEditor, widget=widget
-        ))
+        action = functools.partial(self.actions.onActionConfigUpdatedEditor, widget=widget)
+        kernel.listen('config_updated', action)
 
         return widget
 
-    @inject.params(kernel='kernel', config='config', storage='storage', factory='settings_factory')
-    def _widget(self, kernel=None, config=None, storage=None, factory=None):
+    @inject.params(kernel='kernel', storage='storage')
+    def _widget(self, kernel, storage):
         
         widget = FolderList(self.actions)
 
-        storage.fileRenamed.connect(functools.partial(
-            self.actions.onActionNoteRefresh, widget=widget
-        ))
+        action = functools.partial(self.actions.onActionNoteSelect, widget=widget)
+        storage.fileRenamed.connect(action)
 
-        widget.tree.customContextMenuRequested.connect(functools.partial(
-            self.actions.onActionContextMenu, widget=widget
-        ))
+        action = functools.partial(self.actions.onActionContextMenu, widget=widget)
+        widget.tree.customContextMenuRequested.connect(action)
         
-        widget.tree.clicked.connect(functools.partial(
-            self.actions.onActionNoteSelect, widget=widget
-        ))
+        action = functools.partial(self.actions.onActionNoteSelect, widget=widget)
+        widget.tree.clicked.connect(action)
         
-        widget.toolbar.copyAction.clicked.connect(functools.partial(
-            self.actions.onActionClone, widget=widget
-        ))
+        action = functools.partial(self.actions.onActionClone, widget=widget)
+        widget.toolbar.copyAction.clicked.connect(action)
 
-        widget.toolbar.expandAction.clicked.connect(functools.partial(
-            self.actions.onActionExpand, widget=widget
-        ))
+        action = functools.partial(self.actions.onActionExpand, widget=widget)
+        widget.toolbar.expandAction.clicked.connect(action)
 
-        widget.toolbar.collapseAction.clicked.connect(functools.partial(
-            self.actions.onActionCollaps, widget=widget
-        ))
+        action = functools.partial(self.actions.onActionCollaps, widget=widget)
+        widget.toolbar.collapseAction.clicked.connect(action)
 
-        widget.toolbar.removeAction.clicked.connect(functools.partial(
-            self.actions.onActionRemove, widget=widget
-        ))
+        action = functools.partial(self.actions.onActionRemove, widget=widget)
+        widget.toolbar.removeAction.clicked.connect(action)
 
-        kernel.listen('note_new', functools.partial(
-            self.actions.onActionNoteCreate, widget=widget
-        ))
+        action = functools.partial(self.actions.onActionNoteCreate, widget=widget)
+        kernel.listen('note_new', action)
 
-        kernel.listen('folder_new', functools.partial(
-            self.actions.onActionFolderCreate, widget=widget
-        ))
+        action = functools.partial(self.actions.onActionFolderCreate, widget=widget)
+        kernel.listen('folder_new', action)
 
-        kernel.listen('config_updated', functools.partial(
-            self.actions.onActionConfigUpdated, widget=widget
-        ))
+        action = functools.partial(self.actions.onActionConfigUpdated, widget=widget)
+        kernel.listen('config_updated', action)
 
         return widget

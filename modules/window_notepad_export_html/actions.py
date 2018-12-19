@@ -19,10 +19,7 @@ from PyQt5 import QtCore
 
 class ModuleActions(object):
 
-    def onActionButtonPressed(self, event=None, widget=None):
-        if widget.editor is None or widget.editor.note is None:
-            return None
-
+    def onActionButtonPressed(self, event, widget):
         selector = QtWidgets.QFileDialog()
         if not selector.exec_():
             return None
@@ -30,7 +27,7 @@ class ModuleActions(object):
         for path in selector.selectedFiles():
 
             document = QtGui.QTextDocument()
-            document.setHtml(widget.editor.note.text)
+            document.setHtml(widget.editor.getHtml())
             encoding = QtCore.QByteArray(bytes('UTF8', 'utf-8'))
 
             if not os.path.exists(path):

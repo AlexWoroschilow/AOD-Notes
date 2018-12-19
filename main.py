@@ -1,5 +1,5 @@
-#!/usr/bin/python3
-
+#! /usr/bin/python3
+#
 # -*- coding: utf-8 -*-
 # Copyright 2015 Alex Woroschilow (alex.woroschilow@gmail.com)
 #
@@ -13,11 +13,15 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
+import sys 
 
 abspath = os.path.abspath(__file__)
 os.chdir(os.path.dirname(abspath))
 
-import sys
+root = os.path.dirname(abspath)
+sys.path.append('{}/lib'.format(root))
+
+
 import inject       
 import logging
 import optparse

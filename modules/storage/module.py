@@ -16,8 +16,6 @@ import inject
 from lib.plugin import Loader
 
 from .filesystem import FilesystemStorage
-from .filesystem import Note
-from .filesystem import Folder
 
 
 class Loader(Loader):
@@ -28,9 +26,6 @@ class Loader(Loader):
 
     def config(self, binder=None):
         binder.bind_to_constructor('storage', self._construct)
-        
-        binder.bind_to_provider('storage.note', Note)
-        binder.bind_to_provider('storage.folder', Folder)
 
     @inject.params(config='config')
     def _construct(self, config=None):

@@ -40,6 +40,12 @@ class FolderTree(QtWidgets.QTreeView):
         self.setColumnHidden(3, True)
 
     @property
+    def current(self):
+        for index in self.selectedIndexes():
+            return index
+        return None
+
+    @property
     @inject.params(config='config')
     def selected(self, config=None):
         for index in self.selectedIndexes():
