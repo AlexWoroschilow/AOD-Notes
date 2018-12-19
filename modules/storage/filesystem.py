@@ -101,6 +101,12 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         self.setReadOnly(False)
         self._location = location
         
+        self.fileRenamed.connect(self.test)
+         
+    def test(self, path, old, new):
+        print(self.data(self.index("{}/{}".format(path, old))))
+        print(path, old, new)
+        
     def _update_document(self, entity=None):
         destination = "%s/%s" % (
             os.path.dirname(entity.path),
@@ -119,13 +125,14 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         return entity
 
     def _create_folder(self, entity=None):
-        entity.path = "%s/%s" % (
-            entity.path,
-            entity.name,
-        )
         
-        if not os.path.exists(entity.path):
-            os.makedirs(entity.path)            
+        if self.isDir(self.index(entity.path)):
+            self.mkdir(self.index(entity.path), entity.name)
+
+        entity.path = "{}/{}".format(
+            entity.path, entity.name
+        )
+                        
         return entity
 
     def _create_document(self, entity=None):
@@ -143,6 +150,18 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
                 stream.close()
                 
         return entity
+
+    def mkdir(self, *args, **kwargs):
+        print('QFileSystemModel.mkdir')
+        return QtWidgets.QFileSystemModel.mkdir(self, *args, **kwargs)
+
+    def rmdir(self, *args, **kwargs):
+        print('QFileSystemModel.rmdir')
+        return QtWidgets.QFileSystemModel.rmdir(self, *args, **kwargs)
+
+    def remove(self, *args, **kwargs):
+        print('QFileSystemModel.remove')
+        return QtWidgets.QFileSystemModel.remove(self, *args, **kwargs)
 
     def create(self, entity=None):
         
@@ -164,6 +183,9 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
 
         return None
 
+    def touch(self, path, name):
+        pass
+
     def clone(self, path=None):
         destination = "%s(copy)" % path
         if not os.path.exists(path):
@@ -180,7 +202,7 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
             return None
             
         if os.path.isdir(path):
-            return shutil.rmtree(path)
+            return self.rmdir(self.index(path))
         
         if os.path.isfile(path):
             return os.remove(path)

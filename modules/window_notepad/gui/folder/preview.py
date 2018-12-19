@@ -17,7 +17,7 @@ class NotePreviewTitle(QtWidgets.QLabel):
 
     def __init__(self, text):
         super(NotePreviewTitle, self).__init__(text)
-        self.setStyleSheet('font-size: 22px; font-weight: bold;')
+        self.setMaximumWidth(100)
         self.setWordWrap(True)
 
 
@@ -38,10 +38,10 @@ class NotePreviewWidget(QtWidgets.QWidget):
         label.setContentsMargins(0, 10, 0, 10)
         
         title = NotePreviewTitle(entity.name)
-        label.addWidget(title, 0, 0)
+        label.addWidget(title, 0, 0, 1, 1)
 
         description = NotePreviewDescription()
-        label.addWidget(description, 1, 0)
+        label.addWidget(description, 0, 1, 10, 5)
         
         if (entity.__class__.__name__ == 'Note'):
             description.setText(entity.text)

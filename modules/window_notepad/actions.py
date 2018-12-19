@@ -21,19 +21,10 @@ class ModuleActions(object):
 
     @inject.params(storage='storage')
     def onActionNoteRefresh(self, folder, old, new, storage, widget=None):
-        """
-        Reload the file into editor after the file name has been changed
-        It crushed the application because somethimes the aditor 
-        had not idea about the file name changs
-        """
         return self.onActionNoteSelect(event=(folder,), widget=widget)
 
     @inject.params(storage='storage')
     def onActionNoteSelect(self, event, storage, widget=None):
-        """
-        Get the selected note from the tree and 
-        open it in the text editor
-        """
         if widget.tree is None:
             return None
         if widget.tree.selected is not None:
