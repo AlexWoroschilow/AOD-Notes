@@ -21,14 +21,18 @@ class ModuleActions(object):
     @inject.params(storage='storage', logger='logger')
     def onActionNoteSelect(self, event, storage, widget, logger):
         try:
-            widget.entity(widget.tree.current)
+            if storage.isDir(widget.tree.current):
+                return widget.group(widget.tree.current)
+            if storage.isFile(widget.tree.current):
+                return widget.note(widget.tree.current)
+            return widget.demo()
         except(Exception) as ex:
             logger.exception(ex.message)
 
     @inject.params(storage='storage', logger='logger')
     def onActionNoteCreate(self, event, widget, storage, logger):
         try:
-            storage.touch(widget.tree.selected, 'New note')
+            storage.touch(widget.tree.current, 'New note')
         except(Exception) as ex:
             logger.exception(ex.message)
 
@@ -130,12 +134,6 @@ class ModuleActions(object):
         try:        
             visible = int(config.get('editor.rightbar'))
             widget.rightbar.setVisible(visible)
-        except (AttributeError) as ex:
-            logger.exception(ex)
-
-        try:        
-            visible = int(config.get('editor.name'))
-            widget.name.setVisible(visible)
         except (AttributeError) as ex:
             logger.exception(ex)
 

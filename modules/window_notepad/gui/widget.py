@@ -71,7 +71,7 @@ class FolderList(QtWidgets.QSplitter):
         self.test = None
         
     @inject.params(config='config', storage='storage', kernel='kernel', widget='notepad')
-    def entity(self, index, config, storage, widget, kernel):
+    def note(self, index, config, storage, widget, kernel):
         for i in range(self.container.layout().count()): 
             self.container.layout().itemAt(i).widget().close()            
 
@@ -99,16 +99,23 @@ class FolderList(QtWidgets.QSplitter):
         self.container.layout().addWidget(self.editor)
         return self
 
-    @inject.params(config='config', storage='storage', kernel='kernel', widget='notepad')
-    def group(self, index, config, storage, widget, kernel):
+    @inject.params(storage='storage')
+    def group(self, index, storage):
         for i in range(self.container.layout().count()): 
             self.container.layout().itemAt(i).widget().close()            
 
-        if not storage.isDir(index):
-            self.container.layout().addWidget(DemoWidget())
-            return self
-
+        widget = FolderViewWidget()
+        for entity in storage.entities(index):
+            content = storage.fileContent(entity)
+            name = storage.fileName(entity)
+            widget.addPreview(name, content)
+        
+        self.container.layout().addWidget(widget)
+        return self
+ 
+    def demo(self):
+        for i in range(self.container.layout().count()): 
+            self.container.layout().itemAt(i).widget().close()            
         self.container.layout().addWidget(DemoWidget())
-        # self.container.layout().addWidget(FolderViewWidget(index))
         return self
  

@@ -63,13 +63,17 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
             return True
         return False
         
-    def touch(self, path, name):
-        if os.path.isfile("{}/{}".format(path, name)):
+    def touch(self, index, name):
+        destination_root = self.filePath(index)
+        if not os.path.isdir(destination_root):
             return None
-        if not os.path.isdir(path):
-            return None
-        with open("{}/{}".format(path, name), 'w+') as stream:
-            stream.close()
+
+        destination_file = "{}/{}".format(destination_root, name)
+        if os.path.isfile(destination_file):
+            return self.index(destination_file)
+
+        open(destination_file, 'w+').close()
+        return self.index(destination_file)
 
     def clone(self, index=None):
         source = self.filePath(index)
@@ -92,9 +96,13 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
 
         response = []
         for path in glob.glob('{}/*'.format(source)):
-            if os.path.isdir(path):
-                response = response + self.entities(path)
+            index = self.index(path)
+            if index is None or not index:
                 continue
-            response.append(self.entity(path))
+                        
+            if os.path.isdir(path):
+                response = response + self.entities(index)
+                continue
+            response.append(index)
         return response
     
