@@ -70,36 +70,45 @@ class FolderList(QtWidgets.QSplitter):
         self.actions = actions
         self.test = None
         
-    @inject.params(config='config', kernel='kernel', widget='notepad')
-    def entity(self, entity, config, kernel, widget):
+    @inject.params(config='config', storage='storage', kernel='kernel', widget='notepad')
+    def entity(self, index, config, storage, widget, kernel):
         for i in range(self.container.layout().count()): 
             self.container.layout().itemAt(i).widget().close()            
 
-        if (entity.__class__.__name__ == 'Note'):
-            self.editor = TextEditorWidget()
-            self.editor.name.setVisible(int(config.get('editor.name')))
-            self.editor.formatbar.setVisible(int(config.get('editor.formatbar')))
-            self.editor.rightbar.setVisible(int(config.get('editor.rightbar')))
-            self.editor.leftbar.setVisible(int(config.get('editor.leftbar')))
-
-            kernel.dispatch('window.notepad.rightbar', (self.editor, self.editor.rightbar))
-            self.editor.leftbar.saveAction.clicked.connect(functools.partial(
-                self.actions.onActionSave, widget=self.editor
-            ))
-            kernel.dispatch('window.notepad.formatbar', (self.editor, self.editor.formatbar))
-            self.editor.leftbar.fullscreenAction.clicked.connect(functools.partial(
-                self.actions.onActionFullScreen, widget=widget
-            ))
-            kernel.dispatch('window.notepad.leftbar', (self.editor, self.editor.leftbar))
-
-            self.editor.note = entity
-
-            self.container.layout().addWidget(self.editor)
+        if not storage.isFile(index):
+            self.container.layout().addWidget(DemoWidget())
             return self
+            
+        self.editor = TextEditorWidget()
+        self.editor.formatbar.setVisible(int(config.get('editor.formatbar')))
+        self.editor.rightbar.setVisible(int(config.get('editor.rightbar')))
+        self.editor.leftbar.setVisible(int(config.get('editor.leftbar')))
+        
+        kernel.dispatch('window.notepad.rightbar', (self.editor, self.editor.rightbar))
+        kernel.dispatch('window.notepad.formatbar', (self.editor, self.editor.formatbar))
+        kernel.dispatch('window.notepad.leftbar', (self.editor, self.editor.leftbar))
+        
+        action = functools.partial(self.actions.onActionSave, widget=widget)
+        self.editor.leftbar.saveAction.clicked.connect(action)
+        
+        action = functools.partial(self.actions.onActionFullScreen, widget=widget)
+        self.editor.leftbar.fullscreenAction.clicked.connect(action)
+        
+        self.editor.insertHtml(storage.fileContent(index))
+        
+        self.container.layout().addWidget(self.editor)
+        return self
 
-        if (entity.__class__.__name__ == 'Folder'):
-            self.container.layout().addWidget(FolderViewWidget(entity))
+    @inject.params(config='config', storage='storage', kernel='kernel', widget='notepad')
+    def group(self, index, config, storage, widget, kernel):
+        for i in range(self.container.layout().count()): 
+            self.container.layout().itemAt(i).widget().close()            
+
+        if not storage.isDir(index):
+            self.container.layout().addWidget(DemoWidget())
             return self
 
         self.container.layout().addWidget(DemoWidget())
+        # self.container.layout().addWidget(FolderViewWidget(index))
         return self
+ 

@@ -22,13 +22,13 @@ from builtins import range
 class NotePreviewContainer(QtWidgets.QWidget):
 
     @inject.params(storage='storage')
-    def __init__(self, path=None, storage=None):
+    def __init__(self, index=None, storage=None):
         super(NotePreviewContainer, self).__init__()
         
         self.layout = QtWidgets.QVBoxLayout()
         self.setLayout(self.layout)
 
-        for entity in storage.entities(path):
+        for entity in storage.entities(index):
             widget = NotePreviewWidget(entity)
             self.layout.addWidget(widget)
 

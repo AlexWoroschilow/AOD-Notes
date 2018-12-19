@@ -10,7 +10,6 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import os
 import inject
 import functools
 
@@ -19,161 +18,97 @@ from PyQt5 import QtWidgets
 
 class ModuleActions(object):
 
-    @inject.params(storage='storage')
-    def onActionNoteRefresh(self, folder, old, new, storage, widget=None):
-        return self.onActionNoteSelect(event=(folder,), widget=widget)
-
-    @inject.params(storage='storage')
-    def onActionNoteSelect(self, event, storage, widget=None):
-        if widget.tree is None:
-            return None
-        if widget.tree.selected is not None:
-            widget.entity(storage.entity(
-                widget.tree.selected                
-            ))
-
-    @inject.params(storage='storage')
-    def onActionContextMenu(self, event, widget, storage):
-
-        menu = QtWidgets.QMenu()
-
-        if widget.tree.index is not None:
-            name = storage.data(widget.tree.index)
-
-            menu.addAction('Open in a new tab', functools.partial(
-                self.onActionFullScreen, event=None, widget=widget
-            ))
-            menu.addSeparator()
-            menu.addAction('Remove \'%s\'' % name, functools.partial(
-                self.onActionRemove, event=None, widget=widget
-            ))
-            menu.addAction('Clone \'%s\'' % name, functools.partial(
-                self.onActionClone, event=None, widget=widget
-            ))
-            menu.addSeparator()
-
-        menu.addAction('Create new document', functools.partial(
-            self.onActionNoteCreate, event=None, widget=widget
-        ))
-        menu.addAction('Create new group', functools.partial(
-            self.onActionFolderCreate, event=None, widget=widget
-        ))
-        
-        menu.exec_(widget.tree.mapToGlobal(event))
-
-    @inject.params(storage='storage', note='storage.note', kernel='kernel', logger='logger')
-    def onActionNoteCreate(self, event, widget, storage, note, kernel, logger):
-
-        folder = storage.entity(widget.tree.selected)
-        if folder is not None and folder:
-            note.folder = folder
-        
-        if event is not None and event.data is not None:
-            note.name, note.text = event.data
-
+    @inject.params(storage='storage', logger='logger')
+    def onActionNoteSelect(self, event, storage, widget, logger):
         try:
-            note = storage.create(note)
-            kernel.dispatch('note_created', note)
+            widget.entity(widget.tree.current)
         except(Exception) as ex:
             logger.exception(ex.message)
 
-    @inject.params(storage='storage', folder='storage.folder', logger='logger')
-    def onActionFolderCreate(self, event, widget, storage, folder, logger):
-
-        destination = storage.entity(widget.tree.selected)
-        if destination is not None and destination:
-            folder.folder = destination
-
-        if event is not None and event.data is not None:
-            folder.name, folder.description = event.data
-        
+    @inject.params(storage='storage', logger='logger')
+    def onActionNoteCreate(self, event, widget, storage, logger):
         try:
-            storage.create(folder)
+            storage.touch(widget.tree.selected, 'New note')
         except(Exception) as ex:
             logger.exception(ex.message)
 
-    @inject.params(storage='storage')
-    def onActionClone(self, event=None, widget=None, storage=None):
-        if widget.tree is None:
-            return None
-        path = widget.tree.selected
-        if path is not None:
-            storage.clone(path)
-
-    @inject.params(storage='storage', kernel='kernel', logger='logger')
-    def onActionSave(self, event, widget, storage, kernel, logger):
-        note = widget._note
-        note.name = widget.name.text() 
-        note.text = widget._text.text.toHtml()
-         
+    @inject.params(storage='storage', logger='logger')
+    def onActionClone(self, event, widget, storage, logger):
         try:
-            note = storage.update(note)
-            kernel.dispatch('note_udpated', note)
+            storage.clone(widget.tree.current)
         except(Exception) as ex:
             logger.exception(ex.message)
-        
+
+    @inject.params(storage='storage', logger='logger')
+    def onActionSave(self, event, widget, storage, logger):
+        try:
+            storage.setFileContent(widget.tree.current, widget.editor.getHtml())
+        except(Exception) as ex:
+            logger.exception(ex.message)
+
+    @inject.params(storage='storage', logger='logger')
+    def onActionFolderCreate(self, event, widget, storage, logger):
+        try:
+            storage.mkdir(widget.tree.current, 'New group')
+        except(Exception) as ex:
+            logger.exception(ex.message)
+
     @inject.params(kernel='kernel', storage='storage', editor='editor')
-    def onActionFullScreen(self, event=None, widget=None, kernel=None, storage=None, editor=None):
-        if widget.tree is None or editor is None:
-            return None
-        path = widget.tree.selected
-        if path is None:
+    def onActionFullScreen(self, event, widget, kernel, storage, editor):
+        index = widget.tree.current
+        if index is None or not index:
             return None
         
-        note = storage.note(path)
-        if note is None:
-            return None
+        content = storage.fileContent(index) 
+        editor.insertHtml(content)
+
+        event = (editor, storage.fileName(index))
+        kernel.dispatch('window.tab', event)
+
+    @inject.params(storage='storage', logger='logger')
+    def onActionRemove(self, event, widget, storage, logger):
         
-        editor.note = note
-
-        kernel.dispatch('window.tab', (editor, note.name))
-
-    @inject.params(storage='storage', kernel='kernel')
-    def onActionRemove(self, event, widget, storage, kernel):
-        entity = storage.entity(widget.tree.selected)
-        if entity is None or not entity:
-            return None
-
-        message = widget.tr("Are you sure you want to remove this element: %s ?" % entity.name)
+        message = widget.tr("Are you sure you want to remove this element: {} ?".format(
+            storage.fileName(widget.tree.current)
+        ))
+        
         reply = QtWidgets.QMessageBox.question(widget, 'Remove folder', message, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
-        if reply == QtWidgets.QMessageBox.Yes:
-            try:
-                
-                if (entity.__class__.__name__ == 'Note'):
-                    kernel.dispatch('note_remove', entity)
-                    
-                if (entity.__class__.__name__ == 'Folder'):
-                    for child in storage.entities(entity.__str__()):
-                        kernel.dispatch('note_remove', child)
-                    
-                storage.delete(entity.__str__())
-            except(Exception) as ex:
-                print(ex)
+        if reply == QtWidgets.QMessageBox.No:
+            return None
+        
+        try:
+            storage.remove(widget.tree.current)
+        except(Exception) as ex:
+            logger.exception(ex)
 
-    def onActionExpand(self, event=None, widget=None):
-        if widget.tree is not None:
+    @inject.params(logger='logger')
+    def onActionExpand(self, event, widget, logger):
+        try:
             widget.tree.expandAll()
+        except(Exception) as ex:
+            logger.exception(ex)
 
-    def onActionCollaps(self, event, widget):
-        if widget.tree is not None:
+    @inject.params(logger='logger')
+    def onActionCollaps(self, event, widget, logger):
+        try:
             widget.tree.collapseAll()
+        except(Exception) as ex:
+            logger.exception(ex)
 
     @inject.params(config='config', logger='logger')
     def onActionConfigUpdated(self, event, config=None, widget=None, logger=None):
-        if widget is None or config is None:
-            return None
 
         try:        
             visible = int(config.get('folders.toolbar'))
             widget.toolbar.setVisible(visible)
         except (AttributeError) as ex:
-            logger.error(ex)
+            logger.exception(ex)
 
         try:        
             visible = int(config.get('folders.keywords'))
             widget.tags.setVisible(visible)
-        except (AttributeError):
-            pass
+        except (AttributeError) as ex:
+            logger.exception(ex)
         
         self.onActionConfigUpdatedEditor(event, widget=widget.editor)
 
@@ -183,24 +118,50 @@ class ModuleActions(object):
         try:        
             visible = int(config.get('editor.formatbar'))
             widget.formatbar.setVisible(visible)
-        except (AttributeError):
-            pass
+        except (AttributeError) as ex:
+            logger.exception(ex)
 
         try:        
             visible = int(config.get('editor.leftbar'))
             widget.leftbar.setVisible(visible)
-        except (AttributeError):
-            pass
+        except (AttributeError) as ex:
+            logger.exception(ex)
             
         try:        
             visible = int(config.get('editor.rightbar'))
             widget.rightbar.setVisible(visible)
-        except (AttributeError):
-            pass
+        except (AttributeError) as ex:
+            logger.exception(ex)
 
         try:        
             visible = int(config.get('editor.name'))
             widget.name.setVisible(visible)
-        except (AttributeError):
-            pass
+        except (AttributeError) as ex:
+            logger.exception(ex)
 
+    @inject.params(storage='storage')
+    def onActionContextMenu(self, event, widget, storage):
+
+        menu = QtWidgets.QMenu()
+
+        if widget.tree.index is not None:
+            name = storage.data(widget.tree.index)
+
+            action = functools.partial(self.onActionFullScreen, event=None, widget=widget)
+            menu.addAction('Open in a new tab', action)
+            menu.addSeparator()
+            
+            action = functools.partial(self.onActionRemove, event=None, widget=widget)
+            menu.addAction('Remove \'{}\''.format(name), action)
+            
+            action = functools.partial(self.onActionClone, event=None, widget=widget)
+            menu.addAction('Clone \'{}\''.format(name), action)
+            menu.addSeparator()
+
+        action = functools.partial(self.onActionNoteCreate, event=None, widget=widget)
+        menu.addAction('Create new document', action)
+        
+        action = functools.partial(self.onActionFolderCreate, event=None, widget=widget)
+        menu.addAction('Create new group', action)
+        
+        menu.exec_(widget.tree.mapToGlobal(event))

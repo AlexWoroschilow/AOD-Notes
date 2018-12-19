@@ -50,8 +50,9 @@ class Loader(Loader):
         
         widget = MainWindow()
         
-        widget.resize(int(config.get('window.width')),
-            int(config.get('window.height')))
+        width = int(config.get('window.width'))
+        height = int(config.get('window.height'))  
+        widget.resize(width, height)
         
         widget.header = widget.addToolBar('main')
         widget.header.setIconSize(QtCore.QSize(20, 20))
@@ -60,7 +61,6 @@ class Loader(Loader):
         widget.header.setFloatable(False)
         widget.header.setMovable(False)
         
-        print(factory.widgets)
         for bunch in factory.widgets:
             header_widget, priority = bunch
             if isinstance(header_widget, QtWidgets.QAction):

@@ -10,10 +10,8 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import inject
-import functools
 from PyQt5.QtCore import Qt
-
+    
 from PyQt5 import QtPrintSupport
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
@@ -22,7 +20,6 @@ from .bar import ToolbarWidgetLeft
 from .bar import ToolBarWidgetRight
 from .bar import FormatbarWidget
 
-from .line import NameEditor
 from .scroll import TextWriter
 
 
@@ -34,7 +31,6 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.setContentsMargins(0, 0, 0, 0)
 
         self._note = None
-        self.name = NameEditor()
 
         self._text = TextWriter(self)
         self._text.text.cursorPositionChanged.connect(self.cursorPosition)
@@ -77,7 +73,6 @@ class TextEditorWidget(QtWidgets.QWidget):
         layout.setContentsMargins(0, 10, 0, 0)
 
         layout.addWidget(self.leftbar, 0, 0, 5, 1)
-        layout.addWidget(self.name, 0, 1, 1, 1)
         layout.addWidget(self.rightbar, 1, 2, 3, 1)
         layout.addWidget(self.formatbar, 1, 1)
         layout.addWidget(self._text, 2, 1)
@@ -139,6 +134,9 @@ class TextEditorWidget(QtWidgets.QWidget):
                 cursor = self._text.text.textCursor()
                 image = image.scaled(800, 600, Qt.KeepAspectRatio)
                 cursor.insertImage(image, filename)
+
+    def getHtml(self):
+        return self._text.text.toHtml()
 
     def insertHtml(self, html=None):
         if self._text is not None and html is not None:
