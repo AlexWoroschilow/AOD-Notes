@@ -13,11 +13,8 @@
 import os
 import glob
 import shutil
-import inject
 
 from PyQt5 import QtWidgets
-from PyQt5 import QtGui
-from PyQt5 import QtCore
 
 from .gui.icons import IconProvider
 
@@ -30,12 +27,6 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         self.setRootPath(location)
         self.setReadOnly(False)
         self._location = location
-        
-        # self.fileRenamed.connect(self.test)
-         
-#    def test(self, path, old, new):
-#        print(self.data(self.index("{}/{}".format(path, old))))
-#        print(path, old, new)
         
     def isDir(self, index):
         source = self.filePath(index)
