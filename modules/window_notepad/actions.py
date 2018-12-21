@@ -18,6 +18,9 @@ from PyQt5 import QtWidgets
 
 class ModuleActions(object):
 
+    def onActionFileRenamed(self, source, old, new, widget):
+        return self.onActionNoteSelect((source, old, new), widget=widget)
+
     @inject.params(storage='storage', logger='logger')
     def onActionNoteSelect(self, event, storage, widget, logger):
         try:

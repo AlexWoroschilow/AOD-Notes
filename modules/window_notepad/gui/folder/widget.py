@@ -20,6 +20,8 @@ class NotePreviewContainer(QtWidgets.QWidget):
 
     def __init__(self):
         super(NotePreviewContainer, self).__init__()
+        self.setObjectName('NotePreviewContainer')
+        self.setContentsMargins(0, 0, 0, 0)
         
         self.layout = QtWidgets.QGridLayout()
         self.layout.setAlignment(Qt.AlignTop)

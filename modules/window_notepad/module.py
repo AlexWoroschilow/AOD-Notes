@@ -73,7 +73,7 @@ class Loader(Loader):
         
         widget = FolderList(self.actions)
 
-        action = functools.partial(self.actions.onActionNoteSelect, widget=widget)
+        action = functools.partial(self.actions.onActionFileRenamed, widget=widget)
         storage.fileRenamed.connect(action)
 
         action = functools.partial(self.actions.onActionContextMenu, widget=widget)
