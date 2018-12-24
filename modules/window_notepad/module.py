@@ -52,16 +52,14 @@ class Loader(Loader):
         widget.leftbar.setVisible(int(config.get('editor.leftbar')))
         widget.formatbar.setVisible(int(config.get('editor.formatbar')))
         widget.rightbar.setVisible(int(config.get('editor.rightbar')))
-
+        widget.leftbar.fullscreenAction.setVisible(False)
+        
         kernel.dispatch('window.notepad.leftbar', (widget, widget.leftbar))
         kernel.dispatch('window.notepad.rightbar', (widget, widget.rightbar))
         kernel.dispatch('window.notepad.formatbar', (widget, widget.formatbar))
 
         action = functools.partial(self.actions.onActionSave, widget=widget)
-        widget.leftbar.saveAction.clicked.connect(action)
-        
-        action = functools.partial(self.actions.onActionFullScreen, widget=widget)
-        widget.leftbar.fullscreenAction.clicked.connect(action)
+        widget.saveAction.connect(action)
 
         action = functools.partial(self.actions.onActionConfigUpdatedEditor, widget=widget)
         kernel.listen('config_updated', action)

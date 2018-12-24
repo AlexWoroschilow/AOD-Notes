@@ -29,17 +29,9 @@ class Loader(Loader):
 
     @property
     def enabled(self):
-        """
-        This is the core-functionaliry plugin,
-        should be enabled by default
-        """
         return True
 
     def config(self, binder=None):
-        """
-        Initialize the widget of this plugin as a service
-        this widget will be used in the main window 
-        """
         binder.bind_to_constructor('search', self._service)
 
     @inject.params(factory='window.header_factory', kernel='kernel')
@@ -88,8 +80,13 @@ class Loader(Loader):
         if service.exists('%s/index' % destination):
             return service.previous('%s/index' % destination)
 
-        service.previous('%s/index' % destination)
-        for entity in storage.entities(config.get('storage.location')):
-            service.append(entity)
+        service.create('%s/index' % destination)
+        for index in storage.entitiesByPath(config.get('storage.location')):
+            
+            name = storage.fileName(index)
+            path = storage.filePath(index)
+            text = storage.fileContent(index)
+
+            service.append(name, path, text)
         return service
 

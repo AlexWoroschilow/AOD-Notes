@@ -26,7 +26,6 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         self.setIconProvider(IconProvider())
         self.setRootPath(location)
         self.setReadOnly(False)
-        self._location = location
         
     def isDir(self, index):
         source = self.filePath(index)
@@ -35,6 +34,10 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
     def isFile(self, index):
         source = self.filePath(index)
         return os.path.isfile(source)
+
+    def fileName(self, index):
+        source = self.filePath(index)
+        return os.path.basename(source)
 
     def fileContent(self, index):
         source = self.filePath(index)
@@ -81,7 +84,13 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         return True
 
     def entities(self, index=None):
+        if index is None or not index:
+            index = self.index(self.rootPath())
+            
         source = self.filePath(index)
+        return self.entitiesByPath(source)
+
+    def entitiesByPath(self, source=None):
         if not os.path.exists(source):
             return None
 
@@ -92,8 +101,8 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
                 continue
                         
             if os.path.isdir(path):
-                response = response + self.entities(index)
+                response = response + self.entitiesByPath(path)
                 continue
             response.append(index)
         return response
-    
+

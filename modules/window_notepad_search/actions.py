@@ -19,13 +19,26 @@ from PyQt5.Qt import Qt
 
 class ModuleActions(object):
 
-    @inject.params(search='search', storage='storage')
-    def onActionSearchRequest(self, widget, search, storage):
-        filters = []
-        for hit in search.request(widget.text()):
-            filters.append(hit['title'])
-        storage.setNameFilterDisables(False)
-        storage.setNameFilters(filters)
+    @inject.params(search='search', storage='storage', notepad='notepad')
+    def onActionSearchRequest(self, widget, search, storage, notepad):
+
+        result = search.request(widget.text())
+        collection = [x['path'] for x in result]
+        
+        if collection is None or not len(collection):
+            for index in storage.entities():
+                row, parent = (index.row(), index.parent())
+                notepad.tree.setRowHidden(row, parent, False)
+            return None
+        
+        for index in storage.entities():
+            source = storage.filePath(index)
+            if source is not notepad and  source in collection:
+                row, parent = (index.row(), index.parent())
+                notepad.tree.setRowHidden(row, parent, False)
+                continue
+            row, parent = (index.row(), index.parent())
+            notepad.tree.setRowHidden(row, parent, True)
 
     def onActionSearchShortcut(self, event=None, widget=None):
         widget.setFocusPolicy(Qt.StrongFocus)

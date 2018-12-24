@@ -14,6 +14,7 @@ import inject
 import functools
 
 from PyQt5 import QtWidgets
+from PyQt5 import QtCore
 
 from .bar import ToolBarWidget
 
@@ -25,6 +26,9 @@ from .editor.widget import TextEditorWidget
 
 
 class FolderList(QtWidgets.QSplitter):
+
+    saveAction = QtCore.pyqtSignal(object)
+    fullscreenAction = QtCore.pyqtSignal(object)
 
     @inject.params(config='config')
     def __init__(self, actions, config):
@@ -80,6 +84,8 @@ class FolderList(QtWidgets.QSplitter):
             return self
             
         self.editor = TextEditorWidget()
+        self.editor.fullscreenAction.connect(lambda x: self.fullscreenAction.emit(x))
+        self.editor.saveAction.connect(lambda x: self.saveAction.emit(x))
         self.editor.formatbar.setVisible(int(config.get('editor.formatbar')))
         self.editor.rightbar.setVisible(int(config.get('editor.rightbar')))
         self.editor.leftbar.setVisible(int(config.get('editor.leftbar')))
@@ -88,13 +94,16 @@ class FolderList(QtWidgets.QSplitter):
         kernel.dispatch('window.notepad.formatbar', (self.editor, self.editor.formatbar))
         kernel.dispatch('window.notepad.leftbar', (self.editor, self.editor.leftbar))
         
-        action = functools.partial(self.actions.onActionSave, widget=widget)
-        self.editor.leftbar.saveAction.clicked.connect(action)
+        action = functools.partial(self.actions.onActionSave, widget=self.editor)
+        self.editor.saveAction.connect(action)
+
+        action = functools.partial(self.actions.onActionFullScreen, widget=self.editor)
+        self.editor.fullscreenAction.connect(action)
         
-        action = functools.partial(self.actions.onActionFullScreen, widget=widget)
-        self.editor.leftbar.fullscreenAction.clicked.connect(action)
-        
-        self.editor.insertHtml(storage.fileContent(index))
+        self.editor.name = storage.fileName(index)
+        self.editor.path = storage.filePath(index)
+        self.editor.content = storage.fileContent(index)
+        self.editor.insertHtml(self.editor.content)
         
         self.container.layout().addWidget(self.editor)
         return self

@@ -49,7 +49,7 @@ class ModuleActions(object):
     @inject.params(storage='storage', logger='logger')
     def onActionSave(self, event, widget, storage, logger):
         try:
-            storage.setFileContent(widget.tree.current, widget.editor.getHtml())
+            storage.setFileContent(storage.index(widget.path), widget.getHtml())
         except(Exception) as ex:
             logger.exception(ex.message)
 
@@ -62,15 +62,13 @@ class ModuleActions(object):
 
     @inject.params(kernel='kernel', storage='storage', editor='editor')
     def onActionFullScreen(self, event, widget, kernel, storage, editor):
-        index = widget.tree.current
-        if index is None or not index:
-            return None
         
-        content = storage.fileContent(index) 
-        editor.insertHtml(content)
+        editor.name = widget.name
+        editor.content = widget.content
+        editor.path = widget.path
+        editor.insertHtml(editor.content)
 
-        event = (editor, storage.fileName(index))
-        kernel.dispatch('window.tab', event)
+        kernel.dispatch('window.tab', (editor, editor.name))
 
     @inject.params(storage='storage', logger='logger')
     def onActionRemove(self, event, widget, storage, logger):
@@ -148,9 +146,10 @@ class ModuleActions(object):
         if widget.tree.index is not None:
             name = storage.data(widget.tree.index)
 
-            action = functools.partial(self.onActionFullScreen, event=None, widget=widget)
-            menu.addAction('Open in a new tab', action)
-            menu.addSeparator()
+            if hasattr(widget, 'editor') and widget.editor is not None:
+                action = functools.partial(self.onActionFullScreen, event=None, widget=widget.editor)
+                menu.addAction('Open in a new tab', action)
+                menu.addSeparator()
             
             action = functools.partial(self.onActionRemove, event=None, widget=widget)
             menu.addAction('Remove \'{}\''.format(name), action)

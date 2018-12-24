@@ -11,7 +11,6 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
-import inject 
 
 from whoosh.fields import Schema, TEXT, ID
 from whoosh.qparser import MultifieldParser
@@ -25,6 +24,8 @@ class Search(object):
         pass
 
     def create(self, destination):
+        if not os.path.exists(destination):
+            os.mkdir(destination)
         self.ix = index.create_in(destination, Schema(
             title=TEXT(stored=True),
             path=ID(stored=True),
@@ -42,21 +43,20 @@ class Search(object):
             self.ix = index.open_dir(destination)
         return self
 
-    def append(self, entity=None):
+    def append(self, title, path, text):
         self.writer = self.ix.writer()
-        self.writer.add_document(title=entity.name, path=entity.path, content=entity.text)
+        self.writer.add_document(title=title, path=path, content=text)
         self.writer.commit()
 
-    def update(self, entity=None):
+    def update(self, title, path, text):
         self.writer = self.ix.writer()
-        self.writer.update_document(title=entity.name, path=entity.path, content=entity.text)
+        self.writer.update_document(title=title, path=path, content=text)
         self.writer.commit()
 
-    def remove(self, entity=None):
+    def remove(self, path=None):
         self.writer = self.ix.writer()
         with self.ix.searcher() as searcher:
-            for number in searcher.document_numbers(path=entity.path):
-                print(number)
+            for number in searcher.document_numbers(path=path):
                 self.writer.delete_document(number)
         self.writer.commit()
 

@@ -21,16 +21,9 @@ os.chdir(os.path.dirname(abspath))
 root = os.path.dirname(abspath)
 sys.path.append('{}/lib'.format(root))
 
-
 import inject       
 import logging
 import optparse
-import configparser
-import pdfkit
-from whoosh import index
-from whoosh import fields
-from whoosh import qparser
-
  
 from PyQt5 import QtWidgets
 
@@ -43,6 +36,7 @@ class Application(QtWidgets.QApplication):
     
     def __init__(self, options=None, args=None):
         super(Application, self).__init__(sys.argv)
+        self.setApplicationName('Notes')
         
         self.kernel = Kernel(options, args)
 
@@ -60,11 +54,9 @@ class Application(QtWidgets.QApplication):
 if __name__ == "__main__":
     parser = optparse.OptionParser()
     
-    logfile = os.path.expanduser('/var/log/notes.log')
-    parser.add_option("--logfile", default=logfile, dest="logfile", help="Logfile location")
     parser.add_option("--loglevel", default=logging.DEBUG, dest="loglevel", help="Logging level")
-    configfile = os.path.expanduser('~/.config/CloudNotes/notes.conf')
-    parser.add_option("--config", default=configfile, dest="config", help="Config file location")
+    parser.add_option("--logfile", default=os.path.expanduser('~/.config/CloudNotes/notes.log'), dest="logfile", help="Logfile location")
+    parser.add_option("--config", default=os.path.expanduser('~/.config/CloudNotes/notes.conf'), dest="config", help="Config file location")
     
     (options, args) = parser.parse_args()
     
