@@ -35,20 +35,37 @@ class ModuleActions(object):
     @inject.params(storage='storage', search='search', logger='logger')
     def onActionNoteCreate(self, event, widget, storage, search, logger):
         try:
-            storage.touch(widget.tree.current, 'New note')
+            index = storage.touch(widget.tree.current, 'New note')
+            if index is None or not index:
+                return None
+            # update search index only after
+            # the update was successful
+            name = storage.fileName(index)
+            content = storage.fileContent(index) 
+            path = storage.filePath(index)
+            if search is None or not search:
+                return None
+            search.append(name, path, content)
+            
         except(Exception) as ex:
             logger.exception(ex.message)
 
     @inject.params(storage='storage', search='search', logger='logger')
     def onActionClone(self, event, widget, storage, search, logger):
         try:
-            name = storage.fileName(widget.tree.current)
-            content = storage.fileContent(widget.tree.current) 
-            path = storage.filePath(widget.tree.current)
             # update search index only after
             # the update was successful
-            if storage.clone(widget.tree.current):
-                search.update(name, path, content)            
+            index = storage.clone(widget.tree.current)
+            if index is None or not index:
+                return None
+            
+            name = storage.fileName(index)
+            content = storage.fileContent(index) 
+            path = storage.filePath(index)
+            if search is None or not search:
+                return None
+            search.append(name, path, content)
+                                
         except(Exception) as ex:
             logger.exception(ex.message)
 
@@ -59,10 +76,15 @@ class ModuleActions(object):
             index = storage.index(path)
             if index is None or not index:
                 return None
+            index = storage.setFileContent(index, content)
+            if index is None or not index:
+                return None
             # update search index only after
             # the update was successful
-            if storage.setFileContent(index, content):
-                search.update(name, path, content)            
+            if search is None or not search:
+                return None
+            search.update(name, path, content)
+                            
         except(Exception) as ex:
             logger.exception(ex.message)
 
@@ -83,8 +105,8 @@ class ModuleActions(object):
 
         kernel.dispatch('window.tab', (editor, editor.name))
 
-    @inject.params(storage='storage', logger='logger')
-    def onActionRemove(self, event, widget, storage, logger):
+    @inject.params(storage='storage', search='search', logger='logger')
+    def onActionRemove(self, event, widget, storage, search, logger):
         
         message = widget.tr("Are you sure you want to remove this element: {} ?".format(
             storage.fileName(widget.tree.current)
@@ -95,7 +117,15 @@ class ModuleActions(object):
             return None
         
         try:
-            storage.remove(widget.tree.current)
+            index = widget.tree.current
+            path = storage.filePath(index)
+            if not storage.remove(index):
+                return None
+            # update search index only after
+            # the update was successful
+            if search is None or not search:
+                return None
+            search.remove(path)
         except(Exception) as ex:
             logger.exception(ex)
 

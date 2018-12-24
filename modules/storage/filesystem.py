@@ -54,7 +54,7 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         with open(destination, 'w+') as stream:
             stream.write(content)
             stream.close()
-            return True
+            return index
         return False
         
     def touch(self, index, name):
@@ -77,11 +77,11 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         if os.path.isdir(source):
             destination = "{}(clone)".format(source)
             shutil.copytree(source, destination)
-            return True
+            return self.index(destination)
         
         destination = "{}(clone)".format(source)
         shutil.copy(source, destination)
-        return True
+        return self.index(destination)
 
     def entities(self, index=None):
         if index is None or not index:
