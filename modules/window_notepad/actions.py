@@ -32,24 +32,37 @@ class ModuleActions(object):
         except(Exception) as ex:
             logger.exception(ex.message)
 
-    @inject.params(storage='storage', logger='logger')
-    def onActionNoteCreate(self, event, widget, storage, logger):
+    @inject.params(storage='storage', search='search', logger='logger')
+    def onActionNoteCreate(self, event, widget, storage, search, logger):
         try:
             storage.touch(widget.tree.current, 'New note')
         except(Exception) as ex:
             logger.exception(ex.message)
 
-    @inject.params(storage='storage', logger='logger')
-    def onActionClone(self, event, widget, storage, logger):
+    @inject.params(storage='storage', search='search', logger='logger')
+    def onActionClone(self, event, widget, storage, search, logger):
         try:
-            storage.clone(widget.tree.current)
+            name = storage.fileName(widget.tree.current)
+            content = storage.fileContent(widget.tree.current) 
+            path = storage.filePath(widget.tree.current)
+            # update search index only after
+            # the update was successful
+            if storage.clone(widget.tree.current):
+                search.update(name, path, content)            
         except(Exception) as ex:
             logger.exception(ex.message)
 
-    @inject.params(storage='storage', logger='logger')
-    def onActionSave(self, event, widget, storage, logger):
+    @inject.params(storage='storage', search='search', logger='logger')
+    def onActionSave(self, event, storage, search, logger):
         try:
-            storage.setFileContent(storage.index(widget.path), widget.getHtml())
+            name, path, content = event 
+            index = storage.index(path)
+            if index is None or not index:
+                return None
+            # update search index only after
+            # the update was successful
+            if storage.setFileContent(index, content):
+                search.update(name, path, content)            
         except(Exception) as ex:
             logger.exception(ex.message)
 
@@ -60,8 +73,8 @@ class ModuleActions(object):
         except(Exception) as ex:
             logger.exception(ex.message)
 
-    @inject.params(kernel='kernel', storage='storage', editor='editor')
-    def onActionFullScreen(self, event, widget, kernel, storage, editor):
+    @inject.params(kernel='kernel', editor='editor')
+    def onActionFullScreen(self, event, widget, kernel, editor):
         
         editor.name = widget.name
         editor.content = widget.content

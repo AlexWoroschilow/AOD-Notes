@@ -74,32 +74,16 @@ class FolderList(QtWidgets.QSplitter):
         self.actions = actions
         self.test = None
         
-    @inject.params(config='config', storage='storage', kernel='kernel', widget='notepad')
-    def note(self, index, config, storage, widget, kernel):
+    @inject.params(storage='storage', editor='editor')
+    def note(self, index, storage, editor):
         for i in range(self.container.layout().count()): 
             self.container.layout().itemAt(i).widget().close()            
 
         if not storage.isFile(index):
             self.container.layout().addWidget(DemoWidget())
             return self
-            
-        self.editor = TextEditorWidget()
-        self.editor.fullscreenAction.connect(lambda x: self.fullscreenAction.emit(x))
-        self.editor.saveAction.connect(lambda x: self.saveAction.emit(x))
-        self.editor.formatbar.setVisible(int(config.get('editor.formatbar')))
-        self.editor.rightbar.setVisible(int(config.get('editor.rightbar')))
-        self.editor.leftbar.setVisible(int(config.get('editor.leftbar')))
-        
-        kernel.dispatch('window.notepad.rightbar', (self.editor, self.editor.rightbar))
-        kernel.dispatch('window.notepad.formatbar', (self.editor, self.editor.formatbar))
-        kernel.dispatch('window.notepad.leftbar', (self.editor, self.editor.leftbar))
-        
-        action = functools.partial(self.actions.onActionSave, widget=self.editor)
-        self.editor.saveAction.connect(action)
 
-        action = functools.partial(self.actions.onActionFullScreen, widget=self.editor)
-        self.editor.fullscreenAction.connect(action)
-        
+        self.editor = editor            
         self.editor.name = storage.fileName(index)
         self.editor.path = storage.filePath(index)
         self.editor.content = storage.fileContent(index)

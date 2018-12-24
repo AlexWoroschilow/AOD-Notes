@@ -33,6 +33,9 @@ class TextEditorWidget(QtWidgets.QWidget):
         super(TextEditorWidget, self).__init__()
         self.setObjectName('TextEditorWidget')
         self.setContentsMargins(0, 0, 0, 0)
+        self.name = None
+        self.content = None
+        self.path = None
 
         self._text = TextWriter(self)
         self._text.text.cursorPositionChanged.connect(self.cursorPosition)
@@ -50,7 +53,7 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.leftbar.undoAction.clicked.connect(self._text.text.undo)
         self.leftbar.redoAction.clicked.connect(self._text.text.redo)
 
-        self.leftbar.saveAction.clicked.connect(lambda x: self.saveAction.emit(x))
+        self.leftbar.saveAction.clicked.connect(lambda x: self.saveAction.emit((self.name, self.path, self.getHtml())))
         self.leftbar.fullscreenAction.clicked.connect(lambda x: self.fullscreenAction.emit(x))
 
         self.formatbar = FormatbarWidget()

@@ -22,7 +22,7 @@ class Search(object):
 
     def __init__(self):
         pass
-
+    
     def create(self, destination):
         if not os.path.exists(destination):
             os.mkdir(destination)
