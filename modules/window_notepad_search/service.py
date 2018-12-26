@@ -13,6 +13,8 @@
 import os
 
 from whoosh.fields import Schema, TEXT, ID
+from whoosh import qparser
+
 from whoosh.qparser import MultifieldParser
 
 from whoosh import index
@@ -63,9 +65,10 @@ class Search(object):
     def request(self, string=None):
         with self.ix.searcher() as searcher:
             
-            query = MultifieldParser([
+            query = qparser.MultifieldParser([
                 "title", "content"
-            ], self.ix.schema).parse(string)
+            ], self.ix.schema)
+            query.add_plugin(qparser.WildcardPlugin())            
             
-            for result in searcher.search(query):
+            for result in searcher.search(query.parse("*{}*".format(string))):
                 yield result

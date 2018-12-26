@@ -33,10 +33,9 @@ class Loader(Loader):
         storage = config.get('storage.location')
         if len(storage) and storage.find('~') >= 0:
             storage = os.path.expanduser(storage)
-        folder = os.path.dirname(storage)
         if not os.path.exists(storage):
-            if not os.path.exists(folder):
-                os.makedirs(folder)
+            if not os.path.exists(storage):
+                os.makedirs(storage)
                 
-        return FilesystemStorage(folder)
+        return FilesystemStorage(storage)
  

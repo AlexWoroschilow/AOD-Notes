@@ -27,6 +27,9 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         self.setRootPath(location)
         self.setReadOnly(False)
         
+    def rootIndex(self):
+        return self.index(self.rootPath())
+        
     def isDir(self, index):
         source = self.filePath(index)
         return os.path.isdir(source)
@@ -101,7 +104,9 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
                 continue
                         
             if os.path.isdir(path):
-                response = response + self.entitiesByPath(path)
+                response.append(index)
+                children = self.entitiesByPath(path)
+                response = response + children 
                 continue
             response.append(index)
         return response

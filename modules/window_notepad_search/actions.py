@@ -29,16 +29,25 @@ class ModuleActions(object):
             for index in storage.entities():
                 row, parent = (index.row(), index.parent())
                 notepad.tree.setRowHidden(row, parent, False)
+                if notepad is not None and notepad:
+                    notepad.tree.expand(index)
             return None
         
         for index in storage.entities():
-            source = storage.filePath(index)
-            if source is not notepad and  source in collection:
-                row, parent = (index.row(), index.parent())
-                notepad.tree.setRowHidden(row, parent, False)
-                continue
             row, parent = (index.row(), index.parent())
             notepad.tree.setRowHidden(row, parent, True)
+            
+            source = storage.filePath(index)
+            if source is None or  source not in collection:
+                continue
+            
+            while source != storage.rootPath():
+                index = storage.index(source)
+                if notepad is not None and notepad:
+                    notepad.tree.expand(index)
+                row, parent = (index.row(), index.parent())
+                notepad.tree.setRowHidden(row, parent, False)
+                source = os.path.dirname(source)
 
     def onActionSearchShortcut(self, event=None, widget=None):
         widget.setFocusPolicy(Qt.StrongFocus)
