@@ -34,42 +34,6 @@ class Loader(Loader):
     def config(self, binder=None):
         binder.bind_to_constructor('search', self._service)
 
-    @inject.params(factory='window.header_factory', kernel='kernel')
-    def boot(self, options=None, args=None, factory=None, kernel=None):
-
-        widget_create_folder = QtWidgets.QAction(QtGui.QIcon("icons/plus.svg"), 'Create folder')
-        widget_create_folder.triggered.connect(self.actions.onActionFolderCreate)
-
-        widget_create_note = QtWidgets.QAction(QtGui.QIcon("icons/plus.svg"), 'Create document')
-        widget_create_note.triggered.connect(self.actions.onActionNoteCreate)
-
-        widget_import_document = QtWidgets.QAction(QtGui.QIcon("icons/import.svg"), 'Import document')
-        widget_import_document.triggered.connect(self.actions.onActionNoteImport)
-        
-        widget_search_field = SearchField()
-        widget_search_field.returnPressed.connect(functools.partial(
-            self.actions.onActionSearchRequest, widget=widget_search_field
-        ))
-
-        shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+f"), widget_search_field)
-        shortcut.activated.connect(functools.partial(
-            self.actions.onActionSearchShortcut, widget=widget_search_field
-        ))
-
-        factory.addWidget(widget_create_folder)
-        factory.addWidget(widget_create_note)
-        factory.addWidget(widget_import_document)
-
-        spacer = QtWidgets.QWidget();
-        spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred);
-        factory.addWidget(spacer)
-        
-        factory.addWidget(widget_search_field)
-        
-        kernel.listen('note_created', self.actions.onActionNoteCreated)
-        kernel.listen('note_udpated', self.actions.onActionNoteUpdated)
-        kernel.listen('note_remove', self.actions.onActionNoteRemove)
-
     @inject.params(kernel='kernel', config='config', storage='storage')
     def _service(self, kernel, config, storage):
         from .service import Search
@@ -90,3 +54,53 @@ class Loader(Loader):
             service.append(name, path, text)
         return service
 
+    @inject.params(factory='window.header_factory', notepad='notepad')
+    def boot(self, options, args, factory, notepad):
+
+        self.buttonGroup = QtWidgets.QAction(QtGui.QIcon("icons/plus.svg"), 'Create group')
+        action = functools.partial(notepad.actions.onActionFolderCreate, widget=notepad)
+        self.buttonGroup.triggered.connect(action)
+
+        self.buttonNote = QtWidgets.QAction(QtGui.QIcon("icons/plus.svg"), 'Create note')
+        action = functools.partial(notepad.actions.onActionNoteCreate, widget=notepad)
+        self.buttonNote.triggered.connect(action)
+
+        self.buttonImport = QtWidgets.QAction(QtGui.QIcon("icons/import.svg"), 'Import document')
+        self.buttonImport.triggered.connect(self.actions.onActionNoteImport)
+        
+        self.search = SearchField()
+        action = functools.partial(self.onSearchFocusIn, widget=self.search)
+        self.search.focusInEvent = action
+        
+        action = functools.partial(self.onSearchFocusOut, widget=self.search)          
+        self.search.focusOutEvent = action
+        
+        action = functools.partial(self.actions.onActionSearchRequest, widget=self.search)         
+        self.search.returnPressed.connect(action)
+
+        shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+f"), self.search)
+        action = functools.partial(self.actions.onActionSearchShortcut, widget=self.search)
+        shortcut.activated.connect(action)
+
+        self.spacer = QtWidgets.QWidget();
+        self.spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred);
+
+        factory.addWidget(self.buttonGroup)
+        factory.addWidget(self.buttonNote)
+        factory.addWidget(self.buttonImport)
+        factory.addWidget(self.spacer)
+        factory.addWidget(self.search)
+
+    def onSearchFocusIn(self, event, widget):
+        self.spacer.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum);
+        self.spacer.setVisible(False)
+        self.buttonGroup.setVisible(False)
+        self.buttonNote.setVisible(False)
+        self.buttonImport.setVisible(False)
+    
+    def onSearchFocusOut(self, event, widget):
+        self.spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred);
+        self.spacer.setVisible(True)
+        self.buttonGroup.setVisible(True)
+        self.buttonImport.setVisible(True)
+        self.buttonNote.setVisible(True)

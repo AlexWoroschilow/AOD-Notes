@@ -35,7 +35,7 @@ class ModuleActions(object):
     @inject.params(storage='storage', search='search', logger='logger')
     def onActionNoteCreate(self, event, widget, storage, search, logger):
         try:
-            index = storage.touch(widget.tree.current, 'New note')
+            index = storage.touch(widget.current, 'New note')
             if index is None or not index:
                 return None
             # update search index only after

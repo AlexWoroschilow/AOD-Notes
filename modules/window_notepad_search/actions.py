@@ -21,33 +21,17 @@ class ModuleActions(object):
 
     @inject.params(search='search', storage='storage', notepad='notepad')
     def onActionSearchRequest(self, widget, search, storage, notepad):
+        text = widget.text()
+        if text is None or not len(text):
+            return notepad.toggle([], False)
 
-        result = search.request(widget.text())
-        collection = [x['path'] for x in result]
+        result = search.request(text)
+        collection = [storage.index(x['path']) for x in result]
         
         if collection is None or not len(collection):
-            for index in storage.entities():
-                row, parent = (index.row(), index.parent())
-                notepad.tree.setRowHidden(row, parent, False)
-                if notepad is not None and notepad:
-                    notepad.tree.expand(index)
-            return None
-        
-        for index in storage.entities():
-            row, parent = (index.row(), index.parent())
-            notepad.tree.setRowHidden(row, parent, True)
-            
-            source = storage.filePath(index)
-            if source is None or  source not in collection:
-                continue
-            
-            while source != storage.rootPath():
-                index = storage.index(source)
-                if notepad is not None and notepad:
-                    notepad.tree.expand(index)
-                row, parent = (index.row(), index.parent())
-                notepad.tree.setRowHidden(row, parent, False)
-                source = os.path.dirname(source)
+            return notepad.toggle([], False)
+
+        return notepad.toggle(collection, True)
 
     def onActionSearchShortcut(self, event=None, widget=None):
         widget.setFocusPolicy(Qt.StrongFocus)
@@ -57,10 +41,7 @@ class ModuleActions(object):
     def onActionFolderCreate(self, event, kernel):
         kernel.dispatch('folder_new')
 
-    @inject.params(kernel='kernel')
-    def onActionNoteCreate(self, event, kernel=None):
-        kernel.dispatch('note_new')
-
+        
     @inject.params(search='search')
     def onActionNoteCreated(self, event, search):
         return search.append(event.data)

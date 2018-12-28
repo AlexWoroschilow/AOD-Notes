@@ -11,8 +11,6 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
-import functools
-
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 
@@ -22,7 +20,6 @@ from .tags import TagsEditor
 from .folders import FolderTree
 from .demo.widget import DemoWidget
 from .folder.widget import FolderViewWidget
-from .editor.widget import TextEditorWidget
 
 
 class FolderList(QtWidgets.QSplitter):
@@ -74,6 +71,12 @@ class FolderList(QtWidgets.QSplitter):
         self.actions = actions
         self.test = None
         
+    @property
+    def current(self):
+        if self.tree is not None and self.tree:
+            return self.tree.currentIndex()
+        return None
+        
     @inject.params(storage='storage', editor='editor')
     def note(self, index, storage, editor):
         for i in range(self.container.layout().count()): 
@@ -112,3 +115,20 @@ class FolderList(QtWidgets.QSplitter):
         self.container.layout().addWidget(DemoWidget())
         return self
  
+    @inject.params(storage='storage')
+    def toggle(self, collection=[], state=False, storage=None):
+        for index in storage.entities():
+            row, parent = (index.row(), index.parent())
+            self.tree.setRowHidden(row, parent, state)
+            if index not in collection:
+                continue
+
+            current = index
+            while current != storage.rootIndex():
+                row, parent = (current.row(), current.parent())
+                self.tree.setRowHidden(row, parent, False)
+                self.tree.expand(current)
+                current = parent
+            
+        return True
+
