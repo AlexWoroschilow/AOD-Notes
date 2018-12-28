@@ -25,7 +25,7 @@ class ModuleActions(object):
         if text is None or not len(text):
             return notepad.toggle([], False)
 
-        result = search.request(text)
+        result = search.search(text)
         collection = [storage.index(x['path']) for x in result]
         
         if collection is None or not len(collection):

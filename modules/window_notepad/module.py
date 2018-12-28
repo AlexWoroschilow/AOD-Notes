@@ -92,12 +92,6 @@ class Loader(Loader):
         action = functools.partial(self.actions.onActionRemove, widget=widget)
         widget.toolbar.removeAction.clicked.connect(action)
 
-        action = functools.partial(self.actions.onActionNoteCreate, widget=widget)
-        kernel.listen('note_new', action)
-
-        action = functools.partial(self.actions.onActionFolderCreate, widget=widget)
-        kernel.listen('folder_new', action)
-
         action = functools.partial(self.actions.onActionConfigUpdated, widget=widget)
         kernel.listen('config_updated', action)
 

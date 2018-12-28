@@ -11,6 +11,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
+from html.parser import HTMLParser
 
 from whoosh.fields import Schema, TEXT, ID
 from whoosh import qparser
@@ -20,7 +21,32 @@ from whoosh.qparser import MultifieldParser
 from whoosh import index
 
 
+class MLStripper(HTMLParser):
+
+    def __init__(self):
+        self.reset()
+        self.strict = False
+        self.convert_charrefs = True
+        self.fed = []
+
+    def handle_data(self, d):
+        self.fed.append(d)
+
+    def get_data(self):
+        return ''.join(self.fed)
+
+    def stripTags(self, html=None):
+        if html is None:
+            return ''
+        
+        self.feed(html)
+        return self.get_data()
+
+
 class Search(object):
+
+    parser = MLStripper()
+    searchResult = None
 
     def __init__(self):
         pass
@@ -47,12 +73,14 @@ class Search(object):
 
     def append(self, title, path, text):
         self.writer = self.ix.writer()
-        self.writer.add_document(title=title, path=path, content=text)
+        content = self.parser.stripTags(text)
+        self.writer.add_document(title=title, path=path, content=content)
         self.writer.commit()
 
     def update(self, title, path, text):
         self.writer = self.ix.writer()
-        self.writer.update_document(title=title, path=path, content=text)
+        content = self.parser.stripTags(text)
+        self.writer.update_document(title=title, path=path, content=content)
         self.writer.commit()
 
     def remove(self, path=None):
@@ -62,7 +90,7 @@ class Search(object):
                 self.writer.delete_document(number)
         self.writer.commit()
 
-    def request(self, string=None):
+    def search(self, string=None):
         with self.ix.searcher() as searcher:
             
             query = qparser.MultifieldParser([
@@ -70,5 +98,16 @@ class Search(object):
             ], self.ix.schema)
             query.add_plugin(qparser.WildcardPlugin())            
             
-            for result in searcher.search(query.parse("*{}*".format(string))):
+            self.searchResult = searcher.search(query.parse(
+                "*{}*".format(string)                
+            ))
+            
+            for result in self.searchResult:
                 yield result
+
+    def keywords(self, string=None):
+        if self.searchResult is None:
+            self.search(string)
+        
+        keys = self.searchResult.key_terms("content", docs=5, numterms=10)
+        return [keyword for keyword, score in keys]

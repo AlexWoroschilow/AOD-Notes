@@ -24,10 +24,10 @@ class ModuleActions(object):
     @inject.params(storage='storage', logger='logger')
     def onActionNoteSelect(self, event, storage, widget, logger):
         try:
-            if storage.isDir(widget.tree.current):
-                return widget.group(widget.tree.current)
-            if storage.isFile(widget.tree.current):
-                return widget.note(widget.tree.current)
+            if storage.isDir(widget.current):
+                return widget.group(widget.current)
+            if storage.isFile(widget.current):
+                return widget.note(widget.current)
             return widget.demo()
         except(Exception) as ex:
             logger.exception(ex.message)
@@ -161,7 +161,7 @@ class ModuleActions(object):
         self.onActionConfigUpdatedEditor(event, widget=widget.editor)
 
     @inject.params(config='config', logger='logger')
-    def onActionConfigUpdatedEditor(self, event, widget=None, config=None, logger=None):
+    def onActionConfigUpdatedEditor(self, event, widget, config, logger):
 
         try:        
             visible = int(config.get('editor.formatbar'))
@@ -186,23 +186,21 @@ class ModuleActions(object):
 
         menu = QtWidgets.QMenu()
 
-        if widget.tree.index is not None:
-            name = storage.data(widget.tree.index)
-
-            if hasattr(widget, 'editor') and widget.editor is not None:
+        if widget.current is not None and widget.current:
+            if not storage.isDir(widget.current) and widget.editor:
                 action = functools.partial(self.onActionFullScreen, event=None, widget=widget.editor)
                 menu.addAction('Open in a new tab', action)
                 menu.addSeparator()
             
             action = functools.partial(self.onActionRemove, event=None, widget=widget)
-            menu.addAction('Remove \'{}\''.format(name), action)
+            menu.addAction('Remove \'{}\''.format(storage.fileName(widget.current)), action)
             
             action = functools.partial(self.onActionClone, event=None, widget=widget)
-            menu.addAction('Clone \'{}\''.format(name), action)
+            menu.addAction('Clone \'{}\''.format(storage.fileName(widget.current)), action)
             menu.addSeparator()
 
         action = functools.partial(self.onActionNoteCreate, event=None, widget=widget)
-        menu.addAction('Create new document', action)
+        menu.addAction('Create new note', action)
         
         action = functools.partial(self.onActionFolderCreate, event=None, widget=widget)
         menu.addAction('Create new group', action)
