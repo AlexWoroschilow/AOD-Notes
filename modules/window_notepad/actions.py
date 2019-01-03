@@ -186,17 +186,9 @@ class ModuleActions(object):
 
         menu = QtWidgets.QMenu()
 
-        if widget.current is not None and widget.current:
-            if not storage.isDir(widget.current) and widget.editor:
-                action = functools.partial(self.onActionFullScreen, event=None, widget=widget.editor)
-                menu.addAction('Open in a new tab', action)
-                menu.addSeparator()
-            
-            action = functools.partial(self.onActionRemove, event=None, widget=widget)
-            menu.addAction('Remove \'{}\''.format(storage.fileName(widget.current)), action)
-            
-            action = functools.partial(self.onActionClone, event=None, widget=widget)
-            menu.addAction('Clone \'{}\''.format(storage.fileName(widget.current)), action)
+        if widget.current and not storage.isDir(widget.current) and widget.editor:
+            action = functools.partial(self.onActionFullScreen, event=None, widget=widget.editor)
+            menu.addAction('Open in a new tab', action)
             menu.addSeparator()
 
         action = functools.partial(self.onActionNoteCreate, event=None, widget=widget)
@@ -204,5 +196,14 @@ class ModuleActions(object):
         
         action = functools.partial(self.onActionFolderCreate, event=None, widget=widget)
         menu.addAction('Create new group', action)
+        menu.addSeparator()
+
+        if widget.current is not None and widget.current:
+            
+            action = functools.partial(self.onActionClone, event=None, widget=widget)
+            menu.addAction('Duplicate: {}'.format(storage.fileName(widget.current)), action)
+
+            action = functools.partial(self.onActionRemove, event=None, widget=widget)
+            menu.addAction('Remove: {}'.format(storage.fileName(widget.current)), action)
         
         menu.exec_(widget.tree.mapToGlobal(event))

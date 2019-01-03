@@ -26,6 +26,7 @@ class FolderList(QtWidgets.QSplitter):
 
     saveAction = QtCore.pyqtSignal(object)
     fullscreenAction = QtCore.pyqtSignal(object)
+    editor = None
 
     @inject.params(config='config')
     def __init__(self, actions, config):
