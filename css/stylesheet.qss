@@ -3,7 +3,7 @@ QToolBar#ToolBarWidget { border: none; background-color: #414649; color: #A0A0A0
 QLabel#TagsEditor { border: none; background-color: #414649; color: #A0A0A0; }
 QTabBar::close-button { image: url(icons/close.svg); subcontrol-position: right; }
 
-TextView, DemoWidget, NotePreviewContainer, DemoViewContainer { background: #ffffff; border: none; }
+TextView, DemoWidget, DemoViewContainer { background: #ffffff; border: none; }
 QTabBar::close-button { image: url(icons/close.svg); subcontrol-position: right; }
 
 QTabWidget::pane {
@@ -20,8 +20,10 @@ QToolBar {  border: none; }
 QPushButton { margin: 5px; }
 QTreeView { font-size: 16px; }
 
+
+
 QScrollArea#FolderViewWidget { border: none; background-color: #ffffff; }
-QWidget#NotePreviewContainer { border: none; background-color: #ffffff; }
+
 
 SettingsScrollArea { border: none; background-color: #f1f2f3; }
 QWidget#WidgetSettings QWidget {  padding: 10px 0px; }
@@ -34,3 +36,5 @@ QWidget#WidgetSettings QWidget#spacer {
 
     border-radius: 5px;	 
 }
+
+

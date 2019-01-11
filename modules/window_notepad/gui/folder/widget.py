@@ -10,6 +10,7 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import os
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 
@@ -23,13 +24,13 @@ class NotePreviewContainer(QtWidgets.QWidget):
         self.setObjectName('NotePreviewContainer')
         self.setContentsMargins(0, 0, 0, 0)
         
-        self.layout = QtWidgets.QGridLayout()
+        self.layout = QtWidgets.QVBoxLayout()
         self.layout.setAlignment(Qt.AlignTop)
         self.setLayout(self.layout)
 
     def addPreview(self, name, content):
         widget = NotePreviewDescription(content)
-        self.layout.addWidget(widget, self.layout.count(), 0)
+        self.layout.addWidget(widget)
 
 
 class FolderViewWidget(QtWidgets.QScrollArea):

@@ -103,6 +103,8 @@ class FolderList(QtWidgets.QSplitter):
 
         widget = FolderViewWidget()
         for entity in storage.entities(index):
+            if storage.isDir(entity):
+                continue
             content = storage.fileContent(entity)
             name = storage.fileName(entity)
             widget.addPreview(name, content)

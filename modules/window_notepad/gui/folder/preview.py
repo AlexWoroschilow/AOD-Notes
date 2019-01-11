@@ -10,7 +10,9 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import os
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt
 
 
 class NotePreviewTitle(QtWidgets.QLabel):
@@ -21,28 +23,27 @@ class NotePreviewTitle(QtWidgets.QLabel):
         self.setWordWrap(True)
 
 
-class NotePreviewDescription(QtWidgets.QLabel):
+class Description(QtWidgets.QLabel):
 
     def __init__(self, parent=None):
-        super(NotePreviewDescription, self).__init__(parent)
+        super(Description, self).__init__(parent)
         self.setWordWrap(True)
 
 
-class NotePreviewWidget(QtWidgets.QWidget):
+class NotePreviewDescription(QtWidgets.QWidget):
 
-    def __init__(self, name, content):
-        super(NotePreviewWidget, self).__init__()
+    def __init__(self, content):
+        super(NotePreviewDescription, self).__init__()
         self.setContentsMargins(0, 0, 0, 0)
         
-        label = QtWidgets.QGridLayout()
-        label.setContentsMargins(0, 10, 0, 10)
-        
-        title = NotePreviewTitle(name)
-        label.addWidget(title, 0, 0, 1, 1)
+        root = os.path.dirname(os.path.abspath(__file__))
+        with open('{}/css/{}.qss'.format(root, self.__class__.__name__), 'r') as stream:
+            self.setStyleSheet(stream.read())
 
-        description = NotePreviewDescription()
-        label.addWidget(description, 0, 1, 10, 5)
-        
-        description.setText(content)
-        
-        self.setLayout(label)
+        self.layout = QtWidgets.QVBoxLayout()
+        self.layout.setAlignment(Qt.AlignTop)
+
+        description = Description(content)
+        self.layout.addWidget(description)
+
+        self.setLayout(self.layout)
