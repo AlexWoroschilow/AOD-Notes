@@ -48,4 +48,8 @@ NotePreviewContainer NotePreviewDescription {
 	padding-bottom: 200px;
 }
 
+NotePreviewContainer NotePreviewDescription #previewTitle {
+	background-color: #fff;
+}
+
 

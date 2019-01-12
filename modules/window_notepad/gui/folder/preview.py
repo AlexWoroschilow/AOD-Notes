@@ -17,8 +17,6 @@ from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 
-from lib.widget.button import ToolBarButton
-
 
 class Button(QtWidgets.QPushButton):
 
@@ -29,7 +27,7 @@ class Button(QtWidgets.QPushButton):
         self.setFlat(True)
 
 
-class NotePreviewDescription(QtWidgets.QWidget):
+class NotePreviewDescription(QtWidgets.QGroupBox):
 
     edit = QtCore.pyqtSignal(object)
     delete = QtCore.pyqtSignal(object)
@@ -39,6 +37,8 @@ class NotePreviewDescription(QtWidgets.QWidget):
     def __init__(self, index, storage):
         super(NotePreviewDescription, self).__init__()
         self.setContentsMargins(0, 0, 0, 0)
+        self.setObjectName('preview')
+        
 
         self.layout = QtWidgets.QGridLayout()
         self.layout.setAlignment(Qt.AlignTop)
@@ -53,17 +53,17 @@ class NotePreviewDescription(QtWidgets.QWidget):
         self.buttonEdit.setIcon(QtGui.QIcon("icons/file-light.svg"))
         self.buttonEdit.clicked.connect(lambda x: self.edit.emit(index))
         
-        self.layout.addWidget(self.buttonEdit, 0, 18, 1, 1)
+        self.layout.addWidget(self.buttonEdit, 0, 17, 1, 1)
 
         self.buttonClone = Button()
         self.buttonClone.setIcon(QtGui.QIcon("icons/copy-light.svg"))
         self.buttonClone.clicked.connect(lambda x: self.clone.emit(index))
-        self.layout.addWidget(self.buttonClone, 0, 19, 1, 1)
+        self.layout.addWidget(self.buttonClone, 0, 18, 1, 1)
 
         self.buttonDelete = Button()
         self.buttonDelete.setIcon(QtGui.QIcon("icons/remove-light.svg"))
         self.buttonDelete.clicked.connect(lambda x: self.delete.emit(index))
-        self.layout.addWidget(self.buttonDelete, 0, 20, 1, 1)
+        self.layout.addWidget(self.buttonDelete, 0, 19, 1, 1)
 
         self.setLayout(self.layout)
 
@@ -72,6 +72,7 @@ class Title(QtWidgets.QLabel):
 
     def __init__(self, text):
         super(Title, self).__init__(text)
+        self.setObjectName('previewTitle')
         font = self.font()
         font.setPixelSize(20)
         self.setFont(font)
