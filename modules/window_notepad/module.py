@@ -57,9 +57,11 @@ class Loader(Loader):
         kernel.dispatch('window.notepad.rightbar', (widget, widget.rightbar))
         kernel.dispatch('window.notepad.formatbar', (widget, widget.formatbar))
 
-        widget.saveAction.connect(self.actions.onActionSave)
+        action = functools.partial(self.actions.onActionSave, widget=widget)
+        widget.save.connect(action)
+        
         action = functools.partial(self.actions.onActionFullScreen, widget=widget)
-        widget.fullscreenAction.connect(action)
+        widget.fullscreen.connect(action)
 
         action = functools.partial(self.actions.onActionConfigUpdatedEditor, widget=widget)
         kernel.listen('config_updated', action)
@@ -70,6 +72,15 @@ class Loader(Loader):
     def _widget(self, kernel, storage):
         
         widget = FolderList(self.actions)
+        
+        action = functools.partial(self.actions.onActionNoteEdit, widget=widget)
+        widget.edit.connect(action)
+
+        action = functools.partial(self.actions.onActionCopy, widget=widget)
+        widget.clone.connect(action)
+
+        action = functools.partial(self.actions.onActionDelete, widget=widget)
+        widget.delete.connect(action)
 
         action = functools.partial(self.actions.onActionFileRenamed, widget=widget)
         storage.fileRenamed.connect(action)

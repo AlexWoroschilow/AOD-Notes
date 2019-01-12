@@ -23,11 +23,26 @@ class ModuleActions(object):
 
     @inject.params(storage='storage', logger='logger')
     def onActionNoteSelect(self, event, storage, widget, logger):
+        return self.onActionNoteEdit(widget.current, widget=widget)
+
+    @inject.params(storage='storage', search='search', logger='logger')
+    def onActionClone(self, event, widget, storage, search, logger):
+        return self.onActionCopy(widget.tree.current, widget=widget)
+
+    @inject.params(storage='storage', search='search', logger='logger')
+    def onActionRemove(self, event, widget, storage, search, logger):
+        return self.onActionDelete(widget.tree.current, widget=widget)
+
+    @inject.params(storage='storage', logger='logger')
+    def onActionNoteEdit(self, index, storage, logger, widget):
         try:
-            if storage.isDir(widget.current):
-                return widget.group(widget.current)
-            if storage.isFile(widget.current):
-                return widget.note(widget.current)
+            if widget is not None and widget.current != index:
+                widget.tree.setCurrentIndex(index)
+
+            if storage.isDir(index):
+                return widget.group(index)
+            if storage.isFile(index):
+                return widget.note(index)
             return widget.demo()
         except(Exception) as ex:
             logger.exception(ex.message)
@@ -51,11 +66,11 @@ class ModuleActions(object):
             logger.exception(ex.message)
 
     @inject.params(storage='storage', search='search', logger='logger')
-    def onActionClone(self, event, widget, storage, search, logger):
+    def onActionCopy(self, index, widget, storage, search, logger):
         try:
             # update search index only after
             # the update was successful
-            index = storage.clone(widget.tree.current)
+            index = storage.clone(index)
             if index is None or not index:
                 return None
             
@@ -70,10 +85,9 @@ class ModuleActions(object):
             logger.exception(ex.message)
 
     @inject.params(storage='storage', search='search', logger='logger')
-    def onActionSave(self, event, storage, search, logger):
+    def onActionSave(self, event, storage, search, logger, widget):
         try:
-            name, path, content = event 
-            index = storage.index(path)
+            index, content = event 
             if index is None or not index:
                 return None
             index = storage.setFileContent(index, content)
@@ -83,6 +97,8 @@ class ModuleActions(object):
             # the update was successful
             if search is None or not search:
                 return None
+            name = storage.fileName(index)
+            path = storage.filePath(index)
             search.update(name, path, content)
                             
         except(Exception) as ex:
@@ -95,21 +111,19 @@ class ModuleActions(object):
         except(Exception) as ex:
             logger.exception(ex.message)
 
-    @inject.params(kernel='kernel', editor='editor')
-    def onActionFullScreen(self, event, widget, kernel, editor):
+    @inject.params(kernel='kernel', editor='editor', storage='storage')
+    def onActionFullScreen(self, event, widget, kernel, editor, storage):
         
-        editor.name = widget.name
-        editor.content = widget.content
-        editor.path = widget.path
-        editor.insertHtml(editor.content)
+        editor.index = widget.index
 
-        kernel.dispatch('window.tab', (editor, editor.name))
+        name = storage.fileName(widget.index)
+        kernel.dispatch('window.tab', (editor, name))
 
     @inject.params(storage='storage', search='search', logger='logger')
-    def onActionRemove(self, event, widget, storage, search, logger):
+    def onActionDelete(self, index, widget, storage, search, logger):
         
         message = widget.tr("Are you sure you want to remove this element: {} ?".format(
-            storage.fileName(widget.tree.current)
+            storage.fileName(index)
         ))
         
         reply = QtWidgets.QMessageBox.question(widget, 'Remove folder', message, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
@@ -117,7 +131,6 @@ class ModuleActions(object):
             return None
         
         try:
-            index = widget.tree.current
             path = storage.filePath(index)
             if not storage.remove(index):
                 return None

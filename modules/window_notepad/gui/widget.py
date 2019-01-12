@@ -14,15 +14,18 @@ import inject
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 
-from .bar import ToolBarWidget
-
 from .tags import TagsEditor
 from .folders import FolderTree
 from .demo.widget import DemoWidget
 from .folder.widget import FolderViewWidget
+from .bar import ToolBarWidget
 
 
 class FolderList(QtWidgets.QSplitter):
+
+    edit = QtCore.pyqtSignal(object)
+    delete = QtCore.pyqtSignal(object)
+    clone = QtCore.pyqtSignal(object)
 
     saveAction = QtCore.pyqtSignal(object)
     fullscreenAction = QtCore.pyqtSignal(object)
@@ -88,11 +91,7 @@ class FolderList(QtWidgets.QSplitter):
             return self
 
         self.editor = editor            
-        self.editor.name = storage.fileName(index)
-        self.editor.path = storage.filePath(index)
-        self.editor.content = storage.fileContent(index)
-        self.editor.insertHtml(self.editor.content)
-        
+        self.editor.index = index
         self.container.layout().addWidget(self.editor)
         return self
 
@@ -102,12 +101,15 @@ class FolderList(QtWidgets.QSplitter):
             self.container.layout().itemAt(i).widget().close()            
 
         widget = FolderViewWidget()
+        widget.edit.connect(self.edit.emit)
+        widget.delete.connect(self.delete.emit)
+        widget.delete.connect(lambda x: self.group(index))
+        widget.clone.connect(self.clone.emit)
+        widget.clone.connect(lambda x: self.group(index))
+        
         for entity in storage.entities(index):
-            if storage.isDir(entity):
-                continue
-            content = storage.fileContent(entity)
-            name = storage.fileName(entity)
-            widget.addPreview(name, content)
+            if not storage.isDir(entity):
+                widget.addPreview(entity)
         
         self.container.layout().addWidget(widget)
         return self

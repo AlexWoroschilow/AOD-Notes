@@ -10,14 +10,19 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import os
 from PyQt5 import QtWidgets
+from PyQt5 import QtCore
+
 from PyQt5.QtCore import Qt
 
 from .preview import NotePreviewDescription 
 
 
 class NotePreviewContainer(QtWidgets.QWidget):
+
+    edit = QtCore.pyqtSignal(object)
+    delete = QtCore.pyqtSignal(object)
+    clone = QtCore.pyqtSignal(object)
 
     def __init__(self):
         super(NotePreviewContainer, self).__init__()
@@ -28,12 +33,20 @@ class NotePreviewContainer(QtWidgets.QWidget):
         self.layout.setAlignment(Qt.AlignTop)
         self.setLayout(self.layout)
 
-    def addPreview(self, name, content):
-        widget = NotePreviewDescription(content)
+    def addPreview(self, index):
+        widget = NotePreviewDescription(index)
+        widget.edit.connect(self.edit.emit)
+        widget.delete.connect(self.delete.emit)
+        widget.clone.connect(self.clone.emit)
+        
         self.layout.addWidget(widget)
 
 
 class FolderViewWidget(QtWidgets.QScrollArea):
+
+    edit = QtCore.pyqtSignal(object)
+    delete = QtCore.pyqtSignal(object)
+    clone = QtCore.pyqtSignal(object)
 
     def __init__(self):
         super(FolderViewWidget, self).__init__()
@@ -48,6 +61,10 @@ class FolderViewWidget(QtWidgets.QScrollArea):
         self.setLayout(self.layout)
 
         self.preview = NotePreviewContainer()
+        self.preview.edit.connect(self.edit.emit)
+        self.preview.delete.connect(self.delete.emit)
+        self.preview.clone.connect(self.clone.emit)
+        
         self.setWidget(self.preview)
         
         self._entity = None
@@ -67,6 +84,6 @@ class FolderViewWidget(QtWidgets.QScrollArea):
         return super(FolderViewWidget, self)\
             .resizeEvent(*args, **kwargs)
         
-    def addPreview(self, name, content):
-        self.preview.addPreview(name, content)        
+    def addPreview(self, index):
+        self.preview.addPreview(index)        
 

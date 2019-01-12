@@ -10,16 +10,71 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import os
-from PyQt5 import QtWidgets
+import inject
 from PyQt5.QtCore import Qt
 
+from PyQt5 import QtCore
+from PyQt5 import QtWidgets
+from PyQt5 import QtGui
 
-class NotePreviewTitle(QtWidgets.QLabel):
+from lib.widget.button import ToolBarButton
+
+
+class Button(QtWidgets.QPushButton):
+
+    def __init__(self, parent=None):
+        super(Button, self).__init__(parent)
+        self.setIconSize(QtCore.QSize(20, 20))
+        self.setMaximumWidth(40)
+        self.setFlat(True)
+
+
+class NotePreviewDescription(QtWidgets.QWidget):
+
+    edit = QtCore.pyqtSignal(object)
+    delete = QtCore.pyqtSignal(object)
+    clone = QtCore.pyqtSignal(object)
+
+    @inject.params(storage='storage')
+    def __init__(self, index, storage):
+        super(NotePreviewDescription, self).__init__()
+        self.setContentsMargins(0, 0, 0, 0)
+
+        self.layout = QtWidgets.QGridLayout()
+        self.layout.setAlignment(Qt.AlignTop)
+
+        title = Title(storage.fileName(index))
+        self.layout.addWidget(title, 0, 0, 1, 20)
+
+        description = Description(storage.fileContent(index))
+        self.layout.addWidget(description, 1, 0, 4, 20)
+
+        self.buttonEdit = Button()
+        self.buttonEdit.setIcon(QtGui.QIcon("icons/file-light.svg"))
+        self.buttonEdit.clicked.connect(lambda x: self.edit.emit(index))
+        
+        self.layout.addWidget(self.buttonEdit, 0, 18, 1, 1)
+
+        self.buttonClone = Button()
+        self.buttonClone.setIcon(QtGui.QIcon("icons/copy-light.svg"))
+        self.buttonClone.clicked.connect(lambda x: self.clone.emit(index))
+        self.layout.addWidget(self.buttonClone, 0, 19, 1, 1)
+
+        self.buttonDelete = Button()
+        self.buttonDelete.setIcon(QtGui.QIcon("icons/remove-light.svg"))
+        self.buttonDelete.clicked.connect(lambda x: self.delete.emit(index))
+        self.layout.addWidget(self.buttonDelete, 0, 20, 1, 1)
+
+        self.setLayout(self.layout)
+
+
+class Title(QtWidgets.QLabel):
 
     def __init__(self, text):
-        super(NotePreviewTitle, self).__init__(text)
-        self.setMaximumWidth(150)
+        super(Title, self).__init__(text)
+        font = self.font()
+        font.setPixelSize(20)
+        self.setFont(font)
         self.setWordWrap(True)
 
 
@@ -29,21 +84,3 @@ class Description(QtWidgets.QLabel):
         super(Description, self).__init__(parent)
         self.setWordWrap(True)
 
-
-class NotePreviewDescription(QtWidgets.QWidget):
-
-    def __init__(self, content):
-        super(NotePreviewDescription, self).__init__()
-        self.setContentsMargins(0, 0, 0, 0)
-        
-        root = os.path.dirname(os.path.abspath(__file__))
-        with open('{}/css/{}.qss'.format(root, self.__class__.__name__), 'r') as stream:
-            self.setStyleSheet(stream.read())
-
-        self.layout = QtWidgets.QVBoxLayout()
-        self.layout.setAlignment(Qt.AlignTop)
-
-        description = Description(content)
-        self.layout.addWidget(description)
-
-        self.setLayout(self.layout)
