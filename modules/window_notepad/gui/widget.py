@@ -31,8 +31,8 @@ class FolderList(QtWidgets.QSplitter):
     fullscreenAction = QtCore.pyqtSignal(object)
     editor = None
 
-    @inject.params(config='config')
-    def __init__(self, actions, config):
+    @inject.params(config='config', storage='storage')
+    def __init__(self, actions, config, storage):
         super(FolderList, self).__init__()
         self.setContentsMargins(0, 0, 0, 0)
         self.setObjectName('FolderList')
@@ -61,7 +61,6 @@ class FolderList(QtWidgets.QSplitter):
 
         self.container = QtWidgets.QWidget()
         self.container.setLayout(QtWidgets.QVBoxLayout())
-        self.container.layout().addWidget(DemoWidget())
 
         self.addWidget(self.container)
         
@@ -74,6 +73,21 @@ class FolderList(QtWidgets.QSplitter):
         
         self.actions = actions
         self.test = None
+
+        # get last edited document from the confnig
+        # and open this document in the editor by default
+        path = config.get('editor.current')
+        if path is not None and len(path):
+            index = storage.index(path)
+            if storage.isDir(index):
+                self.group(index)
+                return None
+            self.note(index)
+            return None
+        # if there are not default document open 
+        # the first one in the document tree
+        self.note(storage.first())
+        return None
         
     @property
     def current(self):
@@ -81,8 +95,11 @@ class FolderList(QtWidgets.QSplitter):
             return self.tree.currentIndex()
         return None
         
-    @inject.params(storage='storage', editor='editor')
-    def note(self, index, storage, editor):
+    @inject.params(storage='storage', editor='editor', config='config')
+    def note(self, index, storage, editor, config=None):
+        current = storage.filePath(index)
+        config.set('editor.current', current)
+        
         for i in range(self.container.layout().count()): 
             self.container.layout().itemAt(i).widget().close()            
 
@@ -93,10 +110,22 @@ class FolderList(QtWidgets.QSplitter):
         self.editor = editor            
         self.editor.index = index
         self.container.layout().addWidget(self.editor)
+        
+        if self.tree is not None and self.tree:
+            # highlight the current note if the  
+            # selected not and editable not are different
+            # this happens of the edition was started programmatically
+            # or in any other way except the folder tree view
+            if index is not None and  self.current != index: 
+                self.tree.setCurrentIndex(index)
+           
         return self
 
-    @inject.params(storage='storage')
-    def group(self, index, storage):
+    @inject.params(storage='storage', config='config')
+    def group(self, index, storage, config):
+        current = storage.filePath(index)
+        config.set('editor.current', current)
+                
         for i in range(self.container.layout().count()): 
             self.container.layout().itemAt(i).widget().close()            
 
@@ -112,6 +141,7 @@ class FolderList(QtWidgets.QSplitter):
                 widget.addPreview(entity)
         
         self.container.layout().addWidget(widget)
+        
         return self
  
     def demo(self):

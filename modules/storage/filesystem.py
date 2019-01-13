@@ -86,6 +86,21 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         shutil.copy(source, destination)
         return self.index(destination)
 
+    def first(self):
+        index = self.rootIndex()
+        source = self.filePath(index)
+        if not os.path.exists(source):
+            return None
+        
+        sources = [self.filePath(index)]
+        while len(sources):
+            for path in glob.glob('{}/*'.format(sources.pop())):
+                index = self.index(path)
+                if self.isDir(index):
+                    sources.append(path)
+                    continue
+                return index
+
     def entities(self, index=None):
         if index is None or not index:
             index = self.index(self.rootPath())

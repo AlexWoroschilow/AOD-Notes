@@ -42,6 +42,7 @@ class ConfigService(object):
             self._parser.set('editor', 'formatbar', '1')
             self._parser.set('editor', 'rightbar', '1')
             self._parser.set('editor', 'name', '1')
+            self._parser.set('editor', 'current', '')
 
             self._parser.add_section('storage')
             self._parser.set('storage', 'location', '~/owncloud/CloudNotes/')

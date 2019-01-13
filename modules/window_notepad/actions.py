@@ -36,9 +36,6 @@ class ModuleActions(object):
     @inject.params(storage='storage', logger='logger')
     def onActionNoteEdit(self, index, storage, logger, widget):
         try:
-            if widget is not None and widget.current != index:
-                widget.tree.setCurrentIndex(index)
-
             if storage.isDir(index):
                 return widget.group(index)
             if storage.isFile(index):
