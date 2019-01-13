@@ -107,7 +107,9 @@ class ModuleActions(object):
     @inject.params(storage='storage', logger='logger')
     def onActionFolderCreate(self, event, widget, storage, logger):
         try:
-            storage.mkdir(widget.tree.current, 'New group')
+            if widget.tree.current is not None:
+                return storage.mkdir(widget.tree.current, 'New group')
+            return storage.mkdir(storage.rootIndex(), 'New group')
         except(Exception) as ex:
             logger.exception(ex.message)
 
