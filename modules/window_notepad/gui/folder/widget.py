@@ -12,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
+from PyQt5 import QtGui
 
 from PyQt5.QtCore import Qt
 
@@ -34,11 +35,11 @@ class NotePreviewContainer(QtWidgets.QWidget):
         self.setLayout(self.layout)
 
     def addPreview(self, index):
+        
         widget = NotePreviewDescription(index)
         widget.edit.connect(self.edit.emit)
         widget.delete.connect(self.delete.emit)
         widget.clone.connect(self.clone.emit)
-        
         self.layout.addWidget(widget)
 
 

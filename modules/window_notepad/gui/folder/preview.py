@@ -67,6 +67,12 @@ class NotePreviewDescription(QtWidgets.QGroupBox):
 
         self.setLayout(self.layout)
 
+        effect = QtWidgets.QGraphicsDropShadowEffect()
+        effect.setBlurRadius(10)
+        effect.setOffset(0)
+
+        self.setGraphicsEffect(effect)
+
 
 class Title(QtWidgets.QLabel):
 
