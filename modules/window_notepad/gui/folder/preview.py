@@ -36,15 +36,15 @@ class NotePreviewDescription(QtWidgets.QGroupBox):
     @inject.params(storage='storage')
     def __init__(self, index, storage):
         super(NotePreviewDescription, self).__init__()
+        self.setSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Expanding);
         self.setContentsMargins(0, 0, 0, 0)
         self.setObjectName('preview')
-        
 
         self.layout = QtWidgets.QGridLayout()
         self.layout.setAlignment(Qt.AlignTop)
 
         title = Title(storage.fileName(index))
-        self.layout.addWidget(title, 0, 0, 1, 20)
+        self.layout.addWidget(title, 0, 0, 1, 17)
 
         description = Description(storage.fileContent(index))
         self.layout.addWidget(description, 1, 0, 4, 20)

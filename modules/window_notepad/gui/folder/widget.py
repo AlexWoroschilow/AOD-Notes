@@ -30,9 +30,11 @@ class NotePreviewContainer(QtWidgets.QWidget):
         self.setObjectName('NotePreviewContainer')
         self.setContentsMargins(0, 0, 0, 0)
         
-        self.layout = QtWidgets.QVBoxLayout()
+        self.layout = QtWidgets.QGridLayout()
         self.layout.setAlignment(Qt.AlignTop)
         self.setLayout(self.layout)
+        self.i = 0
+        self.j = 0
 
     def addPreview(self, index):
         
@@ -40,7 +42,12 @@ class NotePreviewContainer(QtWidgets.QWidget):
         widget.edit.connect(self.edit.emit)
         widget.delete.connect(self.delete.emit)
         widget.clone.connect(self.clone.emit)
-        self.layout.addWidget(widget)
+        self.layout.addWidget(widget, self.i, self.j, 1, 1)
+
+        self.j += 1
+        if self.j > 1:
+            self.i += 1
+            self.j = 0
 
 
 class FolderViewWidget(QtWidgets.QScrollArea):
