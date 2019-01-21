@@ -12,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
 import functools
+from PyQt5 import QtWidgets
 
 from lib.plugin import Loader
 from .gui.widget import FolderList
@@ -72,7 +73,7 @@ class Loader(Loader):
     def _widget(self, kernel, storage):
         
         widget = FolderList(self.actions)
-        
+
         action = functools.partial(self.actions.onActionNoteEdit, widget=widget)
         widget.edit.connect(action)
 

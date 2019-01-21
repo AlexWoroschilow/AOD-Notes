@@ -22,7 +22,6 @@ class FolderTree(QtWidgets.QTreeView):
     @inject.params(config='config', storage='storage')
     def __init__(self, config=None, storage=None):
         super(FolderTree, self).__init__()
-        self.setSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Expanding);
 
         self.setObjectName('FolderTree')
         self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)

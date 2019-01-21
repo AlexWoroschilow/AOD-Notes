@@ -68,8 +68,8 @@ class FolderList(QtWidgets.QSplitter):
         self.setCollapsible(1, False)
         self.setCollapsible(2, False)
 
-        self.setStretchFactor(0, 4)
-        self.setStretchFactor(1, 5)
+        self.setStretchFactor(1, 2)
+        self.setStretchFactor(2, 3)
         
         self.actions = actions
         self.test = None
