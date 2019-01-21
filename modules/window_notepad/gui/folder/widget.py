@@ -12,7 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
-from PyQt5 import QtGui
 
 from PyQt5.QtCore import Qt
 
@@ -43,7 +42,7 @@ class NotePreviewContainer(QtWidgets.QWidget):
         widget.delete.connect(self.delete.emit)
         widget.clone.connect(self.clone.emit)
         self.layout.addWidget(widget, self.i, self.j, 1, 1)
-
+        
         self.j += 1
         if self.j > 1:
             self.i += 1
@@ -87,11 +86,6 @@ class FolderViewWidget(QtWidgets.QScrollArea):
             return None
         self.text.zoomOut(value)
 
-    def resizeEvent(self, *args, **kwargs):
-        self.preview.resizeEvent(*args, **kwargs)
-        return super(FolderViewWidget, self)\
-            .resizeEvent(*args, **kwargs)
-        
     def addPreview(self, index):
-        self.preview.addPreview(index)        
+        self.preview.addPreview(index)
 

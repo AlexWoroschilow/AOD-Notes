@@ -85,9 +85,18 @@ class Title(QtWidgets.QLabel):
         self.setWordWrap(True)
 
 
-class Description(QtWidgets.QLabel):
+class Description(QtWidgets.QTextEdit):
 
-    def __init__(self, parent=None):
-        super(Description, self).__init__(parent)
-        self.setWordWrap(True)
+    def __init__(self, text=None):
+        super(Description, self).__init__()
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding);
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setReadOnly(True)
+        self.setHtml(text)
+        self.show()
+
+    def resizeEvent(self, *args, **kwargs):
+        self.setFixedHeight(self.document().size().height() + 20)
+        return QtWidgets.QTextEdit.resizeEvent(self, *args, **kwargs)        
 
