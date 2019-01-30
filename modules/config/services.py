@@ -46,6 +46,9 @@ class ConfigService(object):
 
             self._parser.add_section('storage')
             self._parser.set('storage', 'location', '~/owncloud/CloudNotes/')
+
+            self._parser.add_section('cryptography')
+            self._parser.set('cryptography', 'password', '')
             
             self._parser.write(stream)
             stream.close()

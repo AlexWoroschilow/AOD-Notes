@@ -11,6 +11,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
+import inject
 import glob
 import shutil
 
@@ -42,15 +43,25 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         source = self.filePath(index)
         return os.path.basename(source)
 
-    def fileContent(self, index):
+    @inject.params(encryptor='encryptor')
+    def fileContent(self, index, encryptor):
+        content = self.fileContentRaw(index)
+        return encryptor.decrypt(content)
+    
+    def fileContentRaw(self, index):
         source = self.filePath(index)
         if not os.path.isfile(source):
             return None
         with open(source, 'r') as stream:
             return stream.read()
         return None
-    
-    def setFileContent(self, index, content):
+
+    @inject.params(encryptor='encryptor')
+    def setFileContent(self, index, content, encryptor):
+        content = encryptor.encrypt(content)
+        return self.setFileContentRaw(index, content)
+
+    def setFileContentRaw(self, index, content):
         destination = self.filePath(index)
         if not os.path.isfile(destination):
             return None

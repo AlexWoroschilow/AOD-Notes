@@ -15,8 +15,6 @@ import inject
 
 from lib.plugin import Loader
 
-from .filesystem import FilesystemStorage
-
 
 class Loader(Loader):
 
@@ -25,10 +23,21 @@ class Loader(Loader):
         return True
 
     def config(self, binder=None):
-        binder.bind_to_constructor('storage', self._construct)
+        binder.bind_to_constructor('storage', self._config)
+        binder.bind_to_constructor('encryptor', self._encryptor)
+
+    @inject.params(storage='storage', encryptor='encryptor')
+    def boot(self, options, args, storage, encryptor):
+        # for index in storage.entities():
+            # if storage.isDir(index):
+                # continue
+            # print(storage.fileName(index))
+            # content = storage.fileContentRaw(index)
+            # storage.setFileContentRaw(index, encryptor.encrypt(content))
+        pass
 
     @inject.params(config='config')
-    def _construct(self, config=None):
+    def _config(self, config=None):
 
         storage = config.get('storage.location')
         if len(storage) and storage.find('~') >= 0:
@@ -36,6 +45,12 @@ class Loader(Loader):
         if not os.path.exists(storage):
             if not os.path.exists(storage):
                 os.makedirs(storage)
-                
+
+        from .filesystem import FilesystemStorage
         return FilesystemStorage(storage)
+ 
+    @inject.params(config='config')
+    def _encryptor(self, config=None):
+        from .cryptography import CryptoAES 
+        return CryptoAES(config.get('cryptography.password'))
  
