@@ -31,7 +31,6 @@ class Loader(Loader):
 #         for index in storage.entities():
 #             if storage.isDir(index):
 #                 continue
-#             print(storage.fileName(index))
 #             content = storage.fileContent(index)
 #             storage.setFileContent(index, content)
         pass
