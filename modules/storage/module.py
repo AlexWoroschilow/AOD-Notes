@@ -28,12 +28,12 @@ class Loader(Loader):
 
     @inject.params(storage='storage', encryptor='encryptor')
     def boot(self, options, args, storage, encryptor):
-        # for index in storage.entities():
-            # if storage.isDir(index):
-                # continue
-            # print(storage.fileName(index))
-            # content = storage.fileContentRaw(index)
-            # storage.setFileContentRaw(index, encryptor.encrypt(content))
+#         for index in storage.entities():
+#             if storage.isDir(index):
+#                 continue
+#             print(storage.fileName(index))
+#             content = storage.fileContent(index)
+#             storage.setFileContent(index, content)
         pass
 
     @inject.params(config='config')

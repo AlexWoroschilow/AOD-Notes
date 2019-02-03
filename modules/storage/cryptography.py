@@ -26,7 +26,7 @@ class CryptoAES(object):
         self.password = password.encode('utf-8')
 
     def encrypt(self, string=None):
-        if not len(string):
+        if string is None or not len(string):
             string = ' '
         
         try:

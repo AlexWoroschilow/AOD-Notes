@@ -24,9 +24,31 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
     
     def __init__(self, location=None):
         super(FilesystemStorage, self).__init__()
+        self.fileRenamed.connect(self.printRenamed)
         self.setIconProvider(IconProvider())
         self.setRootPath(location)
         self.setReadOnly(False)
+
+    @inject.params(encryptor='encryptor', logger='logger')
+    def printRenamed(self, path, name_old, name_new, length=80, encryptor=None, logger=None):
+        index = self.index("{}/{}".format(path, name_new))
+        if index is None or not index:
+            return self.revert()
+
+        try:
+            
+            header = encryptor.encrypt(name_new)
+            chunks = [header[i:i + length] for i in range(0, len(header), length)]
+            header = "===HEADER BEGIN===\n{}\n===HEADER END===\n".format("\n".join(chunks))
+            
+            content = self.fileContentRaw(index)
+            chunks = [content[i:i + length] for i in range(0, len(content), length)]
+            content = "===CONTENT BEGIN===\n{}\n===CONTENT END===\n".format("\n".join(chunks)) 
+            
+            self.writeFileContentRaw(index, "{}{}".format(header, content))
+        except(ValueError)  as ex:
+            logger.debug(ex, "{}/{}".format(path, name_new))
+            self.revert()
         
     def rootIndex(self):
         return self.index(self.rootPath())
@@ -39,29 +61,67 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         source = self.filePath(index)
         return os.path.isfile(source)
 
-    def fileName(self, index):
+    @inject.params(encryptor='encryptor')
+    def fileName(self, index, encryptor):
+        content = self.fileHeaderRaw(index)
+        return encryptor.decrypt(content)
+        
+    @inject.params(logger='logger', encryptor='encryptor')
+    def fileHeaderRaw(self, index, encryptor, logger):
         source = self.filePath(index)
-        return os.path.basename(source)
+        if not os.path.isfile(source):
+            return None
+        try:
+            content = self.readContentRaw(index)
+            lines = content.split("\n")
+            if lines is None or not len(lines):
+                return ""
+            
+            begin = lines.index("===HEADER BEGIN===")
+            end = lines.index("===HEADER END===")
+            return "".join(lines[begin + 1:end])
+        except(ValueError)  as ex:
+            logger.debug(ex)
+        parent = super(FilesystemStorage, self)
+        return encryptor.encrypt(parent.fileName(index))
 
     @inject.params(encryptor='encryptor')
     def fileContent(self, index, encryptor):
         content = self.fileContentRaw(index)
         return encryptor.decrypt(content)
     
-    def fileContentRaw(self, index):
-        source = self.filePath(index)
-        if not os.path.isfile(source):
-            return None
-        with open(source, 'r') as stream:
-            return stream.read()
-        return None
+    @inject.params(logger='logger', encryptor='encryptor')
+    def fileContentRaw(self, index, encryptor, logger):
+        try:
+            content = self.readContentRaw(index)
+            if content is None:
+                return ""
+
+            lines = content.split("\n")
+            if lines is None or not len(lines):
+                return ""
+            
+            begin = lines.index("===CONTENT BEGIN===")
+            end = lines.index("===CONTENT END===")
+            return "".join(lines[begin + 1:end])
+        except(ValueError)  as ex:
+            logger.debug(ex)
+        return encryptor.encrypt('')
 
     @inject.params(encryptor='encryptor')
-    def setFileContent(self, index, content, encryptor):
+    def setFileContent(self, index, content, length=80, encryptor=None):
+            
+        header = self.fileHeaderRaw(index)
+        chunks = [header[i:i + length] for i in range(0, len(header), length)]
+        header = "===HEADER BEGIN===\n{}\n===HEADER END===\n".format("\n".join(chunks))
+            
         content = encryptor.encrypt(content)
-        return self.setFileContentRaw(index, content)
+        chunks = [content[i:i + length] for i in range(0, len(content), length)]
+        content = "===CONTENT BEGIN===\n{}\n===CONTENT END===\n".format("\n".join(chunks)) 
+            
+        return self.writeFileContentRaw(index, "{}{}".format(header, content))
 
-    def setFileContentRaw(self, index, content):
+    def writeFileContentRaw(self, index, content):
         destination = self.filePath(index)
         if not os.path.isfile(destination):
             return None
@@ -70,6 +130,14 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
             stream.close()
             return index
         return False
+    
+    def readContentRaw(self, index):
+        source = self.filePath(index)
+        if not os.path.isfile(source):
+            return None
+        with open(source, 'r') as stream:
+            return stream.read()
+        return None
         
     def touch(self, index, name):
         destination_root = self.filePath(index)

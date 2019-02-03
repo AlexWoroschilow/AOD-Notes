@@ -42,7 +42,7 @@ class ModuleActions(object):
                 return widget.note(index)
             return widget.demo()
         except(Exception) as ex:
-            logger.exception(ex.message)
+            logger.exception(ex)
 
     @inject.params(storage='storage', search='search', logger='logger')
     def onActionNoteCreate(self, event, widget, storage, search, logger):
@@ -60,7 +60,7 @@ class ModuleActions(object):
             search.append(name, path, content)
             
         except(Exception) as ex:
-            logger.exception(ex.message)
+            logger.exception(ex)
 
     @inject.params(storage='storage', search='search', logger='logger')
     def onActionCopy(self, index, widget, storage, search, logger):
@@ -79,7 +79,7 @@ class ModuleActions(object):
             search.append(name, path, content)
                                 
         except(Exception) as ex:
-            logger.exception(ex.message)
+            logger.exception(ex)
 
     @inject.params(storage='storage', search='search', logger='logger')
     def onActionSave(self, event, storage, search, logger, widget):
@@ -99,7 +99,7 @@ class ModuleActions(object):
             search.update(name, path, content)
                             
         except(Exception) as ex:
-            logger.exception(ex.message)
+            logger.exception(ex)
 
     @inject.params(storage='storage', logger='logger')
     def onActionFolderCreate(self, event, widget, storage, logger):
@@ -108,7 +108,7 @@ class ModuleActions(object):
                 return storage.mkdir(widget.tree.current, 'New group')
             return storage.mkdir(storage.rootIndex(), 'New group')
         except(Exception) as ex:
-            logger.exception(ex.message)
+            logger.exception(ex)
 
     @inject.params(kernel='kernel', editor='editor', storage='storage')
     def onActionFullScreen(self, event, widget, kernel, editor, storage):
