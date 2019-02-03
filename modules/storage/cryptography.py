@@ -130,6 +130,11 @@ class CryptoFile(object):
          
         self.__write("{}{}".format(header, content))
 
+    def clone(self, source):
+        source = CryptoFile(source)
+        self.name = "{}(clone)".format(source.name)
+        self.name.content = source.content
+
 
 class CryptoAES(object):
     

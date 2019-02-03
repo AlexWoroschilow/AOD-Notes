@@ -92,13 +92,16 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         if not os.path.exists(source):
             return None
 
+        destination = "{}(clone)".format(source)
         if os.path.isdir(source):
-            destination = "{}(clone)".format(source)
             shutil.copytree(source, destination)
             return self.index(destination)
+
+        file_source = CryptoFile(source)
+        file_desintation = CryptoFile(destination)
+        file_desintation.name = "{}(clone)".format(file_source.name)
+        file_desintation.content = file_source.content
         
-        destination = "{}(clone)".format(source)
-        shutil.copy(source, destination)
         return self.index(destination)
 
     def first(self):
