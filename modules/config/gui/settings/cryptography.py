@@ -11,24 +11,27 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt
+
+from .text import TextEditor
+
+from . import SettingsTitle
+from . import WidgetSettings
 
 
-class SettingsTitle(QtWidgets.QLabel):
-
-    def __init__(self, text):
-        super(SettingsTitle, self).__init__(text)
-
-
-class WidgetSettings(QtWidgets.QGroupBox):
+class WidgetSettingsCryptography(WidgetSettings):
 
     def __init__(self):
-        super(WidgetSettings, self).__init__()
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-        self.setMinimumHeight(200)
+        super(WidgetSettingsCryptography, self).__init__()
 
-        effect = QtWidgets.QGraphicsDropShadowEffect()
-        effect.setBlurRadius(10)
-        effect.setOffset(0)
+        self.layout = QtWidgets.QVBoxLayout()
 
-        self.setGraphicsEffect(effect)
+        label = SettingsTitle('Cryptography settings')
+        self.layout.addWidget(label)
+
+        self.code = TextEditor('...')
+        self.layout.addWidget(self.code)
+
+        self.setLayout(self.layout)
+
+        self.show()
+

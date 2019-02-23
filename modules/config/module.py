@@ -42,7 +42,7 @@ class Loader(Loader):
 
     @inject.params(config='config')
     def _widget_settings_cryptography(self, config=None):
-        from .gui.settings.widget import WidgetSettingsCryptography
+        from .gui.settings.cryptography import WidgetSettingsCryptography
         widget = WidgetSettingsCryptography()
         widget.code.setText(config.get('cryptography.password'))
         return widget
@@ -50,7 +50,7 @@ class Loader(Loader):
     @inject.params(config='config')
     def _widget_settings_navigator(self, config=None):
         
-        from .gui.settings.widget import WidgetSettingsNavigator
+        from .gui.settings.navigator import WidgetSettingsNavigator
         
         widget = WidgetSettingsNavigator()
         
@@ -69,7 +69,7 @@ class Loader(Loader):
     @inject.params(config='config')
     def _widget_settings_editor(self, config=None):
         
-        from .gui.settings.widget import WidgetSettingsEditor
+        from .gui.settings.editor import WidgetSettingsEditor
         
         widget = WidgetSettingsEditor()
         
@@ -93,7 +93,7 @@ class Loader(Loader):
     @inject.params(config='config')
     def _widget_settings_storage(self, config=None):
         
-        from .gui.settings.widget import WidgetSettingsStorage
+        from .gui.settings.storage import WidgetSettingsStorage
         
         widget = WidgetSettingsStorage()
         widget.location.setText(config.get('storage.location'))
