@@ -169,7 +169,7 @@ class CryptoAES(object):
             iv = content_binary[:AES.block_size]
             cipher = AES.new(self.password, AES.MODE_CBC, iv)            
             content_bytes = cipher.decrypt(content_binary[AES.block_size:])
-            return content_bytes.decode('utf-8')
+            return content_bytes.decode('utf-8').strip()
         except(ValueError)  as ex:
             logger = logging.getLogger('CryptoAES')
             logger.exception(ex)

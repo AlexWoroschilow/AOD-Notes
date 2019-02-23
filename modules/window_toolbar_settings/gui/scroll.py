@@ -10,27 +10,31 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import math
 from PyQt5.QtCore import Qt
 from PyQt5 import QtWidgets
 
 
 class WidgetSettings(QtWidgets.QWidget):
+    
+    columns = 2
 
     def __init__(self):
         super(WidgetSettings, self).__init__()
         self.setAutoFillBackground(True)
-        self.layout = QtWidgets.QVBoxLayout()
+        self.layout = QtWidgets.QGridLayout()
+        self.layout.setAlignment(Qt.AlignTop)
+
         self.setLayout(self.layout)
 
         self.setGeometry(0, 0, 300, 100)        
         self.setObjectName('WidgetSettings')
         
     def addWidget(self, widget):
-        self.layout.addWidget(widget)
-        
-        spacer = QtWidgets.QWidget();
-        spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred);
-        self.layout.addWidget(spacer)
+        count = self.layout.count()
+        col = count % self.columns
+        row = math.floor(count / self.columns)
+        self.layout.addWidget(widget, row, col)
 
 
 class SettingsScrollArea(QtWidgets.QScrollArea):
@@ -39,7 +43,7 @@ class SettingsScrollArea(QtWidgets.QScrollArea):
         super(SettingsScrollArea, self).__init__(parent)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setAlignment(Qt.AlignHCenter)
+        self.setAlignment(Qt.AlignTop)
         self.setObjectName('SettingsScrollArea')
 
         self.setContentsMargins(0, 0, 0, 0)

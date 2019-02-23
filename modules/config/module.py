@@ -34,10 +34,18 @@ class Loader(Loader):
     def _service(self, kernel=None, factory=None):
 
         factory.addWidget(self._widget_settings_storage)
+        factory.addWidget(self._widget_settings_cryptography)
         factory.addWidget(self._widget_settings_navigator)
         factory.addWidget(self._widget_settings_editor)
         
         return ConfigService(kernel.options.config)
+
+    @inject.params(config='config')
+    def _widget_settings_cryptography(self, config=None):
+        from .gui.settings.widget import WidgetSettingsCryptography
+        widget = WidgetSettingsCryptography()
+        widget.code.setText(config.get('cryptography.password'))
+        return widget
 
     @inject.params(config='config')
     def _widget_settings_navigator(self, config=None):
@@ -65,11 +73,6 @@ class Loader(Loader):
         
         widget = WidgetSettingsEditor()
         
-        widget.name.setChecked(int(config.get('editor.name')))
-        widget.name.stateChanged.connect(functools.partial(
-            self.actions.onActionCheckboxToggle, variable='editor.name'
-        ))
-
         widget.formatbar.setChecked(int(config.get('editor.formatbar')))
         widget.formatbar.stateChanged.connect(functools.partial(
             self.actions.onActionCheckboxToggle, variable='editor.formatbar'
@@ -94,7 +97,7 @@ class Loader(Loader):
         
         widget = WidgetSettingsStorage()
         widget.location.setText(config.get('storage.location'))
-        widget.locationChoice.clicked.connect(functools.partial(
+        widget.location.clicked.connect(functools.partial(
             self.actions.onActionStorageLocationChange, widget=widget
         ))
         

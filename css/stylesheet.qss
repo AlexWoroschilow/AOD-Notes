@@ -21,28 +21,36 @@ QPushButton { margin: 5px; }
 QTreeView { font-size: 16px; }
 
 
-
 QScrollArea#FolderViewWidget { border: none; background-color: #ffffff; }
 
 
-SettingsScrollArea { border: none; background-color: #f1f2f3; }
-QWidget#WidgetSettings QWidget {  padding: 10px 0px; }
-QWidget#WidgetSettings QWidget#spacer { 
-    background: #ffffff;
-    border-top: 2px solid #ffffff;
-    border-left: 2px solid #ffffff;
-    border-bottom: 3px solid qlineargradient(x1: 0, y1: 0, x2: 0, y2: 3, stop: 0 #ffffff, stop: 1.0 #e0e9f0);
-    border-right: 3px solid qlineargradient(x1: 0, y1: 0, x2: 3, y2: 0, stop: 0 #ffffff, stop: 1.0 #e0e9f0);
-
-    border-radius: 5px;	 
-}
-
 NotePreviewContainer NotePreviewDescription {
+	background-color: #fff;
 	border-radius: 15px;
 	padding: 10px 30px;
-	background-color: #fff;
 }
 
 NotePreviewContainer NotePreviewDescription #previewTitle {
 	background-color: #fff;
 }
+
+SettingsScrollArea { 
+	background-color: #fff;
+	border: none;
+}
+SettingsScrollArea SettingsTitle {
+	font-size: 26px;
+	padding: 0px;
+}
+
+SettingsScrollArea WidgetSettings {
+	border-radius: 15px;
+	padding: 0px 30px 20px 30px;
+	background-color: #fff;
+}
+SettingsScrollArea WidgetSettings QPushButton{
+	padding: 5px 5px;
+}
+
+
+

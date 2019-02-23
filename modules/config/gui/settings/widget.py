@@ -3,103 +3,113 @@
 # PYQT5 PyQt4’s QtGui module has been split into PyQt5’s QtGui, QtPrintSupport and QtWidgets modules
 
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt
+
+from .text import TextEditor
 
 
-class WidgetSettingsNavigator(QtWidgets.QWidget):
+class SettingsTitle(QtWidgets.QLabel):
+
+    def __init__(self, text):
+        super(SettingsTitle, self).__init__(text)
+
+
+class WidgetSettings(QtWidgets.QGroupBox):
+
+    def __init__(self):
+        super(WidgetSettings, self).__init__()
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.setMinimumHeight(200)
+
+        effect = QtWidgets.QGraphicsDropShadowEffect()
+        effect.setBlurRadius(10)
+        effect.setOffset(0)
+
+        self.setGraphicsEffect(effect)
+
+
+class WidgetSettingsNavigator(WidgetSettings):
 
     def __init__(self):
         super(WidgetSettingsNavigator, self).__init__()
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding);
 
-        self.setStyleSheet('margin: 2px 50px; padding: 10px 20px;')
-    
-        self.layout = QtWidgets.QGridLayout()
+        self.layout = QtWidgets.QVBoxLayout()
 
-        label = QtWidgets.QLabel('Navigator settings')
-        label.setStyleSheet('QLabel { font-size: 26px;}')
-
-        self.layout.addWidget(label, 0, 0, 1, 3)
-
-        spacer = QtWidgets.QWidget();
-        spacer.setObjectName('spacer')
-        spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding);
-        self.layout.addWidget(spacer, 1, 0, 8, 3)
+        label = SettingsTitle('Navigator settings')
+        self.layout.addWidget(label)
 
         self.toolbar = QtWidgets.QCheckBox('Toolbar is visible')
-        self.layout.addWidget(self.toolbar, 2, 0)
+        self.layout.addWidget(self.toolbar)
 
         self.keywords = QtWidgets.QCheckBox('Keywords are visible')
-        self.layout.addWidget(self.keywords, 3, 0)
+        self.layout.addWidget(self.keywords)
 
         self.setLayout(self.layout)
 
         self.show()
 
 
-class WidgetSettingsEditor(QtWidgets.QWidget):
+class WidgetSettingsEditor(WidgetSettings):
 
     def __init__(self):
         super(WidgetSettingsEditor, self).__init__()
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding);
 
-        self.setStyleSheet('margin: 2px 50px; padding: 10px 20px;')
-    
-        self.layout = QtWidgets.QGridLayout()
+        self.layout = QtWidgets.QVBoxLayout()
 
-        label = QtWidgets.QLabel('Editor settings')
-        label.setStyleSheet('QLabel { font-size: 26px;}')
-
-        self.layout.addWidget(label, 0, 0, 1, 3)
-
-        spacer = QtWidgets.QWidget();
-        spacer.setObjectName('spacer')
-        spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding);
-        self.layout.addWidget(spacer, 1, 0, 8, 3)
-
-        self.name = QtWidgets.QCheckBox('Record name is visible')
-        self.layout.addWidget(self.name, 2, 0)
+        label = SettingsTitle('Editor settings')
+        self.layout.addWidget(label)
 
         self.formatbar = QtWidgets.QCheckBox('Formatting toolbar is visible')
-        self.layout.addWidget(self.formatbar, 3, 0)
+        self.layout.addWidget(self.formatbar)
 
         self.rightbar = QtWidgets.QCheckBox('Toolbar at the rith side is visible')
-        self.layout.addWidget(self.rightbar, 4, 0)
+        self.layout.addWidget(self.rightbar)
 
         self.leftbar = QtWidgets.QCheckBox('Toolbar at the left side is visible')
-        self.layout.addWidget(self.leftbar, 5, 0)
+        self.layout.addWidget(self.leftbar)
 
         self.setLayout(self.layout)
 
         self.show()
 
 
-class WidgetSettingsStorage(QtWidgets.QWidget):
+class WidgetSettingsStorage(WidgetSettings):
 
     def __init__(self):
         super(WidgetSettingsStorage, self).__init__()
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding);
 
-        self.setStyleSheet('margin: 2px 50px; padding: 10px 20px;')
-    
-        self.layout = QtWidgets.QGridLayout()
+        self.layout = QtWidgets.QVBoxLayout()
 
-        label = QtWidgets.QLabel('Storage settings')
-        label.setStyleSheet('QLabel { font-size: 26px;}')
+        label = SettingsTitle('Storage settings')
+        self.layout.addWidget(label)
+        
+        self.layout.addSpacing(1)
 
-        self.layout.addWidget(label, 0, 0, 1, 3)
+        self.location = QtWidgets.QPushButton('Change')
+        self.location.setToolTip("Clone selected folder")
+        self.layout.setAlignment(Qt.AlignLeft)
+        self.location.setFlat(True)
+        self.layout.addWidget(self.location)
+        
+        self.layout.addSpacing(1)
 
-        spacer = QtWidgets.QWidget();
-        spacer.setObjectName('spacer')
-        spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding);
-        self.layout.addWidget(spacer, 1, 0, 3, 3)
+        self.setLayout(self.layout)
 
-        self.location = QtWidgets.QLabel('...')
-        self.layout.addWidget(self.location, 2, 0)
+        self.show()
 
-        self.locationChoice = QtWidgets.QPushButton('Change')
-        self.locationChoice.setToolTip("Clone selected folder")
-        self.locationChoice.setFlat(True)
-        self.layout.addWidget(self.locationChoice, 2, 2)
+
+class WidgetSettingsCryptography(WidgetSettings):
+
+    def __init__(self):
+        super(WidgetSettingsCryptography, self).__init__()
+
+        self.layout = QtWidgets.QVBoxLayout()
+
+        label = SettingsTitle('Cryptography settings')
+        self.layout.addWidget(label)
+
+        self.code = TextEditor('...')
+        self.layout.addWidget(self.code)
 
         self.setLayout(self.layout)
 

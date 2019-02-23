@@ -31,6 +31,12 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         self.setRootPath(location)
         self.setReadOnly(False)
 
+    def data(self, index=None, role=None):
+        if index is not None and role == 0:
+            #print(index, role, self.fileName(index))
+            return self.fileName(index)
+        return super(FilesystemStorage, self).data(index, role)
+
     def rootIndex(self):
         return self.index(self.rootPath())
         

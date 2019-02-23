@@ -28,21 +28,10 @@ class Loader(Loader):
         return True
 
     def config(self, binder=None):
+        binder.bind_to_provider('settings_menu', self._widget)
         
         from .gui.widget import WidgetSettingsFactory
-        """
-        Store the settings widgets from te different 
-        modules in the factory and access them all the time
-        we build the settings tab
-        """
         binder.bind('settings_factory', WidgetSettingsFactory())
-        
-        """
-        We have provide a new settings widget
-        all the time we call the menu, that why we 
-        use the provider method
-        """
-        binder.bind_to_provider('settings_menu', self._widget)
         
     @inject.params(factory='window.header_factory')
     def boot(self, options=None, args=None, factory=None):
