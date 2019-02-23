@@ -23,8 +23,8 @@ class Loader(Loader):
         return True
 
     def config(self, binder=None):
-        binder.bind_to_constructor('storage', self._config)
         binder.bind_to_constructor('encryptor', self._encryptor)
+        binder.bind_to_constructor('storage', self._storage)
 
     @inject.params(storage='storage', encryptor='encryptor')
     def boot(self, options, args, storage, encryptor):
@@ -36,7 +36,7 @@ class Loader(Loader):
         pass
 
     @inject.params(config='config')
-    def _config(self, config=None):
+    def _storage(self, config=None):
 
         storage = config.get('storage.location')
         if len(storage) and storage.find('~') >= 0:
@@ -45,11 +45,11 @@ class Loader(Loader):
             if not os.path.exists(storage):
                 os.makedirs(storage)
 
-        from .filesystem import FilesystemStorage
+        from .service.storage import FilesystemStorage
         return FilesystemStorage(storage)
  
     @inject.params(config='config')
     def _encryptor(self, config=None):
-        from .cryptography import CryptoAES 
+        from .service.cryptography import CryptoAES 
         return CryptoAES(config.get('cryptography.password'))
  

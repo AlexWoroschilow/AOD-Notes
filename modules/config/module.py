@@ -30,14 +30,15 @@ class Loader(Loader):
     def config(self, binder=None):
         binder.bind_to_constructor('config', self._service)
 
-    @inject.params(kernel='kernel', factory='settings_factory')
-    def _service(self, kernel=None, factory=None):
-
+    @inject.params(factory='settings_factory')
+    def boot(self, options, args, factory=None):
         factory.addWidget(self._widget_settings_storage)
         factory.addWidget(self._widget_settings_cryptography)
         factory.addWidget(self._widget_settings_navigator)
         factory.addWidget(self._widget_settings_editor)
-        
+
+    @inject.params(kernel='kernel')
+    def _service(self, kernel=None):
         return ConfigService(kernel.options.config)
 
     @inject.params(config='config')
@@ -53,16 +54,13 @@ class Loader(Loader):
         from .gui.settings.navigator import WidgetSettingsNavigator
         
         widget = WidgetSettingsNavigator()
-        
         widget.toolbar.setChecked(int(config.get('folders.toolbar')))
-        widget.toolbar.stateChanged.connect(functools.partial(
-            self.actions.onActionCheckboxToggle, variable='folders.toolbar'
-        ))
+        action = functools.partial(self.actions.onActionCheckboxToggle, variable='folders.toolbar')
+        widget.toolbar.stateChanged.connect(action)
         
         widget.keywords.setChecked(int(config.get('folders.keywords')))
-        widget.keywords.stateChanged.connect(functools.partial(
-            self.actions.onActionCheckboxToggle, variable='folders.keywords'
-        ))
+        action = functools.partial(self.actions.onActionCheckboxToggle, variable='folders.keywords')
+        widget.keywords.stateChanged.connect(action)
         
         return widget
 
@@ -74,19 +72,16 @@ class Loader(Loader):
         widget = WidgetSettingsEditor()
         
         widget.formatbar.setChecked(int(config.get('editor.formatbar')))
-        widget.formatbar.stateChanged.connect(functools.partial(
-            self.actions.onActionCheckboxToggle, variable='editor.formatbar'
-        ))
+        action = functools.partial(self.actions.onActionCheckboxToggle, variable='editor.formatbar')
+        widget.formatbar.stateChanged.connect(action)
 
         widget.rightbar.setChecked(int(config.get('editor.rightbar')))
-        widget.rightbar.stateChanged.connect(functools.partial(
-            self.actions.onActionCheckboxToggle, variable='editor.rightbar'
-        ))
+        action = functools.partial(self.actions.onActionCheckboxToggle, variable='editor.rightbar')
+        widget.rightbar.stateChanged.connect(action)
         
         widget.leftbar.setChecked(int(config.get('editor.leftbar')))
-        widget.leftbar.stateChanged.connect(functools.partial(
-            self.actions.onActionCheckboxToggle, variable='editor.leftbar'
-        ))
+        action = functools.partial(self.actions.onActionCheckboxToggle, variable='editor.leftbar')
+        widget.leftbar.stateChanged.connect(action)
         
         return widget
 
@@ -97,8 +92,7 @@ class Loader(Loader):
         
         widget = WidgetSettingsStorage()
         widget.location.setText(config.get('storage.location'))
-        widget.location.clicked.connect(functools.partial(
-            self.actions.onActionStorageLocationChange, widget=widget
-        ))
+        action = functools.partial(self.actions.onActionStorageLocationChange, widget=widget)
+        widget.location.clicked.connect(action)
         
         return widget

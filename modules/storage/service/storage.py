@@ -19,7 +19,7 @@ from PyQt5 import QtWidgets
 
 from .gui.icons import IconProvider
 
-from .cryptography import CryptoFile
+from modules.storage.service.cryptography import CryptoFile
 
 
 class FilesystemStorage(QtWidgets.QFileSystemModel):
