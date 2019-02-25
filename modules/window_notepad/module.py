@@ -12,13 +12,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
 import functools
-from PyQt5 import QtWidgets
 
 from lib.plugin import Loader
 from .gui.widget import FolderList
 from .gui.editor.widget import TextEditorWidget  
 
 from .actions import ModuleActions
+from .factory import ToolbarFactory
 
 
 class Loader(Loader):
@@ -27,37 +27,45 @@ class Loader(Loader):
 
     @property
     def enabled(self):
-        """
-        This is the core-functionaliry plugin,
-        should be enabled by default
-        """
         return True
 
     def config(self, binder=None):
-        """
-        Initialize the widget of this plugin as a service
-        this widget will be used in the main window 
-        """
-        binder.bind_to_constructor('notepad', self._widget)
-        """
-        Initialize the widget of this plugin as a service
-        this widget will be used in the main window 
-        """
-        binder.bind_to_provider('editor', self._widget_editor)
+        binder.bind_to_constructor('notepad', self._notepad)
+        binder.bind_to_provider('editor', self._editor)
+        
+        binder.bind('toolbar_factory.leftbar', ToolbarFactory())
+        binder.bind('toolbar_factory.formatbar', ToolbarFactory())
+        binder.bind('toolbar_factory.rightbar', ToolbarFactory())
 
-    @inject.params(kernel='kernel', config='config')
-    def _widget_editor(self, kernel, config):
+    @inject.params(kernel='kernel', config='config', factory_leftbar='toolbar_factory.leftbar', factory_rightbar='toolbar_factory.rightbar', factory_formatbar='toolbar_factory.formatbar')
+    def _editor(self, kernel, config, factory_leftbar=None, factory_rightbar=None, factory_formatbar=None):
         
         widget = TextEditorWidget()
-        
+
+        for plugin in factory_leftbar.widgets:
+            if plugin.connected() == True:
+                plugin.clicked.disconnect()
+            action = functools.partial(plugin.clickedEvent, widget=widget)
+            plugin.clicked.connect(action)
+            widget.leftbar.addWidget(plugin)
         widget.leftbar.setVisible(int(config.get('editor.leftbar')))
+        
+        for plugin in factory_formatbar.widgets:
+            if plugin.connected() == True:
+                plugin.clicked.disconnect()
+            action = functools.partial(plugin.clickedEvent, widget=widget)
+            plugin.clicked.connect(action)
+            widget.formatbar.addWidget(plugin)
         widget.formatbar.setVisible(int(config.get('editor.formatbar')))
+
+        for plugin in factory_rightbar.widgets:
+            if plugin.connected() == True:
+                plugin.clicked.disconnect()
+            action = functools.partial(plugin.clickedEvent, widget=widget)
+            plugin.clicked.connect(action)
+            widget.rightbar.addWidget(plugin)
         widget.rightbar.setVisible(int(config.get('editor.rightbar')))
         
-        kernel.dispatch('window.notepad.leftbar', (widget, widget.leftbar))
-        kernel.dispatch('window.notepad.rightbar', (widget, widget.rightbar))
-        kernel.dispatch('window.notepad.formatbar', (widget, widget.formatbar))
-
         action = functools.partial(self.actions.onActionSave, widget=widget)
         widget.save.connect(action)
         
@@ -70,7 +78,7 @@ class Loader(Loader):
         return widget
 
     @inject.params(kernel='kernel', storage='storage')
-    def _widget(self, kernel, storage):
+    def _notepad(self, kernel, storage):
         
         widget = FolderList(self.actions)
 

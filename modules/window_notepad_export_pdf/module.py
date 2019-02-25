@@ -11,7 +11,6 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
-import functools
 
 from PyQt5 import QtGui
 
@@ -29,24 +28,15 @@ class Loader(Loader):
     def enabled(self):
         return True
 
-    @inject.params(kernel='kernel')
-    def boot(self, options=None, args=None, kernel=None):
-        kernel.listen('window.notepad.leftbar', self._widget, 100)
-        kernel.listen('window.notelist.toolbar', self._widget, 100)
+    @inject.params(factory='toolbar_factory.leftbar')
+    def boot(self, options=None, args=None, factory=None):
 
-    def _widget(self, event=None):
         widget = ToolBarButton()
-        widget.editor, widget.toolbar = event.data
-        if widget.editor is None or widget.toolbar is None:
-            raise 'Editor or Toolbar object can not be empty'
-
         widget.setIcon(QtGui.QIcon("icons/pdf.svg"))
         widget.setToolTip(widget.tr("Export document to PDF"))
+        widget.clickedEvent = self.clickedEvent
         
-        widget.clicked.connect(functools.partial(
-            self.actions.onActionButtonPressed, widget=widget
-        ))
+        factory.addWidget(widget)
 
-        widget.toolbar.addSeparator()
-        widget.toolbar.addWidget(widget)
-
+    def clickedEvent(self, event=None, widget=None):
+        self.actions.onActionButtonPressed(widget)

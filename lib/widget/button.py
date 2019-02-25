@@ -16,8 +16,14 @@ from PyQt5 import QtWidgets
 
 class ToolBarButton(QtWidgets.QPushButton):
 
+    activate = QtCore.pyqtSignal(object)
+
     def __init__(self, parent=None):
         super(ToolBarButton, self).__init__(parent)
         self.setIconSize(QtCore.QSize(20, 20))
         self.setFlat(True)
 
+
+    def connected(self):
+        receiversCount = self.receivers(self.clicked)
+        return receiversCount > 0

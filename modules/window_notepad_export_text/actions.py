@@ -18,7 +18,7 @@ from PyQt5 import QtWidgets
 
 class ModuleActions(object):
 
-    def onActionButtonPressed(self, event, widget):
+    def onActionButtonPressed(self, widget):
         selector = QtWidgets.QFileDialog()
         if not selector.exec_():
             return None
@@ -26,7 +26,7 @@ class ModuleActions(object):
         for path in selector.selectedFiles():
 
             document = QtGui.QTextDocument()
-            document.setHtml(widget.editor.getHtml())
+            document.setHtml(widget.getHtml())
 
             if not os.path.exists(path):
                 with open(path, 'w+') as stream:
@@ -34,8 +34,8 @@ class ModuleActions(object):
                     stream.close()
                 continue
 
-            message = widget.editor.tr("Are you sure you want to overwrite the file '%s' ?" % path)
-            reply = QtWidgets.QMessageBox.question(widget.editor, 'Message', message, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
+            message = widget.tr("Are you sure you want to overwrite the file '%s' ?" % path)
+            reply = QtWidgets.QMessageBox.question(widget, 'Message', message, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
             if reply == QtWidgets.QMessageBox.No:
                 continue
 

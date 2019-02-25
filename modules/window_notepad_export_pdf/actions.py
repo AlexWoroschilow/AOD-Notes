@@ -20,7 +20,7 @@ from PyQt5 import QtCore
 
 class ModuleActions(object):
 
-    def onActionButtonPressed(self, event, widget):
+    def onActionButtonPressed(self, widget):
         selector = QtWidgets.QFileDialog()
         if not selector.exec_():
             return None
@@ -28,15 +28,15 @@ class ModuleActions(object):
         for path in selector.selectedFiles():
 
             document = QtGui.QTextDocument()
-            document.setHtml(widget.editor.getHtml())
+            document.setHtml(widget.getHtml())
             encoding = QtCore.QByteArray(bytes('UTF8', 'utf-8'))
 
             if not os.path.exists(path):
                 pdfkit.from_string(document.toHtml(encoding=encoding), path)
                 continue
 
-            message = widget.editor.tr("Are you sure you want to overwrite the file '%s' ?" % path)
-            reply = QtWidgets.QMessageBox.question(widget.editor, 'Message', message, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
+            message = widget.tr("Are you sure you want to overwrite the file '%s' ?" % path)
+            reply = QtWidgets.QMessageBox.question(widget, 'Message', message, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
             if reply == QtWidgets.QMessageBox.No:
                 continue
 

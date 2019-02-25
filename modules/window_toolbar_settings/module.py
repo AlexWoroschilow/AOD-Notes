@@ -13,10 +13,12 @@
 import inject
 import functools
 
-from lib.plugin import Loader
+from PyQt5 import QtGui
 from PyQt5 import QtWidgets
 
 from .actions import ModuleActions
+
+from lib.plugin import Loader
 
 
 class Loader(Loader):
@@ -28,23 +30,23 @@ class Loader(Loader):
         return True
 
     def config(self, binder=None):
-        binder.bind_to_provider('settings_menu', self._widget)
-        
-        from .gui.widget import WidgetSettingsFactory
-        binder.bind('settings_factory', WidgetSettingsFactory())
+        binder.bind_to_provider('settings_menu', self._menu)
+        binder.bind_to_constructor('settings_factory', self._settings)
         
     @inject.params(factory='window.header_factory')
     def boot(self, options=None, args=None, factory=None):
-
-        from PyQt5 import QtGui
 
         widget = QtWidgets.QAction(QtGui.QIcon("icons/settings.svg"), None)
         widget.triggered.connect(self.actions.onActionSettings)
 
         factory.addWidget(widget, 128)
 
-    @inject.params(config='config', notepad='notepad')
-    def _widget(self, config, notepad):
+    def _settings(self):
+        from .settings import SettingsFactory
+        return SettingsFactory()
+
+    @inject.params(config='config')
+    def _menu(self, config):
 
         from .gui.menu import SettingsMenu
 
@@ -52,35 +54,30 @@ class Loader(Loader):
 
         widget = SettingsMenu(menu)
         widget.editorName.setChecked(int(config.get('editor.name')))
-        widget.editorName.stateChanged.connect(functools.partial(
-            self.actions.onActionToggle, variable='editor.name',
-        ))
+        action = functools.partial(self.actions.onActionToggle, variable='editor.name')
+        widget.editorName.stateChanged.connect(action)
 
         widget.editorToolbarFormat.setChecked(int(config.get('editor.formatbar')))
-        widget.editorToolbarFormat.stateChanged.connect(functools.partial(
-            self.actions.onActionToggle, variable='editor.formatbar',
-        ))
+        action = functools.partial(self.actions.onActionToggle, variable='editor.formatbar')
+        widget.editorToolbarFormat.stateChanged.connect(action)
 
         widget.editorToolbarRight.setChecked(int(config.get('editor.rightbar')))
-        widget.editorToolbarRight.stateChanged.connect(functools.partial(
-            self.actions.onActionToggle, variable='editor.rightbar',
-        ))
+        action = functools.partial(self.actions.onActionToggle, variable='editor.rightbar')
+        widget.editorToolbarRight.stateChanged.connect(action)
 
         widget.editorToolbarLeft.setChecked(int(config.get('editor.leftbar')))
-        widget.editorToolbarLeft.stateChanged.connect(functools.partial(
-            self.actions.onActionToggle, variable='editor.leftbar',
-        ))
+        action = functools.partial(self.actions.onActionToggle, variable='editor.leftbar')
+        widget.editorToolbarLeft.stateChanged.connect(action)
 
         widget.tags.setChecked(int(config.get('folders.keywords')))
-        widget.tags.stateChanged.connect(functools.partial(
-            self.actions.onActionToggle, variable='folders.keywords',
-        ))
+        action = functools.partial(self.actions.onActionToggle, variable='folders.keywords')
+        widget.tags.stateChanged.connect(action)
 
         widget.toolbar.setChecked(int(config.get('folders.toolbar')))
-        widget.toolbar.stateChanged.connect(functools.partial(
-            self.actions.onActionToggle, variable='folders.toolbar',
-        ))
+        action = functools.partial(self.actions.onActionToggle, variable='folders.toolbar')
+        widget.toolbar.stateChanged.connect(action)
         
         menu.addAction(widget)
         
         return menu
+

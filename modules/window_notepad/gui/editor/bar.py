@@ -20,7 +20,17 @@ from PyQt5 import QtGui
 from lib.widget.button import ToolBarButton
 
 
-class ToolbarWidgetLeft(QtWidgets.QToolBar):
+class ToolbarBase(QtWidgets.QToolBar):
+
+    def __init__(self):
+        super(ToolbarBase, self).__init__()
+
+    @inject.params(menu='settings_menu')
+    def onActionContextMenu(self, event, menu):
+        menu.exec_(self.mapToGlobal(event))
+
+
+class ToolbarWidgetLeft(ToolbarBase):
 
     def __init__(self):
         super(ToolbarWidgetLeft, self).__init__()
@@ -85,12 +95,8 @@ class ToolbarWidgetLeft(QtWidgets.QToolBar):
         self.addWidget(self.previewAction)
         self.addWidget(self.fullscreenAction)
 
-    @inject.params(menu='settings_menu')
-    def onActionContextMenu(self, event, menu):
-        menu.exec_(self.mapToGlobal(event))
 
-
-class ToolBarWidgetRight(QtWidgets.QToolBar):
+class ToolBarWidgetRight(ToolbarBase):
 
     def __init__(self):
         super(ToolBarWidgetRight, self).__init__()
@@ -143,12 +149,8 @@ class ToolBarWidgetRight(QtWidgets.QToolBar):
         self.addWidget(self.fontColor)
         self.addWidget(self.backColor)
 
-    @inject.params(menu='settings_menu')
-    def onActionContextMenu(self, event, menu):
-        menu.exec_(self.mapToGlobal(event))
 
-
-class FormatbarWidget(QtWidgets.QToolBar):
+class FormatbarWidget(ToolbarBase):
 
     def __init__(self):
         super(FormatbarWidget, self).__init__()
@@ -211,14 +213,3 @@ class FormatbarWidget(QtWidgets.QToolBar):
         self.addWidget(self.dedentAction)
         self.addWidget(self.imageAction)
 
-    @property
-    def folder(self):
-        pass
-
-    @folder.setter
-    def folder(self, entity=None):
-        pass
-
-    @inject.params(menu='settings_menu')
-    def onActionContextMenu(self, event, menu):
-        menu.exec_(self.mapToGlobal(event))

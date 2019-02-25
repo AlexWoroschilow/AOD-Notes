@@ -11,41 +11,28 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
-import functools
 
 from PyQt5 import QtGui
 
 from lib.plugin import Loader
 from lib.widget.button import ToolBarButton
 
-from .actions import ModuleActions
-
 
 class Loader(Loader):
-
-    actions = ModuleActions()
 
     @property
     def enabled(self):
         return True
 
-    @inject.params(kernel='kernel')
-    def boot(self, options=None, args=None, kernel=None):
-        kernel.listen('window.notepad.rightbar', self._widget, 100)
-
-    def _widget(self, event=None):
+    @inject.params(factory='toolbar_factory.rightbar')
+    def boot(self, options=None, args=None, factory=None):
         
         widget = ToolBarButton()
-        widget.editor, widget.toolbar = event.data
-        if widget.editor is None or widget.toolbar is None:
-            raise 'Editor or Toolbar object can not be empty'
-
         widget.setIcon(QtGui.QIcon("icons/font-red.svg"))
         widget.setToolTip(widget.tr("Change the text color to red"))
+        widget.clickedEvent = self.clickedEvent
+        
+        factory.addWidget(widget)
 
-        widget.clicked.connect(functools.partial(
-            self.actions.onActionButtonPressed, widget=widget
-        ))
-
-        widget.toolbar.addWidget(widget)
-
+    def clickedEvent(self, event=None, widget=None):
+        widget.setTextColor(QtGui.QColor.fromRgb(127, 0, 0))

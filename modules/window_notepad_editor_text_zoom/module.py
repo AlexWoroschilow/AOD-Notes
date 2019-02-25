@@ -11,54 +11,41 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
-import functools
 
 from PyQt5 import QtGui
 
 from lib.plugin import Loader
 from lib.widget.button import ToolBarButton
 
-from .actions import ModuleActions
-
 
 class Loader(Loader):
-
-    actions = ModuleActions()
 
     @property
     def enabled(self):
         return True
 
-    @inject.params(kernel='kernel')
-    def boot(self, options=None, args=None, kernel=None):
-        kernel.listen('window.notepad.leftbar', self._widget, 512)
-
-    def _widget(self, event=None):
+    @inject.params(factory='toolbar_factory.leftbar')
+    def boot(self, options=None, args=None, factory=None):
         
         zoomIn = ToolBarButton()
         zoomIn.setShortcut("Ctrl+=")
-        
-        zoomIn.editor, toolbar = event.data
-        if zoomIn.editor is None or toolbar is None:
-            raise 'Editor or Toolbar object can not be empty'
         zoomIn.setIcon(QtGui.QIcon("icons/zoomIn.svg"))
         zoomIn.setToolTip(zoomIn.tr("Change the text color to blue"))
-        zoomIn.clicked.connect(functools.partial(
-            self.actions.onActionZoomIn, widget=zoomIn
-        ))
-        
+        zoomIn.clickedEvent = self.zoomInEvent
+
+        factory.addWidget(zoomIn)
+
         zoomOut = ToolBarButton()
         zoomOut.setShortcut("Ctrl+-")
-        zoomOut.editor, zoomOut.toolbar = event.data
-        if zoomOut.editor is None or toolbar is None:
-            raise 'Editor or Toolbar object can not be empty'
         zoomOut.setIcon(QtGui.QIcon("icons/zoomOut.svg"))
         zoomOut.setToolTip(zoomOut.tr("Change the text color to blue"))
-        zoomOut.clicked.connect(functools.partial(
-            self.actions.onActionZoomOut, widget=zoomOut
-        ))
+        zoomOut.clickedEvent = self.zoomOutEvent
         
-        toolbar.addSeparator()
-        toolbar.addWidget(zoomIn)
-        toolbar.addWidget(zoomOut)
+        factory.addWidget(zoomOut)
+
+    def zoomOutEvent(self, event=None, widget=None):
+        widget.zoomOut(5)
+
+    def zoomInEvent(self, event=None, widget=None):
+        widget.zoomIn(5)
 

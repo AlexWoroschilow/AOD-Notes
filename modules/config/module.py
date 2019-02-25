@@ -15,7 +15,6 @@ import functools
 
 from lib.plugin import Loader
 
-from .services import ConfigService
 from .actions import ModuleActions
 
 
@@ -28,7 +27,7 @@ class Loader(Loader):
         return True
     
     def config(self, binder=None):
-        binder.bind_to_constructor('config', self._service)
+        binder.bind_to_constructor('config', self._config)
 
     @inject.params(factory='settings_factory')
     def boot(self, options, args, factory=None):
@@ -38,8 +37,9 @@ class Loader(Loader):
         factory.addWidget(self._widget_settings_editor)
 
     @inject.params(kernel='kernel')
-    def _service(self, kernel=None):
-        return ConfigService(kernel.options.config)
+    def _config(self, kernel=None):
+        from .service.config import ConfigFile
+        return ConfigFile(kernel.options.config)
 
     @inject.params(config='config')
     def _widget_settings_cryptography(self, config=None):

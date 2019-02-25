@@ -37,11 +37,10 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.setObjectName('TextEditorWidget')
         self.setContentsMargins(0, 0, 0, 0)
         
-        self.content = None
         self._index = None
 
-        self._text = TextWriter(self)
-        self._text.text.cursorPositionChanged.connect(self.cursorPosition)
+        self.writer = TextWriter(self)
+        self.writer.text.cursorPositionChanged.connect(self.cursorPosition)
 
         self.statusbar = QtWidgets.QLabel()
         self.statusbar.setAlignment(Qt.AlignCenter)
@@ -50,17 +49,17 @@ class TextEditorWidget(QtWidgets.QWidget):
         
         self.leftbar.printAction.clicked.connect(self.onActionPrint)
         self.leftbar.previewAction.clicked.connect(self.onActionPreview)
-        self.leftbar.cutAction.clicked.connect(self._text.text.cut)
-        self.leftbar.copyAction.clicked.connect(self._text.text.copy)
-        self.leftbar.pasteAction.clicked.connect(self._text.text.paste)
-        self.leftbar.undoAction.clicked.connect(self._text.text.undo)
-        self.leftbar.redoAction.clicked.connect(self._text.text.redo)
+        self.leftbar.cutAction.clicked.connect(self.writer.text.cut)
+        self.leftbar.copyAction.clicked.connect(self.writer.text.copy)
+        self.leftbar.pasteAction.clicked.connect(self.writer.text.paste)
+        self.leftbar.undoAction.clicked.connect(self.writer.text.undo)
+        self.leftbar.redoAction.clicked.connect(self.writer.text.redo)
 
         self.leftbar.saveAction.clicked.connect(lambda x: self.save.emit((self.index, self.getHtml())))
         self.leftbar.fullscreenAction.clicked.connect(lambda x: self.fullscreen.emit(x))
 
         self.formatbar = FormatbarWidget()
-        self.formatbar.fontSize.valueChanged.connect(lambda size: self._text.text.setFontPointSize(size))
+        self.formatbar.fontSize.valueChanged.connect(lambda size: self.writer.text.setFontPointSize(size))
         self.formatbar.bulletAction.clicked.connect(self.onActionBulletList)
         self.formatbar.numberedAction.clicked.connect(self.onActionNumberList)
         self.formatbar.alignLeft.clicked.connect(self.onActionAlignLeft)
@@ -86,7 +85,7 @@ class TextEditorWidget(QtWidgets.QWidget):
         layout.addWidget(self.leftbar, 0, 0, 5, 1)
         layout.addWidget(self.rightbar, 1, 2, 3, 1)
         layout.addWidget(self.formatbar, 1, 1)
-        layout.addWidget(self._text, 2, 1)
+        layout.addWidget(self.writer, 2, 1)
         layout.addWidget(self.statusbar, 3, 1)
 
         self.setLayout(layout)
@@ -103,30 +102,30 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.insertHtml(content)
 
     def zoomIn(self, value):
-        if self._text is None:
+        if self.writer is None:
             return None
-        self._text.zoomIn(value)
+        self.writer.zoomIn(value)
         
     def zoomOut(self, value):
-        if self._text is None:
+        if self.writer is None:
             return None
-        self._text.zoomOut(value)
+        self.writer.zoomOut(value)
 
     def cursorPosition(self):
-        cursor = self._text.text.textCursor()
+        cursor = self.writer.text.textCursor()
         line = cursor.blockNumber() + 1
         col = cursor.columnNumber()
         self.statusbar.setText("Line: {}, Column: {}".format(line, col))
 
     def onActionPreview(self):
         preview = QtPrintSupport.QPrintPreviewDialog()
-        preview.paintRequested.connect(lambda p: self._text.text.print_(p))
+        preview.paintRequested.connect(lambda p: self.writer.text.print_(p))
         preview.exec_()
 
     def onActionPrint(self):
         dialog = QtPrintSupport.QPrintDialog()
         if dialog.exec_() == QtWidgets.QDialog.Accepted:
-            self._text.text.document().print_(dialog.printer())
+            self.writer.text.document().print_(dialog.printer())
 
     def onActionInsertImage(self):
         filename = \
@@ -141,83 +140,83 @@ class TextEditorWidget(QtWidgets.QWidget):
                                               self)
                 popup.show()
             else:
-                cursor = self._text.text.textCursor()
+                cursor = self.writer.text.textCursor()
                 image = image.scaled(800, 600, Qt.KeepAspectRatio)
                 cursor.insertImage(image, filename)
 
     def getHtml(self):
-        return self._text.text.toHtml()
+        return self.writer.text.toHtml()
 
     def insertHtml(self, html=None):
-        if self._text is not None and html is not None:
-            self._text.text.insertHtml(html)
+        if self.writer is not None and html is not None:
+            self.writer.text.insertHtml(html)
 
     def setTextColor(self, color=None):
-        if self._text is not None and color is not None:
-            self._text.text.setTextColor(color)
+        if self.writer is not None and color is not None:
+            self.writer.text.setTextColor(color)
 
     def setFontPointSize(self, size=None):
-        if self._text is not None and size is not None:
-            self._text.text.setFontPointSize(size)
+        if self.writer is not None and size is not None:
+            self.writer.text.setFontPointSize(size)
 
     def onActionFontColor(self):
         self.setTextColor(QtWidgets.QColorDialog.getColor())
 
     def onActionHighlight(self):
         color = QtWidgets.QColorDialog.getColor()
-        self._text.text.setTextBackgroundColor(color)
+        self.writer.text.setTextBackgroundColor(color)
 
     def onActionBold(self):
-        if self._text.text.fontWeight() == QtGui.QFont.Bold:
-            self._text.text.setFontWeight(QtGui.QFont.Normal)
+        if self.writer.text.fontWeight() == QtGui.QFont.Bold:
+            self.writer.text.setFontWeight(QtGui.QFont.Normal)
         else:
-            self._text.text.setFontWeight(QtGui.QFont.Bold)
+            self.writer.text.setFontWeight(QtGui.QFont.Bold)
 
     def onActionItalic(self):
-        state = self._text.text.fontItalic()
-        self._text.text.setFontItalic(not state)
+        state = self.writer.text.fontItalic()
+        self.writer.text.setFontItalic(not state)
 
     def onActionUnderline(self):
-        state = self._text.text.fontUnderline()
-        self._text.text.setFontUnderline(not state)
+        state = self.writer.text.fontUnderline()
+        self.writer.text.setFontUnderline(not state)
 
     def onActionStrike(self):
-        fmt = self._text.text.currentCharFormat()
+        fmt = self.writer.text.currentCharFormat()
         fmt.setFontStrikeOut(not fmt.fontStrikeOut())
-        self._text.text.setCurrentCharFormat(fmt)
+        self.writer.text.setCurrentCharFormat(fmt)
 
     def onActionSuperScript(self):
-        fmt = self._text.text.currentCharFormat()
+        fmt = self.writer.text.currentCharFormat()
         align = fmt.verticalAlignment()
         if align == QtGui.QTextCharFormat.AlignNormal:
             fmt.setVerticalAlignment(QtGui.QTextCharFormat.AlignSuperScript)
         else:
             fmt.setVerticalAlignment(QtGui.QTextCharFormat.AlignNormal)
-        self._text.text.setCurrentCharFormat(fmt)
+        self.writer.text.setCurrentCharFormat(fmt)
 
     def onActionSubScript(self):
-        fmt = self._text.text.currentCharFormat()
+        fmt = self.writer.text.currentCharFormat()
         align = fmt.verticalAlignment()
         if align == QtGui.QTextCharFormat.AlignNormal:
             fmt.setVerticalAlignment(QtGui.QTextCharFormat.AlignSubScript)
         else:
             fmt.setVerticalAlignment(QtGui.QTextCharFormat.AlignNormal)
-        self._text.text.setCurrentCharFormat(fmt)
+        self.writer.text.setCurrentCharFormat(fmt)
 
     def onActionAlignLeft(self):
-        self._text.text.setAlignment(Qt.AlignLeft)
+        self.writer.text.setAlignment(Qt.AlignLeft)
 
     def onActionAlignRight(self):
-        self._text.text.setAlignment(Qt.AlignRight)
+        self.writer.text.setAlignment(Qt.AlignRight)
 
     def onActionAlignCenter(self):
-        self._text.text.setAlignment(Qt.AlignCenter)
+        self.writer.text.setAlignment(Qt.AlignCenter)
 
     def onActionAlignJustify(self):
-        self._text.text.setAlignment(Qt.AlignJustify)
+        self.writer.text.setAlignment(Qt.AlignJustify)
 
     def onActionIndent(self):
-        cursor = self._text.text.textCursor()
+        cursor = self.writer.text.textCursor()
         if cursor.hasSelection():
             temp = cursor.blockNumber()
             cursor.setPosition(cursor.anchor())
@@ -242,7 +241,7 @@ class TextEditorWidget(QtWidgets.QWidget):
                 cursor.deleteChar()
 
     def onActionDedent(self):
-        cursor = self._text.text.textCursor()
+        cursor = self.writer.text.textCursor()
         if cursor.hasSelection():
             temp = cursor.blockNumber()
             cursor.setPosition(cursor.anchor())
@@ -255,9 +254,9 @@ class TextEditorWidget(QtWidgets.QWidget):
             self.handleDedent(cursor)
 
     def onActionBulletList(self):
-        cursor = self._text.text.textCursor()
+        cursor = self.writer.text.textCursor()
         cursor.insertList(QtGui.QTextListFormat.ListDisc)
 
     def onActionNumberList(self):
-        cursor = self._text.text.textCursor()
+        cursor = self.writer.text.textCursor()
         cursor.insertList(QtGui.QTextListFormat.ListDecimal)
