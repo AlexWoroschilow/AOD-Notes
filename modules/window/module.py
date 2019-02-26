@@ -35,10 +35,6 @@ class Loader(Loader):
         return True
 
     def config(self, binder=None):
-        """
-        Store the settings widgets from te different 
-        modules in the factory and access them all the time
-        """
         binder.bind('window.header_factory', WidgetHeaderFactory())
         
         binder.bind_to_constructor('window', self._widget)

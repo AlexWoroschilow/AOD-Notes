@@ -26,13 +26,15 @@ class Loader(Loader):
 
     @inject.params(factory='toolbar_factory.rightbar')
     def boot(self, options=None, args=None, factory=None):
+        factory.addWidget(self._constructor)
+
+    def _constructor(self):
 
         widget = ToolBarButton()
-        widget.setIcon(QtGui.QIcon("icons/line.svg"))
-        widget.setToolTip(widget.tr('Add a line'))
+        widget.setIcon(QtGui.QIcon("icons/font-green.svg"))
+        widget.setToolTip(widget.tr("Change the text color to green"))
         widget.clickedEvent = self.clickedEvent
-        
-        factory.addWidget(widget)
+        return widget
 
     def clickedEvent(self, event=None, widget=None):
-        widget.insertHtml('<hr></hr>')
+        widget.setTextColor(QtGui.QColor.fromRgb(0, 127, 0))

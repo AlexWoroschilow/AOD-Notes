@@ -26,13 +26,15 @@ class Loader(Loader):
 
     @inject.params(factory='toolbar_factory.rightbar')
     def boot(self, options=None, args=None, factory=None):
-        
+        factory.addWidget(self._constructor)
+
+    def _constructor(self):
+
         widget = ToolBarButton()
-        widget.setIcon(QtGui.QIcon("icons/font-gray.svg"))
-        widget.setToolTip(widget.tr("Change the text color to gray"))
+        widget.setIcon(QtGui.QIcon("icons/font-red.svg"))
+        widget.setToolTip(widget.tr("Change the text color to red"))
         widget.clickedEvent = self.clickedEvent
-        
-        factory.addWidget(widget)
+        return widget
 
     def clickedEvent(self, event=None, widget=None):
-        widget.setTextColor(QtGui.QColor.fromRgb(127, 127, 127))
+        widget.setTextColor(QtGui.QColor.fromRgb(127, 0, 0))

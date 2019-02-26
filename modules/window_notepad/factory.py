@@ -15,10 +15,15 @@
 class ToolbarFactory(object):
 
     def __init__(self):
-        self.widgets = []
+        self.collection = []
 
-    def addWidget(self, widget=None):
-        if widget is None:
-            return None
-        self.widgets.append(widget)
+    def addWidget(self, constructor=None):
+        if constructor is None: return None
+        if not callable(constructor): return None
+        self.collection.append(constructor)
 
+    @property
+    def widgets(self):
+        for constructor in self.collection:
+            if not callable(constructor): continue
+            yield constructor()

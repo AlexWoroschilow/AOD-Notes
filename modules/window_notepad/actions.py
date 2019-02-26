@@ -21,16 +21,13 @@ class ModuleActions(object):
     def onActionFileRenamed(self, source, old, new, widget):
         return self.onActionNoteSelect((source, old, new), widget=widget)
 
-    @inject.params(storage='storage', logger='logger')
-    def onActionNoteSelect(self, event, storage, widget, logger):
+    def onActionNoteSelect(self, event=None, widget=None):
         return self.onActionNoteEdit(widget.current, widget=widget)
 
-    @inject.params(storage='storage', search='search', logger='logger')
-    def onActionClone(self, event, widget, storage, search, logger):
+    def onActionClone(self, event=None, widget=None):
         return self.onActionCopy(widget.tree.current, widget=widget)
 
-    @inject.params(storage='storage', search='search', logger='logger')
-    def onActionRemove(self, event, widget, storage, search, logger):
+    def onActionRemove(self, event=None, widget=None):
         return self.onActionDelete(widget.tree.current, widget=widget)
 
     @inject.params(storage='storage', logger='logger')
@@ -48,15 +45,13 @@ class ModuleActions(object):
     def onActionNoteCreate(self, event, widget, storage, search, logger):
         try:
             index = storage.touch(widget.current, 'New note')
-            if index is None or not index:
-                return None
+            if index is None: return None
             # update search index only after
             # the update was successful
             name = storage.fileName(index)
             content = storage.fileContent(index) 
             path = storage.filePath(index)
-            if search is None or not search:
-                return None
+            if search is None: return None
             search.append(name, path, content)
             
         except(Exception) as ex:
@@ -68,14 +63,11 @@ class ModuleActions(object):
             # update search index only after
             # the update was successful
             index = storage.clone(index)
-            if index is None or not index:
-                return None
-            
+            if index is None: return None
             name = storage.fileName(index)
             content = storage.fileContent(index) 
             path = storage.filePath(index)
-            if search is None or not search:
-                return None
+            if search is None: return None
             search.append(name, path, content)
                                 
         except(Exception) as ex:
@@ -85,15 +77,12 @@ class ModuleActions(object):
     def onActionSave(self, event, storage, search, logger, widget):
         try:
             index, content = event 
-            if index is None or not index:
-                return None
+            if index is None: return None
             index = storage.setFileContent(index, content)
-            if index is None or not index:
-                return None
+            if index is None: return None
             # update search index only after
             # the update was successful
-            if search is None or not search:
-                return None
+            if search is None: return None
             name = storage.fileName(index)
             path = storage.filePath(index)
             search.update(name, path, content)
@@ -135,8 +124,7 @@ class ModuleActions(object):
                 return None
             # update search index only after
             # the update was successful
-            if search is None or not search:
-                return None
+            if search is None: return None
             search.remove(path)
         except(Exception) as ex:
             logger.exception(ex)

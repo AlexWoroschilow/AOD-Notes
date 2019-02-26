@@ -17,22 +17,28 @@ from PyQt5 import QtGui
 from lib.plugin import Loader
 from lib.widget.button import ToolBarButton
 
+from .actions import ModuleActions
+
 
 class Loader(Loader):
+
+    actions = ModuleActions()
 
     @property
     def enabled(self):
         return True
 
-    @inject.params(factory='toolbar_factory.rightbar')
+    @inject.params(factory='toolbar_factory.leftbar')
     def boot(self, options=None, args=None, factory=None):
-        
+        factory.addWidget(self._constructor)
+
+    def _constructor(self):
+
         widget = ToolBarButton()
-        widget.setIcon(QtGui.QIcon("icons/font-red.svg"))
-        widget.setToolTip(widget.tr("Change the text color to red"))
+        widget.setIcon(QtGui.QIcon("icons/html.svg"))
+        widget.setToolTip(widget.tr("Export document to HTML"))
         widget.clickedEvent = self.clickedEvent
-        
-        factory.addWidget(widget)
+        return widget
 
     def clickedEvent(self, event=None, widget=None):
-        widget.setTextColor(QtGui.QColor.fromRgb(127, 0, 0))
+        self.actions.onActionButtonPressed(widget)

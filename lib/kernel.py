@@ -21,31 +21,20 @@ from lib.event import Dispatcher
 
 class Kernel(object):
 
-    def __init__(self, options=None, args=None, sources="modules/**/module.py"):
-        self._options = options
-        self._sources = sources
-        self._args = args
-        self._loaders = []
+    def __init__(self, options=None, args=None, sources=["plugins/**/module.py", "modules/**/module.py"]):
+        self.options = options
+        self.sources = sources
+        self.args = args
+        self.loaders = []
 
-        inject.configure(self.__configure_dependencies)
+        inject.configure(self._configure)
 
-        for loader in self._loaders:
-            if hasattr(loader.__class__, 'boot') and \
-            callable(getattr(loader.__class__, 'boot')):
-                loader.boot(options, args)
+        for loader in self.loaders:
+            if not hasattr(loader.__class__, 'boot'): continue
+            if not callable(getattr(loader.__class__, 'boot')): continue
+            loader.boot(options, args)
 
-        dispatcher = self.get('event_dispatcher')
-        dispatcher.dispatch('kernel.start')
-
-    @property
-    def options(self):
-        return self._options
-
-    @property
-    def args(self):
-        return self._args
-
-    def __configure_dependencies(self, binder):
+    def _configure(self, binder):
         
         binder.bind('logger', logging.getLogger('app'))
         
@@ -53,31 +42,30 @@ class Kernel(object):
         binder.bind('event_dispatcher', Dispatcher(logger))
 
         logger = logging.getLogger('kernel')
-        for module_source in self.__modules(self._sources):
+        for module_source in self.__modules(self.sources):
             try:
                 module = importlib.import_module(module_source, False)
-                with module.Loader(self._options, self._args) as loader:
-                    if not loader.enabled:
-                        continue
-                    
-                    if hasattr(loader.__class__, 'config') and \
-                    callable(getattr(loader.__class__, 'config')):
-                            binder.install(loader.config)
+                with module.Loader(self.options, self.args) as loader:
+                    if not loader.enabled: continue
+                    if not hasattr(loader.__class__, 'config'): continue
+                    if not callable(getattr(loader.__class__, 'config')): continue
+                    binder.install(loader.config)
                             
-                    self._loaders.append(loader)
+                    self.loaders.append(loader)
                     
             except (SyntaxError, RuntimeError) as err:
-                logger.critical("%s: %s" % (module_source, err))
+                logger.critical("{}: {}".format(module_source, err))
                 continue
             
         binder.bind('kernel', self)
 
-    def __modules(self, mask=None):
+    def __modules(self, masks=None):
         logger = logging.getLogger('kernel')
-        for source in glob.glob(mask):
-            if os.path.exists(source):
-                logger.debug("config: %s" % source)
-                yield source[:-3].replace('/', '.')
+        for mask in masks:
+            for source in glob.glob(mask):
+                if os.path.exists(source):
+                    logger.debug("config: %s" % source)
+                    yield source[:-3].replace('/', '.')
 
     def get(self, name=None):
         container = inject.get_injector()

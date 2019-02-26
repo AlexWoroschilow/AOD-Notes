@@ -20,20 +20,21 @@ from lib.widget.button import ToolBarButton
 
 class Loader(Loader):
 
-
     @property
     def enabled(self):
         return True
 
     @inject.params(factory='toolbar_factory.rightbar')
     def boot(self, options=None, args=None, factory=None):
+        factory.addWidget(self._constructor)
 
+    def _constructor(self):
         widget = ToolBarButton()
-        widget.setIcon(QtGui.QIcon("icons/h1.svg"))
-        widget.setToolTip(widget.tr('Turn selected text into header'))
+
+        widget.setIcon(QtGui.QIcon("icons/font-black.svg"))
+        widget.setToolTip(widget.tr("Change the text color to black"))
         widget.clickedEvent = self.clickedEvent
-        
-        factory.addWidget(widget)
+        return widget
 
     def clickedEvent(self, event=None, widget=None):
-        widget.setFontPointSize(20)
+        widget.setTextColor(QtGui.QColor.fromRgb(0, 0, 0))

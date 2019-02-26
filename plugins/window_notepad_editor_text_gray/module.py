@@ -17,26 +17,24 @@ from PyQt5 import QtGui
 from lib.plugin import Loader
 from lib.widget.button import ToolBarButton
 
-from .actions import ModuleActions
-
 
 class Loader(Loader):
-
-    actions = ModuleActions()
 
     @property
     def enabled(self):
         return True
 
-    @inject.params(factory='toolbar_factory.leftbar')
+    @inject.params(factory='toolbar_factory.rightbar')
     def boot(self, options=None, args=None, factory=None):
+        factory.addWidget(self._constructor)
 
-        widget = ToolBarButton()
-        widget.setIcon(QtGui.QIcon("icons/html.svg"))
-        widget.setToolTip(widget.tr("Export document to HTML"))
-        widget.clickedEvent = self.clickedEvent
+    def _constructor(self):
         
-        factory.addWidget(widget)
+        widget = ToolBarButton()
+        widget.setIcon(QtGui.QIcon("icons/font-gray.svg"))
+        widget.setToolTip(widget.tr("Change the text color to gray"))
+        widget.clickedEvent = self.clickedEvent
+        return widget
 
     def clickedEvent(self, event=None, widget=None):
-        self.actions.onActionButtonPressed(widget)
+        widget.setTextColor(QtGui.QColor.fromRgb(127, 127, 127))

@@ -10,23 +10,23 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-from PyQt5 import QtCore
-from PyQt5 import QtWidgets
+from .gui.scroll import SettingsScrollArea
 
 
-class ToolBarButton(QtWidgets.QPushButton):
+class SettingsFactory(object):
 
-    activate = QtCore.pyqtSignal(object)
+    widgets = []
 
-    def __init__(self, parent=None):
-        super(ToolBarButton, self).__init__(parent)
-        self.setIconSize(QtCore.QSize(20, 20))
-        self.setFlat(True)
+    def addWidget(self, constructor=None):
+        if constructor is None: return None
+        if not callable(constructor): return None
+        self.widgets.append(constructor)
 
-    def connected(self):
-        try:
-            receiversCount = self.receivers(self.clicked)
-            return receiversCount > 0
-        except (SyntaxError, RuntimeError) as err:
-            return False
-        
+    @property
+    def widget(self):
+        widget = SettingsScrollArea()
+        for constructor in self.widgets:
+            if not callable(constructor): continue
+            widget.addWidget(constructor())
+        return widget
+

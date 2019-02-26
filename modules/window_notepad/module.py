@@ -30,39 +30,43 @@ class Loader(Loader):
         return True
 
     def config(self, binder=None):
-        binder.bind_to_constructor('notepad', self._notepad)
-        binder.bind_to_provider('editor', self._editor)
-        
         binder.bind('toolbar_factory.leftbar', ToolbarFactory())
         binder.bind('toolbar_factory.formatbar', ToolbarFactory())
         binder.bind('toolbar_factory.rightbar', ToolbarFactory())
 
+        binder.bind_to_constructor('notepad', self._notepad)
+        binder.bind_to_provider('editor', self._editor)
+
+    @inject.params(config='config', storage='storage', notepad='notepad')
+    def boot(self, options=None, args=None, config=None, storage=None, notepad=None):
+        if not len(config.get('editor.current')):
+            return notepad.note(storage.first())
+        # get last edited document from the confnig
+        # and open this document in the editor by default
+        index = storage.index(config.get('editor.current'))
+        if index is not None and storage.isDir(index):
+            return notepad.group(index)
+        
+        if index is not None and storage.isFile(index):
+            return notepad.note(index)
+
     @inject.params(kernel='kernel', config='config', factory_leftbar='toolbar_factory.leftbar', factory_rightbar='toolbar_factory.rightbar', factory_formatbar='toolbar_factory.formatbar')
-    def _editor(self, kernel, config, factory_leftbar=None, factory_rightbar=None, factory_formatbar=None):
+    def _editor(self, kernel=None, config=None, factory_leftbar=None, factory_rightbar=None, factory_formatbar=None):
         
         widget = TextEditorWidget()
 
         for plugin in factory_leftbar.widgets:
-            if plugin.connected() == True:
-                plugin.clicked.disconnect()
-            action = functools.partial(plugin.clickedEvent, widget=widget)
-            plugin.clicked.connect(action)
+            plugin.clicked.connect(functools.partial(plugin.clickedEvent, widget=widget))
             widget.leftbar.addWidget(plugin)
         widget.leftbar.setVisible(int(config.get('editor.leftbar')))
         
         for plugin in factory_formatbar.widgets:
-            if plugin.connected() == True:
-                plugin.clicked.disconnect()
-            action = functools.partial(plugin.clickedEvent, widget=widget)
-            plugin.clicked.connect(action)
+            plugin.clicked.connect(functools.partial(plugin.clickedEvent, widget=widget))
             widget.formatbar.addWidget(plugin)
         widget.formatbar.setVisible(int(config.get('editor.formatbar')))
 
         for plugin in factory_rightbar.widgets:
-            if plugin.connected() == True:
-                plugin.clicked.disconnect()
-            action = functools.partial(plugin.clickedEvent, widget=widget)
-            plugin.clicked.connect(action)
+            plugin.clicked.connect(functools.partial(plugin.clickedEvent, widget=widget))
             widget.rightbar.addWidget(plugin)
         widget.rightbar.setVisible(int(config.get('editor.rightbar')))
         

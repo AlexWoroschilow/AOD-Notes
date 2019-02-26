@@ -73,61 +73,45 @@ class FolderList(QtWidgets.QSplitter):
         
         self.actions = actions
         self.test = None
-
-        # get last edited document from the confnig
-        # and open this document in the editor by default
-        path = config.get('editor.current')
-        if path is not None and len(path):
-            index = storage.index(path)
-            if storage.isDir(index):
-                self.group(index)
-                return None
-            self.note(index)
-            return None
-        # if there are not default document open 
-        # the first one in the document tree
-        self.note(storage.first())
-        return None
         
     @property
     def current(self):
-        if self.tree is not None and self.tree:
-            return self.tree.currentIndex()
-        return None
+        if self.tree is None: return None
+        return self.tree.currentIndex()
         
     @inject.params(storage='storage', editor='editor', config='config')
     def note(self, index, storage, editor, config=None):
         current = storage.filePath(index)
         config.set('editor.current', current)
         
-        for i in range(self.container.layout().count()): 
-            self.container.layout().itemAt(i).widget().close()            
+        layout = self.container.layout()
+        for i in range(layout.count()): 
+            layout.itemAt(i).widget().close()            
 
         if not storage.isFile(index):
-            self.container.layout().addWidget(DemoWidget())
+            layout.addWidget(DemoWidget())
             return self
 
         self.editor = editor            
         self.editor.index = index
-        self.container.layout().addWidget(self.editor)
+        layout.addWidget(self.editor)
         
-        if self.tree is not None and self.tree:
-            # highlight the current note if the  
-            # selected not and editable not are different
-            # this happens of the edition was started programmatically
-            # or in any other way except the folder tree view
-            if index is not None and  self.current != index: 
-                self.tree.setCurrentIndex(index)
-           
+        if self.current == index: return self 
+        # highlight the current note if the  
+        # selected not and editable not are different
+        # this happens of the edition was started programmatically
+        # or in any other way except the folder tree view
+        self.tree.setCurrentIndex(index)
         return self
 
     @inject.params(storage='storage', config='config')
     def group(self, index, storage, config):
         current = storage.filePath(index)
         config.set('editor.current', current)
-                
-        for i in range(self.container.layout().count()): 
-            self.container.layout().itemAt(i).widget().close()            
+
+        layout = self.container.layout()
+        for i in range(layout.count()): 
+            layout.itemAt(i).widget().close()            
 
         widget = FolderViewWidget()
         widget.edit.connect(self.edit.emit)
@@ -139,15 +123,14 @@ class FolderList(QtWidgets.QSplitter):
         for entity in storage.entities(index):
             if not storage.isDir(entity):
                 widget.addPreview(entity)
-        
-        self.container.layout().addWidget(widget)
-        
+        layout.addWidget(widget)
         return self
  
     def demo(self):
-        for i in range(self.container.layout().count()): 
-            self.container.layout().itemAt(i).widget().close()            
-        self.container.layout().addWidget(DemoWidget())
+        layout = self.container.layout()
+        for i in range(layout.count()): 
+            layout.itemAt(i).widget().close()            
+        layout.addWidget(DemoWidget())
         return self
  
     @inject.params(storage='storage')

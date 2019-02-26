@@ -30,14 +30,15 @@ class Loader(Loader):
 
     @inject.params(factory='toolbar_factory.leftbar')
     def boot(self, options=None, args=None, factory=None):
+        factory.addWidget(self._constructor)
+
+    def _constructor(self):
 
         widget = ToolBarButton()
-        widget.setIcon(QtGui.QIcon("icons/text.svg"))
-        widget.setToolTip(widget.tr("Export document to text"))
+        widget.setIcon(QtGui.QIcon("icons/pdf.svg"))
+        widget.setToolTip(widget.tr("Export document to PDF"))
         widget.clickedEvent = self.clickedEvent
-        
-        factory.addWidget(widget)
+        return widget
 
     def clickedEvent(self, event=None, widget=None):
         self.actions.onActionButtonPressed(widget)
-

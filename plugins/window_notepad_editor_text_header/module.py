@@ -26,13 +26,15 @@ class Loader(Loader):
 
     @inject.params(factory='toolbar_factory.rightbar')
     def boot(self, options=None, args=None, factory=None):
-        
+        factory.addWidget(self._constructor)
+
+    def _constructor(self):
+
         widget = ToolBarButton()
-        widget.setIcon(QtGui.QIcon("icons/font-blue.svg"))
-        widget.setToolTip(widget.tr("Change the text color to blue"))
+        widget.setIcon(QtGui.QIcon("icons/h1.svg"))
+        widget.setToolTip(widget.tr('Turn selected text into header'))
         widget.clickedEvent = self.clickedEvent
-        
-        factory.addWidget(widget)
+        return widget
 
     def clickedEvent(self, event=None, widget=None):
-        widget.setTextColor(QtGui.QColor.fromRgb(0, 0, 127))
+        widget.setFontPointSize(20)

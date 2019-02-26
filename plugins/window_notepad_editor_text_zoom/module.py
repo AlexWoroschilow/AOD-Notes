@@ -17,12 +17,8 @@ from PyQt5 import QtGui
 from lib.plugin import Loader
 from lib.widget.button import ToolBarButton
 
-from .actions import ModuleActions
-
 
 class Loader(Loader):
-
-    actions = ModuleActions()
 
     @property
     def enabled(self):
@@ -30,13 +26,30 @@ class Loader(Loader):
 
     @inject.params(factory='toolbar_factory.leftbar')
     def boot(self, options=None, args=None, factory=None):
+        factory.addWidget(self._zoomIn)
+        factory.addWidget(self._zoomOut)
 
-        widget = ToolBarButton()
-        widget.setIcon(QtGui.QIcon("icons/pdf.svg"))
-        widget.setToolTip(widget.tr("Export document to PDF"))
-        widget.clickedEvent = self.clickedEvent
-        
-        factory.addWidget(widget)
+    def _zoomIn(self):
 
-    def clickedEvent(self, event=None, widget=None):
-        self.actions.onActionButtonPressed(widget)
+        zoomIn = ToolBarButton()
+        zoomIn.setShortcut("Ctrl+=")
+        zoomIn.setIcon(QtGui.QIcon("icons/zoomIn.svg"))
+        zoomIn.setToolTip(zoomIn.tr("Change the text color to blue"))
+        zoomIn.clickedEvent = self.zoomInEvent
+        return zoomIn
+
+    def _zoomOut(self):
+
+        zoomOut = ToolBarButton()
+        zoomOut.setShortcut("Ctrl+-")
+        zoomOut.setIcon(QtGui.QIcon("icons/zoomOut.svg"))
+        zoomOut.setToolTip(zoomOut.tr("Change the text color to blue"))
+        zoomOut.clickedEvent = self.zoomOutEvent
+        return zoomOut
+
+    def zoomOutEvent(self, event=None, widget=None):
+        widget.zoomOut(5)
+
+    def zoomInEvent(self, event=None, widget=None):
+        widget.zoomIn(5)
+
