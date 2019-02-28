@@ -19,6 +19,7 @@ appimage:
 	cp              -r     css build/opt/application
 	cp              -r     lib build/opt/application
 	cp              -r     modules build/opt/application
+	cp              -r     plugins build/opt/application
 	cp              -r     icons build/opt/application
 	cp              -r     template build/opt/application
 	cp              -r     main.py build/opt/application

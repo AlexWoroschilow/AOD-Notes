@@ -12,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
 import inject
+import shutil
 
 from lib.plugin import Loader
 
@@ -28,11 +29,28 @@ class Loader(Loader):
 
     @inject.params(storage='storage', encryptor='encryptor')
     def boot(self, options, args, storage, encryptor):
+        path = storage.filePath(storage.rootIndex())
+        sourses = [os.path.join(path, o) for o in os.listdir(path) if os.path.isdir(os.path.join(path, o))]
+        while len(sourses) > 0:
+            path = sourses.pop()
+            for child in [os.path.join(path, o) for o in os.listdir(path) if os.path.isdir(os.path.join(path, o))]:
+                sourses.append(child)
+#                 
+#             if os.path.exists('{}/.metadata'.format(path)):
+#                 os.remove('{}/.metadata'.format(path))
+# 
+#             metadata = storage.touch(storage.index(path), '.metadata')
+#             storage.setFileContent(metadata, os.path.basename(path))
+# 
+            #print(path, os.path.basename(path))
+
 #         for index in storage.entities():
-#             if storage.isDir(index):
+#             if not storage.isDir(index):
 #                 continue
-#             content = storage.fileContent(index)
-#             storage.setFileContent(index, content)
+#             index_metadata = storage.index('{}/.metadata'.format(storage.filePath(index)))
+#              
+#             name = os.path.basename(storage.filePath(index))
+#             storage.setFileContent(index_metadata, name)
         pass
 
     @inject.params(config='config')

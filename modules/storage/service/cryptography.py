@@ -14,10 +14,119 @@ import os
 import inject
 import base64 
 import logging
+import secrets
+
 from Crypto.Cipher import AES
 from Crypto import Random        
 
 import math
+
+
+def rename(path=None, name=None):
+    if path is None: return None
+    if name is None: return None
+
+    file = path    
+    if os.path.isdir(path) and os.path.exists(path):
+        file = '{}/.metadata'.format(path)
+    try:
+        crypto = CryptoFile(file)
+        if os.path.isfile(path): crypto.setName(name)
+        if os.path.isdir(path): crypto.setContent(name)
+        return path
+    except(ValueError)  as ex:
+        logger = logging.getLogger('cryptography')
+        logger.debug(ex, "{}, {}".format(path, name))
+    return None
+
+
+def mkdir(path=None, name=None):
+    if path is None: return None
+    if name is None: return None
+
+    unique = secrets.token_hex(16)
+    while os.path.exists("{}/{}".format(path, unique)):
+        unique = secrets.token_hex(16)
+
+    folder = "{}/{}".format(path, unique)
+    if os.path.isdir(folder): return folder
+    
+    os.makedirs(folder)
+
+    try:
+        crypto = CryptoFile('{}/.metadata'.format(folder))
+        crypto.setName('.metadata')
+        crypto.setContent(name)
+        return folder
+    except(ValueError)  as ex:
+        logger = logging.getLogger('cryptography')
+        logger.debug(ex, "{}/{}".format(path, name))
+    return None
+
+
+def touch(path=None, name=None):
+    if path is None: return None
+    if name is None: return None
+    
+    file = "{}/{}".format(path, name)
+    if os.path.isfile(file): return file
+
+    unique = secrets.token_hex(16)
+    while os.path.isfile("{}/{}".format(path, unique)):
+        unique = secrets.token_hex(16)
+        
+    file = "{}/{}".format(path, unique)
+    if os.path.isfile(file): return file
+
+    try:
+        crypto = CryptoFile(file)
+        crypto.setName(name)
+        
+        return file
+    except(ValueError)  as ex:
+        logger = logging.getLogger('cryptography')
+        logger.debug(ex, "{}/{}".format(path, name))
+    return None
+
+
+class CryptoAES(object):
+    
+    block = 16
+
+    def __init__(self, password=None):
+        self.password = password.encode('utf-8')
+
+    def encrypt(self, string=None):
+        if string is None or not len(string):
+            string = ' '
+        
+        try:
+            string = string.encode('utf-8')
+            string = string.ljust(self.block * math.ceil(len(string) / self.block))
+
+            iv = Random.new().read(AES.block_size)        
+            cipher = AES.new(self.password, AES.MODE_CBC, iv)  # never use ECB in strong systems obviously
+            content_binary = cipher.encrypt(string)
+            content_bytes = base64.b64encode(iv + content_binary, altchars=b'+/')
+            return content_bytes.decode("utf-8")
+        except(ValueError)  as ex:
+            logger = logging.getLogger('CryptoAES')
+            logger.exception(ex, string)
+            return string
+    
+    def decrypt(self, string=None):
+        if string is None or not len(string):
+            return None
+        try:
+            content_binary = base64.b64decode(string, altchars=b'+/')
+            iv = content_binary[:AES.block_size]
+            cipher = AES.new(self.password, AES.MODE_CBC, iv)            
+            content_bytes = cipher.decrypt(content_binary[AES.block_size:])
+            return content_bytes.decode('utf-8').strip()
+        except(ValueError)  as ex:
+            logger = logging.getLogger('CryptoAES')
+            logger.exception(ex)
+            return string
 
 
 class CryptoFile(object):
@@ -33,13 +142,13 @@ class CryptoFile(object):
         return True
     
     def __read(self):
-        if os.path.isfile(self.path):
-            with open(self.path, 'r') as stream:
-                return stream.read()
-        return None
+        if not os.path.exists(self.path): return None
+        with open(self.path, 'r') as stream:
+            result = stream.read()
+            stream.close()
+            return result
 
-    @inject.params(logger='logger')
-    def __header_raw(self, logger):
+    def __header_raw(self):
         if not os.path.isfile(self.path):
             return os.path.basename(self.path)
         try:
@@ -56,15 +165,15 @@ class CryptoFile(object):
             
             return "".join(lines[start + 1:stop])
         except(ValueError)  as ex:
+            logger = logging.getLogger('cryptography')
             logger.debug(ex)
         return os.path.basename(self.path)
 
-    @inject.params(logger='logger')
-    def __content_raw(self, logger):
+    def __content_raw(self):
         try:
             content = self.__read()
-            if content is None:
-                return ""
+
+            if content is None: return ''
 
             lines = content.split("\n")
             if lines is None or not len(lines):
@@ -75,12 +184,13 @@ class CryptoFile(object):
             
             return "".join(lines[start + 1:stop])
         except(ValueError)  as ex:
+            logger = logging.getLogger('cryptography')
             logger.debug(ex)
         return ""
 
     @property
-    @inject.params(encryptor='encryptor', logger='logger')
-    def name(self, encryptor, logger):
+    @inject.params(encryptor='encryptor')
+    def name(self, encryptor):
         if not os.path.isfile(self.path):
             return os.path.basename(self.path)
         try:
@@ -89,18 +199,25 @@ class CryptoFile(object):
                 return os.path.basename(self.path)
             return encryptor.decrypt(content)
         except(ValueError)  as ex:
+            logger = logging.getLogger('cryptography')
             logger.debug(ex)
         return os.path.basename(self.path)
 
+    def setName(self, value):
+        self.name = value
+
+    def setContent(self, value):
+        self.content = value
+
     @property
-    @inject.params(encryptor='encryptor', logger='logger')
-    def content(self, encryptor, logger):
+    @inject.params(encryptor='encryptor')
+    def content(self, encryptor):
         try:
             content = self.__content_raw()
-            if content is None:
-                return ""
+            if content is None: return ''
             return encryptor.decrypt(content)
         except(ValueError)  as ex:
+            logger = logging.getLogger('cryptography')
             logger.debug(ex)
         return ""
 
@@ -134,46 +251,6 @@ class CryptoFile(object):
         source = CryptoFile(source)
         self.name = "{}(clone)".format(source.name)
         self.name.content = source.content
-
-
-class   CryptoAES(object):
-    
-    block = 16
-
-    def __init__(self, password=None):
-        self.password = password.encode('utf-8')
-
-    def encrypt(self, string=None):
-        if string is None or not len(string):
-            string = ' '
-        
-        try:
-            string = string.encode('utf-8')
-            string = string.ljust(self.block * math.ceil(len(string) / self.block))
-
-            iv = Random.new().read(AES.block_size)        
-            cipher = AES.new(self.password, AES.MODE_CBC, iv)  # never use ECB in strong systems obviously
-            content_binary = cipher.encrypt(string)
-            content_bytes = base64.b64encode(iv + content_binary)
-            return content_bytes.decode("utf-8")
-        except(ValueError)  as ex:
-            logger = logging.getLogger('CryptoAES')
-            logger.exception(ex, string)
-            return string
-    
-    def decrypt(self, string=None):
-        if string is None or not len(string):
-            return None
-        try:
-            content_binary = base64.b64decode(string)
-            iv = content_binary[:AES.block_size]
-            cipher = AES.new(self.password, AES.MODE_CBC, iv)            
-            content_bytes = cipher.decrypt(content_binary[AES.block_size:])
-            return content_bytes.decode('utf-8').strip()
-        except(ValueError)  as ex:
-            logger = logging.getLogger('CryptoAES')
-            logger.exception(ex)
-            return string
 
 
 if __name__ == "__main__":
