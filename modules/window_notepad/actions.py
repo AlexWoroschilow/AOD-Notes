@@ -201,9 +201,9 @@ class ModuleActions(object):
         if widget.current is not None and widget.current:
             
             action = functools.partial(self.onActionClone, event=None, widget=widget)
-            menu.addAction('Duplicate: {}'.format(storage.fileName(widget.current)), action)
+            menu.addAction('Clone selected element', action)
 
             action = functools.partial(self.onActionRemove, event=None, widget=widget)
-            menu.addAction('Remove: {}'.format(storage.fileName(widget.current)), action)
+            menu.addAction('Remove selected element', action)
         
         menu.exec_(widget.tree.mapToGlobal(event))
