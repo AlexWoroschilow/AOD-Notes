@@ -21,15 +21,14 @@ class TextEditor(QtWidgets.QTextEdit):
     
     def __init__(self, parent=None):
         super(TextEditor, self).__init__(parent)
-        self.setObjectName('editorTextEditor')
         self.setWordWrapMode(QtGui.QTextOption.WordWrap)
         self.setViewportMargins(40, 20, 20, 20)
         self.setAcceptRichText(True)
         self.setAcceptDrops(True)
-        self.setFontPointSize(14)
 
         self.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         
         self._entity = None
 

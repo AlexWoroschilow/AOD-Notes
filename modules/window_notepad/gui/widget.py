@@ -35,7 +35,6 @@ class FolderList(QtWidgets.QSplitter):
     def __init__(self, actions, config, storage):
         super(FolderList, self).__init__()
         self.setContentsMargins(0, 0, 0, 0)
-        self.setObjectName('FolderList')
         
         containerLayout = QtWidgets.QGridLayout()
         containerLayout.setContentsMargins(0, 0, 0, 0)
@@ -54,12 +53,14 @@ class FolderList(QtWidgets.QSplitter):
         containerLayout.addWidget(self.tags, 1, 1)
 
         container = QtWidgets.QWidget()
+        
         container.setContentsMargins(0, 0, 0, 0)
 
         container.setLayout(containerLayout)
         self.addWidget(container)
 
         self.container = QtWidgets.QWidget()
+        self.container.setObjectName('FolderListContainer')
         self.container.setLayout(QtWidgets.QVBoxLayout())
 
         self.addWidget(self.container)

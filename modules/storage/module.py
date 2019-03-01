@@ -13,6 +13,7 @@
 import os
 import inject
 import shutil
+import secrets
 
 from lib.plugin import Loader
 
@@ -29,28 +30,29 @@ class Loader(Loader):
 
     @inject.params(storage='storage', encryptor='encryptor')
     def boot(self, options, args, storage, encryptor):
-        path = storage.filePath(storage.rootIndex())
-        sourses = [os.path.join(path, o) for o in os.listdir(path) if os.path.isdir(os.path.join(path, o))]
-        while len(sourses) > 0:
-            path = sourses.pop()
-            for child in [os.path.join(path, o) for o in os.listdir(path) if os.path.isdir(os.path.join(path, o))]:
-                sourses.append(child)
+#         path = storage.filePath(storage.rootIndex())
+#         sourses = [os.path.join(path, o) for o in os.listdir(path) if os.path.isdir(os.path.join(path, o))]
+#         for path in sourses:
+#             for child in [os.path.join(path, o) for o in os.listdir(path) if os.path.isdir(os.path.join(path, o))]:
+#                 sourses.append(child)
+# 
+#         print(sourses)
+# 
+#         for path in sourses:
+#             for name in os.listdir(path):
+#                 if name in ['.metadata']: continue
+# 
+#                 path_old = '{}/{}'.format(path, name)
+#                 if not os.path.isfile(path_old): continue
+#                 if not os.path.exists(path_old): continue
 #                 
-#             if os.path.exists('{}/.metadata'.format(path)):
-#                 os.remove('{}/.metadata'.format(path))
+#                 new = secrets.token_hex(16)
+#                 while os.path.exists('{}/{}'.format(path, new)):
+#                     new = secrets.token_hex(16)
 # 
-#             metadata = storage.touch(storage.index(path), '.metadata')
-#             storage.setFileContent(metadata, os.path.basename(path))
-# 
-            #print(path, os.path.basename(path))
-
-#         for index in storage.entities():
-#             if not storage.isDir(index):
-#                 continue
-#             index_metadata = storage.index('{}/.metadata'.format(storage.filePath(index)))
-#              
-#             name = os.path.basename(storage.filePath(index))
-#             storage.setFileContent(index_metadata, name)
+#                 path_new = '{}/{}'.format(path, new)
+#                 #os.rename(path_old, path_new)
+        
         pass
 
     @inject.params(config='config')

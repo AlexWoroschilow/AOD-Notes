@@ -23,7 +23,6 @@ class FolderTree(QtWidgets.QTreeView):
     def __init__(self, config=None, storage=None):
         super(FolderTree, self).__init__()
 
-        self.setObjectName('FolderTree')
         self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)

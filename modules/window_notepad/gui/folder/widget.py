@@ -26,7 +26,6 @@ class NotePreviewContainer(QtWidgets.QWidget):
 
     def __init__(self):
         super(NotePreviewContainer, self).__init__()
-        self.setObjectName('NotePreviewContainer')
         self.setContentsMargins(0, 0, 0, 0)
         
         self.layout = QtWidgets.QGridLayout()
@@ -57,7 +56,6 @@ class FolderViewWidget(QtWidgets.QScrollArea):
 
     def __init__(self):
         super(FolderViewWidget, self).__init__()
-        self.setObjectName('FolderViewWidget')
         self.setContentsMargins(0, 0, 0, 0)
 
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)

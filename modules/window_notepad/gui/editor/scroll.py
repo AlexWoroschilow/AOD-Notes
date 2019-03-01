@@ -23,12 +23,18 @@ class TextWriter(QtWidgets.QScrollArea):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setAlignment(Qt.AlignHCenter)
-        self.setObjectName('editorQScrollArea')
         self.setContentsMargins(0, 0, 0, 0)
 
         self.text = TextEditor(self)
         self.setWidgetResizable(True)
         self.setWidget(self.text)
+        
+        effect = QtWidgets.QGraphicsDropShadowEffect()
+        effect.setBlurRadius(10)
+        effect.setOffset(0)
+
+        self.setGraphicsEffect(effect)
+        
         
         self._entity = None
 

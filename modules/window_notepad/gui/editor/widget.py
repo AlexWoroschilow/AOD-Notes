@@ -34,7 +34,6 @@ class TextEditorWidget(QtWidgets.QWidget):
 
     def __init__(self):
         super(TextEditorWidget, self).__init__()
-        self.setObjectName('TextEditorWidget')
         self.setContentsMargins(0, 0, 0, 0)
         
         self._index = None
