@@ -15,11 +15,24 @@ import inject
 import base64 
 import logging
 import secrets
+import shutil
 
 from Crypto.Cipher import AES
 from Crypto import Random        
 
 import math
+
+
+def clone(path=None):
+    if path is None: return None
+    name_old = os.path.basename(path)
+    name_new = secrets.token_hex(16)
+    while os.path.exists(path.replace(name_old, name_new)):
+        name_new = secrets.token_hex(16)
+    destination = path.replace(name_old, name_new)
+    if os.path.isdir(path): shutil.copytree(path, destination)
+    if os.path.isfile(path): shutil.copyfile(path, destination)
+    return destination
 
 
 def rename(path=None, name=None):
@@ -107,7 +120,7 @@ class CryptoAES(object):
             iv = Random.new().read(AES.block_size)        
             cipher = AES.new(self.password, AES.MODE_CBC, iv)  # never use ECB in strong systems obviously
             content_binary = cipher.encrypt(string)
-            content_bytes = base64.b64encode(iv + content_binary, altchars=b'+/')
+            content_bytes = base64.b64encode(iv + content_binary)
             return content_bytes.decode("utf-8")
         except(ValueError)  as ex:
             logger = logging.getLogger('CryptoAES')
@@ -118,7 +131,7 @@ class CryptoAES(object):
         if string is None or not len(string):
             return None
         try:
-            content_binary = base64.b64decode(string, altchars=b'+/')
+            content_binary = base64.b64decode(string)
             iv = content_binary[:AES.block_size]
             cipher = AES.new(self.password, AES.MODE_CBC, iv)            
             content_bytes = cipher.decrypt(content_binary[AES.block_size:])

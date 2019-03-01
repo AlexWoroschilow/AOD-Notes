@@ -72,6 +72,13 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         if path is None: return None
         return self.index(path)
 
+    def clone(self, index=None):
+        root = self.filePath(index)
+        if root is None: return None
+        path = cryptography.clone(root)
+        if path is None: return None
+        return self.index(path)
+
     def rootIndex(self):
         return self.index(self.rootPath())
         
@@ -117,22 +124,6 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         except(ValueError)  as ex:
             logger = logging.getLogger('storage')
             logger.debug(ex)
-
-    def clone(self, index=None):
-        source = self.filePath(index)
-        if not os.path.exists(source): return None
-
-        destination = "{}(clone)".format(source)
-        if os.path.isdir(source):
-            shutil.copytree(source, destination)
-            return self.index(destination)
-
-        file_source = CryptoFile(source)
-        file_desintation = CryptoFile(destination)
-        file_desintation.name = "{}(clone)".format(file_source.name)
-        file_desintation.content = file_source.content
-        
-        return self.index(destination)
 
     def first(self):
         index = self.rootIndex()

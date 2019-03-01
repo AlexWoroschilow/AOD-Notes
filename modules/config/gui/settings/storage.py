@@ -22,21 +22,17 @@ class WidgetSettingsStorage(WidgetSettings):
     def __init__(self):
         super(WidgetSettingsStorage, self).__init__()
 
-        self.layout = QtWidgets.QVBoxLayout()
+        self.layout = QtWidgets.QGridLayout()
+        self.layout.setAlignment(Qt.AlignLeft)
 
-        label = SettingsTitle('Storage settings')
-        self.layout.addWidget(label)
-        
-        self.layout.addSpacing(1)
+        self.layout.addWidget(SettingsTitle('Storage settings'), 0, 0, 1, 5)
+        self.layout.addWidget(QtWidgets.QLabel('Database:'), 1, 0)
 
         self.location = QtWidgets.QPushButton('Change')
         self.location.setToolTip("Clone selected folder")
-        self.layout.setAlignment(Qt.AlignLeft)
         self.location.setFlat(True)
-        self.layout.addWidget(self.location)
+        self.layout.addWidget(self.location, 1, 1)
         
-        self.layout.addSpacing(1)
-
         self.setLayout(self.layout)
 
         self.show()

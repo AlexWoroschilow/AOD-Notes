@@ -9,13 +9,12 @@ QLabel#TagsEditor { border: none; background-color: #414649; color: #A0A0A0; }
 QTabBar::close-button { image: url(icons/close.svg); subcontrol-position: right; }
 
 TextView, DemoWidget, DemoViewContainer { background: #ffffff; border: none; }
-QTabBar::close-button { image: url(icons/close.svg); subcontrol-position: right; }
 
 QTabWidget::pane {
 	border-top: 5px solid qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #f1f2f3, stop: 1.0 #414649);
 	border-bottom: 5px solid qlineargradient(x1: 0, y1: 1, x2: 0, y2: 0, stop: 0 #f1f2f3, stop: 1.0 #414649);
 	border-left: 5px solid qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #f1f2f3, stop: 1.0 #414649);
-	background: #fff;
+	background: #f0f0f0;
 }
 
 QLineEdit { font-size: 12px; padding: 3px; margin: 5px 0px 0px 0px; }
@@ -41,6 +40,7 @@ NotePreviewContainer NotePreviewDescription #previewTitle {
 	background-color: #fff;
 }
 
+TextEditorWidget,
 QWidget#FolderListContainer,
 SettingsScrollArea { 
 	background-color: #f0f0f0;

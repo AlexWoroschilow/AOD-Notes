@@ -11,8 +11,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 from PyQt5 import QtWidgets
-
-from .text import TextEditor
+from PyQt5.QtCore import Qt
 
 from . import SettingsTitle
 from . import WidgetSettings
@@ -23,13 +22,19 @@ class WidgetSettingsCryptography(WidgetSettings):
     def __init__(self):
         super(WidgetSettingsCryptography, self).__init__()
 
-        self.layout = QtWidgets.QVBoxLayout()
+        self.layout = QtWidgets.QGridLayout()
+        self.layout.setAlignment(Qt.AlignLeft)
 
-        label = SettingsTitle('Cryptography settings')
-        self.layout.addWidget(label)
+        self.layout.addWidget(SettingsTitle('Cryptography settings'), 0, 0, 1, 5)
+        self.layout.addWidget(QtWidgets.QLabel('Password:'), 1, 0)
 
-        self.code = TextEditor('...')
-        self.layout.addWidget(self.code)
+        self.code = QtWidgets.QLabel('...')
+        self.layout.addWidget(self.code, 1, 1)
+
+        self.layout.addWidget(QtWidgets.QLabel('Algorithm:'), 2, 0)
+        
+        self.algorithm = QtWidgets.QLabel('AES-128')
+        self.layout.addWidget(self.algorithm, 2, 1)
 
         self.setLayout(self.layout)
 
