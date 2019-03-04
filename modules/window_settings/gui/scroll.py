@@ -39,8 +39,6 @@ class SettingsScrollArea(QtWidgets.QScrollArea):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setAlignment(Qt.AlignCenter)
 
-        self.setObjectName('SettingsScrollArea')
-
         self.setContentsMargins(0, 0, 0, 0)
 
         self.container = WidgetSettings()

@@ -69,10 +69,6 @@ class Loader(Loader):
         action = functools.partial(self.actions.onActionToggle, variable='editor.leftbar')
         widget.editorToolbarLeft.stateChanged.connect(action)
 
-        widget.tags.setChecked(int(config.get('folders.keywords')))
-        action = functools.partial(self.actions.onActionToggle, variable='folders.keywords')
-        widget.tags.stateChanged.connect(action)
-
         widget.toolbar.setChecked(int(config.get('folders.toolbar')))
         action = functools.partial(self.actions.onActionToggle, variable='folders.toolbar')
         widget.toolbar.stateChanged.connect(action)

@@ -20,16 +20,15 @@ from PyQt5 import QtGui
 from lib.widget.button import ToolBarButton
 
 
-class ToolBarWidget(QtWidgets.QToolBar):
+class FolderTreeToolBar(QtWidgets.QToolBar):
 
     @inject.params(config='config')
     def __init__(self, parent=None, config=None):
         self.parent = parent
-        super(ToolBarWidget, self).__init__(parent)
+        super(FolderTreeToolBar, self).__init__(parent)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.onActionContextMenu)
         
-        self.setObjectName('ToolBarWidget')
         self.setContentsMargins(0, 0, 0, 0)
         self.setOrientation(Qt.Vertical)
         self.setMaximumWidth(35)

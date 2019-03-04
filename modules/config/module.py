@@ -58,10 +58,6 @@ class Loader(Loader):
         action = functools.partial(self.actions.onActionCheckboxToggle, variable='folders.toolbar')
         widget.toolbar.stateChanged.connect(action)
         
-        widget.keywords.setChecked(int(config.get('folders.keywords')))
-        action = functools.partial(self.actions.onActionCheckboxToggle, variable='folders.keywords')
-        widget.keywords.stateChanged.connect(action)
-        
         return widget
 
     @inject.params(config='config')

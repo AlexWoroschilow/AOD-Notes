@@ -14,11 +14,10 @@ import inject
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 
-from .tags import TagsEditor
 from .folders import FolderTree
 from .demo.widget import DemoWidget
 from .folder.widget import FolderViewWidget
-from .bar import ToolBarWidget
+from .bar import FolderTreeToolBar
 
 
 class FolderList(QtWidgets.QSplitter):
@@ -40,17 +39,13 @@ class FolderList(QtWidgets.QSplitter):
         containerLayout.setContentsMargins(0, 0, 0, 0)
         containerLayout.setSpacing(0)
 
-        self.toolbar = ToolBarWidget(self)
+        self.toolbar = FolderTreeToolBar(self)
         containerLayout.addWidget(self.toolbar, 0, 0, 3, 1)
         
         self.tree = FolderTree()
         self.tree.expandAll()
 
         containerLayout.addWidget(self.tree, 0, 1)
-
-        self.tags = TagsEditor()
-        self.tags.setVisible(int(config.get('folders.keywords')))
-        containerLayout.addWidget(self.tags, 1, 1)
 
         container = QtWidgets.QWidget()
         

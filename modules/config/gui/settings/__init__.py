@@ -27,7 +27,6 @@ class WidgetSettings(QtWidgets.QGroupBox):
     def __init__(self):
         super(WidgetSettings, self).__init__()
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-        self.setMinimumHeight(200)
 
         effect = QtWidgets.QGraphicsDropShadowEffect()
         effect.setBlurRadius(10)

@@ -29,8 +29,10 @@ class WidgetSettingsNavigator(WidgetSettings):
         self.toolbar = QtWidgets.QCheckBox('Toolbar is visible')
         self.layout.addWidget(self.toolbar)
 
-        self.keywords = QtWidgets.QCheckBox('Keywords are visible')
-        self.layout.addWidget(self.keywords)
+#         self.layout.addWidget(QtWidgets.QCheckBox('Zoom in button is visible'))
+#         self.layout.addWidget(QtWidgets.QCheckBox('Zoom out button is visible'))
+#         self.layout.addWidget(QtWidgets.QCheckBox('Clone button is visible'))
+#         self.layout.addWidget(QtWidgets.QCheckBox('Remove button is visible'))
 
         self.setLayout(self.layout)
 

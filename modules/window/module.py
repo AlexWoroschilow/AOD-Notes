@@ -39,7 +39,9 @@ class Loader(Loader):
         
         binder.bind_to_constructor('window', self._widget)
         binder.bind_to_constructor('window.header', self._widget_header)
+        binder.bind_to_constructor('window.content', self._widget_content)
         binder.bind_to_constructor('window.footer', self._widget_footer)
+        binder.bind_to_constructor('window.status', self._widget_status)
 
     @inject.params(config='config', factory='window.header_factory')
     def _widget(self, config=None, factory=None):
@@ -79,7 +81,18 @@ class Loader(Loader):
         return None
 
     @inject.params(window='window')
+    def _widget_content(self, window=None):
+        if window.content is not None:
+            return window.content
+        return None
+
+    @inject.params(window='window')
     def _widget_footer(self, window=None):
         if window.footer is not None:
             return window.footer
         return None
+
+    @inject.params(window='window')
+    def _widget_status(self, window=None):
+        return window.statusBar()
+

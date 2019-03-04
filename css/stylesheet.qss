@@ -1,14 +1,7 @@
-FolderTree { 
-	border: none; 
-	background-color: #414649; 
-	color: #A0A0A0;
+QTabBar::close-button { 
+	image: url(icons/close.svg); 
+	subcontrol-position: right; 
 }
-
-QToolBar#ToolBarWidget { border: none; background-color: #414649; color: #A0A0A0;  }
-QLabel#TagsEditor { border: none; background-color: #414649; color: #A0A0A0; }
-QTabBar::close-button { image: url(icons/close.svg); subcontrol-position: right; }
-
-TextView, DemoWidget, DemoViewContainer { background: #ffffff; border: none; }
 
 QTabWidget::pane {
 	border-top: 5px solid qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #f1f2f3, stop: 1.0 #414649);
@@ -17,15 +10,34 @@ QTabWidget::pane {
 	background: #f0f0f0;
 }
 
-QLineEdit { font-size: 12px; padding: 3px; margin: 5px 0px 0px 0px; }
-QWidget QTextEdit { background-color: #fff; border: 1px !important; }
-QSplitter { border: none; background-color: #fff; }
-QToolBar {  border: none; }
-QPushButton { margin: 5px; }
-QTreeView { font-size: 16px; }
+QTextEdit { 
+	background-color: #fff; 
+	border: 1px !important; 
+}
 
-NotePreviewContainer, 
-FolderViewWidget { 
+QSplitter { 
+	border: none; background-color: #fff; 
+}
+
+QToolBar {  
+	border: none; 
+}
+
+FolderTree { 
+	background-color: #414649; 
+	color: #A0A0A0;
+	border: none; 
+}
+
+FolderTreeToolBar { 
+	border: none; 
+	background-color: #414649; 
+	color: #A0A0A0;  
+}
+
+
+FolderViewWidget,
+NotePreviewContainer { 
 	background-color: #f0f0f0; 
 	border: none; 
 }
@@ -47,10 +59,6 @@ SettingsScrollArea {
 	text-align: center;
 	border: none;
 }
-SettingsScrollArea SettingsTitle {
-	font-size: 26px;
-	padding: 0px;
-}
 
 TextWriter,
 TextEditor,
@@ -65,8 +73,12 @@ WidgetSettings {
 	max-width: 600px;
 }
 
+WidgetSettings SettingsTitle {
+	font-size: 26px;
+	padding: 15px 0px;
+}
 
-SettingsScrollArea WidgetSettings QPushButton{
+WidgetSettings QPushButton{
 	padding: 5px 5px;
 }
 

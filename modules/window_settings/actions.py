@@ -15,10 +15,11 @@ import inject
 
 class ModuleActions(object):
 
-    @inject.params(kernel='kernel', factory='settings_factory', logger='logger')
-    def onActionSettings(self, event=None, factory=None, kernel=None, logger=None):
-        logger.debug('[search] settings event')
-        kernel.dispatch('window.tab', (factory.widget, 'Settings'))
+    @inject.params(window='window', factory='settings_factory', logger='logger')
+    def onActionSettings(self, event=None, factory=None, window=None, logger=None):
+        if window is None: return None
+        if window.tab is None: return None
+        window.tab.emit((factory.widget, window.tr('Settings')))
 
     @inject.params(config='config', kernel='kernel')
     def onActionToggle(self, status, variable, config, kernel):

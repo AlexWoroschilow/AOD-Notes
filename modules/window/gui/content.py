@@ -28,60 +28,18 @@ class WindowContentDashboard(QtWidgets.QWidget):
 
         self.content = QtWidgets.QSplitter()
         self.content.setContentsMargins(0, 0, 0, 0)
-
         self.content.addWidget(notepad)
 
         layout.addWidget(self.content)
 
         self.setLayout(layout)
 
-    @property
-    def entity(self):
-        return None
-
 
 class WindowContent(QtWidgets.QTabWidget):
 
-    @inject.params(kernel='kernel', logger='logger')
-    def __init__(self, parent=None, kernel=None, logger=None):
+    def __init__(self, parent=None):
         super(WindowContent, self).__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
-        
         self.setTabPosition(QtWidgets.QTabWidget.West)
-        self.tabCloseRequested.connect(self._onTabClose)
-
         self.addTab(WindowContentDashboard(parent), self.tr('Dashboard'))
         self.setTabsClosable(True)
-
-        kernel.listen('window.tab', self._onTabOpen)
-        kernel.listen('note_update', self._onNoteUpdateEvent, 128)
-        kernel.listen('note_synchronize', self._onNoteUpdateEvent, 128)
-        kernel.listen('folder_update', self._onNoteUpdateEvent, 128)
-
-    def _onNoteUpdateEvent(self, event):
-        entity = event.data
-        for index in range(0, self.count()):
-            widget = self.widget(index)
-            if widget.entity is None:
-                continue
-            if type(widget.entity) != type(entity):
-                continue            
-            if widget.entity != entity:
-                continue
-            self.setTabText(index, entity.name)
-
-    def _onTabOpen(self, event=None, dispatcher=None):
-        widget, name = event.data
-        if widget is None :
-            return None
-
-        self.addTab(widget, name)
-        self.setCurrentIndex(self.indexOf(widget))
-
-    def _onTabClose(self, index=None):
-        if index in [0]:
-            return None
-        widget = self.widget(index)
-        if widget is not None:
-            widget.deleteLater()
-        self.removeTab(index)

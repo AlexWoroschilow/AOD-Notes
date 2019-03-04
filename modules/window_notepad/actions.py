@@ -99,13 +99,13 @@ class ModuleActions(object):
         except(Exception) as ex:
             logger.exception(ex)
 
-    @inject.params(kernel='kernel', editor='editor', storage='storage')
-    def onActionFullScreen(self, event, widget, kernel, editor, storage):
+    @inject.params(window='window', editor='editor', storage='storage')
+    def onActionFullScreen(self, event, widget, window, editor, storage):
         
         editor.index = widget.index
 
         name = storage.fileName(widget.index)
-        kernel.dispatch('window.tab', (editor, name))
+        window.tab.emit((editor, name))
 
     @inject.params(storage='storage', search='search', logger='logger')
     def onActionDelete(self, index, widget, storage, search, logger):
@@ -152,12 +152,6 @@ class ModuleActions(object):
         except (AttributeError) as ex:
             logger.exception(ex)
 
-        try:        
-            visible = int(config.get('folders.keywords'))
-            widget.tags.setVisible(visible)
-        except (AttributeError) as ex:
-            logger.exception(ex)
-        
         self.onActionConfigUpdatedEditor(event, widget=widget.editor)
 
     @inject.params(config='config', logger='logger')
