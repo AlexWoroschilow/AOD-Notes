@@ -99,7 +99,7 @@ class ModuleActions(object):
         except(Exception) as ex:
             logger.exception(ex)
 
-    @inject.params(window='window', editor='editor', storage='storage')
+    @inject.params(window='window', editor='notepad.editor', storage='storage')
     def onActionFullScreen(self, event, widget, window, editor, storage):
         
         editor.index = widget.index
@@ -115,13 +115,11 @@ class ModuleActions(object):
         ))
         
         reply = QtWidgets.QMessageBox.question(widget, 'Remove folder', message, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
-        if reply == QtWidgets.QMessageBox.No:
-            return None
+        if reply == QtWidgets.QMessageBox.No: return None
         
         try:
             path = storage.filePath(index)
-            if not storage.remove(index):
-                return None
+            if not storage.remove(index): return None
             # update search index only after
             # the update was successful
             if search is None: return None

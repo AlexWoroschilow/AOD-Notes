@@ -123,6 +123,7 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         except(ValueError)  as ex:
             logger = logging.getLogger('storage')
             logger.debug(ex)
+        return self.index(path)
 
     def first(self):
         index = self.rootIndex()

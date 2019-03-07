@@ -19,65 +19,53 @@ from PyQt5.Qt import Qt
 
 class ModuleActions(object):
 
-    @inject.params(search='search', storage='storage', notepad='notepad')
-    def onActionSearchRequest(self, widget, search, storage, notepad):
+    @inject.params(search='search', storage='storage', dashboard='notepad.dashboard')
+    def onActionSearchRequest(self, widget=None, search=None, storage=None, dashboard=None):
+        if widget is None: return None
+        if search is None: return None
+        if dashboard is None: return None
+        if storage is None: return None
+        
         text = widget.text()
         if text is None or not len(text):
-            return notepad.toggle([], False)
+            return dashboard.toggle([], False)
 
         result = search.search(text)
         collection = [storage.index(x['path']) for x in result]
         
         if collection is None or not len(collection):
-            return notepad.toggle([], False)
+            return dashboard.toggle([], False)
 
-        return notepad.toggle(collection, True)
+        return dashboard.toggle(collection, True)
 
     def onActionSearchShortcut(self, event=None, widget=None):
+        if widget is None: return None
         widget.setFocusPolicy(Qt.StrongFocus)
         widget.setFocus()
 
-    @inject.params(kernel='kernel')
-    def onActionFolderCreate(self, event, kernel):
-        kernel.dispatch('folder_new')
+    @inject.params(storage='storage', config='config')
+    def onActionNoteImport(self, event, storage=None, config=None):
+        if storage is None: return None
+        if config is None: return None
 
-        
-    @inject.params(search='search')
-    def onActionNoteCreated(self, event, search):
-        return search.append(event.data)
-
-    @inject.params(search='search')
-    def onActionNoteUpdated(self, event, search):
-        return search.update(event.data)
-
-    @inject.params(search='search')
-    def onActionNoteRemove(self, event, search):
-        return search.remove(event.data)
-
-    @inject.params(logger='logger', storage='storage', config='config')
-    def onActionNoteImport(self, event, logger, storage, config):
         selector = QtWidgets.QFileDialog()
-        if not selector.exec_():
-            return None
+        if not selector.exec_(): return None
 
         for path in selector.selectedFiles():
-            if not os.path.exists(path):
-                continue
+            if not os.path.exists(path): continue
 
             size = os.path.getsize(path) / 1000000 
             if size and size >= 1: 
                 message = "The file  '%s' is about %.2f Mb, are you sure?" % (path, size)
                 reply = QtWidgets.QMessageBox.question(self._widget, 'Message', message, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
-                if reply == QtWidgets.QMessageBox.No:
-                    continue
+                if reply == QtWidgets.QMessageBox.No: continue
+                
             with open(path, 'r') as source:
                 index = storage.index(config.get('storage.location'))
-                if index is None or not index:
-                    return None
+                if index is None or not index: return None
                 
                 index = storage.touch(index, os.path.basename(path))
-                if index is None or not index:
-                    return None
+                if index is None or not index: return None
                 
                 storage.setFileContent(index, source.read())
                 source.close()

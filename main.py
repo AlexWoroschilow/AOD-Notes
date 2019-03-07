@@ -37,14 +37,12 @@ class Application(QtWidgets.QApplication):
     def __init__(self, options=None, args=None):
         super(Application, self).__init__(sys.argv)
         self.setApplicationName('Notes')
-        
         self.kernel = Kernel(options, args)
 
     @inject.params(kernel='kernel', widget='window')
     def exec_(self, kernel=None, widget=None):
-
-        if kernel is None and widget is None:
-            return None
+        if kernel is None: return None
+        if widget is None: return None
         
         widget.show()
 

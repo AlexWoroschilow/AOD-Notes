@@ -14,8 +14,6 @@ import inject
 import functools
 
 from lib.plugin import Loader
-from .gui.widget import FolderList
-from .gui.editor.widget import TextEditorWidget  
 
 from .actions import ModuleActions
 from .factory import ToolbarFactory
@@ -34,24 +32,39 @@ class Loader(Loader):
         binder.bind('toolbar_factory.formatbar', ToolbarFactory())
         binder.bind('toolbar_factory.rightbar', ToolbarFactory())
 
-        binder.bind_to_constructor('notepad', self._notepad)
-        binder.bind_to_provider('editor', self._editor)
+        binder.bind_to_provider('notepad', self._notepad)
+        binder.bind_to_provider('notepad.editor', self._notepad_editor)
+        
+        binder.bind_to_constructor('notepad.dashboard', self._notepad_dashboard)
 
-    @inject.params(config='config', storage='storage', notepad='notepad')
-    def boot(self, options=None, args=None, config=None, storage=None, notepad=None):
-        if not len(config.get('editor.current')):
-            return notepad.note(storage.first())
+    @inject.params(config='config', storage='storage', dashboard='notepad.dashboard')
+    def boot(self, options=None, args=None, config=None, storage=None, dashboard=None):
+        if config is None: return None
+        if dashboard is None: return None
+        if storage is None: return None
+
+        current = config.get('editor.current')
+        if not len(current): return dashboard.note(storage.first())
         # get last edited document from the confnig
         # and open this document in the editor by default
-        index = storage.index(config.get('editor.current'))
-        if index is not None and storage.isDir(index):
-            return notepad.group(index)
-        
-        if index is not None and storage.isFile(index):
-            return notepad.note(index)
+        index = storage.index(current)
+        if index is None: return None
+         
+        if storage.isDir(index): return dashboard.group(index)
+        if storage.isFile(index): return dashboard.note(index)
+
+    @inject.params(dashboard='notepad.dashboard')
+    def _notepad(self, dashboard=None):
+        if dashboard is None: return None
+
+        from .gui.dashboard import Notepad
+        content = Notepad()
+        content.addTab(dashboard, content.tr('Dashboard'))
+        return content
 
     @inject.params(kernel='kernel', config='config', factory_leftbar='toolbar_factory.leftbar', factory_rightbar='toolbar_factory.rightbar', factory_formatbar='toolbar_factory.formatbar')
-    def _editor(self, kernel=None, config=None, factory_leftbar=None, factory_rightbar=None, factory_formatbar=None):
+    def _notepad_editor(self, kernel=None, config=None, factory_leftbar=None, factory_rightbar=None, factory_formatbar=None):
+        from .gui.editor.widget import TextEditorWidget  
         
         widget = TextEditorWidget()
 
@@ -82,9 +95,10 @@ class Loader(Loader):
         return widget
 
     @inject.params(kernel='kernel', storage='storage')
-    def _notepad(self, kernel, storage):
-        
-        widget = FolderList(self.actions)
+    def _notepad_dashboard(self, kernel, storage):
+        from .gui.widget import NotepadDashboard
+
+        widget = NotepadDashboard(self.actions)
 
         action = functools.partial(self.actions.onActionNoteEdit, widget=widget)
         widget.edit.connect(action)

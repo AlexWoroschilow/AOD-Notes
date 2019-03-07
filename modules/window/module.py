@@ -38,16 +38,20 @@ class Loader(Loader):
         binder.bind('window.header_factory', WidgetHeaderFactory())
         
         binder.bind_to_constructor('window', self._widget)
-        binder.bind_to_constructor('window.header', self._widget_header)
-        binder.bind_to_constructor('window.content', self._widget_content)
-        binder.bind_to_constructor('window.footer', self._widget_footer)
-        binder.bind_to_constructor('window.status', self._widget_status)
+        binder.bind_to_provider('window.header', self._widget_header)
+        binder.bind_to_provider('window.content', self._widget_content)
+        binder.bind_to_provider('window.footer', self._widget_footer)
+        binder.bind_to_provider('window.status', self._widget_status)
 
     @inject.params(config='config', factory='window.header_factory')
     def _widget(self, config=None, factory=None):
+        container = inject.get_injector()
+        if container is None: return None
         
         widget = MainWindow()
-        
+        dashboard = container.get_instance('notepad')
+        widget.setMainWidget(dashboard)
+
         width = int(config.get('window.width'))
         height = int(config.get('window.height'))  
         widget.resize(width, height)
@@ -55,12 +59,10 @@ class Loader(Loader):
         widget.header = widget.addToolBar('main')
         widget.header.setIconSize(QtCore.QSize(20, 20))
         widget.header.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
-        widget.header.setObjectName('MainToolbar')
         widget.header.setFloatable(False)
         widget.header.setMovable(False)
         
-        for bunch in factory.widgets:
-            header_widget, priority = bunch
+        for header_widget, priority in factory.widgets:
             if isinstance(header_widget, QtWidgets.QAction):
                 widget.header.addAction(header_widget)
             if isinstance(header_widget, QtWidgets.QWidget):
@@ -76,21 +78,18 @@ class Loader(Loader):
 
     @inject.params(window='window')
     def _widget_header(self, window=None):
-        if window.header is not None:
-            return window.header
-        return None
+        if window.header is None: return None
+        return window.header
 
     @inject.params(window='window')
     def _widget_content(self, window=None):
-        if window.content is not None:
-            return window.content
-        return None
+        if window.content is None: return None
+        return window.content
 
     @inject.params(window='window')
     def _widget_footer(self, window=None):
-        if window.footer is not None:
-            return window.footer
-        return None
+        if window.footer is None: return None
+        return window.footer
 
     @inject.params(window='window')
     def _widget_status(self, window=None):

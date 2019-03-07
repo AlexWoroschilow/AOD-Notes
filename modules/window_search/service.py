@@ -16,8 +16,6 @@ from html.parser import HTMLParser
 from whoosh.fields import Schema, TEXT, ID
 from whoosh import qparser
 
-from whoosh.qparser import MultifieldParser
-
 from whoosh import index
 
 

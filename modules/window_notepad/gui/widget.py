@@ -20,7 +20,7 @@ from .folder.widget import FolderViewWidget
 from .bar import FolderTreeToolBar
 
 
-class FolderList(QtWidgets.QSplitter):
+class NotepadDashboard(QtWidgets.QSplitter):
 
     edit = QtCore.pyqtSignal(object)
     delete = QtCore.pyqtSignal(object)
@@ -32,7 +32,7 @@ class FolderList(QtWidgets.QSplitter):
 
     @inject.params(config='config', storage='storage')
     def __init__(self, actions, config, storage):
-        super(FolderList, self).__init__()
+        super(NotepadDashboard, self).__init__()
         self.setContentsMargins(0, 0, 0, 0)
         
         containerLayout = QtWidgets.QGridLayout()
@@ -75,7 +75,7 @@ class FolderList(QtWidgets.QSplitter):
         if self.tree is None: return None
         return self.tree.currentIndex()
         
-    @inject.params(storage='storage', editor='editor', config='config')
+    @inject.params(storage='storage', editor='notepad.editor', config='config')
     def note(self, index, storage, editor, config=None):
         current = storage.filePath(index)
         config.set('editor.current', current)

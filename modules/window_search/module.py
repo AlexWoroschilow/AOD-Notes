@@ -54,15 +54,18 @@ class Loader(Loader):
             service.append(name, path, text)
         return service
 
-    @inject.params(factory='window.header_factory', notepad='notepad')
-    def boot(self, options, args, factory, notepad):
+    @inject.params(factory='window.header_factory', dashboard='notepad.dashboard')
+    def boot(self, options=None, args=None, factory=None, dashboard=None):
+        if dashboard is None: return None
+        if options is None: return None
+        if args is None: return None
 
         self.buttonGroup = QtWidgets.QAction(QtGui.QIcon("icons/plus.svg"), 'Create group')
-        action = functools.partial(notepad.actions.onActionFolderCreate, widget=notepad)
+        action = functools.partial(dashboard.actions.onActionFolderCreate, widget=dashboard)
         self.buttonGroup.triggered.connect(action)
 
         self.buttonNote = QtWidgets.QAction(QtGui.QIcon("icons/plus.svg"), 'Create note')
-        action = functools.partial(notepad.actions.onActionNoteCreate, widget=notepad)
+        action = functools.partial(dashboard.actions.onActionNoteCreate, widget=dashboard)
         self.buttonNote.triggered.connect(action)
 
         self.buttonImport = QtWidgets.QAction(QtGui.QIcon("icons/import.svg"), 'Import document')
@@ -85,6 +88,7 @@ class Loader(Loader):
         self.spacer = QtWidgets.QWidget();
         self.spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred);
 
+        if factory is None: return None
         factory.addWidget(self.buttonGroup)
         factory.addWidget(self.buttonNote)
         factory.addWidget(self.buttonImport)
