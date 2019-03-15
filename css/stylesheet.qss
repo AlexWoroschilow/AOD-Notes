@@ -7,8 +7,13 @@ QToolButton:hover {
 }
 QToolButton:!hover {
     background-color:#ffffff;
-	color: #A0A0A0;
+	color: #4F4F4F;
     padding: 3px;
+}
+
+QTabBar {
+    background-color:#ffffff;
+	color: #4F4F4F;
 }
 
 QTabBar::close-button {
@@ -20,7 +25,7 @@ QTabWidget::pane {
 	border-top: 2px solid qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #f1f2f3, stop: 1.0 #414649);
 	border-bottom: 2px solid qlineargradient(x1: 0, y1: 1, x2: 0, y2: 0, stop: 0 #f1f2f3, stop: 1.0 #414649);
 	border-left: 2px solid qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #f1f2f3, stop: 1.0 #414649);
-	background: #f0f0f0;
+	background: #A0A0A0;
 }
 
 QTextEdit {
@@ -90,7 +95,7 @@ WidgetSettings {
 
 WidgetSettings {
 	padding: 0px 30px 20px 30px;
-	background-color: #fff;
+	background-color: #ffffff;
 	max-width: 600px;
 }
 
