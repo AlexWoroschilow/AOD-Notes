@@ -1,12 +1,20 @@
 QMainWindow {
 	background: #ffffff;
 }
+QToolButton:hover {
+	color: #000000;
+    padding: 3px;
+}
+QToolButton:!hover {
+    background-color:#ffffff;
+	color: #A0A0A0;
+    padding: 3px;
+}
 
 QTabBar::close-button {
 	image: url(icons/close.svg); 
 	subcontrol-position: right; 
 }
-
 
 QTabWidget::pane {
 	border-top: 2px solid qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #f1f2f3, stop: 1.0 #414649);
@@ -29,10 +37,12 @@ QToolBar {
 }
 
 SearchField {
-    margin-top: 5px;
+    margin: 5px 0px;
     padding: 5px 5px;
     border: none;
-	border-bottom: 1px solid #A0A0A0;
+}
+ActionButton {
+	color: #A0A0A0;
 }
 
 FolderTree { 
@@ -46,7 +56,6 @@ FolderTreeToolBar {
 	background-color: #414649; 
 	color: #A0A0A0;  
 }
-
 
 FolderViewWidget,
 NotePreviewContainer { 
@@ -93,6 +102,3 @@ WidgetSettings SettingsTitle {
 WidgetSettings QPushButton{
 	padding: 5px 5px;
 }
-
-
-

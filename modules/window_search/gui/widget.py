@@ -22,5 +22,15 @@ class SearchField(QtWidgets.QLineEdit):
         super(SearchField, self).__init__(parent)
         self.setPlaceholderText('Enter the search string...')
         self.setObjectName('searchSearchField')
-        self.setContentsMargins(5, 0, 0, 5)
-        
+
+        effect = QtWidgets.QGraphicsDropShadowEffect()
+        effect.setBlurRadius(3)
+        effect.setOffset(0)
+
+        self.setGraphicsEffect(effect)
+
+
+class ActionButton(QtWidgets.QAction):
+
+    def __init__(self, icon, name):
+        super(ActionButton, self).__init__(icon, name)

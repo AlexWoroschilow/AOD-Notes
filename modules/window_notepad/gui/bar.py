@@ -35,15 +35,15 @@ class FolderTreeToolBar(QtWidgets.QToolBar):
 
         self.setVisible(int(config.get('folders.toolbar')))
         
-        self.expandAction = ToolBarButton()
-        self.expandAction.setIcon(QtGui.QIcon("icons/plus-light.svg"))
-        self.expandAction.setToolTip("Expand all folders")
-        self.addWidget(self.expandAction)
-
         self.collapseAction = ToolBarButton()
         self.collapseAction.setIcon(QtGui.QIcon("icons/minus-light.svg"))
         self.collapseAction.setToolTip("Collaps all folders")
         self.addWidget(self.collapseAction)
+
+        self.expandAction = ToolBarButton()
+        self.expandAction.setIcon(QtGui.QIcon("icons/tree.svg"))
+        self.expandAction.setToolTip("Expand all folders")
+        self.addWidget(self.expandAction)
 
         self.copyAction = ToolBarButton()
         self.copyAction.setIcon(QtGui.QIcon("icons/copy-light.svg"))

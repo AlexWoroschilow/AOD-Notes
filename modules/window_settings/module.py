@@ -22,7 +22,6 @@ from lib.plugin import Loader
 
 
 class Loader(Loader):
-
     actions = ModuleActions()
 
     @property
@@ -32,10 +31,9 @@ class Loader(Loader):
     def config(self, binder=None):
         binder.bind_to_provider('settings_menu', self._menu)
         binder.bind_to_constructor('settings_factory', self._settings)
-        
+
     @inject.params(factory='window.header_factory')
     def boot(self, options=None, args=None, factory=None):
-
         widget = QtWidgets.QAction(QtGui.QIcon("icons/settings.svg"), None)
         widget.triggered.connect(self.actions.onActionSettings)
 
@@ -47,7 +45,6 @@ class Loader(Loader):
 
     @inject.params(config='config')
     def _menu(self, config):
-
         from .gui.menu import SettingsMenu
 
         menu = QtWidgets.QMenu()
@@ -72,8 +69,7 @@ class Loader(Loader):
         widget.toolbar.setChecked(int(config.get('folders.toolbar')))
         action = functools.partial(self.actions.onActionToggle, variable='folders.toolbar')
         widget.toolbar.stateChanged.connect(action)
-        
-        menu.addAction(widget)
-        
-        return menu
 
+        menu.addAction(widget)
+
+        return menu
