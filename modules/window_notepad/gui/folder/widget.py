@@ -59,6 +59,7 @@ class FolderViewWidget(QtWidgets.QScrollArea):
         self.setContentsMargins(0, 0, 0, 0)
 
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setContentsMargins(0, 0, 0, 0)
         self.setWidgetResizable(True)
 

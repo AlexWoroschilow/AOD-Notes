@@ -1,16 +1,21 @@
-QTabBar::close-button { 
+QMainWindow {
+	background: #ffffff;
+}
+
+QTabBar::close-button {
 	image: url(icons/close.svg); 
 	subcontrol-position: right; 
 }
 
+
 QTabWidget::pane {
-	border-top: 5px solid qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #f1f2f3, stop: 1.0 #414649);
-	border-bottom: 5px solid qlineargradient(x1: 0, y1: 1, x2: 0, y2: 0, stop: 0 #f1f2f3, stop: 1.0 #414649);
-	border-left: 5px solid qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #f1f2f3, stop: 1.0 #414649);
+	border-top: 2px solid qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #f1f2f3, stop: 1.0 #414649);
+	border-bottom: 2px solid qlineargradient(x1: 0, y1: 1, x2: 0, y2: 0, stop: 0 #f1f2f3, stop: 1.0 #414649);
+	border-left: 2px solid qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #f1f2f3, stop: 1.0 #414649);
 	background: #f0f0f0;
 }
 
-QTextEdit { 
+QTextEdit {
 	background-color: #fff; 
 	border: 1px !important; 
 }
@@ -19,8 +24,15 @@ QSplitter {
 	border: none; background-color: #fff; 
 }
 
-QToolBar {  
-	border: none; 
+QToolBar {
+	border: none;
+}
+
+SearchField {
+    margin-top: 5px;
+    padding: 5px 5px;
+    border: none;
+	border-bottom: 1px solid #A0A0A0;
 }
 
 FolderTree { 
@@ -38,24 +50,24 @@ FolderTreeToolBar {
 
 FolderViewWidget,
 NotePreviewContainer { 
-	background-color: #f0f0f0; 
-	border: none; 
+	background: #ffffff;
+	border: none;
 }
 
 NotePreviewContainer NotePreviewDescription {
-	background-color: #fff;
-	border-radius: 15px;
+	background-color: #ffffff;
+	border-radius: 0px;
 	padding: 10px 30px;
 }
 
 NotePreviewContainer NotePreviewDescription #previewTitle {
-	background-color: #fff;
+	background-color: #ffffff;
 }
 
 TextEditorWidget,
 QWidget#FolderListContainer,
 SettingsScrollArea { 
-	background-color: #f0f0f0;
+	background-color: #ffffff;
 	text-align: center;
 	border: none;
 }
@@ -63,7 +75,7 @@ SettingsScrollArea {
 TextWriter,
 TextEditor,
 WidgetSettings {
-	border-radius: 15px;
+	border-radius: 0px;
 	border: none
 }
 

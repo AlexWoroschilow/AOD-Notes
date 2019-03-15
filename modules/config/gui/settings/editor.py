@@ -23,7 +23,7 @@ class WidgetSettingsEditor(WidgetSettings):
 
         self.layout = QtWidgets.QVBoxLayout()
 
-        label = SettingsTitle('Editor settings')
+        label = SettingsTitle('Text editor settings')
         self.layout.addWidget(label)
 
         self.formatbar = QtWidgets.QCheckBox('Formatting toolbar is visible')

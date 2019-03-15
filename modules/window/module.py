@@ -57,6 +57,7 @@ class Loader(Loader):
         widget.resize(width, height)
         
         widget.header = widget.addToolBar('main')
+        widget.header.setObjectName('QToolBarTop')
         widget.header.setIconSize(QtCore.QSize(20, 20))
         widget.header.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         widget.header.setFloatable(False)

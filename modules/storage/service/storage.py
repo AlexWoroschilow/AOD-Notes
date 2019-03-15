@@ -24,21 +24,21 @@ from . import cryptography
 from .cryptography import CryptoFile
 
 
-class QCustomDelegate (QtWidgets.QItemDelegate):
+class QCustomDelegate(QtWidgets.QItemDelegate):
 
     def setEditorData(self, editor, index):
         model = index.model()
-        if model.isFile(index) == True: 
+        if model.isFile(index) == True:
             return super(QCustomDelegate, self).setEditorData(editor, index)
-        metadata = '{}/.metadata'.format(model.filePath(index)) 
+        metadata = '{}/.metadata'.format(model.filePath(index))
         editor.setText(model.fileContent(metadata))
 
-    def setModelData (self, editor, model, index):
+    def setModelData(self, editor, model, index):
         cryptography.rename(model.filePath(index), editor.text())
 
 
 class FilesystemStorage(QtWidgets.QFileSystemModel):
-    
+
     def __init__(self, location=None):
         super(FilesystemStorage, self).__init__()
         self.setIconProvider(IconProvider())
@@ -54,9 +54,9 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
             return super(FilesystemStorage, self).data(index, role)
 
         if self.isFile(index): return self.fileName(index)
-        metadata = '{}/.metadata'.format(self.filePath(index)) 
+        metadata = '{}/.metadata'.format(self.filePath(index))
         return self.fileContent(metadata)
-        
+
     def mkdir(self, index, name):
         root = self.filePath(index)
         if root is None: return None
@@ -80,7 +80,7 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
 
     def rootIndex(self):
         return self.index(self.rootPath())
-        
+
     def isDir(self, path=None):
         if path is None: return None
         if isinstance(path, QtCore.QModelIndex):
@@ -97,7 +97,11 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         if path is None: return None
         if isinstance(path, QtCore.QModelIndex):
             path = self.filePath(path)
-        
+
+        if self.isDir(path):
+            metadata = '{}/.metadata'.format(path)
+            return self.fileContent(metadata)
+
         file = CryptoFile(path)
         return file.name
 
@@ -111,7 +115,7 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         except(ValueError)  as ex:
             logger = logging.getLogger('storage')
             logger.debug(ex)
-    
+
     def setFileContent(self, path, content):
         if path is None: return None
         if isinstance(path, QtCore.QModelIndex):
@@ -130,7 +134,7 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         source = self.filePath(index)
         if not os.path.exists(source):
             return None
-        
+
         sources = [self.filePath(index)]
         while len(sources):
             for path in glob.glob('{}/*'.format(sources.pop())):
@@ -143,7 +147,7 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
     def entities(self, index=None):
         if index is None or not index:
             index = self.index(self.rootPath())
-            
+
         source = self.filePath(index)
         return self.entitiesByPath(source)
 
@@ -155,12 +159,11 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
             index = self.index(path)
             if index is None: continue
             if not index: continue
-                        
+
             if os.path.isdir(path):
                 response.append(index)
                 children = self.entitiesByPath(path)
-                response = response + children 
+                response = response + children
                 continue
             response.append(index)
         return response
-

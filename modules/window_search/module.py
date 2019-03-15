@@ -60,15 +60,15 @@ class Loader(Loader):
         if options is None: return None
         if args is None: return None
 
-        self.buttonGroup = QtWidgets.QAction(QtGui.QIcon("icons/plus.svg"), 'Create group')
+        self.buttonGroup = QtWidgets.QAction(QtGui.QIcon("icons/plus.svg"), 'New Group')
         action = functools.partial(dashboard.actions.onActionFolderCreate, widget=dashboard)
         self.buttonGroup.triggered.connect(action)
 
-        self.buttonNote = QtWidgets.QAction(QtGui.QIcon("icons/plus.svg"), 'Create note')
+        self.buttonNote = QtWidgets.QAction(QtGui.QIcon("icons/plus.svg"), 'New Note')
         action = functools.partial(dashboard.actions.onActionNoteCreate, widget=dashboard)
         self.buttonNote.triggered.connect(action)
 
-        self.buttonImport = QtWidgets.QAction(QtGui.QIcon("icons/import.svg"), 'Import document')
+        self.buttonImport = QtWidgets.QAction(QtGui.QIcon("icons/import.svg"), 'Import File')
         self.buttonImport.triggered.connect(self.actions.onActionNoteImport)
         
         self.search = SearchField()

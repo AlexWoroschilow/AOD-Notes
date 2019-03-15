@@ -26,5 +26,5 @@ appimage:
 	find build/opt/application -name '__pycache__' -exec rm -rf {} +
 	find build/opt/application -name '.pyc*' -exec rm -rf {} +
 	export ARCH=x86_64
-	exec bin/appimagetool build bin/Notes
+	exec bin/appimagetool build bin/CryptoNotes
 
