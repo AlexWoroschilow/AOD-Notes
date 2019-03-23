@@ -1,0 +1,109 @@
+QMainWindow {
+	background: #ffffff;
+}
+QToolButton:hover {
+	color: #000000;
+    padding: 3px;
+}
+QToolButton:!hover {
+    background-color:#ffffff;
+	color: #4F4F4F;
+    padding: 3px;
+}
+
+QTabBar {
+    background-color:#ffffff;
+	color: #4F4F4F;
+}
+
+QTabBar::close-button {
+	image: url(icons/close.svg); 
+	subcontrol-position: right; 
+}
+
+QTabWidget::pane {
+	border-top: 2px solid qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #f1f2f3, stop: 1.0 #414649);
+	border-bottom: 2px solid qlineargradient(x1: 0, y1: 1, x2: 0, y2: 0, stop: 0 #f1f2f3, stop: 1.0 #414649);
+	border-left: 2px solid qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #f1f2f3, stop: 1.0 #414649);
+	background: #A0A0A0;
+}
+
+QTextEdit {
+	background-color: #fff; 
+	border: 1px !important; 
+}
+
+QSplitter { 
+	border: none; background-color: #fff; 
+}
+
+QToolBar {
+	border: none;
+}
+
+SearchField {
+    margin: 5px 0px;
+    padding: 5px 5px;
+    border: none;
+}
+ActionButton {
+	color: #A0A0A0;
+}
+
+FolderTree { 
+	background-color: #414649; 
+	color: #A0A0A0;
+	border: none; 
+}
+
+FolderTreeToolBar { 
+	border: none; 
+	background-color: #414649; 
+	color: #A0A0A0;  
+}
+
+FolderViewWidget,
+NotePreviewContainer { 
+	background: #ffffff;
+	border: none;
+}
+
+NotePreviewContainer NotePreviewDescription {
+	background-color: #ffffff;
+	border-radius: 0px;
+	padding: 10px 30px;
+}
+
+NotePreviewContainer NotePreviewDescription #previewTitle {
+	background-color: #ffffff;
+}
+
+TextEditorWidget,
+QWidget#FolderListContainer,
+SettingsScrollArea { 
+	background-color: #ffffff;
+	text-align: center;
+	border: none;
+}
+
+TextWriter,
+TextEditor,
+WidgetSettings {
+	border-radius: 0px;
+	border: none
+}
+
+WidgetSettings {
+	padding: 0px 30px 20px 30px;
+	background-color: #ffffff;
+	max-width: 600px;
+}
+
+WidgetSettings SettingsTitle {
+	font-size: 26px;
+	padding: 15px 0px;
+}
+
+WidgetSettings QPushButton{
+	padding: 5px 5px;
+}
