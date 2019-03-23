@@ -31,6 +31,7 @@ class FolderTree(QtWidgets.QTreeView):
 
         self.setHeaderHidden(True)
         self.setModel(storage)
+
         delegate = storage.getItemDelegate()
         self.setItemDelegate(delegate)
         

@@ -30,8 +30,7 @@ class QCustomDelegate(QtWidgets.QItemDelegate):
         model = index.model()
         if model.isFile(index) == True:
             return super(QCustomDelegate, self).setEditorData(editor, index)
-        metadata = '{}/.metadata'.format(model.filePath(index))
-        editor.setText(model.fileContent(metadata))
+        editor.setText(model.fileName(index))
 
     def setModelData(self, editor, model, index):
         cryptography.rename(model.filePath(index), editor.text())
@@ -52,10 +51,7 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         if index is None: return super(FilesystemStorage, self).data(index, role)
         if role not in [Qt.DisplayRole, Qt.EditRole]:
             return super(FilesystemStorage, self).data(index, role)
-
-        if self.isFile(index): return self.fileName(index)
-        metadata = '{}/.metadata'.format(self.filePath(index))
-        return self.fileContent(metadata)
+        return self.fileName(index)
 
     def mkdir(self, index, name):
         root = self.filePath(index)
@@ -64,17 +60,31 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         if path is None: return None
         return self.index(path)
 
-    def touch(self, index, name):
-        root = self.filePath(index)
-        if root is None: return None
-        path = cryptography.touch(root, name)
+    def rename(self, path=None, name=None):
+        if path is None: return None
+        if name is None: return None
+        if isinstance(path, QtCore.QModelIndex):
+            path = self.filePath(path)
+        if path is None: return None
+        path = cryptography.rename(path, name)
         if path is None: return None
         return self.index(path)
 
-    def clone(self, index=None):
-        root = self.filePath(index)
-        if root is None: return None
-        path = cryptography.clone(root)
+    def touch(self, path=None, name=None):
+        if path is None: return None
+        if name is None: return None
+        if isinstance(path, QtCore.QModelIndex):
+            path = self.filePath(path)
+        if path is None: return None
+        path = cryptography.touch(path, name)
+        if path is None: return None
+        return self.index(path)
+
+    def clone(self, path=None):
+        if isinstance(path, QtCore.QModelIndex):
+            path = self.filePath(path)
+        if path is None: return None
+        path = cryptography.clone(path)
         if path is None: return None
         return self.index(path)
 
@@ -98,23 +108,28 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         if isinstance(path, QtCore.QModelIndex):
             path = self.filePath(path)
 
-        if self.isDir(path):
-            metadata = '{}/.metadata'.format(path)
-            return self.fileContent(metadata)
+        if self.isDir(path) == True:
+            metadata = os.path.join(path, '.metadata')
+            with cryptography.file(metadata, 'r') as stream:
+                return stream.read()
+            return os.path.basename(path)
 
-        file = CryptoFile(path)
-        return file.name
+        with cryptography.file(path, 'r') as stream:
+            return stream.name()
+        return os.path.basename(path)
 
     def fileContent(self, path=None):
         if path is None: return None
         if isinstance(path, QtCore.QModelIndex):
             path = self.filePath(path)
+
         try:
-            file = CryptoFile(path)
-            return file.content
+            with cryptography.file(path, 'r') as stream:
+                return stream.read()
         except(ValueError)  as ex:
             logger = logging.getLogger('storage')
-            logger.debug(ex)
+            logger.critical(ex, 'file not found: {}'.format(path))
+        return None
 
     def setFileContent(self, path, content):
         if path is None: return None
@@ -122,11 +137,11 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
             path = self.filePath(path)
 
         try:
-            file = CryptoFile(path)
-            file.content = content
+            with cryptography.file(path, 'wb') as stream:
+                stream.write(content)
         except(ValueError)  as ex:
             logger = logging.getLogger('storage')
-            logger.debug(ex)
+            logger.debug('file not found: {}'.format(path))
         return self.index(path)
 
     def first(self):

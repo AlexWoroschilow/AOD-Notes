@@ -10,14 +10,43 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import os
+import inject
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 
 from . import SettingsTitle
 from . import WidgetSettings
+from PyQt5 import QtCore
+
+
+class CryptographyThread(QtCore.QThread):
+    progress = QtCore.pyqtSignal(int)
+
+    @inject.params(storage='storage', search='search', config='config')
+    def run(self, storage, search, config):
+        collection = storage.entities()
+        total = len(collection) + len(collection)
+        for progress, index in enumerate(collection, start=1):
+            self.progress.emit(progress / total * 100)
+            path = storage.filePath(index)
+            if not os.path.exists(path): continue
+            search.remove(path)
+
+        for progress, index in enumerate(collection, start=progress):
+            self.progress.emit(progress / total * 100)
+            if storage.isDir(index): continue
+            path = storage.filePath(index)
+            if not os.path.exists(path): continue
+            content = storage.fileContent(path)
+            name = storage.fileName(path)
+            search.append(name, path, content)
+
+        self.progress.emit(100)
 
 
 class WidgetSettingsSearch(WidgetSettings):
+    thread = CryptographyThread()
 
     def __init__(self):
         super(WidgetSettingsSearch, self).__init__()
@@ -32,13 +61,32 @@ class WidgetSettingsSearch(WidgetSettings):
         self.layout.addWidget(self.searchIndex, 1, 1)
 
         self.layout.addWidget(QtWidgets.QLabel('Rebuild index:'), 2, 0)
-        
+
         self.rebuild = QtWidgets.QPushButton('Start indexation process')
         self.rebuild.setToolTip("Rebuild the search index")
+        self.rebuild.clicked.connect(self.onActionRebuild)
         self.rebuild.setFlat(True)
         self.layout.addWidget(self.rebuild, 2, 1)
+
+        self.progress = QtWidgets.QProgressBar(self)
+        self.progress.setVisible(False)
+        self.layout.addWidget(self.progress, 3, 0, 1, 5)
 
         self.setLayout(self.layout)
 
         self.show()
 
+    def onActionRebuild(self, event):
+        self.thread.progress.connect(self.onActionRebuildProgress)
+        self.thread.start()
+        self.thread.exit()
+
+    def onActionRebuildProgress(self, value):
+        if not self.progress.isVisible() and value > 0:
+            self.progress.setVisible(True)
+        self.progress.setValue(value)
+        if self.progress.isVisible() and value == 100:
+            self.progress.setVisible(False)
+
+    def quit(self):
+        self.thread.exit()
