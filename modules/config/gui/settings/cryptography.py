@@ -12,7 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
 import inject
-import shutil
 import secrets
 
 from PyQt5 import QtWidgets
