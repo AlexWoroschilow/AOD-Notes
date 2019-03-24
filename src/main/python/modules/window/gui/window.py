@@ -33,11 +33,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.setCentralWidget(container)
         
-        spacer = QtWidgets.QWidget();
-        spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred);
-        self.statusBar().addWidget(spacer);
+        spacer = QtWidgets.QWidget()
+        spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        self.statusBar().addWidget(spacer)
 
-        self.setWindowTitle('Crypto-Notepad')
+        self.setWindowTitle('CryptoNotes')
 
         if not os.path.exists('css/stylesheet.qss'): return None
         self.setStyleSheet(open('css/stylesheet.qss').read())
