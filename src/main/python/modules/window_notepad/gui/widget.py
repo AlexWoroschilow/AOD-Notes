@@ -16,7 +16,7 @@ from PyQt5 import QtCore
 
 from .folders import FolderTree
 from .demo.widget import DemoWidget
-from .folder.widget import FolderViewWidget
+from .folder.widget import FoldersScrollArea
 from .bar import FolderTreeToolBar
 
 
@@ -55,8 +55,10 @@ class NotepadDashboard(QtWidgets.QSplitter):
         self.addWidget(container)
 
         self.container = QtWidgets.QWidget()
+        self.container.setContentsMargins(0, 0, 0, 0)
         self.container.setObjectName('FolderListContainer')
         self.container.setLayout(QtWidgets.QVBoxLayout())
+        self.container.layout().setContentsMargins(0, 0, 0, 0)
 
         self.addWidget(self.container)
         
@@ -112,7 +114,7 @@ class NotepadDashboard(QtWidgets.QSplitter):
         for i in range(layout.count()): 
             layout.itemAt(i).widget().close()            
 
-        widget = FolderViewWidget()
+        widget = FoldersScrollArea()
         widget.edit.connect(self.edit.emit)
         widget.delete.connect(self.delete.emit)
         widget.delete.connect(lambda x: self.group(index))

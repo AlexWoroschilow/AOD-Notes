@@ -24,7 +24,7 @@ from . import cryptography
 from .cryptography import CryptoFile
 
 
-class QCustomDelegate(QtWidgets.QItemDelegate):
+class QCustomDelegate(QtWidgets.QStyledItemDelegate):
 
     def setEditorData(self, editor, index):
         model = index.model()
@@ -34,6 +34,7 @@ class QCustomDelegate(QtWidgets.QItemDelegate):
 
     def setModelData(self, editor, model, index):
         cryptography.rename(model.filePath(index), editor.text())
+
 
 
 class FilesystemStorage(QtWidgets.QFileSystemModel):

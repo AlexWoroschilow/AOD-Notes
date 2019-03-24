@@ -48,14 +48,14 @@ class NotePreviewContainer(QtWidgets.QWidget):
             self.j = 0
 
 
-class FolderViewWidget(QtWidgets.QScrollArea):
+class FoldersScrollArea(QtWidgets.QScrollArea):
 
     edit = QtCore.pyqtSignal(object)
     delete = QtCore.pyqtSignal(object)
     clone = QtCore.pyqtSignal(object)
 
     def __init__(self):
-        super(FolderViewWidget, self).__init__()
+        super(FoldersScrollArea, self).__init__()
         self.setContentsMargins(0, 0, 0, 0)
 
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)

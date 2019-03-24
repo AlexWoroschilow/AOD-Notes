@@ -12,7 +12,7 @@ QToolButton:!hover {
 }
 
 QTabBar {
-    background-color:#ffffff;
+	background: #ffffff;
 	color: #4F4F4F;
 }
 
@@ -21,20 +21,24 @@ QTabBar::close-button {
 	subcontrol-position: right; 
 }
 
+QTabWidget {
+	background: #ffffff;
+	border: none;
+}
+
 QTabWidget::pane {
-	border-top: 2px solid qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #f1f2f3, stop: 1.0 #414649);
-	border-bottom: 2px solid qlineargradient(x1: 0, y1: 1, x2: 0, y2: 0, stop: 0 #f1f2f3, stop: 1.0 #414649);
-	border-left: 2px solid qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #f1f2f3, stop: 1.0 #414649);
-	background: #FFFFFF;
+	background: #ffffff;
+	border: none;
 }
 
 QTextEdit {
-	background-color: #fff; 
+	background: #fff;
 	border: 1px !important; 
 }
 
-QSplitter { 
-	border: none; background-color: #fff; 
+QSplitter {
+	background: #515659;
+	border: none;
 }
 
 QToolBar {
@@ -50,21 +54,38 @@ ActionButton {
 	color: #A0A0A0;
 }
 
-FolderTree { 
-	background-color: #414649; 
-	color: #A0A0A0;
-	border: none; 
+FolderTree,
+FolderTree::branch {
+    background: #414649;
+    alternate-background-color: #414649;
+	border: none;
 }
+
+FolderTree::item {
+	border-bottom: 1px solid #515659;
+	color: #C0C0C0;
+	padding: 3px 0px;
+}
+
+FolderTree::item:hover,
+FolderTree::item:selected:active,
+FolderTree::item:hover:selected,
+FolderTree::item:selected {
+    alternate-background-color: #515659;
+	border-bottom: 1px solid #515659;
+ 	background: #515659;
+}
+
+
 
 FolderTreeToolBar { 
-	border: none; 
-	background-color: #414649; 
-	color: #A0A0A0;  
+    background: #3F4447;
+    border-right: 3px solid qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #3F4447, stop:1 #414649);
+
+	color: #A0A0A0;
 }
 
-FolderViewWidget,
 NotePreviewContainer { 
-	background: #ffffff;
 	border: none;
 }
 
@@ -75,14 +96,22 @@ NotePreviewContainer NotePreviewDescription {
 }
 
 NotePreviewContainer NotePreviewDescription #previewTitle {
-	background-color: #ffffff;
+	background: #ffffff;
 }
 
 TextEditorWidget,
 QWidget#FolderListContainer,
-SettingsScrollArea { 
-	background-color: #ffffff;
+SettingsScrollArea {
+	background: #ffffff;
 	text-align: center;
+	border: none;
+}
+
+FoldersScrollArea,
+SettingsScrollArea {
+    background: #ffffff url("image/background.jpg") repeat right top;
+    padding: 10px;
+    margin: 0px;
 	border: none;
 }
 

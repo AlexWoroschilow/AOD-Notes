@@ -35,9 +35,10 @@ from html.parser import HTMLParser
 import whoosh
 from whoosh import fields
 
-from PyQt5 import QtWidgets
 from PyQt5 import QtCore
+from PyQt5 import QtWidgets
 from PyQt5 import QtGui
+from PyQt5.QtCore import Qt
 
 from fbs_runtime.application_context import ApplicationContext
 
@@ -54,6 +55,8 @@ from lib.kernel import Kernel
 class ApplicationContainer(ApplicationContext):
 
     def run(self, options, args):
+        self.app.setAttribute(Qt.AA_ShareOpenGLContexts)
+
         spec = importlib.util.find_spec('application')
         module = spec.loader.load_module()
 
