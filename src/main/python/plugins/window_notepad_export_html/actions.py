@@ -20,9 +20,9 @@ from PyQt5 import QtCore
 class ModuleActions(object):
 
     def onActionButtonPressed(self, widget):
-        selector = QtWidgets.QFileDialog()
-        if not selector.exec_():
-            return None
+
+        selector = QtWidgets.QFileDialog(None, 'Select where to export', os.path.expanduser('~'))
+        if not selector.exec_(): return None
 
         for path in selector.selectedFiles():
 
@@ -37,7 +37,8 @@ class ModuleActions(object):
                 continue
 
             message = widget.tr("Are you sure you want to overwrite the file '%s' ?" % path)
-            reply = QtWidgets.QMessageBox.question(widget, 'Message', message, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
+            reply = QtWidgets.QMessageBox.question(widget, 'Message', message, QtWidgets.QMessageBox.Yes,
+                                                   QtWidgets.QMessageBox.No)
             if reply == QtWidgets.QMessageBox.No:
                 continue
 

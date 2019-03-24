@@ -50,18 +50,18 @@ class NotePreviewDescription(QtWidgets.QGroupBox):
         self.layout.addWidget(description, 1, 0, 4, 20)
 
         self.buttonEdit = Button()
-        self.buttonEdit.setIcon(QtGui.QIcon("icons/file-light.svg"))
+        self.buttonEdit.setIcon(QtGui.QIcon("icons/file-light"))
         self.buttonEdit.clicked.connect(lambda x: self.edit.emit(index))
         
         self.layout.addWidget(self.buttonEdit, 0, 17, 1, 1)
 
         self.buttonClone = Button()
-        self.buttonClone.setIcon(QtGui.QIcon("icons/copy-light.svg"))
+        self.buttonClone.setIcon(QtGui.QIcon("icons/copy-light"))
         self.buttonClone.clicked.connect(lambda x: self.clone.emit(index))
         self.layout.addWidget(self.buttonClone, 0, 18, 1, 1)
 
         self.buttonDelete = Button()
-        self.buttonDelete.setIcon(QtGui.QIcon("icons/remove-light.svg"))
+        self.buttonDelete.setIcon(QtGui.QIcon("icons/close-light"))
         self.buttonDelete.clicked.connect(lambda x: self.delete.emit(index))
         self.layout.addWidget(self.buttonDelete, 0, 19, 1, 1)
 

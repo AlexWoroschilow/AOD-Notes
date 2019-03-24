@@ -59,15 +59,15 @@ class Loader(Loader):
         if options is None: return None
         if args is None: return None
 
-        self.buttonGroup = ActionButton(QtGui.QIcon("icons/folder-light.svg"), 'New Group')
+        self.buttonGroup = ActionButton(QtGui.QIcon("icons/folder-light"), 'New Group')
         action = functools.partial(dashboard.actions.onActionFolderCreate, widget=dashboard)
         self.buttonGroup.triggered.connect(action)
 
-        self.buttonNote = ActionButton(QtGui.QIcon("icons/file-light.svg"), 'New Note')
+        self.buttonNote = ActionButton(QtGui.QIcon("icons/file-new-light"), 'New Note')
         action = functools.partial(dashboard.actions.onActionNoteCreate, widget=dashboard)
         self.buttonNote.triggered.connect(action)
 
-        self.buttonImport = ActionButton(QtGui.QIcon("icons/new-file.svg"), 'Import File')
+        self.buttonImport = ActionButton(QtGui.QIcon("icons/file-import-light"), 'Import File')
         self.buttonImport.triggered.connect(self.actions.onActionNoteImport)
 
         self.search = SearchField()

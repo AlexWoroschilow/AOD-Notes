@@ -19,9 +19,8 @@ from PyQt5 import QtWidgets
 class ModuleActions(object):
 
     def onActionButtonPressed(self, widget):
-        selector = QtWidgets.QFileDialog()
-        if not selector.exec_():
-            return None
+        selector = QtWidgets.QFileDialog(None, 'Select where to export', os.path.expanduser('~'))
+        if not selector.exec_(): return None
 
         for path in selector.selectedFiles():
 
