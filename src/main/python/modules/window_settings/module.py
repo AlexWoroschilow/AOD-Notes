@@ -19,7 +19,7 @@ from PyQt5 import QtWidgets
 from .actions import ModuleActions
 
 from lib.plugin import Loader
-
+from .gui.button import PictureButton
 
 class Loader(Loader):
     actions = ModuleActions()
@@ -34,8 +34,8 @@ class Loader(Loader):
 
     @inject.params(factory='window.header_factory')
     def boot(self, options=None, args=None, factory=None):
-        widget = QtWidgets.QAction(QtGui.QIcon("icons/settings.svg"), None)
-        widget.triggered.connect(self.actions.onActionSettings)
+        widget = PictureButton(QtGui.QIcon("icons/settings.svg"), None)
+        widget.clicked.connect(self.actions.onActionSettings)
 
         factory.addWidget(widget, 128)
 

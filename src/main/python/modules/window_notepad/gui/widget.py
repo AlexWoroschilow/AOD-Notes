@@ -72,8 +72,11 @@ class NotepadDashboard(QtWidgets.QSplitter):
         
     @property
     def current(self):
-        if self.tree is None: return None
-        return self.tree.currentIndex()
+        injector = inject.get_injector()
+        storage = injector.get_instance('storage')
+        if len(storage.filePath(self.tree.currentIndex())):
+            return self.tree.currentIndex()
+        return storage.rootIndex()
         
     @inject.params(storage='storage', editor='notepad.editor', config='config')
     def note(self, index, storage, editor, config=None):

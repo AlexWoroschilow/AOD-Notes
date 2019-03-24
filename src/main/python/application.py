@@ -13,20 +13,26 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
-import sys 
-import inject       
+import sys
+import inject
 import logging
 import optparse
- 
+
 from PyQt5 import QtWidgets
 
 from lib.kernel import Kernel
 
+abspath = os.path.abspath(__file__)
+os.chdir(os.path.dirname(abspath))
+
+sys.path.append(os.path.join(os.getcwd(), 'lib'))
+sys.path.append(os.path.join(os.getcwd(), 'modules'))
+sys.path.append(os.path.join(os.getcwd(), 'plugins'))
+
 
 class Application(QtWidgets.QApplication):
-
     kernel = None
-    
+
     def __init__(self, options=None, args=None):
         super(Application, self).__init__(sys.argv)
         self.setApplicationName('CryptoNotes')
@@ -36,7 +42,7 @@ class Application(QtWidgets.QApplication):
     def exec_(self, kernel=None, widget=None):
         if kernel is None: return None
         if widget is None: return None
-        
+
         widget.show()
 
         return super(Application, self).exec_()
@@ -44,13 +50,13 @@ class Application(QtWidgets.QApplication):
 
 if __name__ == "__main__":
     parser = optparse.OptionParser()
-    
+
     parser.add_option("--loglevel", default=logging.DEBUG, dest="loglevel", help="Logging level")
     parser.add_option("--logfile", default=os.path.expanduser('~/.config/CryptoNotes/notes.log'), dest="logfile", help="Logfile location")
     parser.add_option("--config", default=os.path.expanduser('~/.config/CryptoNotes/notes.conf'), dest="config", help="Config file location")
-    
+
     (options, args) = parser.parse_args()
-    
+
     log_format = '[%(relativeCreated)d][%(name)s] %(levelname)s - %(message)s'
     logging.basicConfig(level=options.loglevel, format=log_format)
 

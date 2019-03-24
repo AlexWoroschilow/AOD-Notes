@@ -59,23 +59,33 @@ class ConfigFile(object):
         return None
 
     def get(self, name, default=None):
-        section, option = name.split('.')
+        if not self.has(name):
+            return self.set(name, default)
+
+        section, option = name.split('.', 1)
         if not self.parser.has_section(section):
-            return default
+            return None
+
         if self.parser.has_option(section, option):
             return self.parser.get(section, option)
-        return default
+        return None
 
     def set(self, name, value=None):
-        section, option = name.split('.')
-        
+        section, option = name.split('.', 1)
+
         if not self.parser.has_section(section):
             self.parser.add_section(section)
-        
-        self.parser.set(section, option, value)
+
+        self.parser.set(section, option, '%s' % value)
         with open(self.file, 'w') as stream:
             self.parser.write(stream)
             stream.close()
-            
-        return self
+        return value
 
+    def has(self, name):
+        section, option = name.split('.', 1)
+
+        if self.parser.has_section(section):
+            return self.parser.has_option(section, option)
+
+        return False

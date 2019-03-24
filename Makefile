@@ -1,16 +1,16 @@
 project = CryptoNotes
-project_version = 0.1
 source_rpm = ~/rpmbuild/SOURCES
+project_version = 0.1
 source_project = $(source_rpm)/$(project)-$(project_version)
 
 
-all: appimage
+all: appimage clean
 	echo "done"
 
 clean: 
-	rm              -rf    $(project).AppDir
-	rm              -rf    target/PyInstaller
-	rm              -rf    target/$(project)
+	@echo	"[clean] Cleanup the AppDir" && 		rm	-rf		$(project).AppDir
+	@echo	"[clean] Cleanup the PyInstaller" && 	rm 	-rf		target/PyInstaller
+	@echo	"[clean] Cleanup the Build" && 			rm  -rf		target/$(project)
 
 
 appimage:
@@ -36,8 +36,8 @@ appimage:
 
 	echo			"#! /bin/bash" >> $(project).AppDir/AppRun
 	echo			"set -e" >> $(project).AppDir/AppRun
-	echo			"cd \$${APPDIR}/opt/$(project)" >> $(project).AppDir/AppRun
-	echo			"exec ./$(project)" >> $(project).AppDir/AppRun
+	echo			"cd \$${HOME}" >> $(project).AppDir/AppRun
+	echo			"exec \$${APPDIR}/opt/$(project)/$(project)" >> $(project).AppDir/AppRun
 	chmod 			+x $(project).AppDir/AppRun
 	find 			$(project).AppDir -name '__pycache__' -exec rm -rf {} +
 	find 			$(project).AppDir -name '.pyc*' -exec rm -rf {} +
