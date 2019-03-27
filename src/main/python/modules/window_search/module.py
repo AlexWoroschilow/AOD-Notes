@@ -59,7 +59,7 @@ class Loader(Loader):
         if options is None: return None
         if args is None: return None
 
-        self.buttonGroup = ActionButton(QtGui.QIcon("icons/folder"), 'New Group')
+        self.buttonGroup = ActionButton(QtGui.QIcon("icons/preview"), 'New Group')
         action = functools.partial(dashboard.actions.onActionFolderCreate, widget=dashboard)
         self.buttonGroup.triggered.connect(action)
 

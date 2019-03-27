@@ -29,7 +29,7 @@ class WidgetSettingsStorage(WidgetSettings):
         self.layout.addWidget(QtWidgets.QLabel('Database:'), 1, 0)
 
         self.location = QtWidgets.QPushButton('Change')
-        self.location.setToolTip("Clone selected folder")
+        self.location.setToolTip("Clone selected preview")
         self.location.setFlat(True)
         self.layout.addWidget(self.location, 1, 1)
         

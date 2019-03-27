@@ -85,17 +85,17 @@ FolderTreeToolBar {
 	color: #A0A0A0;
 }
 
-NotePreviewContainer { 
+PreviewContainer { 
 	border: none;
 }
 
-NotePreviewContainer NotePreviewDescription {
+PreviewContainer NotePreviewDescription {
 	background-color: #ffffff;
 	border-radius: 0px;
 	padding: 10px 30px;
 }
 
-NotePreviewContainer NotePreviewDescription #previewTitle {
+PreviewContainer NotePreviewDescription #previewTitle {
 	background: #ffffff;
 }
 
@@ -107,7 +107,7 @@ SettingsScrollArea {
 	border: none;
 }
 
-FoldersScrollArea,
+PreviewScrollArea,
 SettingsScrollArea {
     background: #ffffff url("image/background.jpg") repeat right top;
     padding: 10px;

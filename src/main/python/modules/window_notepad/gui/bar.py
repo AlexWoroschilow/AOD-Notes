@@ -47,13 +47,13 @@ class FolderTreeToolBar(QtWidgets.QToolBar):
 
         self.copyAction = ToolBarButton()
         self.copyAction.setIcon(QtGui.QIcon("icons/copy-light.svg"))
-        self.copyAction.setToolTip("Clone selected folder")
+        self.copyAction.setToolTip("Clone selected preview")
         self.copyAction.setShortcut("Ctrl+C")
         self.addWidget(self.copyAction)
 
         self.removeAction = ToolBarButton()
         self.removeAction.setIcon(QtGui.QIcon("icons/remove-light.svg"))
-        self.removeAction.setToolTip("Remove selected folder")
+        self.removeAction.setToolTip("Remove selected preview")
         self.removeAction.setShortcut("Del")
         self.addWidget(self.removeAction)
 

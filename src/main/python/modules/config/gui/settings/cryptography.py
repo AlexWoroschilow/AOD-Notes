@@ -72,13 +72,13 @@ class CryptographyThread(QtCore.QThread):
         for index, path_old in enumerate(folders, start=index):
             self.progress.emit(index / total * 100)
             # check if the metadata file already there
-            # that means the folder was already encrypted
+            # that means the preview was already encrypted
             if not os.path.exists(path_old): continue
             metadata = os.path.join(path_old, '.metadata')
             if os.path.exists(metadata): continue
             open(metadata, 'w+').write('')
             if not os.path.exists(metadata): continue
-            # The metadata content play the role of the folder name for now
+            # The metadata content play the role of the preview name for now
             storage.setFileContent(metadata, os.path.basename(path_old))
 
             root = os.path.dirname(path_old)
