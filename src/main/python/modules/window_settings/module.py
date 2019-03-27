@@ -34,7 +34,7 @@ class Loader(Loader):
 
     @inject.params(factory='window.header_factory')
     def boot(self, options=None, args=None, factory=None):
-        widget = PictureButton(QtGui.QIcon("icons/settings.svg"), None)
+        widget = PictureButton(QtGui.QIcon("icons/settings"), None)
         widget.clicked.connect(self.actions.onActionSettings)
 
         factory.addWidget(widget, 128)
