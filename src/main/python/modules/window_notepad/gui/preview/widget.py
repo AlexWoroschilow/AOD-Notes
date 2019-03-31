@@ -55,7 +55,7 @@ class PreviewScrollArea(QtWidgets.QScrollArea):
     def resizeEvent(self, QResizeEvent):
         columns = round(QResizeEvent.size().width() / 600)
         if columns and self.columns != columns:
-            self.columns = columns
+            self.columns = columns if columns > 0 else 1
             self.show()
         return super(PreviewScrollArea, self).resizeEvent(QResizeEvent)
 

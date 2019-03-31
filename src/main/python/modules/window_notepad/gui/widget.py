@@ -128,6 +128,7 @@ class NotepadDashboard(QtWidgets.QSplitter):
             widget.addPreview(entity)
 
         layout.addWidget(widget)
+        widget.show()
         return self
 
     def demo(self):
