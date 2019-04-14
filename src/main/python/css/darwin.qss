@@ -15,11 +15,13 @@ QTabBar::close-button {
 QTabWidget {
 	background: #ffffff;
 	border: none;
+	margin: 0px;
 }
 
 QTabWidget::pane {
 	background: #ffffff;
 	border: none;
+	margin: 0px;
 }
 
 QTextEdit {
@@ -49,11 +51,11 @@ QToolButton:!hover {
 }
 
 
-
 ToolbarWidgetLeft,
 ToolbarWidgetRight,
 FormatbarWidget,
 FolderTreeToolBar {
+    padding: 0px;
     margin: 0px;
 }
 
@@ -62,17 +64,23 @@ ToolbarWidgetLeft ToolBarButton,
 ToolbarWidgetRight ToolBarButton,
 FormatbarWidget ToolBarButton {
 	border: none;
-    padding: 6px;
+    padding: 5px;
     margin: 0px;
 }
 
+FolderTreeToolBar ToolBarButton:pressed,
+ToolbarWidgetLeft ToolBarButton:pressed,
+ToolbarWidgetRight ToolBarButton:pressed,
+FormatbarWidget ToolBarButton:pressed {
+    background-color: rgb(236,236,236);
+    padding: 5px;
+}
 
 SearchField {
     margin: 0px;
     padding: 5px;
     border: none;
 }
-
 
 FolderTree,
 FolderTree::branch {
@@ -97,7 +105,6 @@ FolderTree::item:selected {
 }
 
 
-
 FolderTreeToolBar { 
     background: #3F4447;
     border-right: 3px solid qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #3F4447, stop:1 #414649);
@@ -118,6 +125,7 @@ PreviewContainer NotePreviewDescription #previewTitle {
 	background: #ffffff;
 }
 
+
 TextEditorWidget,
 QWidget#FolderListContainer,
 SettingsScrollArea {
@@ -131,15 +139,16 @@ WizardDashboardScrollArea,
 SettingsScrollArea {
     background: #515659;
     padding: 0px 0px;
-    margin: 0px;
 	border: none;
+    margin: 0px;
 }
 
 TextWriter,
 TextEditor,
 WidgetSettings {
 	border-radius: 0px;
-	border: none
+	border: none;
+    margin: 0px;
 }
 
 WizardSettings {

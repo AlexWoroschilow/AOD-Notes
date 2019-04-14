@@ -79,7 +79,7 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.rightbar.boldAction.clicked.connect(self.onActionBold)
 
         layout = QtWidgets.QGridLayout()
-        layout.setContentsMargins(0, 10, 0, 0)
+        layout.setContentsMargins(0, 0, 0, 0)
 
         layout.addWidget(self.leftbar, 0, 0, 5, 1)
         layout.addWidget(self.rightbar, 1, 2, 3, 1)

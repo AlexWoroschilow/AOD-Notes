@@ -16,13 +16,15 @@ import functools
 
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
+from PyQt5.Qt import Qt
 
 from lib.plugin import Loader
 
 from .actions import ModuleActions
 from .gui.widget import SearchField
 from .gui.widget import ActionButton
-from PyQt5.Qt import Qt
+from .gui.button import PictureButton
+
 
 
 class Loader(Loader):
@@ -70,16 +72,16 @@ class Loader(Loader):
         if options is None: return None
         if args is None: return None
 
-        self.buttonGroup = ActionButton(QtGui.QIcon("icons/preview"), 'New Group')
+        self.buttonGroup = PictureButton(QtGui.QIcon("icons/preview"), 'New Group')
         action = functools.partial(dashboard.actions.onActionFolderCreate, widget=dashboard)
-        self.buttonGroup.triggered.connect(action)
+        self.buttonGroup.clicked.connect(action)
 
-        self.buttonNote = ActionButton(QtGui.QIcon("icons/file-new"), 'New Note')
+        self.buttonNote = PictureButton(QtGui.QIcon("icons/file-new"), 'New Note')
         action = functools.partial(dashboard.actions.onActionNoteCreate, widget=dashboard)
-        self.buttonNote.triggered.connect(action)
+        self.buttonNote.clicked.connect(action)
 
-        self.buttonImport = ActionButton(QtGui.QIcon("icons/file-import"), 'Import File')
-        self.buttonImport.triggered.connect(self.actions.onActionNoteImport)
+        self.buttonImport = PictureButton(QtGui.QIcon("icons/file-import"), 'Import File')
+        self.buttonImport.clicked.connect(self.actions.onActionNoteImport)
 
         self.search = SearchField()
         self.search.setFocusPolicy(Qt.StrongFocus)
