@@ -38,11 +38,6 @@ class ModuleActions(object):
 
         return dashboard.toggle(collection, True)
 
-    def onActionSearchShortcut(self, event=None, widget=None):
-        if widget is None: return None
-        widget.setFocusPolicy(Qt.StrongFocus)
-        widget.setFocus()
-
     @inject.params(storage='storage', config='config', dashboard='notepad.dashboard')
     def onActionNoteImport(self, event=None, storage=None, config=None, dashboard=None):
         if dashboard is None or storage is None or config is None: return None

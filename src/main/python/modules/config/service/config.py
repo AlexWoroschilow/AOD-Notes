@@ -47,7 +47,7 @@ class ConfigFile(object):
             self.parser.set('editor', 'current', '')
 
             self.parser.add_section('storage')
-            self.parser.set('storage', 'location', '~/owncloud/CloudNotes/')
+            self.parser.set('storage', 'location', '')
 
             self.parser.add_section('cryptography')
             self.parser.set('cryptography', 'password', '')

@@ -172,6 +172,7 @@ class CryptoFile(object):
         return True
 
     def __read(self):
+        if not os.path.isfile(self.path): return None
         if not os.path.exists(self.path): return None
         with open(self.path, 'r') as stream:
             result = stream.read()

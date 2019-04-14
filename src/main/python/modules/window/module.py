@@ -27,7 +27,6 @@ from .actions import ModuleActions
 
 
 class Loader(Loader):
-
     actions = ModuleActions()
 
     @property
@@ -36,46 +35,12 @@ class Loader(Loader):
 
     def config(self, binder=None):
         binder.bind('window.header_factory', WidgetHeaderFactory())
-        
+
         binder.bind_to_constructor('window', self._widget)
         binder.bind_to_provider('window.header', self._widget_header)
         binder.bind_to_provider('window.content', self._widget_content)
         binder.bind_to_provider('window.footer', self._widget_footer)
         binder.bind_to_provider('window.status', self._widget_status)
-
-    @inject.params(config='config', factory='window.header_factory')
-    def _widget(self, config=None, factory=None):
-        container = inject.get_injector()
-        if container is None: return None
-        
-        widget = MainWindow()
-        dashboard = container.get_instance('notepad')
-        widget.setMainWidget(dashboard)
-
-        width = int(config.get('window.width'))
-        height = int(config.get('window.height'))  
-        widget.resize(width, height)
-        
-        widget.header = widget.addToolBar('main')
-        widget.header.setObjectName('QToolBarTop')
-        widget.header.setIconSize(QtCore.QSize(20, 20))
-        widget.header.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
-        widget.header.setFloatable(False)
-        widget.header.setMovable(False)
-        
-        for header_widget, priority in factory.widgets:
-            if isinstance(header_widget, QtWidgets.QAction):
-                widget.header.addAction(header_widget)
-            if isinstance(header_widget, QtWidgets.QWidget):
-                widget.header.addWidget(header_widget)
-
-        widget.footer = widget.statusBar()
-
-        widget.resizeEvent = functools.partial(
-            self.actions.onActionWindowResize
-        )
-        
-        return widget
 
     @inject.params(window='window')
     def _widget_header(self, window=None):
@@ -96,3 +61,35 @@ class Loader(Loader):
     def _widget_status(self, window=None):
         return window.statusBar()
 
+    @inject.params(config='config', factory='window.header_factory')
+    def _widget(self, config=None, factory=None):
+        container = inject.get_injector()
+        if container is None: return None
+
+        widget = MainWindow()
+        width = int(config.get('window.width'))
+        height = int(config.get('window.height'))
+        widget.resize(width, height)
+
+        wizard = container.get_instance('wizard')
+        if wizard is not None and wizard:
+            wizard.start.connect(self.test)
+            widget.setMainWidget(wizard)
+            return widget
+
+        notepad = container.get_instance('notepad')
+        if notepad is None: return None
+        widget.setMainWidget(notepad)
+
+        widget.footer = widget.statusBar()
+        widget.resizeEvent = self.actions.onActionWindowResize
+
+        return widget
+
+    @inject.params(window='window')
+    def test(self, event, window=None):
+        container = inject.get_injector()
+        if container is None: return None
+        notepad = container.get_instance('notepad')
+        if notepad is None: return None
+        window.setMainWidget(notepad)

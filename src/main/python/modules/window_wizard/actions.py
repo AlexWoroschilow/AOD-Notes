@@ -10,22 +10,18 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-from PyQt5 import QtCore
-from PyQt5 import QtWidgets
+import os
+import inject
 
 
-class ToolBarButton(QtWidgets.QPushButton):
+class ModuleActions(object):
 
-    activate = QtCore.pyqtSignal(object)
+    @inject.params(config='config')
+    def onActionWizardLocation(self, location=None, config=None):
+        if location is None: return None
+        config.set('storage.location', location)
 
-    def __init__(self, parent=None):
-        super(ToolBarButton, self).__init__(parent)
-        self.setFlat(True)
-
-    def connected(self):
-        try:
-            receiversCount = self.receivers(self.clicked)
-            return receiversCount > 0
-        except (SyntaxError, RuntimeError) as err:
-            return False
-        
+    @inject.params(config='config')
+    def onActionWizardPassword(self, password=None, config=None):
+        if password is None: return None
+        config.set('cryptography.password', password)

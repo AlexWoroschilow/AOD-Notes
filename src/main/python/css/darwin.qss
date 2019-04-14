@@ -1,18 +1,9 @@
 QMainWindow {
-	background: #ffffff;
-}
-QToolButton:hover {
-	color: #000000;
-    padding: 3px;
-}
-QToolButton:!hover {
-    background-color:#ffffff;
-	color: #4F4F4F;
-    padding: 3px;
+	background: rgb(236,236,236);
 }
 
 QTabBar {
-	background: #ffffff;
+	background: rgb(236,236,236);
 	color: #4F4F4F;
 }
 
@@ -33,7 +24,7 @@ QTabWidget::pane {
 
 QTextEdit {
 	background: #fff;
-	border: 1px !important; 
+	border: 1px !important;
 }
 
 QSplitter {
@@ -43,16 +34,45 @@ QSplitter {
 
 QToolBar {
 	border: none;
+    margin: 5px 0px;
 }
 
+QToolButton:pressed {
+    border: none;
+    background-color:#AFAFAF;
+    padding: 0px;
+}
+QToolButton:hover,
+QToolButton:!hover {
+    border: none;
+    padding: 0px;
+}
+
+
+
+ToolbarWidgetLeft,
+ToolbarWidgetRight,
+FormatbarWidget,
+FolderTreeToolBar {
+    margin: 0px;
+}
+
+FolderTreeToolBar ToolBarButton,
+ToolbarWidgetLeft ToolBarButton,
+ToolbarWidgetRight ToolBarButton,
+FormatbarWidget ToolBarButton {
+	border: none;
+    padding: 6px;
+    margin: 0px;
+}
+
+
 SearchField {
-    margin: 5px 0px;
-    padding: 5px 5px;
+    margin: 0px;
+    padding: 5px;
     border: none;
 }
-ActionButton {
-	color: #A0A0A0;
-}
+
 
 FolderTree,
 FolderTree::branch {
@@ -159,5 +179,3 @@ WizardButtonStart {
     min-height: 50px;
 	font-size: 20px;
 }
-
-

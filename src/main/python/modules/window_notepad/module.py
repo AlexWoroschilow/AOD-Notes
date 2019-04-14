@@ -20,7 +20,6 @@ from .factory import ToolbarFactory
 
 
 class Loader(Loader):
-    
     actions = ModuleActions()
 
     @property
@@ -34,7 +33,7 @@ class Loader(Loader):
 
         binder.bind_to_provider('notepad', self._notepad)
         binder.bind_to_provider('notepad.editor', self._notepad_editor)
-        
+
         binder.bind_to_constructor('notepad.dashboard', self._notepad_dashboard)
 
     @inject.params(config='config', storage='storage', dashboard='notepad.dashboard')
@@ -49,12 +48,14 @@ class Loader(Loader):
         # and open this document in the editor by default
         index = storage.index(current)
         if index is None: return None
-         
+
         if storage.isDir(index): return dashboard.group(index)
         if storage.isFile(index): return dashboard.note(index)
 
-    @inject.params(dashboard='notepad.dashboard')
-    def _notepad(self, dashboard=None):
+    @inject.params(config='config', dashboard='notepad.dashboard')
+    def _notepad(self, config=None, dashboard=None):
+        if not len(config.get('storage.location')): return None
+
         if dashboard is None: return None
 
         from .gui.dashboard import Notepad
@@ -64,15 +65,17 @@ class Loader(Loader):
 
     @inject.params(kernel='kernel', config='config', factory_leftbar='toolbar_factory.leftbar', factory_rightbar='toolbar_factory.rightbar', factory_formatbar='toolbar_factory.formatbar')
     def _notepad_editor(self, kernel=None, config=None, factory_leftbar=None, factory_rightbar=None, factory_formatbar=None):
-        from .gui.editor.widget import TextEditorWidget  
-        
+        if not len(config.get('storage.location')): return None
+
+        from .gui.editor.widget import TextEditorWidget
+
         widget = TextEditorWidget()
 
         for plugin in factory_leftbar.widgets:
             plugin.clicked.connect(functools.partial(plugin.clickedEvent, widget=widget))
             widget.leftbar.addWidget(plugin)
         widget.leftbar.setVisible(int(config.get('editor.leftbar')))
-        
+
         for plugin in factory_formatbar.widgets:
             plugin.clicked.connect(functools.partial(plugin.clickedEvent, widget=widget))
             widget.formatbar.addWidget(plugin)
@@ -82,10 +85,10 @@ class Loader(Loader):
             plugin.clicked.connect(functools.partial(plugin.clickedEvent, widget=widget))
             widget.rightbar.addWidget(plugin)
         widget.rightbar.setVisible(int(config.get('editor.rightbar')))
-        
+
         action = functools.partial(self.actions.onActionSave, widget=widget)
         widget.save.connect(action)
-        
+
         action = functools.partial(self.actions.onActionFullScreen, widget=widget)
         widget.fullscreen.connect(action)
 
@@ -94,8 +97,10 @@ class Loader(Loader):
 
         return widget
 
-    @inject.params(kernel='kernel', storage='storage')
-    def _notepad_dashboard(self, kernel, storage):
+    @inject.params(kernel='kernel', config='config', storage='storage')
+    def _notepad_dashboard(self, kernel, config, storage):
+        if not len(config.get('storage.location')): return None
+
         from .gui.widget import NotepadDashboard
 
         widget = NotepadDashboard(self.actions)
@@ -114,10 +119,10 @@ class Loader(Loader):
 
         action = functools.partial(self.actions.onActionContextMenu, widget=widget)
         widget.tree.customContextMenuRequested.connect(action)
-        
+
         action = functools.partial(self.actions.onActionNoteSelect, widget=widget)
         widget.tree.clicked.connect(action)
-        
+
         action = functools.partial(self.actions.onActionClone, widget=widget)
         widget.toolbar.copyAction.clicked.connect(action)
 

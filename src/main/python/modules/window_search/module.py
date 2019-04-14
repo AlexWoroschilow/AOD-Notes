@@ -22,10 +22,19 @@ from lib.plugin import Loader
 from .actions import ModuleActions
 from .gui.widget import SearchField
 from .gui.widget import ActionButton
+from PyQt5.Qt import Qt
 
 
 class Loader(Loader):
     actions = ModuleActions()
+
+    def __init__(self, options=None, args=None):
+        if options is None or args is None: return None
+        self.buttonGroup = None
+        self.buttonNote = None
+        self.buttonImport = None
+        self.search = None
+        self.spacer = None
 
     @property
     def enabled(self):
@@ -53,8 +62,10 @@ class Loader(Loader):
             service.append(name, path, text)
         return service
 
-    @inject.params(factory='window.header_factory', dashboard='notepad.dashboard')
-    def boot(self, options=None, args=None, factory=None, dashboard=None):
+    @inject.params(config='config', factory='window.header_factory', dashboard='notepad.dashboard')
+    def boot(self, options=None, args=None, config=None, factory=None, dashboard=None):
+        if not len(config.get('storage.location')): return None
+
         if dashboard is None: return None
         if options is None: return None
         if args is None: return None
@@ -71,9 +82,11 @@ class Loader(Loader):
         self.buttonImport.triggered.connect(self.actions.onActionNoteImport)
 
         self.search = SearchField()
+        self.search.setFocusPolicy(Qt.StrongFocus)
+        self.search.clearFocus()
+
         action = functools.partial(self.onSearchFocusIn, widget=self.search)
         self.search.focusInEvent = action
-
         action = functools.partial(self.onSearchFocusOut, widget=self.search)
         self.search.focusOutEvent = action
 
@@ -81,8 +94,8 @@ class Loader(Loader):
         self.search.returnPressed.connect(action)
 
         shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+f"), self.search)
-        action = functools.partial(self.actions.onActionSearchShortcut, widget=self.search)
-        shortcut.activated.connect(action)
+        shortcut.activated.connect(self.onSearchFocusActivate)
+        shortcut.setEnabled(True)
 
         self.spacer = QtWidgets.QWidget()
         self.spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
@@ -94,16 +107,42 @@ class Loader(Loader):
         factory.addWidget(self.spacer)
         factory.addWidget(self.search)
 
-    def onSearchFocusIn(self, event, widget):
+    def onSearchFocusActivate(self, event=None):
+        if self.search is None: return None
+        self.search.clearFocus()
+        self.search.setFocus()
+
+    def onSearchFocusIn(self, event=None, widget=None):
+
+        if self.search is None: return None
+        self.search.setAlignment(Qt.AlignCenter)
+
+        if self.spacer is None: return None
         self.spacer.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         self.spacer.setVisible(False)
+
+        if self.buttonGroup is None: return None
         self.buttonGroup.setVisible(False)
+
+        if self.buttonNote is None: return None
         self.buttonNote.setVisible(False)
+
+        if self.buttonImport is None: return None
         self.buttonImport.setVisible(False)
 
     def onSearchFocusOut(self, event, widget):
+        if self.search is None: return None
+        self.search.setAlignment(Qt.AlignLeft)
+
+        if self.spacer is None: return None
         self.spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
         self.spacer.setVisible(True)
+
+        if self.buttonGroup is None: return None
         self.buttonGroup.setVisible(True)
-        self.buttonImport.setVisible(True)
+
+        if self.buttonNote is None: return None
         self.buttonNote.setVisible(True)
+
+        if self.buttonImport is None: return None
+        self.buttonImport.setVisible(True)

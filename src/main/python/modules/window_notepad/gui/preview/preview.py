@@ -22,13 +22,11 @@ class Button(QtWidgets.QPushButton):
 
     def __init__(self, parent=None):
         super(Button, self).__init__(parent)
-        self.setIconSize(QtCore.QSize(20, 20))
         self.setMaximumWidth(40)
         self.setFlat(True)
 
 
 class NotePreviewDescription(QtWidgets.QGroupBox):
-
     edit = QtCore.pyqtSignal(object)
     delete = QtCore.pyqtSignal(object)
     clone = QtCore.pyqtSignal(object)
@@ -44,26 +42,26 @@ class NotePreviewDescription(QtWidgets.QGroupBox):
         self.layout.setAlignment(Qt.AlignTop)
 
         title = Title(storage.fileName(index))
-        self.layout.addWidget(title, 0, 0, 1, 17)
+        self.layout.addWidget(title, 0, 0, 1, 27)
 
         description = Description(storage.fileContent(index))
-        self.layout.addWidget(description, 1, 0, 4, 20)
+        self.layout.addWidget(description, 1, 0, 4, 30)
 
         self.buttonEdit = Button()
         self.buttonEdit.setIcon(QtGui.QIcon("icons/file"))
         self.buttonEdit.clicked.connect(lambda x: self.edit.emit(index))
-        
-        self.layout.addWidget(self.buttonEdit, 0, 17, 1, 1)
+
+        self.layout.addWidget(self.buttonEdit, 0, 27, 1, 1)
 
         self.buttonClone = Button()
         self.buttonClone.setIcon(QtGui.QIcon("icons/copy"))
         self.buttonClone.clicked.connect(lambda x: self.clone.emit(index))
-        self.layout.addWidget(self.buttonClone, 0, 18, 1, 1)
+        self.layout.addWidget(self.buttonClone, 0, 28, 1, 1)
 
         self.buttonDelete = Button()
         self.buttonDelete.setIcon(QtGui.QIcon("icons/file-remove"))
         self.buttonDelete.clicked.connect(lambda x: self.delete.emit(index))
-        self.layout.addWidget(self.buttonDelete, 0, 19, 1, 1)
+        self.layout.addWidget(self.buttonDelete, 0, 29, 1, 1)
 
         self.setLayout(self.layout)
 
@@ -90,11 +88,15 @@ class Description(QtWidgets.QTextEdit):
         super(Description, self).__init__()
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setReadOnly(True)
+        self.setEnabled(False)
         self.setHtml(text)
         self.show()
 
     def resizeEvent(self, *args, **kwargs):
-        self.setFixedHeight(self.document().size().height() + 50)
-        return QtWidgets.QTextEdit.resizeEvent(self, *args, **kwargs)
+        document = self.document()
+        if document is None: return None
+        size = document.size()
+        if size is None: return None
 
+        self.setFixedHeight(size.height())
+        return QtWidgets.QTextEdit.resizeEvent(self, *args, **kwargs)

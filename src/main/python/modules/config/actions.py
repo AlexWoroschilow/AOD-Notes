@@ -20,7 +20,8 @@ class ModuleActions(object):
     def onActionStorageLocationChange(self, event, config, widget, kernel):
 
         from PyQt5 import QtWidgets
-        destination = str(QtWidgets.QFileDialog.getExistingDirectory(widget, "Select Directory",os.path.expanduser('~')))
+        destination = str(
+            QtWidgets.QFileDialog.getExistingDirectory(widget, "Select Directory", os.path.expanduser('~')))
         if destination is not None and len(destination):
             config.set('storage.location', destination)
             widget.location.setText(destination)
@@ -30,4 +31,3 @@ class ModuleActions(object):
     def onActionCheckboxToggle(self, status, variable, config, kernel):
         config.set(variable, '%s' % status)
         kernel.dispatch('config_updated')
-

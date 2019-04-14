@@ -21,6 +21,7 @@ from .actions import ModuleActions
 from lib.plugin import Loader
 from .gui.button import PictureButton
 
+
 class Loader(Loader):
     actions = ModuleActions()
 
@@ -32,8 +33,10 @@ class Loader(Loader):
         binder.bind_to_provider('settings_menu', self._menu)
         binder.bind_to_constructor('settings_factory', self._settings)
 
-    @inject.params(factory='window.header_factory')
-    def boot(self, options=None, args=None, factory=None):
+    @inject.params(config='config', factory='window.header_factory')
+    def boot(self, options=None, args=None, config=None, factory=None):
+        if not len(config.get('storage.location')): return None
+
         widget = PictureButton(QtGui.QIcon("icons/settings"), None)
         widget.clicked.connect(self.actions.onActionSettings)
 
@@ -44,7 +47,9 @@ class Loader(Loader):
         return SettingsFactory()
 
     @inject.params(config='config')
-    def _menu(self, config):
+    def _menu(self, config=None):
+        if not len(config.get('storage.location')): return None
+
         from .gui.menu import SettingsMenu
 
         menu = QtWidgets.QMenu()

@@ -21,4 +21,5 @@ from PyQt5 import QtCore
 class PictureButton(QtWidgets.QPushButton):
     def __init__(self, icon=None, parent=None):
         super(PictureButton, self).__init__(icon, parent)
+        self.setMaximumWidth(35)
         self.setFlat(True)

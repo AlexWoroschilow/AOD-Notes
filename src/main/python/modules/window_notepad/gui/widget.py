@@ -30,7 +30,7 @@ class NotepadDashboard(QtWidgets.QSplitter):
     editor = None
 
     @inject.params(config='config', storage='storage')
-    def __init__(self, actions, config, storage):
+    def __init__(self, actions, config=None, storage=None):
         super(NotepadDashboard, self).__init__()
         self.setContentsMargins(0, 0, 0, 0)
 

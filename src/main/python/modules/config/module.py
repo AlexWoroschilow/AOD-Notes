@@ -110,5 +110,5 @@ class Loader(Loader):
         widget.location.setText(config.get('storage.location'))
         action = functools.partial(self.actions.onActionStorageLocationChange, widget=widget)
         widget.location.clicked.connect(action)
-        
+
         return widget
