@@ -101,7 +101,6 @@ FolderTree::item:selected {
 FolderTreeToolBar { 
     background: #3F4447;
     border-right: 3px solid qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #3F4447, stop:1 #414649);
-
 	color: #A0A0A0;
 }
 
@@ -130,8 +129,8 @@ SettingsScrollArea {
 PreviewScrollArea,
 WizardDashboardScrollArea,
 SettingsScrollArea {
-    background: #ffffff url("image/background.jpg") repeat right top;
-    padding: 10px;
+    background: #515659;
+    padding: 0px 0px;
     margin: 0px;
 	border: none;
 }
