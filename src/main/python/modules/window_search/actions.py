@@ -12,31 +12,52 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
 import inject
-
+import logging
 from PyQt5 import QtWidgets
-from PyQt5.Qt import Qt
+
+from .gui.preview.widget import PreviewScrollArea  
 
 
 class ModuleActions(object):
 
-    @inject.params(search='search', storage='storage', dashboard='notepad.dashboard')
-    def onActionSearchRequest(self, widget=None, search=None, storage=None, dashboard=None):
-        if widget is None: return None
-        if search is None: return None
-        if dashboard is None: return None
-        if storage is None: return None
-
+    @inject.params(search='search', storage='storage', window='window')
+    def onActionSearchRequest(self, widget=None, search=None, storage=None, window=None):
+        if widget is None or window is None: return None
+        
         text = widget.text()
-        if text is None or not len(text):
-            return dashboard.toggle([], False)
+        if text is None: return None
+        if not len(text): return None
 
+        preview = PreviewScrollArea(window)
+        preview.edit.connect(self.onActionEditRequest)
+# 
         result = search.search(text)
-        collection = [storage.index(x['path']) for x in result]
+        result = [x['path'] for x in result]
+        if result is None: return None
+        if not len(result): return None
+        
+        for path in result:
+            index = storage.index(path)
+            if index is None: continue
+            preview.addPreview(index)
 
-        if collection is None or not len(collection):
-            return dashboard.toggle([], False)
+        window.tab.emit((preview, text))
 
-        return dashboard.toggle(collection, True)
+    @inject.params(storage='storage', window='window', dashboard='notepad.dashboard')
+    def onActionEditRequest(self, index, storage, window, dashboard):
+        try:
+            if storage.isDir(index):
+                dashboard.group(index)
+                window.tabSwitch.emit(0)
+                return None            
+            if storage.isFile(index):
+                dashboard.note(index)
+                window.tabSwitch.emit(0)                
+                return None            
+            return None            
+        except(Exception) as ex:
+            logger = logging.getLogger('search')
+            logger.exception(ex)
 
     @inject.params(storage='storage', config='config', dashboard='notepad.dashboard')
     def onActionNoteImport(self, event=None, storage=None, config=None, dashboard=None):

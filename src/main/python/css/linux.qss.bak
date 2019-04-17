@@ -1,9 +1,18 @@
 QMainWindow {
-	background: rgb(236,236,236);
+	background: #ffffff;
+}
+QToolButton:hover {
+	color: #000000;
+    padding: 3px;
+}
+QToolButton:!hover {
+    background-color:#ffffff;
+	color: #4F4F4F;
+    padding: 3px;
 }
 
 QTabBar {
-	background: rgb(236,236,236);
+	background: #ffffff;
 	color: #4F4F4F;
 }
 
@@ -15,18 +24,16 @@ QTabBar::close-button {
 QTabWidget {
 	background: #ffffff;
 	border: none;
-	margin: 0px;
 }
 
 QTabWidget::pane {
 	background: #ffffff;
 	border: none;
-	margin: 0px;
 }
 
 QTextEdit {
 	background: #fff;
-	border: 1px !important;
+	border: 1px !important; 
 }
 
 QSplitter {
@@ -36,50 +43,15 @@ QSplitter {
 
 QToolBar {
 	border: none;
-    margin: 5px 0px;
-}
-
-QToolButton:pressed {
-    border: none;
-    background-color:#AFAFAF;
-    padding: 0px;
-}
-QToolButton:hover,
-QToolButton:!hover {
-    border: none;
-    padding: 0px;
-}
-
-
-ToolbarWidgetLeft,
-ToolbarWidgetRight,
-FormatbarWidget,
-FolderTreeToolBar {
-    padding: 0px;
-    margin: 0px;
-}
-
-FolderTreeToolBar ToolBarButton,
-ToolbarWidgetLeft ToolBarButton,
-ToolbarWidgetRight ToolBarButton,
-FormatbarWidget ToolBarButton {
-	border: none;
-    padding: 5px;
-    margin: 0px;
-}
-
-FolderTreeToolBar ToolBarButton:pressed,
-ToolbarWidgetLeft ToolBarButton:pressed,
-ToolbarWidgetRight ToolBarButton:pressed,
-FormatbarWidget ToolBarButton:pressed {
-    background-color: rgb(236,236,236);
-    padding: 5px;
 }
 
 SearchField {
-    margin: 0px;
-    padding: 5px;
+    margin: 5px 0px;
+    padding: 5px 5px;
     border: none;
+}
+ActionButton {
+	color: #A0A0A0;
 }
 
 FolderTree,
@@ -105,9 +77,11 @@ FolderTree::item:selected {
 }
 
 
+
 FolderTreeToolBar { 
     background: #3F4447;
     border-right: 3px solid qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #3F4447, stop:1 #414649);
+
 	color: #A0A0A0;
 }
 
@@ -125,7 +99,6 @@ PreviewContainer NotePreviewDescription #previewTitle {
 	background: #ffffff;
 }
 
-
 TextEditorWidget,
 QWidget#FolderListContainer,
 SettingsScrollArea {
@@ -137,18 +110,17 @@ SettingsScrollArea {
 PreviewScrollArea,
 WizardDashboardScrollArea,
 SettingsScrollArea {
-    background: #515659;
-    padding: 0px 0px;
-	border: none;
+    background: #ffffff url("image/background.jpg") repeat right top;
+    padding: 10px;
     margin: 0px;
+	border: none;
 }
 
 TextWriter,
 TextEditor,
 WidgetSettings {
 	border-radius: 0px;
-	border: none;
-    margin: 0px;
+	border: none
 }
 
 WizardSettings {
@@ -187,3 +159,5 @@ WizardButtonStart {
     min-height: 50px;
 	font-size: 20px;
 }
+
+

@@ -21,6 +21,7 @@ from PyQt5.QtCore import Qt
 
 class MainWindow(QtWidgets.QMainWindow):
     tab = QtCore.pyqtSignal(object)
+    tabSwitch = QtCore.pyqtSignal(int)
 
     @inject.params(factory='window.header_factory')
     def __init__(self, parent=None, factory=None):
@@ -49,6 +50,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setWindowIcon(QtGui.QIcon('icons/icon.svg'))
 
         self.tab.connect(self.onActionTabOpen)
+        self.tabSwitch.connect(self.onActionTabSwitch)
 
         self.header = self.addToolBar('main')
         self.header.setObjectName('QToolBarTop')
@@ -76,6 +78,10 @@ class MainWindow(QtWidgets.QMainWindow):
         if hasattr(self.content, 'tabCloseRequested'):
             self.content.tabCloseRequested.connect(self.onActionTabClose)
         self.layout.addWidget(self.content)
+
+    def onActionTabSwitch(self, index=None):
+        if index is None: return None
+        self.content.setCurrentIndex(index)
 
     def onActionTabOpen(self, event=None):
         if event is None: return None
