@@ -17,13 +17,9 @@ from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 
-
-class Button(QtWidgets.QPushButton):
-
-    def __init__(self, parent=None):
-        super(Button, self).__init__(parent)
-        self.setMaximumWidth(40)
-        self.setFlat(True)
+from .label import Title
+from .text import Description
+from .button import Button
 
 
 class NotePreviewDescription(QtWidgets.QGroupBox):
@@ -32,9 +28,8 @@ class NotePreviewDescription(QtWidgets.QGroupBox):
     @inject.params(storage='storage')
     def __init__(self, index, storage):
         super(NotePreviewDescription, self).__init__()
-        self.setSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Expanding);
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding);
         self.setContentsMargins(0, 0, 0, 0)
-        self.setObjectName('preview')
 
         self.layout = QtWidgets.QGridLayout()
         self.layout.setAlignment(Qt.AlignTop)
@@ -51,39 +46,3 @@ class NotePreviewDescription(QtWidgets.QGroupBox):
         self.layout.addWidget(self.buttonEdit, 0, 29, 1, 1)
 
         self.setLayout(self.layout)
-
-        effect = QtWidgets.QGraphicsDropShadowEffect()
-        effect.setBlurRadius(10)
-        effect.setOffset(0)
-
-        self.setGraphicsEffect(effect)
-
-
-class Title(QtWidgets.QLabel):
-
-    def __init__(self, text):
-        super(Title, self).__init__(text)
-        font = self.font()
-        font.setPixelSize(20)
-        self.setFont(font)
-        self.setWordWrap(True)
-
-
-class Description(QtWidgets.QTextEdit):
-
-    def __init__(self, text=None):
-        super(Description, self).__init__()
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setEnabled(False)
-        self.setHtml(text)
-        self.show()
-
-    def resizeEvent(self, *args, **kwargs):
-        document = self.document()
-        if document is None: return None
-        size = document.size()
-        if size is None: return None
-
-        self.setFixedHeight(size.height())
-        return QtWidgets.QTextEdit.resizeEvent(self, *args, **kwargs)
