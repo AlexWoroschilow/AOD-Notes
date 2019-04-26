@@ -21,19 +21,16 @@ from .actions import ModuleActions
 
 
 class Loader(Loader):
-
     actions = ModuleActions()
 
-    @property
-    def enabled(self):
-        return True
+    def enabled(self, options=None, args=None):
+        return options.console is None
 
     @inject.params(factory='toolbar_factory.leftbar')
     def boot(self, options=None, args=None, factory=None):
         factory.addWidget(self._constructor)
 
     def _constructor(self):
-
         widget = ToolBarButton()
         widget.setIcon(QtGui.QIcon("icons/pdf.svg"))
         widget.setToolTip(widget.tr("Export document to PDF"))

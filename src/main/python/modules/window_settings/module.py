@@ -25,9 +25,8 @@ from .gui.button import PictureButton
 class Loader(Loader):
     actions = ModuleActions()
 
-    @property
-    def enabled(self):
-        return True
+    def enabled(self, options=None, args=None):
+        return options.console is None
 
     def config(self, binder=None):
         binder.bind_to_provider('settings_menu', self._menu)

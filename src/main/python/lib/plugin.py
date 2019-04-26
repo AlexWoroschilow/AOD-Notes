@@ -22,8 +22,7 @@ class Loader(object):
     def __exit__(self, type, value, traceback):
         pass
 
-    @property
-    def enabled(self):
+    def enabled(self, options=None, args=None):
         return True
 
     def config(self, binder):

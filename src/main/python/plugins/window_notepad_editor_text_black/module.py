@@ -20,9 +20,8 @@ from lib.widget.button import ToolBarButton
 
 class Loader(Loader):
 
-    @property
-    def enabled(self):
-        return True
+    def enabled(self, options=None, args=None):
+        return options.console is None
 
     @inject.params(factory='toolbar_factory.rightbar')
     def boot(self, options=None, args=None, factory=None):

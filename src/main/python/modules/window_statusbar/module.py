@@ -20,24 +20,20 @@ from .actions import ModuleActions
 
 
 class Loader(Loader):
-
     actions = ModuleActions()
 
-    @property
-    def enabled(self):
-        return True
+    def enabled(self, options=None, args=None):
+        return options.console is None
 
     def config(self, binder=None):
         binder.bind_to_constructor('widget.statusbar', self._widget)
 
     @inject.params(kernel='kernel')
     def _widget(self, kernel=None):
-
         widget = QtWidgets.QLabel()
-        
+
         kernel.listen('window_status', functools.partial(
             self.actions.onActionStatus, widget=widget
         ))
-        
+
         return widget
-        

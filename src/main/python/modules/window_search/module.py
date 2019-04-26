@@ -22,9 +22,7 @@ from lib.plugin import Loader
 
 from .actions import ModuleActions
 from .gui.widget import SearchField
-from .gui.widget import ActionButton
 from .gui.button import PictureButton
-
 
 
 class Loader(Loader):
@@ -38,9 +36,8 @@ class Loader(Loader):
         self.search = None
         self.spacer = None
 
-    @property
-    def enabled(self):
-        return True
+    def enabled(self, options=None, args=None):
+        return options.console is None
 
     def config(self, binder=None):
         binder.bind_to_constructor('search', self._service)

@@ -22,9 +22,8 @@ from .factory import ToolbarFactory
 class Loader(Loader):
     actions = ModuleActions()
 
-    @property
-    def enabled(self):
-        return True
+    def enabled(self, options=None, args=None):
+        return options.console is None
 
     def config(self, binder=None):
         binder.bind('toolbar_factory.leftbar', ToolbarFactory())
@@ -63,8 +62,10 @@ class Loader(Loader):
         content.addTab(dashboard, content.tr('Dashboard'))
         return content
 
-    @inject.params(kernel='kernel', config='config', factory_leftbar='toolbar_factory.leftbar', factory_rightbar='toolbar_factory.rightbar', factory_formatbar='toolbar_factory.formatbar')
-    def _notepad_editor(self, kernel=None, config=None, factory_leftbar=None, factory_rightbar=None, factory_formatbar=None):
+    @inject.params(kernel='kernel', config='config', factory_leftbar='toolbar_factory.leftbar',
+                   factory_rightbar='toolbar_factory.rightbar', factory_formatbar='toolbar_factory.formatbar')
+    def _notepad_editor(self, kernel=None, config=None, factory_leftbar=None, factory_rightbar=None,
+                        factory_formatbar=None):
         if not len(config.get('storage.location')): return None
 
         from .gui.editor.widget import TextEditorWidget

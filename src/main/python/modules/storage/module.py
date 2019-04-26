@@ -18,8 +18,7 @@ from lib.plugin import Loader
 
 class Loader(Loader):
 
-    @property
-    def enabled(self):
+    def enabled(self, options=None, args=None):
         return True
 
     def config(self, binder=None):

@@ -20,16 +20,14 @@ from lib.widget.button import ToolBarButton
 
 class Loader(Loader):
 
-    @property
-    def enabled(self):
-        return True
+    def enabled(self, options=None, args=None):
+        return options.console is None
 
     @inject.params(factory='toolbar_factory.rightbar')
     def boot(self, options=None, args=None, factory=None):
         factory.addWidget(self._constructor)
 
     def _constructor(self):
-
         widget = ToolBarButton()
         widget.setIcon(QtGui.QIcon("icons/font-red.svg"))
         widget.setToolTip(widget.tr("Change the text color to red"))

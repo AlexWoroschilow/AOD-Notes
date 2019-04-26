@@ -38,12 +38,17 @@ class Application(QtWidgets.QApplication):
         self.setApplicationName('CryptoNotes')
         self.kernel = Kernel(options, args)
 
-    @inject.params(kernel='kernel', widget='window')
-    def exec_(self, kernel=None, widget=None):
-        if kernel is None: return None
-        if widget is None: return None
+    def exec_(self):
+        container = inject.get_injector()
+        if container is None: return None
 
-        widget.show()
+        kernel = container.get_instance('kernel')
+        if kernel.options.console: return None
+
+        window = container.get_instance('window')
+        if window is None: return None
+
+        window.show()
 
         return super(Application, self).exec_()
 
@@ -52,8 +57,13 @@ if __name__ == "__main__":
     parser = optparse.OptionParser()
 
     parser.add_option("--loglevel", default=logging.DEBUG, dest="loglevel", help="Logging level")
-    parser.add_option("--logfile", default=os.path.expanduser('~/.config/CryptoNotes/notes.log'), dest="logfile", help="Logfile location")
-    parser.add_option("--config", default=os.path.expanduser('~/.config/CryptoNotes/notes.conf'), dest="config", help="Config file location")
+    logfile = os.path.expanduser('~/.config/CryptoNotes/notes.log')
+    parser.add_option("--logfile", default=logfile, dest="logfile", help="Logfile location")
+    configfile = os.path.expanduser('~/.config/CryptoNotes/notes.conf')
+    parser.add_option("--config", default=configfile, dest="config", help="Config file location")
+
+    parser.add_option("--console", action="store_true", dest="console", help="Start program in the console mode")
+    parser.add_option("--console-export", default=None, dest="console_export", help="Start program in the console mode")
 
     (options, args) = parser.parse_args()
 

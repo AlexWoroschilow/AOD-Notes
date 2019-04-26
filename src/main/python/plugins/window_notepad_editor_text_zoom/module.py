@@ -20,9 +20,8 @@ from lib.widget.button import ToolBarButton
 
 class Loader(Loader):
 
-    @property
-    def enabled(self):
-        return True
+    def enabled(self, options=None, args=None):
+        return options.console is None
 
     @inject.params(factory='toolbar_factory.leftbar')
     def boot(self, options=None, args=None, factory=None):
@@ -30,7 +29,6 @@ class Loader(Loader):
         factory.addWidget(self._zoomOut)
 
     def _zoomIn(self):
-
         zoomIn = ToolBarButton()
         zoomIn.setShortcut("Ctrl+=")
         zoomIn.setIcon(QtGui.QIcon("icons/zoomIn.svg"))
@@ -39,7 +37,6 @@ class Loader(Loader):
         return zoomIn
 
     def _zoomOut(self):
-
         zoomOut = ToolBarButton()
         zoomOut.setShortcut("Ctrl+-")
         zoomOut.setIcon(QtGui.QIcon("icons/zoomOut.svg"))
@@ -52,4 +49,3 @@ class Loader(Loader):
 
     def zoomInEvent(self, event=None, widget=None):
         widget.zoomIn(5)
-

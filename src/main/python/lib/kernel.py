@@ -29,16 +29,18 @@ class Kernel(object):
 
         inject.configure(self._configure)
 
+        logger = logging.getLogger('kernel')
         for loader in self.loaders:
             if not hasattr(loader.__class__, 'boot'): continue
             if not callable(getattr(loader.__class__, 'boot')): continue
+            logger.debug("boot: {}".format(loader.__class__))
             loader.boot(options, args)
 
     def _configure(self, binder):
-        
+
         logger = logging.getLogger('app')
         binder.bind('logger', logger)
-        
+
         logger = logging.getLogger('dispatcher')
         binder.bind('event_dispatcher', Dispatcher(logger))
 
@@ -47,24 +49,25 @@ class Kernel(object):
             try:
                 module = importlib.import_module(module_source, False)
                 with module.Loader(self.options, self.args) as loader:
-                    if not loader.enabled: continue
+                    if not loader.enabled(self.options, self.args): continue
                     if not hasattr(loader.__class__, 'config'): continue
                     if not callable(getattr(loader.__class__, 'config')): continue
+                    logger.debug("bind: {}".format(loader.__class__))
                     binder.install(loader.config)
-                            
+
                     self.loaders.append(loader)
-                    
+
             except (SyntaxError, RuntimeError) as err:
                 logger.critical("{}: {}".format(module_source, err))
                 continue
-            
+
         binder.bind('kernel', self)
 
     def __modules(self, masks=None):
         location = os.path.dirname(__file__)
         logger = logging.getLogger('kernel')
         for mask in masks:
-            logger.info('module mask: {}/{}'.format(location,mask))
+            logger.info('module mask: {}/{}'.format(location, mask))
             for source in glob.glob(mask):
                 if os.path.exists(source):
                     logger.debug("config: %s" % source)
@@ -77,7 +80,7 @@ class Kernel(object):
     def dispatch(self, name=None, event=None):
         dispatcher = self.get('event_dispatcher')
         dispatcher.dispatch(name, event)
-        
+
     def listen(self, name=None, action=None, priority=0):
         dispatcher = self.get('event_dispatcher')
         dispatcher.add_listener(name, action, priority)
@@ -85,4 +88,3 @@ class Kernel(object):
     def unlisten(self, name=None, action=None):
         dispatcher = self.get('event_dispatcher')
         dispatcher.remove_listener(name, action)
-

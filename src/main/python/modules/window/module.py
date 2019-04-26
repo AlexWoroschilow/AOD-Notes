@@ -29,9 +29,8 @@ from .actions import ModuleActions
 class Loader(Loader):
     actions = ModuleActions()
 
-    @property
-    def enabled(self):
-        return True
+    def enabled(self, options=None, args=None):
+        return options.console is None
 
     def config(self, binder=None):
         binder.bind('window.header_factory', WidgetHeaderFactory())
