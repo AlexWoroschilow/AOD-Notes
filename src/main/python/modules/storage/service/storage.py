@@ -12,28 +12,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
 import glob
-import logging
+import shutil
 
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
 
 from .gui.icons import IconProvider
-
-from . import cryptography
-from .cryptography import CryptoFile
-
-
-class QCustomDelegate(QtWidgets.QStyledItemDelegate):
-
-    def setEditorData(self, editor, index):
-        model = index.model()
-        if model.isFile(index) == True:
-            return super(QCustomDelegate, self).setEditorData(editor, index)
-        editor.setText(model.fileName(index))
-
-    def setModelData(self, editor, model, index):
-        cryptography.rename(model.filePath(index), editor.text())
 
 
 class FilesystemStorage(QtWidgets.QFileSystemModel):
@@ -43,25 +28,6 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         self.setIconProvider(IconProvider())
         self.setRootPath(location)
         self.setReadOnly(False)
-
-    def getItemDelegate(self):
-        return QCustomDelegate()
-
-    def mkdir(self, index, name):
-        root = self.filePath(index)
-        if root is None: return None
-        path = cryptography.mkdir(root, name)
-        if path is None: return None
-        return self.index(path)
-
-    def rename(self, path=None, name=None):
-        if path is None or name is None: return None
-        if isinstance(path, QtCore.QModelIndex):
-            path = self.filePath(path)
-        if path is None: return None
-        # path = cryptography.rename(path, name)
-        # if path is None: return None
-        # return self.index(path)
 
     def touch(self, path=None, name=None):
         if path is None or name is None: return None
@@ -77,9 +43,10 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         if isinstance(path, QtCore.QModelIndex):
             path = self.filePath(path)
         if path is None: return None
-        path = cryptography.clone(path)
-        if path is None: return None
-        return self.index(path)
+        destination = '{}(clone)'.format(path)
+        shutil.copy2(path, destination)
+        if destination is None: return None
+        return self.index(destination)
 
     def rootIndex(self):
         path = self.rootPath()

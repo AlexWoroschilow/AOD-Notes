@@ -32,10 +32,7 @@ class FolderTree(QtWidgets.QTreeView):
         self.setHeaderHidden(True)
         self.setModel(storage)
 
-        delegate = storage.getItemDelegate()
-        self.setItemDelegate(delegate)
-        
-        location = config.get('storage.location') 
+        location = config.get('storage.location')
         self.setRootIndex(storage.index(location))
         
         self.setColumnHidden(1, True)

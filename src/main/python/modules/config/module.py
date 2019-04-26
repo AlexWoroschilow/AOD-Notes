@@ -48,16 +48,6 @@ class Loader(Loader):
         return ConfigFile(kernel.options.config)
 
     @inject.params(config='config')
-    def _widget_settings_cryptography(self, config=None):
-        if config is None: return None
-
-        from .gui.settings.cryptography import WidgetSettingsCryptography
-
-        widget = WidgetSettingsCryptography()
-        widget.code.setText(config.get('cryptography.password'))
-        return widget
-
-    @inject.params(config='config')
     def _widget_settings_navigator(self, config=None):
         if config is None: return None
 

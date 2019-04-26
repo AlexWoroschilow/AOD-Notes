@@ -22,7 +22,6 @@ class Loader(Loader):
         return True
 
     def config(self, binder=None):
-        binder.bind_to_constructor('encryptor', self._encryptor)
         binder.bind_to_constructor('storage', self._storage)
 
     @inject.params(config='config')
@@ -38,10 +37,3 @@ class Loader(Loader):
 
         from .service.storage import FilesystemStorage
         return FilesystemStorage(storage)
-
-    @inject.params(config='config')
-    def _encryptor(self, config=None):
-        if not len(config.get('storage.location')): return None
-
-        from .service.cryptography import CryptoAES
-        return CryptoAES(config.get('cryptography.password'))
