@@ -40,26 +40,7 @@ class Loader(Loader):
         return options.console is None
 
     def config(self, binder=None):
-        binder.bind_to_constructor('search', self._service)
-
-    @inject.params(kernel='kernel', config='config', storage='storage')
-    def _service(self, kernel, config, storage):
-        from .service import Search
-
-        service = Search()
-
-        destination = os.path.dirname(kernel.options.config)
-        if service.exists('%s/index' % destination):
-            return service.previous('%s/index' % destination)
-
-        service.create('%s/index' % destination)
-        for index in storage.entitiesByPath(config.get('storage.location')):
-            name = storage.fileName(index)
-            path = storage.filePath(index)
-            text = storage.fileContent(index)
-
-            service.append(name, path, text)
-        return service
+        pass
 
     @inject.params(config='config', factory='window.header_factory', dashboard='notepad.dashboard')
     def boot(self, options=None, args=None, config=None, factory=None, dashboard=None):

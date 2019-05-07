@@ -77,6 +77,7 @@ class PreviewScrollArea(QtWidgets.QScrollArea):
             widget.edit.connect(self.edit.emit)
             widget.delete.connect(self.delete.emit)
             widget.clone.connect(self.clone.emit)
+            widget.setFixedHeight(500)
 
             i = math.floor(current / self.columns)
             j = math.floor(current % self.columns)

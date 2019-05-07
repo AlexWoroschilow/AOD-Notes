@@ -73,6 +73,7 @@ class PreviewScrollArea(QtWidgets.QScrollArea):
         for current, index in enumerate(self.collection):
             widget = NotePreviewDescription(index)
             widget.edit.connect(self.edit.emit)
+            widget.setFixedHeight(500)
 
             i = math.floor(current / self.columns)
             j = math.floor(current % self.columns)
