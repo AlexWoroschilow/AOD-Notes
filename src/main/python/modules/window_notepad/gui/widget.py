@@ -38,9 +38,6 @@ class NotepadDashboard(QtWidgets.QSplitter):
         containerLayout.setContentsMargins(0, 0, 0, 0)
         containerLayout.setSpacing(0)
 
-        self.toolbar = FolderTreeToolBar(self)
-        containerLayout.addWidget(self.toolbar, 0, 0, 3, 1)
-
         self.tree = FolderTree()
         self.tree.expandAll()
 

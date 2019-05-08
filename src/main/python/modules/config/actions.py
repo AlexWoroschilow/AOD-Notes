@@ -26,8 +26,3 @@ class ModuleActions(object):
             config.set('storage.location', destination)
             widget.location.setText(destination)
             kernel.dispatch('config_updated')
-
-    @inject.params(config='config', kernel='kernel')
-    def onActionCheckboxToggle(self, status, variable, config, kernel):
-        config.set(variable, '%s' % status)
-        kernel.dispatch('config_updated')

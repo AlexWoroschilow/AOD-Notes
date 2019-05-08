@@ -38,8 +38,6 @@ class Loader(Loader):
         if factory is None: return None
 
         factory.addWidget(self._widget_settings_storage)
-        factory.addWidget(self._widget_settings_navigator)
-        factory.addWidget(self._widget_settings_editor)
         factory.addWidget(self._widget_settings_search)
 
     @inject.params(kernel='kernel')
@@ -47,40 +45,6 @@ class Loader(Loader):
         from .service.config import ConfigFile
         return ConfigFile(kernel.options.config)
 
-    @inject.params(config='config')
-    def _widget_settings_navigator(self, config=None):
-        if config is None: return None
-
-        from .gui.settings.navigator import WidgetSettingsNavigator
-
-        widget = WidgetSettingsNavigator()
-        widget.toolbar.setChecked(int(config.get('folders.toolbar')))
-        action = functools.partial(self.actions.onActionCheckboxToggle, variable='folders.toolbar')
-        widget.toolbar.stateChanged.connect(action)
-
-        return widget
-
-    @inject.params(config='config')
-    def _widget_settings_editor(self, config=None):
-        if config is None: return None
-
-        from .gui.settings.editor import WidgetSettingsEditor
-
-        widget = WidgetSettingsEditor()
-
-        widget.formatbar.setChecked(int(config.get('editor.formatbar')))
-        action = functools.partial(self.actions.onActionCheckboxToggle, variable='editor.formatbar')
-        widget.formatbar.stateChanged.connect(action)
-
-        widget.rightbar.setChecked(int(config.get('editor.rightbar')))
-        action = functools.partial(self.actions.onActionCheckboxToggle, variable='editor.rightbar')
-        widget.rightbar.stateChanged.connect(action)
-
-        widget.leftbar.setChecked(int(config.get('editor.leftbar')))
-        action = functools.partial(self.actions.onActionCheckboxToggle, variable='editor.leftbar')
-        widget.leftbar.stateChanged.connect(action)
-
-        return widget
 
     @inject.params(kernel='kernel')
     def _widget_settings_search(self, kernel=None):
