@@ -36,76 +36,79 @@ class MLStripper(HTMLParser):
     def stripTags(self, html=None):
         if html is None:
             return ''
-        
+
         self.feed(html)
         return self.get_data()
 
 
 class Search(object):
-
     parser = MLStripper()
-    searchResult = None
 
-    def __init__(self):
-        pass
-    
-    def create(self, destination):
-        if not os.path.exists(destination):
-            os.mkdir(destination)
-        self.ix = index.create_in(destination, Schema(
+    def __init__(self, destination=None):
+        self.destination = destination
+        self.writer = None
+        self.ix = None
+
+        self.schema = Schema(
             title=TEXT(stored=True),
-            path=ID(stored=True),
-            content=TEXT(stored=True)
-        ))
-        return self
-        
-    def exists(self, destination):
-        if os.path.exists(destination):
-            return index.exists_in(destination)
-        return False
+            content=TEXT(stored=True),
+            path=ID(stored=True)
+        )
 
-    def previous(self, destination):
-        if self.exists(destination):
-            self.ix = index.open_dir(destination)
-        return self
+        if not os.path.exists(self.destination):
+            os.mkdir(self.destination)
+        if not self.exists(self.destination):
+            return self.create(self.destination)
+        return self.previous(self.destination)
+
+    def create(self, destination=None):
+        if self.schema is None: return None
+        if destination is None: return None
+        self.ix = index.create_in(destination, self.schema)
+
+    def exists(self, destination=None):
+        if destination is None: return False
+        if not os.path.exists(destination): return False
+        return index.exists_in(destination)
+
+    def previous(self, destination=None):
+        if destination is None: return None
+        if not self.exists(destination): return None
+        self.ix = index.open_dir(destination)
+        return None
 
     def append(self, title, path, text):
-        self.writer = self.ix.writer()
         content = self.parser.stripTags(text)
+        if content is None or not len(content): return None
+        self.writer = self.ix.writer()
         self.writer.add_document(title=title, path=path, content=content)
         self.writer.commit()
 
     def update(self, title, path, text):
-        self.writer = self.ix.writer()
         content = self.parser.stripTags(text)
+        if content is None or not len(content): return None
+        self.writer = self.ix.writer()
         self.writer.update_document(title=title, path=path, content=content)
         self.writer.commit()
 
     def remove(self, path=None):
-        self.writer = self.ix.writer()
         with self.ix.searcher() as searcher:
+            self.writer = self.ix.writer()
             for number in searcher.document_numbers(path=path):
                 self.writer.delete_document(number)
-        self.writer.commit()
+            self.writer.commit()
 
     def search(self, string=None):
         with self.ix.searcher() as searcher:
-            
             query = qparser.MultifieldParser([
                 "title", "content"
             ], self.ix.schema)
-            query.add_plugin(qparser.WildcardPlugin())            
-            
-            self.searchResult = searcher.search(query.parse(
-                "*{}*".format(string)                
-            ))
-            
-            for result in self.searchResult:
+            query.add_plugin(qparser.WildcardPlugin())
+            pattern = query.parse("*{}*".format(string))
+            for result in searcher.search(pattern):
                 yield result
 
-    def keywords(self, string=None):
-        if self.searchResult is None:
-            self.search(string)
-        
-        keys = self.searchResult.key_terms("content", docs=5, numterms=10)
-        return [keyword for keyword, score in keys]
+    def clean(self):
+        if self.destination is None: return None
+        self.create(self.destination)
+        return True
