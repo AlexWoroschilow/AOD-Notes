@@ -40,8 +40,9 @@ class ModuleActions(object):
             index = storage.index(path)
             if index is None: continue
             preview.addPreview(index)
-
-        window.tab.emit((preview, text))
+        
+        title = text if len(text) <= 25 else "{}...".format(text[0:22])
+        window.tab.emit((preview, title))
 
     @inject.params(storage='storage', window='window', dashboard='notepad.dashboard')
     def onActionEditRequest(self, index, storage, window, dashboard):
