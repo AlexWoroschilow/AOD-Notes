@@ -42,37 +42,44 @@ class MLStripper(HTMLParser):
 
 
 class Search(object):
-
     parser = MLStripper()
-    searchResult = None
 
-    def __init__(self):
-        pass
-    
-    def create(self, destination):
-        if not os.path.exists(destination):
-            os.mkdir(destination)
-        self.ix = index.create_in(destination, Schema(
+    def __init__(self, destination=None):
+        self.destination = destination
+        self.writer = None
+        self.ix = None
+
+        self.schema = Schema(
             title=TEXT(stored=True),
-            path=ID(stored=True),
-            content=TEXT(stored=True)
-        ))
-        return self
-        
-    def exists(self, destination):
-        if os.path.exists(destination):
-            return index.exists_in(destination)
-        return False
+            content=TEXT(stored=True),
+            path=ID(stored=True)
+        )
 
-    def previous(self, destination):
-        if self.exists(destination):
-            self.ix = index.open_dir(destination)
-        return self
+        if not os.path.exists(self.destination):
+            os.mkdir(self.destination)
+        if not self.exists(self.destination):
+            return self.create(self.destination)
+        return self.previous(self.destination)
+
+    def create(self, destination=None):
+        if self.schema is None: return None
+        if destination is None: return None
+        self.ix = index.create_in(destination, self.schema)
+
+    def exists(self, destination=None):
+        if destination is None: return False
+        if not os.path.exists(destination): return False
+        return index.exists_in(destination)
+
+    def previous(self, destination=None):
+        if destination is None: return None
+        if not self.exists(destination): return None
+        self.ix = index.open_dir(destination)
+        return None
 
     def append(self, title, path, text):
         content = self.parser.stripTags(u"{}".format(text))
         if content is None or not len(content): return
-
         self.writer = self.ix.writer()
         self.writer.add_document(title=title, path=path, content=content)
         self.writer.commit()
@@ -104,3 +111,7 @@ class Search(object):
                 if result.score < minscore: continue  
                 yield result
 
+    def clean(self):
+        if self.destination is None: return None
+        self.create(self.destination)
+        return True

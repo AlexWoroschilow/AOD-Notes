@@ -29,7 +29,6 @@ class Loader(Loader):
         return options.console is None
 
     def config(self, binder=None):
-        binder.bind_to_provider('settings_menu', self._menu)
         binder.bind_to_constructor('settings_factory', self._settings)
 
     @inject.params(config='config', factory='window.header_factory')
@@ -44,36 +43,3 @@ class Loader(Loader):
     def _settings(self):
         from .settings import SettingsFactory
         return SettingsFactory()
-
-    @inject.params(config='config')
-    def _menu(self, config=None):
-        if not len(config.get('storage.location')): return None
-
-        from .gui.menu import SettingsMenu
-
-        menu = QtWidgets.QMenu()
-
-        widget = SettingsMenu(menu)
-        widget.editorName.setChecked(int(config.get('editor.name')))
-        action = functools.partial(self.actions.onActionToggle, variable='editor.name')
-        widget.editorName.stateChanged.connect(action)
-
-        widget.editorToolbarFormat.setChecked(int(config.get('editor.formatbar')))
-        action = functools.partial(self.actions.onActionToggle, variable='editor.formatbar')
-        widget.editorToolbarFormat.stateChanged.connect(action)
-
-        widget.editorToolbarRight.setChecked(int(config.get('editor.rightbar')))
-        action = functools.partial(self.actions.onActionToggle, variable='editor.rightbar')
-        widget.editorToolbarRight.stateChanged.connect(action)
-
-        widget.editorToolbarLeft.setChecked(int(config.get('editor.leftbar')))
-        action = functools.partial(self.actions.onActionToggle, variable='editor.leftbar')
-        widget.editorToolbarLeft.stateChanged.connect(action)
-
-        widget.toolbar.setChecked(int(config.get('folders.toolbar')))
-        action = functools.partial(self.actions.onActionToggle, variable='folders.toolbar')
-        widget.toolbar.stateChanged.connect(action)
-
-        menu.addAction(widget)
-
-        return menu

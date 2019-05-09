@@ -25,10 +25,6 @@ class ToolbarBase(QtWidgets.QToolBar):
     def __init__(self):
         super(ToolbarBase, self).__init__()
 
-    @inject.params(menu='settings_menu')
-    def onActionContextMenu(self, event, menu):
-        menu.exec_(self.mapToGlobal(event))
-
 
 class ToolbarWidgetLeft(ToolbarBase):
 
@@ -36,7 +32,6 @@ class ToolbarWidgetLeft(ToolbarBase):
         super(ToolbarWidgetLeft, self).__init__()
         self.setObjectName('editorToolbarWidgetLeft')
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.onActionContextMenu)
         self.setContentsMargins(0, 0, 0, 0)
         self.setOrientation(Qt.Vertical)
         self.setMaximumWidth(35)
@@ -102,8 +97,7 @@ class ToolBarWidgetRight(ToolbarBase):
         super(ToolBarWidgetRight, self).__init__()
         self.setObjectName('editorToolBarWidgetRight')
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.onActionContextMenu)
-        
+
         self.setOrientation(Qt.Vertical)
         self.setContentsMargins(0, 0, 0, 0)
         self.setMaximumWidth(35)
@@ -157,7 +151,6 @@ class FormatbarWidget(ToolbarBase):
         self.setContentsMargins(0, 0, 0, 0)
         self.setObjectName('editorFormatBarWidget')
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.onActionContextMenu)
 
         self.fontSize = QtWidgets.QSpinBox(self)
         self.fontSize.setSuffix(" pt")
@@ -212,4 +205,3 @@ class FormatbarWidget(ToolbarBase):
         self.addWidget(self.indentAction)
         self.addWidget(self.dedentAction)
         self.addWidget(self.imageAction)
-

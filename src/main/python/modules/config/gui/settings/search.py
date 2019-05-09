@@ -25,21 +25,17 @@ class CryptographyThread(QtCore.QThread):
 
     @inject.params(storage='storage', search='search', config='config')
     def run(self, storage, search, config):
+        if not search.clean(): return None
         collection = storage.entities()
-        total = len(collection) + len(collection)
         for progress, index in enumerate(collection, start=1):
-            self.progress.emit(progress / total * 100)
+            self.progress.emit(progress / len(collection) * 100)
+            if not storage.isFile(index): continue
             path = storage.filePath(index)
-            if not os.path.exists(path): continue
-            search.remove(path)
-
-        for progress, index in enumerate(collection, start=progress):
-            self.progress.emit(progress / total * 100)
-            if storage.isDir(index): continue
-            path = storage.filePath(index)
-            if not os.path.exists(path): continue
-            content = storage.fileContent(path)
+            if path is None: continue
             name = storage.fileName(path)
+            if name is None: continue
+            content = storage.fileContent(path)
+            if content is None: continue
             search.append(name, path, content)
 
         self.progress.emit(100)

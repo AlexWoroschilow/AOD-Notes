@@ -16,6 +16,7 @@ import functools
 
 from lib.plugin import Loader
 
+
 class Loader(Loader):
 
     def enabled(self, options=None, args=None):
@@ -28,17 +29,6 @@ class Loader(Loader):
     def _service(self, kernel, config, storage):
         from .service import Search
 
-        service = Search()
-
         destination = os.path.dirname(kernel.options.config)
-        if service.exists('%s/index' % destination):
-            return service.previous('%s/index' % destination)
-
-        service.create('%s/index' % destination)
-        for index in storage.entitiesByPath(config.get('storage.location')):
-            name = storage.fileName(index)
-            path = storage.filePath(index)
-            text = storage.fileContent(index)
-
-            service.append(name, path, text)
-        return service
+        destination = '{}/index'.format(destination)
+        return Search(destination)

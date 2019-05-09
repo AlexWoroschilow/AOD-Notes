@@ -20,8 +20,6 @@ class SettingsTitle(QtWidgets.QLabel):
         super(SettingsTitle, self).__init__(text)
 
 
-
-
 class WidgetSettings(QtWidgets.QGroupBox):
 
     def __init__(self):

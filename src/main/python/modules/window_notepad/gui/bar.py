@@ -27,8 +27,7 @@ class FolderTreeToolBar(QtWidgets.QToolBar):
         self.parent = parent
         super(FolderTreeToolBar, self).__init__(parent)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.onActionContextMenu)
-        
+
         self.setContentsMargins(0, 0, 0, 0)
         self.setOrientation(Qt.Vertical)
         self.setMaximumWidth(35)
@@ -56,7 +55,3 @@ class FolderTreeToolBar(QtWidgets.QToolBar):
         self.removeAction.setToolTip("Remove selected preview")
         self.removeAction.setShortcut("Del")
         self.addWidget(self.removeAction)
-
-    @inject.params(menu='settings_menu')
-    def onActionContextMenu(self, event, menu):
-        menu.exec_(self.mapToGlobal(event))

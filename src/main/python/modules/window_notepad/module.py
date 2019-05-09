@@ -124,18 +124,6 @@ class Loader(Loader):
         action = functools.partial(self.actions.onActionNoteSelect, widget=widget)
         widget.tree.clicked.connect(action)
 
-        action = functools.partial(self.actions.onActionClone, widget=widget)
-        widget.toolbar.copyAction.clicked.connect(action)
-
-        action = functools.partial(self.actions.onActionExpand, widget=widget)
-        widget.toolbar.expandAction.clicked.connect(action)
-
-        action = functools.partial(self.actions.onActionCollaps, widget=widget)
-        widget.toolbar.collapseAction.clicked.connect(action)
-
-        action = functools.partial(self.actions.onActionRemove, widget=widget)
-        widget.toolbar.removeAction.clicked.connect(action)
-
         action = functools.partial(self.actions.onActionConfigUpdated, widget=widget)
         kernel.listen('config_updated', action)
 
