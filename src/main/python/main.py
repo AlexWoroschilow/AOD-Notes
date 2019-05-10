@@ -39,6 +39,8 @@ from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
+from importlib import util
+
 
 from fbs_runtime.application_context import ApplicationContext
 
@@ -57,7 +59,7 @@ class ApplicationContainer(ApplicationContext):
     def run(self, options, args):
         self.app.setAttribute(Qt.AA_ShareOpenGLContexts)
 
-        spec = importlib.util.find_spec('application')
+        spec = util.find_spec('application')
         module = spec.loader.load_module()
 
         if module is None: return None
@@ -72,6 +74,8 @@ if __name__ == "__main__":
     parser.add_option("--loglevel", default=logging.DEBUG, dest="loglevel", help="Logging level")
     parser.add_option("--logfile", default=os.path.expanduser('~/.config/CryptoNotes/notes.log'), dest="logfile", help="Logfile location")
     parser.add_option("--config", default=os.path.expanduser('~/.config/CryptoNotes/notes.conf'), dest="config", help="Config file location")
+    parser.add_option("--console", action="store_true", dest="console", help="Start program in the console mode")
+    parser.add_option("--console-export", default=None, dest="console_export", help="Start program in the console mode")
 
     (options, args) = parser.parse_args()
 

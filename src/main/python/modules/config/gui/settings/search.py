@@ -10,7 +10,6 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import os
 import inject
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
@@ -23,8 +22,8 @@ from PyQt5 import QtCore
 class CryptographyThread(QtCore.QThread):
     progress = QtCore.pyqtSignal(int)
 
-    @inject.params(storage='storage', search='search', config='config')
-    def run(self, storage, search, config):
+    @inject.params(storage='storage', search='search')
+    def run(self, storage=None, search=None):
         if not search.clean(): return None
         collection = storage.entities()
         for progress, index in enumerate(collection, start=1):
@@ -37,7 +36,6 @@ class CryptographyThread(QtCore.QThread):
             content = storage.fileContent(path)
             if content is None: continue
             search.append(name, path, content)
-
         self.progress.emit(100)
 
 
