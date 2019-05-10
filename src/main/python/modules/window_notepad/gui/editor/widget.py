@@ -89,6 +89,15 @@ class TextEditorWidget(QtWidgets.QWidget):
 
         self.setLayout(layout)
 
+    def focus(self):
+        if self.writer is None: return self 
+        cursor = self.writer.text.textCursor()
+        if cursor is None: return self
+        cursor.setPosition(0)
+        self.writer.text.setTextCursor(cursor)        
+        self.writer.focus()
+        return self
+
     @property
     def index(self):
         return self._index

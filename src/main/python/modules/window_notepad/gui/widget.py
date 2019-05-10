@@ -92,6 +92,7 @@ class NotepadDashboard(QtWidgets.QSplitter):
         self.editor = editor
         self.editor.index = index
         layout.addWidget(self.editor)
+        self.editor.focus()
 
         if self.current == index: return self
         # highlight the current note if the  

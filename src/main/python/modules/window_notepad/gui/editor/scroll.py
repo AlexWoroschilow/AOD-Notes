@@ -35,8 +35,12 @@ class TextWriter(QtWidgets.QScrollArea):
 
         self.setGraphicsEffect(effect)
         
-        
         self._entity = None
+
+    def focus(self):
+        if self.text is not None: 
+            self.text.setFocus()
+        return self
 
     def zoomIn(self, value):
         if self.text is None:
