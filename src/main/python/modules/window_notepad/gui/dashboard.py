@@ -21,3 +21,6 @@ class Notepad(QtWidgets.QTabWidget):
         self.setTabPosition(QtWidgets.QTabWidget.West)
         self.setTabsClosable(True)
 
+    def close(self):
+        super(Notepad, self).deleteLater()
+        return super(Notepad, self).close()

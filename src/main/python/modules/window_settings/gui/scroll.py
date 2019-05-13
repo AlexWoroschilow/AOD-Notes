@@ -15,7 +15,6 @@ from PyQt5 import QtWidgets
 
 
 class WidgetSettings(QtWidgets.QWidget):
-    
     columns = 1
 
     def __init__(self):
@@ -26,7 +25,7 @@ class WidgetSettings(QtWidgets.QWidget):
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
         self.setLayout(self.layout)
-        
+
     def addWidget(self, widget):
         self.layout.addWidget(widget)
 
@@ -47,3 +46,7 @@ class SettingsScrollArea(QtWidgets.QScrollArea):
 
     def addWidget(self, widget):
         self.container.addWidget(widget)
+
+    def close(self):
+        super(SettingsScrollArea, self).deleteLater()
+        return super(SettingsScrollArea, self).close()
