@@ -84,3 +84,7 @@ class PreviewScrollArea(QtWidgets.QScrollArea):
             self.preview.layout().addWidget(widget, i, j)
 
         return super(PreviewScrollArea, self).show()
+
+    def close(self):
+        super(PreviewScrollArea, self).deleteLater()
+        return super(PreviewScrollArea, self).close()

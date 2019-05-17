@@ -10,6 +10,7 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import gc
 import inject
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
@@ -121,7 +122,8 @@ class NotepadDashboard(QtWidgets.QSplitter):
             item = layout.itemAt(i)
             if item is None: layout.takeAt(i)
             widget = item.widget()
-            if item is not None: widget.close()
+            if item is not None:
+                widget.close()
 
         widget = PreviewScrollArea(self)
         widget.edit.connect(self.edit.emit)

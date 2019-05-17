@@ -99,5 +99,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # Do not close the first one tab 
         if index in [0]: return None
         widget = self.content.widget(index)
-        if widget is None: widget.deleteLater()
+        print(widget)
+        if widget is not None: widget.close()
         self.content.removeTab(index)

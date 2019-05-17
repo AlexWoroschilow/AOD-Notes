@@ -271,3 +271,7 @@ class TextEditorWidget(QtWidgets.QWidget):
     def onActionNumberList(self):
         cursor = self.writer.text.textCursor()
         cursor.insertList(QtGui.QTextListFormat.ListDecimal)
+
+    def close(self):
+        super(TextEditorWidget, self).deleteLater()
+        return super(TextEditorWidget, self).close()
