@@ -20,8 +20,3 @@ class ModuleActions(object):
         if window is None: return None
         if window.tab is None: return None
         window.tab.emit((factory.widget, window.tr('Settings')))
-
-    @inject.params(config='config', kernel='kernel')
-    def onActionToggle(self, status, variable, config, kernel):
-        config.set(variable, '%s' % status)
-        kernel.dispatch('config_updated')

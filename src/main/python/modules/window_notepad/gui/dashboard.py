@@ -20,4 +20,3 @@ class Notepad(QtWidgets.QTabWidget):
         self.setContentsMargins(0, 0, 0, 0)
         self.setTabPosition(QtWidgets.QTabWidget.West)
         self.setTabsClosable(True)
-

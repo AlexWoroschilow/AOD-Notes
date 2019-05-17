@@ -18,6 +18,10 @@ from lib.plugin import Loader
 from .actions import ModuleActions
 from .factory import ToolbarFactory
 
+from .gui.dashboard import Notepad
+from .gui.widget import NotepadDashboard
+from .gui.editor.widget import TextEditorWidget
+
 
 class Loader(Loader):
     actions = ModuleActions()
@@ -42,7 +46,8 @@ class Loader(Loader):
         if storage is None: return None
 
         current = config.get('editor.current')
-        if not len(current): return dashboard.note(storage.first())
+        if current is None or not len(current):
+            return dashboard.note(storage.first())
         # get last edited document from the confnig
         # and open this document in the editor by default
         index = storage.index(current)
@@ -53,22 +58,20 @@ class Loader(Loader):
 
     @inject.params(config='config', dashboard='notepad.dashboard')
     def _notepad(self, config=None, dashboard=None):
-        if not len(config.get('storage.location')): return None
-
         if dashboard is None: return None
+        location = config.get('storage.location')
+        if not len(location): return None
 
-        from .gui.dashboard import Notepad
         content = Notepad()
-        content.addTab(dashboard, content.tr('Dashboard'))
+        name = content.tr('Dashboard')
+        content.addTab(dashboard, name)
+        
         return content
 
-    @inject.params(kernel='kernel', config='config', factory_leftbar='toolbar_factory.leftbar',
-                   factory_rightbar='toolbar_factory.rightbar', factory_formatbar='toolbar_factory.formatbar')
-    def _notepad_editor(self, kernel=None, config=None, factory_leftbar=None, factory_rightbar=None,
-                        factory_formatbar=None):
-        if not len(config.get('storage.location')): return None
-
-        from .gui.editor.widget import TextEditorWidget
+    @inject.params(config='config', factory_leftbar='toolbar_factory.leftbar', factory_rightbar='toolbar_factory.rightbar', factory_formatbar='toolbar_factory.formatbar')
+    def _notepad_editor(self, config=None, factory_leftbar=None, factory_rightbar=None, factory_formatbar=None):
+        location = config.get('storage.location')
+        if not len(location): return None
 
         widget = TextEditorWidget()
 
@@ -93,16 +96,11 @@ class Loader(Loader):
         action = functools.partial(self.actions.onActionFullScreen, widget=widget)
         widget.fullscreen.connect(action)
 
-        action = functools.partial(self.actions.onActionConfigUpdatedEditor, widget=widget)
-        kernel.listen('config_updated', action)
-
         return widget
 
-    @inject.params(kernel='kernel', config='config', storage='storage')
-    def _notepad_dashboard(self, kernel, config, storage):
+    @inject.params(config='config', storage='storage')
+    def _notepad_dashboard(self, config, storage):
         if not len(config.get('storage.location')): return None
-
-        from .gui.widget import NotepadDashboard
 
         widget = NotepadDashboard(self.actions)
 
@@ -123,8 +121,5 @@ class Loader(Loader):
 
         action = functools.partial(self.actions.onActionNoteSelect, widget=widget)
         widget.tree.clicked.connect(action)
-
-        action = functools.partial(self.actions.onActionConfigUpdated, widget=widget)
-        kernel.listen('config_updated', action)
 
         return widget

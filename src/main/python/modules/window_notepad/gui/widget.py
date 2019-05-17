@@ -15,7 +15,6 @@ from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 
 from .folder.tree import FolderTree
-from .bar import FolderTreeToolBar
 from .demo.widget import DemoWidget
 from .preview.widget import PreviewScrollArea
 
@@ -76,20 +75,30 @@ class NotepadDashboard(QtWidgets.QSplitter):
             return self.tree.currentIndex()
         return storage.rootIndex()
 
-    @inject.params(storage='storage', editor='notepad.editor', config='config')
-    def note(self, index, storage, editor, config=None):
-        current = storage.filePath(index)
-        config.set('editor.current', current)
+    def focus(self):
+        if self.editor is None:
+            self.editor.focus()
+        return self
 
+    @inject.params(storage='storage', config='config')
+    def note(self, index, storage, config):
+        if storage.isDir(index): return self
+        current = storage.filePath(index)
+        if current is None: return self
+        config.set('editor.current', current)
+        
         layout = self.container.layout()
+        if layout is None: return self
+
         for i in range(layout.count()):
             layout.itemAt(i).widget().close()
 
-        if not storage.isFile(index):
-            layout.addWidget(DemoWidget())
-            return self
+        container = inject.get_injector()
+        if container is None: return self
 
-        self.editor = editor
+        self.editor = container.get_instance('notepad.editor')
+        if self.editor is None: return self
+
         self.editor.index = index
         layout.addWidget(self.editor)
         self.editor.focus()

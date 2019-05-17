@@ -25,4 +25,3 @@ class ModuleActions(object):
         if destination is not None and len(destination):
             config.set('storage.location', destination)
             widget.location.setText(destination)
-            kernel.dispatch('config_updated')
