@@ -36,7 +36,9 @@ class Loader(Loader):
         if not len(config.get('storage.location')): return None
 
         widget = PictureButton(QtGui.QIcon("icons/settings"), None)
-        widget.clicked.connect(self.actions.onActionSettings)
+        widget.clicked.connect(functools.partial(
+            self.actions.onActionSettings, button=widget
+        ))
 
         factory.addWidget(widget, 128)
 

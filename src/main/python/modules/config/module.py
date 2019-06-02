@@ -29,13 +29,16 @@ class Loader(Loader):
         binder.bind_to_constructor('config', self._config)
 
     def boot(self, options=None, args=None):
-        if options.console: return None
+        if options.console:
+            return None
 
         container = inject.get_injector()
-        if container is None: return None
+        if container is None:
+            return None
 
         factory = container.get_instance('settings_factory')
-        if factory is None: return None
+        if factory is None:
+            return None
 
         factory.addWidget(self._widget_settings_storage)
         factory.addWidget(self._widget_settings_search)
@@ -45,10 +48,10 @@ class Loader(Loader):
         from .service.config import ConfigFile
         return ConfigFile(kernel.options.config)
 
-
     @inject.params(kernel='kernel')
     def _widget_settings_search(self, kernel=None):
-        if kernel is None: return None
+        if kernel is None:
+            return None
 
         from .gui.settings.search import WidgetSettingsSearch
 

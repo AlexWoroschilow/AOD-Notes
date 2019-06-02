@@ -137,16 +137,13 @@ PreviewContainer NotePreviewDescription #previewTitle {
 
 
 TextEditorWidget,
-QWidget#FolderListContainer,
-SettingsScrollArea {
+QWidget#FolderListContainer {
 	background: #ffffff;
 	text-align: center;
 	border: none;
 }
 
-PreviewScrollArea,
-WizardDashboardScrollArea,
-SettingsScrollArea {
+PreviewScrollArea {
     background: #515659;
     padding: 0px 0px;
 	border: none;
@@ -154,28 +151,24 @@ SettingsScrollArea {
 }
 
 TextWriter,
-TextEditor,
-WidgetSettings {
+TextEditor {
 	border-radius: 0px;
 	border: none;
     margin: 0px;
 }
 
-WizardSettings {
-    background: #ffffff;
-	max-width: 600px;
-    border: none;
-}
 
 WidgetSettings {
+    text-align: center;
 	padding: 0px 30px 20px 30px;
-	background-color: #ffffff;
 	max-width: 600px;
+	border-bottom: 1px;
 }
 
 WidgetSettings SettingsTitle {
-	font-size: 26px;
-	padding: 15px 0px;
+    text-align: center;
+	font-size: 18px;
+	padding: 5px 0px;
 }
 
 WidgetSettings QPushButton{

@@ -20,14 +20,8 @@ class SettingsTitle(QtWidgets.QLabel):
         super(SettingsTitle, self).__init__(text)
 
 
-class WidgetSettings(QtWidgets.QGroupBox):
+class WidgetSettings(QtWidgets.QWidget):
 
     def __init__(self):
         super(WidgetSettings, self).__init__()
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-
-        effect = QtWidgets.QGraphicsDropShadowEffect()
-        effect.setBlurRadius(10)
-        effect.setOffset(0)
-
-        self.setGraphicsEffect(effect)

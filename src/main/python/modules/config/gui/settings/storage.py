@@ -66,7 +66,7 @@ class WidgetSettingsStorage(WidgetSettings):
         self.layout.addWidget(self.location, 1, 1)
 
         self.layout.addWidget(QtWidgets.QLabel('Export to:'), 2, 0)
-        self.export = QtWidgets.QPushButton('Choose folder')
+        self.export = QtWidgets.QPushButton('Choose folder to export')
         self.export.clicked.connect(self.onActionExport)
         self.export.setToolTip("Export your notes to some external folder")
         self.export.setFlat(True)
@@ -83,7 +83,8 @@ class WidgetSettingsStorage(WidgetSettings):
     def onActionExport(self, event):
         message = self.tr("Select Directory to export the notes")
         self.destination = str(QtWidgets.QFileDialog.getExistingDirectory(self, message, os.path.expanduser('~')))
-        if self.destination is None: return None
+        if self.destination is None:
+            return None
 
         self.thread.progress.connect(self.onActionProgress)
         self.thread.start()
@@ -92,7 +93,9 @@ class WidgetSettingsStorage(WidgetSettings):
     def onActionProgress(self, value):
         if not self.progress.isVisible() and value > 0:
             self.progress.setVisible(True)
+
         self.progress.setValue(value)
+
         if self.progress.isVisible() and value == 100:
             self.progress.setVisible(False)
 

@@ -19,28 +19,38 @@ from . import WidgetSettings
 from PyQt5 import QtCore
 
 
-class CryptographyThread(QtCore.QThread):
+class SearchThread(QtCore.QThread):
     progress = QtCore.pyqtSignal(int)
 
     @inject.params(storage='storage', search='search')
     def run(self, storage=None, search=None):
-        if not search.clean(): return None
+        if not search.clean():
+            return None
+
         collection = storage.entities()
         for progress, index in enumerate(collection, start=1):
             self.progress.emit(progress / len(collection) * 100)
-            if not storage.isFile(index): continue
+            if not storage.isFile(index):
+                continue
+
             path = storage.filePath(index)
-            if path is None: continue
+            if path is None:
+                continue
+
             name = storage.fileName(path)
-            if name is None: continue
+            if name is None:
+                continue
+
             content = storage.fileContent(path)
-            if content is None: continue
+            if content is None:
+                continue
+
             search.append(name, path, content)
         self.progress.emit(100)
 
 
 class WidgetSettingsSearch(WidgetSettings):
-    thread = CryptographyThread()
+    thread = SearchThread()
 
     def __init__(self):
         super(WidgetSettingsSearch, self).__init__()
@@ -78,7 +88,9 @@ class WidgetSettingsSearch(WidgetSettings):
     def onActionRebuildProgress(self, value):
         if not self.progress.isVisible() and value > 0:
             self.progress.setVisible(True)
+
         self.progress.setValue(value)
+
         if self.progress.isVisible() and value == 100:
             self.progress.setVisible(False)
 

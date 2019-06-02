@@ -10,6 +10,8 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import os
+import platform
 from PyQt5.QtCore import Qt
 from PyQt5 import QtWidgets
 
@@ -19,10 +21,10 @@ class WidgetSettings(QtWidgets.QWidget):
 
     def __init__(self):
         super(WidgetSettings, self).__init__()
-        self.setAutoFillBackground(True)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+
         self.layout = QtWidgets.QVBoxLayout()
         self.layout.setAlignment(Qt.AlignTop)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
         self.setLayout(self.layout)
 
@@ -36,13 +38,17 @@ class SettingsScrollArea(QtWidgets.QScrollArea):
         super(SettingsScrollArea, self).__init__(parent)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setAlignment(Qt.AlignCenter)
-
-        self.setContentsMargins(0, 0, 0, 0)
+        self.setAlignment(Qt.AlignTop)
+        self.setWidgetResizable(True)
 
         self.container = WidgetSettings()
-        self.setWidgetResizable(True)
         self.setWidget(self.container)
+
+        stylesheet = 'css/{}.qss'.format(platform.system().lower())
+        if not os.path.exists(stylesheet):
+            return None
+
+        self.setStyleSheet(open(stylesheet).read())
 
     def addWidget(self, widget):
         self.container.addWidget(widget)

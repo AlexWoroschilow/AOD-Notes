@@ -10,27 +10,23 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import inject
 from PyQt5 import QtWidgets
+from .scroll import SettingsScrollArea
 
 
 class SettingsMenu(QtWidgets.QWidgetAction):
 
-    def __init__(self, parent):
-        QtWidgets.QWidgetAction.__init__(self, parent)
-        
-        layout = QtWidgets.QGridLayout()
+    @inject.params(factory='settings_factory')
+    def __init__(self, parent, factory):
+        super(SettingsMenu, self).__init__(parent)
 
-        self.editorToolbarFormat = QtWidgets.QCheckBox('Show format bar')
-        layout.addWidget(self.editorToolbarFormat, 1, 1)
-        
-        self.editorToolbarRight = QtWidgets.QCheckBox('Show right toolbar (editor)')
-        layout.addWidget(self.editorToolbarRight, 2, 1)
-        
-        self.editorToolbarLeft = QtWidgets.QCheckBox('Show left toolbar (editor)')
-        layout.addWidget(self.editorToolbarLeft, 3, 1)
+        container = SettingsScrollArea()
+        for loader in factory.widgets:
+            container.addWidget(loader())
 
-        container = QtWidgets.QWidget()
-        container.setContentsMargins(0, 0, 0, 0)
-        container.setLayout(layout)
-        
+        spacer = QtWidgets.QWidget()
+        spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        container.addWidget(spacer)
+
         self.setDefaultWidget(container)
