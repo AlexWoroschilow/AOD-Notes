@@ -29,8 +29,7 @@ class NotepadDashboard(QtWidgets.QSplitter):
     fullscreenAction = QtCore.pyqtSignal(object)
     editor = None
 
-    @inject.params(config='config', storage='storage')
-    def __init__(self, actions, config=None, storage=None):
+    def __init__(self, actions):
         super(NotepadDashboard, self).__init__()
         self.setContentsMargins(0, 0, 0, 0)
 

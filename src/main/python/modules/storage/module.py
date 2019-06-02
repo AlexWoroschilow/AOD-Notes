@@ -14,9 +14,12 @@ import os
 import inject
 
 from lib.plugin import Loader
+import functools
+from .actions import ModuleActions
 
 
 class Loader(Loader):
+    actions = ModuleActions()
 
     def enabled(self, options=None, args=None):
         return True
@@ -37,3 +40,24 @@ class Loader(Loader):
 
         from .service.storage import FilesystemStorage
         return FilesystemStorage(storage)
+
+    @inject.params(config='config')
+    def _widget_settings_storage(self, config=None):
+        if config is None:
+            return None
+
+        from .gui.settings.storage import WidgetSettingsStorage
+
+        widget = WidgetSettingsStorage()
+        widget.location.setText(config.get('storage.location'))
+        action = functools.partial(self.actions.onActionStorageLocationChange, widget=widget)
+        widget.location.clicked.connect(action)
+
+        return widget
+
+    @inject.params(config='config', factory='settings_factory')
+    def boot(self, options=None, args=None, config=None, factory=None):
+        if options is None or args is None or factory is None:
+            return None
+
+        factory.addWidget(self._widget_settings_storage)

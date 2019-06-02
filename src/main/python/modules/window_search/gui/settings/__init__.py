@@ -10,18 +10,18 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import os
-import inject
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt
 
 
-class ModuleActions(object):
+class SettingsTitle(QtWidgets.QLabel):
 
-    @inject.params(config='config', kernel='kernel')
-    def onActionStorageLocationChange(self, event, config, widget, kernel):
+    def __init__(self, text):
+        super(SettingsTitle, self).__init__(text)
 
-        from PyQt5 import QtWidgets
-        destination = str(
-            QtWidgets.QFileDialog.getExistingDirectory(widget, "Select Directory", os.path.expanduser('~')))
-        if destination is not None and len(destination):
-            config.set('storage.location', destination)
-            widget.location.setText(destination)
+
+class WidgetSettings(QtWidgets.QWidget):
+
+    def __init__(self):
+        super(WidgetSettings, self).__init__()
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)

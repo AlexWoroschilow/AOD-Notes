@@ -58,20 +58,17 @@ class Loader(Loader):
 
     @inject.params(config='config', dashboard='notepad.dashboard')
     def _notepad(self, config=None, dashboard=None):
-        if dashboard is None: return None
-        location = config.get('storage.location')
-        if not len(location): return None
+        if dashboard is None:
+            return None
 
         content = Notepad()
-        name = content.tr('Dashboard')
-        content.addTab(dashboard, name)
-        
+        content.addTab(dashboard, content.tr('Dashboard'))
+
         return content
 
-    @inject.params(config='config', factory_leftbar='toolbar_factory.leftbar', factory_rightbar='toolbar_factory.rightbar', factory_formatbar='toolbar_factory.formatbar')
+    @inject.params(config='config', factory_leftbar='toolbar_factory.leftbar',
+                   factory_rightbar='toolbar_factory.rightbar', factory_formatbar='toolbar_factory.formatbar')
     def _notepad_editor(self, config=None, factory_leftbar=None, factory_rightbar=None, factory_formatbar=None):
-        location = config.get('storage.location')
-        if not len(location): return None
 
         widget = TextEditorWidget()
 
@@ -100,7 +97,6 @@ class Loader(Loader):
 
     @inject.params(config='config', storage='storage')
     def _notepad_dashboard(self, config, storage):
-        if not len(config.get('storage.location')): return None
 
         widget = NotepadDashboard(self.actions)
 
