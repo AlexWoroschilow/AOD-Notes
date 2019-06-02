@@ -50,8 +50,8 @@ class ModuleActions(object):
             if index is None:
                 return None
 
-            if search is None:
-                return None
+            if widget is not None:
+                widget.note(index)
 
             # update search index only after
             # the update was successful
@@ -59,7 +59,8 @@ class ModuleActions(object):
             content = storage.fileContent(index)
             path = storage.filePath(index)
 
-            search.append(name, path, content)
+            if search is not None:
+                search.append(name, path, content)
 
         except Exception as ex:
             logger.exception(ex)
@@ -70,17 +71,20 @@ class ModuleActions(object):
             # update search index only after
             # the update was successful
             index = storage.clone(index)
-            if index is None:
+            if index is None or widget is None:
                 return None
 
-            if search is None:
-                return None
+            if not storage.isFile(index):
+                # todo: add indexation
+                return widget.group(index)
 
-            name = storage.fileName(index)
-            content = storage.fileContent(index)
-            path = storage.filePath(index)
+            if search is not None and search:
+                name = storage.fileName(index)
+                content = storage.fileContent(index)
+                path = storage.filePath(index)
+                search.append(name, path, content)
 
-            search.append(name, path, content)
+            return widget.note(index)
 
         except Exception as ex:
             logger.exception(ex)
@@ -98,22 +102,24 @@ class ModuleActions(object):
 
             # update search index only after
             # the update was successful
-            if search is None:
-                return None
-
-            name = storage.fileName(index)
-            path = storage.filePath(index)
-            search.update(name, path, content)
+            if search is not None and search:
+                name = storage.fileName(index)
+                content = storage.fileContent(index)
+                path = storage.filePath(index)
+                search.update(name, path, content)
 
         except Exception as ex:
             logger.exception(ex)
 
-    @inject.params(storage='storage', logger='logger')
-    def onActionFolderCreate(self, event, widget, storage, logger):
+    @inject.params(storage='storage', config='config', logger='logger')
+    def onActionFolderCreate(self, event, widget, storage, config, logger):
         try:
-            if widget.tree.current is not None:
-                return storage.mkdir(widget.tree.current, 'New group')
-            return storage.mkdir(storage.rootIndex(), 'New group')
+            destination = widget.tree.current
+            if destination is None or not storage.isDir(destination):
+                destination = config.get('storage.location')
+            index = storage.mkdir(destination, 'New group')
+            return widget.group(index)
+
         except Exception as ex:
             logger.exception(ex)
 
@@ -127,6 +133,15 @@ class ModuleActions(object):
 
     @inject.params(storage='storage', search='search', logger='logger')
     def onActionDelete(self, index, widget, storage, search, logger):
+        """
+        :todo Close the editor or group after the index was removed
+        :param index:
+        :param widget:
+        :param storage:
+        :param search:
+        :param logger:
+        :return:
+        """
 
         message = widget.tr("Are you sure you want to remove this element: {} ?".format(
             storage.fileName(index)
@@ -144,13 +159,11 @@ class ModuleActions(object):
             path = storage.filePath(index)
             if not storage.remove(index):
                 return None
-
             # update search index only after
             # the update was successful
-            if search is None:
-                return None
+            if search is not None:
+                search.remove(path)
 
-            search.remove(path)
         except Exception as ex:
             logger.exception(ex)
 

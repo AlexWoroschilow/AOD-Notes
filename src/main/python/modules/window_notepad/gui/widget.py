@@ -132,8 +132,8 @@ class NotepadDashboard(QtWidgets.QSplitter):
         widget.clone.connect(lambda x: self.group(index))
 
         for entity in storage.entities(index):
-            if storage.isDir(entity): continue
-            widget.addPreview(entity)
+            if storage.isFile(entity):
+                widget.addPreview(entity)
 
         layout.addWidget(widget)
         widget.show()

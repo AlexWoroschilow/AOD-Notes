@@ -58,10 +58,13 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
             return None
 
         destination = '{}(clone)'.format(path)
-        if os.path.exists(path):
+        if os.path.exists(destination):
             raise Exception('File exists')
 
-        shutil.copy2(path, destination)
+        if self.isFile(path):
+            shutil.copy2(path, destination)
+        elif self.isDir(path):
+            shutil.copytree(path, destination)
 
         return self.index(destination)
 
