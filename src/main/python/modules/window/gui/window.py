@@ -40,7 +40,7 @@ class MainWindow(QtWidgets.QMainWindow):
         spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
         self.statusBar().addWidget(spacer)
 
-        self.setWindowTitle('CryptoNotes')
+        self.setWindowTitle('AOD - Notepad')
 
         stylesheet = 'css/{}.qss'.format(platform.system().lower())
         if not os.path.exists(stylesheet): return None
@@ -99,6 +99,5 @@ class MainWindow(QtWidgets.QMainWindow):
         # Do not close the first one tab 
         if index in [0]: return None
         widget = self.content.widget(index)
-        print(widget)
         if widget is not None: widget.close()
         self.content.removeTab(index)

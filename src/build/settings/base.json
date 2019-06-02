@@ -1,6 +1,6 @@
 {
-    "app_name": "CryptoNotes",
+    "app_name": "AOD-Notepad",
     "author": "AlexWoroschilow",
     "main_module": "src/main/python/main.py",
-    "version": "0.0.0"
+    "version": "0.0.1"
 }

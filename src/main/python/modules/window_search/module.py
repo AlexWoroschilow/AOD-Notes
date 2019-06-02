@@ -50,15 +50,17 @@ class Loader(Loader):
         if options is None: return None
         if args is None: return None
 
-        self.buttonGroup = PictureButton(QtGui.QIcon("icons/preview"), 'New Group')
-        action = functools.partial(dashboard.actions.onActionFolderCreate, widget=dashboard)
-        self.buttonGroup.clicked.connect(action)
-
-        self.buttonNote = PictureButton(QtGui.QIcon("icons/file-new"), 'New Note')
+        tooltip = 'Create new note. The new note will be created as a part of the selected group or in the root group.'
+        self.buttonNote = PictureButton(QtGui.QIcon("icons/note"), tooltip)
         action = functools.partial(dashboard.actions.onActionNoteCreate, widget=dashboard)
         self.buttonNote.clicked.connect(action)
 
-        self.buttonImport = PictureButton(QtGui.QIcon("icons/file-import"), 'Import File')
+        tooltip = 'Create new group. The new group will be created as in the selected group or in the root group.'
+        self.buttonGroup = PictureButton(QtGui.QIcon("icons/book"), tooltip)
+        action = functools.partial(dashboard.actions.onActionFolderCreate, widget=dashboard)
+        self.buttonGroup.clicked.connect(action)
+
+        self.buttonImport = PictureButton(QtGui.QIcon("icons/import"), 'Import File')
         self.buttonImport.clicked.connect(self.actions.onActionNoteImport)
 
         self.search = SearchField()
@@ -81,8 +83,8 @@ class Loader(Loader):
         self.spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
 
         if factory is None: return None
-        factory.addWidget(self.buttonGroup)
         factory.addWidget(self.buttonNote)
+        factory.addWidget(self.buttonGroup)
         factory.addWidget(self.buttonImport)
         factory.addWidget(self.spacer)
         factory.addWidget(self.search)

@@ -2,6 +2,16 @@ QMainWindow {
 	background: rgb(236,236,236);
 }
 
+PictureButton {
+    min-width: 30px;
+    padding: 2px 2px;
+    margin: 0px 5px;
+}
+PictureButtonFlat {
+    min-width: 20px;
+    padding: 2px 2px;
+    margin: 0px 2px;
+}
 QTabBar {
 	background: rgb(236,236,236);
 	color: #4F4F4F;

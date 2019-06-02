@@ -45,9 +45,6 @@ class StorageThread(QtCore.QThread):
         folders.sort(key=len, reverse=True)
         files.sort(key=len, reverse=True)
 
-        print(folders)
-        print(files)
-
         self.progress.emit(100)
 
 

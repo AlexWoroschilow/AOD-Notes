@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+####! /usr/bin/python3
 #
 # -*- coding: utf-8 -*-
 # Copyright 2015 Alex Woroschilow (alex.woroschilow@gmail.com)
@@ -35,7 +35,7 @@ class Application(QtWidgets.QApplication):
 
     def __init__(self, options=None, args=None):
         super(Application, self).__init__(sys.argv)
-        self.setApplicationName('CryptoNotes')
+        self.setApplicationName('AOD - Notepad')
         self.kernel = Kernel(options, args)
 
     def exec_(self):

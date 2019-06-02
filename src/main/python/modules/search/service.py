@@ -11,38 +11,15 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
-import re
 
-from html.parser import HTMLParser
-
+from bs4 import BeautifulSoup
 from whoosh.fields import Schema, TEXT, ID
 from whoosh import qparser
 from whoosh import scoring
 from whoosh import index
 
 
-class MLStripper(HTMLParser):
-
-    def __init__(self):
-        self.reset()
-        self.strict = False
-        self.convert_charrefs = True
-        self.fed = []
-
-    def handle_data(self, d):
-        self.fed.append(d)
-
-    def get_data(self):
-        return ''.join(self.fed)
-
-    def stripTags(self, html=None):
-        if html is None: return None
-        self.feed(html)
-        return re.sub(' +', ' ', self.get_data())
-
-
 class Search(object):
-    parser = MLStripper()
 
     def __init__(self, destination=None):
         self.destination = destination
@@ -57,58 +34,102 @@ class Search(object):
 
         if not os.path.exists(self.destination):
             os.mkdir(self.destination)
+
         if not self.exists(self.destination):
             return self.create(self.destination)
+
         return self.previous(self.destination)
 
+    def _strip_tags(self, html=None):
+        if html is None:
+            return None
+
+        soup = BeautifulSoup(html, "html5lib")
+        [x.extract() for x in soup.find_all('script')]
+        [x.extract() for x in soup.find_all('style')]
+        [x.extract() for x in soup.find_all('meta')]
+        [x.extract() for x in soup.find_all('noscript')]
+        [x.extract() for x in soup.find_all('iframe')]
+        return soup.text
+
     def create(self, destination=None):
-        if self.schema is None: return None
-        if destination is None: return None
+        if self.schema is None:
+            return None
+
+        if destination is None:
+            return None
+
         self.ix = index.create_in(destination, self.schema)
 
     def exists(self, destination=None):
-        if destination is None: return False
-        if not os.path.exists(destination): return False
+        if destination is None:
+            return False
+
+        if not os.path.exists(destination):
+            return False
+
         return index.exists_in(destination)
 
     def previous(self, destination=None):
-        if destination is None: return None
-        if not self.exists(destination): return None
+        if destination is None:
+            return None
+
+        if not self.exists(destination):
+            return None
+
         self.ix = index.open_dir(destination)
         return None
 
     def append(self, title, path, text):
-        content = self.parser.stripTags(u"{}".format(text))
-        if content is None or not len(content): return
+
+        path = u"{}".format(path)
+        title = u"{}".format(title)
+        text = u"{}".format(text)
+
+        content = self._strip_tags(text)
+        if content is None or not len(content):
+            return
+
         self.writer = self.ix.writer()
         self.writer.add_document(title=title, path=path, content=content)
         self.writer.commit()
 
     def update(self, title, path, text):
-        content = self.parser.stripTags(u"{}".format(text))
-        if content is None or not len(content):
-            return self.remove(path) 
 
-        self.writer = self.ix.writer()
-        self.writer.update_document(title=title, path=path, content=content)
-        self.writer.commit()
+        path = u"{}".format(path)
+        title = u"{}".format(title)
+        text = u"{}".format(text)
 
-    def remove(self, path=None):
+        content = self._strip_tags(text)
         with self.ix.searcher() as searcher:
             self.writer = self.ix.writer()
             for number in searcher.document_numbers(path=path):
                 self.writer.delete_document(number)
             self.writer.commit()
 
-    def search(self, string=None, fields=["title", "content"], minscore=0):
+        self.writer = self.ix.writer()
+        self.writer.add_document(title=title, path=path, content=content)
+        self.writer.commit()
+
+    def remove(self, path=None):
+        path = u"{}".format(path)
+
+        with self.ix.searcher() as searcher:
+            self.writer = self.ix.writer()
+
+            for number in searcher.document_numbers(path=path):
+                self.writer.delete_document(number)
+
+            self.writer.commit()
+
+    def search(self, string=None, fields=["title", "content"]):
+
         with self.ix.searcher(weighting=scoring.BM25F) as searcher:
-            query = qparser.MultifieldParser(fields, self.ix.schema)
-            query.add_plugin(qparser.WhitespacePlugin())
-            query.add_plugin(qparser.WildcardPlugin())
-            pattern = query.parse(u"*{}*".format(string))
+            query_parser = qparser.MultifieldParser(fields, self.ix.schema)
+            query_parser.add_plugin(qparser.WhitespacePlugin())
+            query_parser.add_plugin(qparser.WildcardPlugin())
+            pattern = query_parser.parse(u"*{}*".format(string))
             for result in searcher.search(pattern, limit=None):
-                if result.score > minscore: minscore = result.score
-                if result.score < minscore: continue  
                 yield result
 
     def clean(self):

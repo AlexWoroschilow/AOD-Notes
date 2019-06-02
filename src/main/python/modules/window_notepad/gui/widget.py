@@ -34,20 +34,20 @@ class NotepadDashboard(QtWidgets.QSplitter):
         super(NotepadDashboard, self).__init__()
         self.setContentsMargins(0, 0, 0, 0)
 
-        containerLayout = QtWidgets.QGridLayout()
-        containerLayout.setContentsMargins(0, 0, 0, 0)
-        containerLayout.setSpacing(0)
+        container_layout = QtWidgets.QGridLayout()
+        container_layout.setContentsMargins(0, 0, 0, 0)
+        container_layout.setSpacing(0)
 
         self.tree = FolderTree()
         self.tree.expandAll()
 
-        containerLayout.addWidget(self.tree, 0, 1)
+        container_layout.addWidget(self.tree, 0, 1)
 
         container = QtWidgets.QWidget()
 
         container.setContentsMargins(0, 0, 0, 0)
 
-        container.setLayout(containerLayout)
+        container.setLayout(container_layout)
         self.addWidget(container)
 
         self.container = QtWidgets.QWidget()
@@ -87,7 +87,7 @@ class NotepadDashboard(QtWidgets.QSplitter):
         current = storage.filePath(index)
         if current is None: return self
         config.set('editor.current', current)
-        
+
         layout = self.container.layout()
         if layout is None: return self
 

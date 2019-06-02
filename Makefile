@@ -1,8 +1,9 @@
-project = CryptoNotes
+project = AOD-Notepad
 source_rpm = ~/rpmbuild/SOURCES
 project_version = 0.1
 source_project = $(source_rpm)/$(project)-$(project_version)
-
+GLIBC_VERSION_RAW=$(shell getconf GNU_LIBC_VERSION)
+GLIBC_VERSION=$(shell sed -e 's/ /./g' <<< '${GLIBC_VERSION_RAW}')
 
 all: appimage clean
 	echo "done"
@@ -11,10 +12,11 @@ clean:
 	@echo	"[clean] Cleanup the AppDir" && 		rm	-rf		$(project).AppDir
 	@echo	"[clean] Cleanup the PyInstaller" && 	rm 	-rf		target/PyInstaller
 	@echo	"[clean] Cleanup the Build" && 			rm  -rf		target/$(project)
+	echo $(GLIBC_VERSION1)
 
 
 appimage:
-	python3 		-m 		fbs freeze
+	./python3.6.AppImage 		-m 		fbs freeze
 	cp              -r     src/main/python/modules target/$(project)
 	cp              -r     src/main/python/plugins target/$(project)
 	cp              -r     src/main/python/template target/$(project)
@@ -43,5 +45,5 @@ appimage:
 	find 			$(project).AppDir -name '__pycache__' -exec rm -rf {} +
 	find 			$(project).AppDir -name '.pyc*' -exec rm -rf {} +
 	export 			ARCH=x86_64
-	exec 			bin/appimagetool $(project).AppDir bin/CryptoNotes
+	exec 			bin/appimagetool $(project).AppDir bin/AOD-Notepad.$(GLIBC_VERSION).AppImage
 
