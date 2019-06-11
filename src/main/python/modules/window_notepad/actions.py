@@ -42,106 +42,80 @@ class ModuleActions(object):
         except Exception as ex:
             logger.exception(ex)
 
-    @inject.params(storage='storage', search='search', logger='logger')
-    def onActionNoteCreate(self, event, widget, storage, search, logger):
+    @inject.params(config='config', storage='storage', logger='logger')
+    def onActionNoteCreate(self, event, config, widget, storage, logger):
         try:
+            index = widget.current
+            if index is None or not index:
+                index = config.get('storage.location')
+                index = storage.index(index)
 
-            index = storage.touch(widget.current, 'New note')
-            if index is None:
-                return None
+            if not storage.isDir(index):
+                index = config.get('storage.location')
+                index = storage.index(index)
 
-            if widget is not None:
-                widget.note(index)
+            if storage.isFile(index):
+                index = config.get('storage.location')
+                index = storage.index(index)
 
-            # update search index only after
-            # the update was successful
-            name = storage.fileName(index)
-            content = storage.fileContent(index)
-            path = storage.filePath(index)
-
-            if search is not None:
-                search.append(name, path, content)
-
+            index = storage.touch(index, 'New note')
+            if index is None or not index: return None
+            widget.created.emit(index)
         except Exception as ex:
             logger.exception(ex)
 
     @inject.params(storage='storage', search='search', logger='logger')
     def onActionCopy(self, index, widget, storage, search, logger):
         try:
-            # update search index only after
-            # the update was successful
             index = storage.clone(index)
-            if index is None or widget is None:
-                return None
-
-            if not storage.isFile(index):
-                # todo: add indexation
-                return widget.group(index)
-
-            if search is not None and search:
-                name = storage.fileName(index)
-                content = storage.fileContent(index)
-                path = storage.filePath(index)
-                search.append(name, path, content)
-
-            return widget.note(index)
-
+            if index is None: return None
+            widget.created.emit(index)
         except Exception as ex:
             logger.exception(ex)
 
-    @inject.params(storage='storage', search='search', logger='logger')
-    def onActionSave(self, event, storage, search, logger, widget):
+    @inject.params(storage='storage', dashboard='notepad.dashboard', logger='logger')
+    def onActionSave(self, event, storage, dashboard, logger, widget):
         try:
             index, content = event
-            if index is None:
-                return None
-
+            if index is None: return None
             index = storage.setFileContent(index, content)
-            if index is None:
-                return None
-
-            # update search index only after
-            # the update was successful
-            if search is not None and search:
-                name = storage.fileName(index)
-                content = storage.fileContent(index)
-                path = storage.filePath(index)
-                search.update(name, path, content)
-
+            if index is None or not index: return None
+            dashboard.updated.emit(index)
         except Exception as ex:
             logger.exception(ex)
 
     @inject.params(storage='storage', config='config', logger='logger')
     def onActionFolderCreate(self, event, widget, storage, config, logger):
         try:
-            destination = widget.tree.current
-            if destination is None or not storage.isDir(destination):
-                destination = config.get('storage.location')
-            index = storage.mkdir(destination, 'New group')
-            return widget.group(index)
+            index = widget.tree.current
+            if index is None or not index:
+                index = config.get('storage.location')
+                index = storage.index(index)
 
+            if not storage.isDir(index):
+                index = config.get('storage.location')
+                index = storage.index(index)
+
+            if storage.isFile(index):
+                index = config.get('storage.location')
+                index = storage.index(index)
+
+            index = storage.mkdir(index, 'New group')
+            return widget.group(index)
         except Exception as ex:
             logger.exception(ex)
 
     @inject.params(window='window', editor='notepad.editor', storage='storage')
     def onActionFullScreen(self, event, widget, window, editor, storage):
-
-        editor.index = widget.index
-
-        name = storage.fileName(widget.index)
-        window.tab.emit((editor, name))
+        try:
+            editor.index = widget.index
+            name = storage.fileName(widget.index)
+            window.tab.emit((editor, name))
+        except Exception as ex:
+            print(ex)
 
     @inject.params(storage='storage', search='search', logger='logger')
     def onActionDelete(self, index, widget, storage, search, logger):
-        """
-        :todo Close the editor or group after the index was removed
-        :param index:
-        :param widget:
-        :param storage:
-        :param search:
-        :param logger:
-        :return:
-        """
 
         message = widget.tr("Are you sure you want to remove this element: {} ?".format(
             storage.fileName(index)
@@ -156,28 +130,9 @@ class ModuleActions(object):
             return None
 
         try:
-            path = storage.filePath(index)
-            if not storage.remove(index):
-                return None
-            # update search index only after
-            # the update was successful
-            if search is not None:
-                search.remove(path)
-
-        except Exception as ex:
-            logger.exception(ex)
-
-    @inject.params(logger='logger')
-    def onActionExpand(self, event, widget, logger):
-        try:
-            widget.tree.expandAll()
-        except Exception as ex:
-            logger.exception(ex)
-
-    @inject.params(logger='logger')
-    def onActionCollapse(self, event, widget, logger):
-        try:
-            widget.tree.collapseAll()
+            if index is None: return None
+            widget.removed.emit(index)
+            return storage.remove(index)
         except Exception as ex:
             logger.exception(ex)
 

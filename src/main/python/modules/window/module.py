@@ -64,14 +64,7 @@ class Loader(Loader):
         height = int(config.get('window.height'))
         widget.resize(width, height)
 
-        wizard = container.get_instance('wizard')
-        if wizard is not None and wizard:
-            wizard.start.connect(self.test)
-            widget.setMainWidget(wizard)
-            return widget
-
         notepad = container.get_instance('notepad')
-        if notepad is None: return None
         widget.setMainWidget(notepad)
 
         widget.footer = widget.statusBar()

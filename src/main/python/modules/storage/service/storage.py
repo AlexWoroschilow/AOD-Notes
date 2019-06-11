@@ -54,9 +54,7 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         if isinstance(path, QtCore.QModelIndex):
             path = self.filePath(path)
 
-        if path is None:
-            return None
-
+        if path is None: return None
         destination = '{}(clone)'.format(path)
         if os.path.exists(destination):
             raise Exception('File exists')
@@ -127,6 +125,7 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
                     sources.append(path)
                     continue
                 return index
+        return None
 
     def entities(self, index=None):
         if index is None or not index:

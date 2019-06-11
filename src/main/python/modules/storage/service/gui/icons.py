@@ -21,6 +21,5 @@ class IconProvider(QtWidgets.QFileIconProvider):
             return None
 
         if file_info.isDir():
-            return QtGui.QIcon("icons/book-light.svg")
-
-        return QtGui.QIcon("icons/note-light.svg")
+            return QtGui.QIcon("icons/empty")
+        return QtGui.QIcon("icons/note-light")

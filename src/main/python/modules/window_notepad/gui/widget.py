@@ -24,6 +24,9 @@ class NotepadDashboard(QtWidgets.QSplitter):
     edit = QtCore.pyqtSignal(object)
     delete = QtCore.pyqtSignal(object)
     clone = QtCore.pyqtSignal(object)
+    created = QtCore.pyqtSignal(object)
+    removed = QtCore.pyqtSignal(object)
+    updated = QtCore.pyqtSignal(object)
 
     saveAction = QtCore.pyqtSignal(object)
     fullscreenAction = QtCore.pyqtSignal(object)

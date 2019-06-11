@@ -91,10 +91,9 @@ class Loader(Loader):
     def config(self, binder=None):
         pass
 
-    @inject.params(config='config', factory='window.header_factory', factory_settings='settings_factory')
-    def boot(self, options=None, args=None, config=None, factory=None, factory_settings=None):
-        if options is None or args is None or factory is None:
-            return None
+    @inject.params(config='config', dashboard='notepad.dashboard', factory='window.header_factory',
+                   factory_settings='settings_factory')
+    def boot(self, options=None, args=None, config=None, dashboard=None, factory=None, factory_settings=None):
 
         self.spacer = QtWidgets.QWidget()
         self.spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
@@ -107,8 +106,46 @@ class Loader(Loader):
 
         self.search = factory.addWidget(self._widget_search())
 
-        if factory_settings is not None and factory_settings:
-            factory_settings.addWidget(self._widget_settings_search)
+        if dashboard is None or not dashboard: return None
+        dashboard.created.connect(self.onNoteCreated)
+        dashboard.updated.connect(self.onNoteUpdated)
+        dashboard.removed.connect(self.onNoteRemoved)
+
+        if factory_settings is None or not factory_settings: return None
+        factory_settings.addWidget(self._widget_settings_search)
+
+    @inject.params(storage='storage', search='search')
+    def onNoteCreated(self, index, storage, search):
+        # update search index only after
+        # the update was successful
+        name = storage.fileName(index)
+        path = storage.filePath(index)
+
+        content = storage.fileContent(index)
+        if not len(content): return None
+
+        search.append(name, path, content)
+
+    @inject.params(storage='storage', search='search')
+    def onNoteUpdated(self, index, storage, search):
+        # update search index only after
+        # the update was successful
+        name = storage.fileName(index)
+        path = storage.filePath(index)
+
+        content = storage.fileContent(index)
+        if not len(content): return None
+
+        search.update(name, path, content)
+
+    @inject.params(storage='storage', search='search')
+    def onNoteRemoved(self, index, storage, search):
+        # update search index only after
+        # the update was successful
+        path = storage.filePath(index)
+        if not len(path): return None
+
+        search.remove(path)
 
     def onSearchFocusActivate(self, event=None):
         if self.search is not None:

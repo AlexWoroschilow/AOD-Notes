@@ -67,13 +67,15 @@ class ApplicationContainer(ApplicationContext):
 if __name__ == "__main__":
     parser = optparse.OptionParser()
 
+    logfile = os.path.expanduser('~/.config/AOD-Notepad/notes.log')
+    parser.add_option("--logfile", default=logfile, dest="logfile", help="Logfile location")
     parser.add_option("--loglevel", default=logging.DEBUG, dest="loglevel", help="Logging level")
-    parser.add_option("--logfile", default=os.path.expanduser('~/.config/CryptoNotes/notes.log'), dest="logfile",
-                      help="Logfile location")
-    parser.add_option("--config", default=os.path.expanduser('~/.config/CryptoNotes/notes.conf'), dest="config",
-                      help="Config file location")
+
     parser.add_option("--console", action="store_true", dest="console", help="Start program in the console mode")
     parser.add_option("--console-export", default=None, dest="console_export", help="Start program in the console mode")
+
+    configfile = os.path.expanduser('~/.config/AOD-Notepad/notes.conf')
+    parser.add_option("--config", default=configfile, dest="config", help="Config file location")
 
     (options, args) = parser.parse_args()
 

@@ -41,13 +41,11 @@ class Loader(Loader):
 
     @inject.params(config='config', storage='storage', dashboard='notepad.dashboard')
     def boot(self, options=None, args=None, config=None, storage=None, dashboard=None):
-        if config is None: return None
-        if dashboard is None: return None
-        if storage is None: return None
 
         current = config.get('editor.current')
         if current is None or not len(current):
             return dashboard.note(storage.first())
+
         # get last edited document from the confnig
         # and open this document in the editor by default
         index = storage.index(current)
@@ -58,8 +56,7 @@ class Loader(Loader):
 
     @inject.params(config='config', dashboard='notepad.dashboard')
     def _notepad(self, config=None, dashboard=None):
-        if dashboard is None:
-            return None
+        if dashboard is None: return None
 
         content = Notepad()
         content.addTab(dashboard, content.tr('Dashboard'))
@@ -99,6 +96,8 @@ class Loader(Loader):
     def _notepad_dashboard(self, config, storage):
 
         widget = NotepadDashboard(self.actions)
+        widget.removed.connect(lambda x: widget.note(storage.first()))
+        widget.created.connect(lambda x: widget.note(x))
 
         action = functools.partial(self.actions.onActionNoteEdit, widget=widget)
         widget.edit.connect(action)

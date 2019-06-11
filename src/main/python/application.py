@@ -56,14 +56,11 @@ class Application(QtWidgets.QApplication):
 if __name__ == "__main__":
     parser = optparse.OptionParser()
 
-    parser.add_option("--loglevel", default=logging.DEBUG, dest="loglevel", help="Logging level")
-    logfile = os.path.expanduser('~/.config/CryptoNotes/notes.log')
-    parser.add_option("--logfile", default=logfile, dest="logfile", help="Logfile location")
-    configfile = os.path.expanduser('~/.config/CryptoNotes/notes.conf')
-    parser.add_option("--config", default=configfile, dest="config", help="Config file location")
-
+    parser.add_option("--config", default='notes.conf', dest="config", help="Config file location")
     parser.add_option("--console", action="store_true", dest="console", help="Start program in the console mode")
     parser.add_option("--console-export", default=None, dest="console_export", help="Start program in the console mode")
+    parser.add_option("--logfile", default='notes.log', dest="logfile", help="Logfile location")
+    parser.add_option("--loglevel", default=logging.DEBUG, dest="loglevel", help="Logging level")
 
     (options, args) = parser.parse_args()
 
