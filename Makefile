@@ -12,6 +12,17 @@ clean:
 	@echo	"[clean] Cleanup the PyInstaller" && 	rm 	-rf		target/PyInstaller
 	@echo	"[clean] Cleanup the Build" && 			rm  -rf		target/$(project)
 
+dmg:
+	python3 		-m 	   fbs freeze
+	cp              -r     src/main/python/modules target/CryptoNotes.app/Contents/MacOS
+	cp              -r     src/main/python/plugins target/CryptoNotes.app/Contents/MacOS
+	cp              -r     src/main/python/template target/CryptoNotes.app/Contents/MacOS
+	cp              -r     src/main/python/icons target/CryptoNotes.app/Contents/MacOS
+	cp              -r     src/main/python/image target/CryptoNotes.app/Contents/MacOS
+	cp              -r     src/main/python/css target/CryptoNotes.app/Contents/MacOS
+	cp              -r     src/main/python/lib target/CryptoNotes.app/Contents/MacOS
+	cp              -r     src/main/python/application.py target/CryptoNotes.app/Contents/MacOS
+	python3 		-m 	   fbs installer
 
 appimage:
 	python3 		-m 		fbs freeze
