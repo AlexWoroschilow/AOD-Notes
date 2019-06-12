@@ -24,4 +24,4 @@ class WidgetHeaderFactory(object):
     def addWidget(self, widget, priority=1):
         self.widgets.append((widget, priority))
         self.widgets.sort(key=lambda x: x[1])
-        
+        return widget

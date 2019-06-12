@@ -15,7 +15,7 @@ import inject
 import logging
 from PyQt5 import QtWidgets
 
-from .gui.preview.widget import PreviewScrollArea  
+from .gui.preview.widget import PreviewScrollArea
 
 
 class ModuleActions(object):
@@ -23,24 +23,24 @@ class ModuleActions(object):
     @inject.params(search='search', storage='storage', window='window')
     def onActionSearchRequest(self, widget=None, search=None, storage=None, window=None):
         if widget is None or window is None: return None
-        
+
         text = widget.text()
         if text is None: return None
         if not len(text): return None
 
         preview = PreviewScrollArea(window)
         preview.edit.connect(self.onActionEditRequest)
-# 
+#
         result = search.search(text)
         result = [x['path'] for x in result]
         if result is None: return None
         if not len(result): return None
-        
+
         for path in result:
             index = storage.index(path)
             if index is None: continue
             preview.addPreview(index)
-        
+
         title = text if len(text) <= 25 else "{}...".format(text[0:22])
         window.tab.emit((preview, title))
 
@@ -50,13 +50,13 @@ class ModuleActions(object):
             if storage.isDir(index):
                 dashboard.group(index)
                 window.tabSwitch.emit(0)
-                return None            
+                return None
             if storage.isFile(index):
                 dashboard.note(index)
-                window.tabSwitch.emit(0)                
-                return None            
-            return None            
-        except(Exception) as ex:
+                window.tabSwitch.emit(0)
+                return None
+            return None
+        except Exception as ex:
             logger = logging.getLogger('search')
             logger.exception(ex)
 
@@ -78,12 +78,26 @@ class ModuleActions(object):
                 if reply == QtWidgets.QMessageBox.No: continue
 
             with open(path, 'r') as source:
+
                 index = dashboard.current
-                if index is None: return None
+                if index is None or not index:
+                    index = config.get('storage.location')
+                    index = storage.index(index)
 
-                index = storage.touch(index, os.path.basename(path))
-                if index is None: return None
+                if not storage.isDir(index):
+                    index = config.get('storage.location')
+                    index = storage.index(index)
 
+                if storage.isFile(index):
+                    index = config.get('storage.location')
+                    index = storage.index(index)
+
+                name = os.path.basename(path)
+                index = storage.touch(index, name)
+                if index is None: return None
                 storage.setFileContent(index, source.read())
-                source.close()
 
+                if index is None: return None
+                dashboard.created.emit(index)
+
+                source.close()

@@ -19,7 +19,7 @@ from PyQt5 import QtGui
 
 from .label import Title
 from .text import Description
-from .button import Button
+from .button import PictureButtonFlat
 
 
 class NotePreviewDescription(QtWidgets.QGroupBox):
@@ -40,8 +40,7 @@ class NotePreviewDescription(QtWidgets.QGroupBox):
         description = Description(storage.fileContent(index))
         self.layout.addWidget(description, 1, 0, 4, 30)
 
-        self.buttonEdit = Button()
-        self.buttonEdit.setIcon(QtGui.QIcon("icons/file"))
+        self.buttonEdit = PictureButtonFlat(QtGui.QIcon("icons/note"))
         self.buttonEdit.clicked.connect(lambda x: self.edit.emit(index))
         self.layout.addWidget(self.buttonEdit, 0, 29, 1, 1)
 

@@ -24,30 +24,32 @@ class NotepadDashboard(QtWidgets.QSplitter):
     edit = QtCore.pyqtSignal(object)
     delete = QtCore.pyqtSignal(object)
     clone = QtCore.pyqtSignal(object)
+    created = QtCore.pyqtSignal(object)
+    removed = QtCore.pyqtSignal(object)
+    updated = QtCore.pyqtSignal(object)
 
     saveAction = QtCore.pyqtSignal(object)
     fullscreenAction = QtCore.pyqtSignal(object)
     editor = None
 
-    @inject.params(config='config', storage='storage')
-    def __init__(self, actions, config=None, storage=None):
+    def __init__(self, actions):
         super(NotepadDashboard, self).__init__()
         self.setContentsMargins(0, 0, 0, 0)
 
-        containerLayout = QtWidgets.QGridLayout()
-        containerLayout.setContentsMargins(0, 0, 0, 0)
-        containerLayout.setSpacing(0)
+        container_layout = QtWidgets.QGridLayout()
+        container_layout.setContentsMargins(0, 0, 0, 0)
+        container_layout.setSpacing(0)
 
         self.tree = FolderTree()
         self.tree.expandAll()
 
-        containerLayout.addWidget(self.tree, 0, 1)
+        container_layout.addWidget(self.tree, 0, 1)
 
         container = QtWidgets.QWidget()
 
         container.setContentsMargins(0, 0, 0, 0)
 
-        container.setLayout(containerLayout)
+        container.setLayout(container_layout)
         self.addWidget(container)
 
         self.container = QtWidgets.QWidget()
@@ -76,20 +78,30 @@ class NotepadDashboard(QtWidgets.QSplitter):
             return self.tree.currentIndex()
         return storage.rootIndex()
 
-    @inject.params(storage='storage', editor='notepad.editor', config='config')
-    def note(self, index, storage, editor, config=None):
+    def focus(self):
+        if self.editor is None:
+            self.editor.focus()
+        return self
+
+    @inject.params(storage='storage', config='config')
+    def note(self, index, storage, config):
+        if storage.isDir(index): return self
         current = storage.filePath(index)
+        if current is None: return self
         config.set('editor.current', current)
 
         layout = self.container.layout()
+        if layout is None: return self
+
         for i in range(layout.count()):
             layout.itemAt(i).widget().close()
 
-        if not storage.isFile(index):
-            layout.addWidget(DemoWidget())
-            return self
+        container = inject.get_injector()
+        if container is None: return self
 
-        self.editor = editor
+        self.editor = container.get_instance('notepad.editor')
+        if self.editor is None: return self
+
         self.editor.index = index
         layout.addWidget(self.editor)
         self.editor.focus()
@@ -123,8 +135,8 @@ class NotepadDashboard(QtWidgets.QSplitter):
         widget.clone.connect(lambda x: self.group(index))
 
         for entity in storage.entities(index):
-            if storage.isDir(entity): continue
-            widget.addPreview(entity)
+            if storage.isFile(entity):
+                widget.addPreview(entity)
 
         layout.addWidget(widget)
         widget.show()

@@ -31,14 +31,16 @@ class Loader(Loader):
     def config(self, binder=None):
         binder.bind_to_constructor('settings_factory', self._settings)
 
-    @inject.params(config='config', factory='window.header_factory')
-    def boot(self, options=None, args=None, config=None, factory=None):
-        if not len(config.get('storage.location')): return None
+    @inject.params(factory_header='window.header_factory')
+    def boot(self, options=None, args=None, factory_header=None):
+        if factory_header is None:
+            return None
 
         widget = PictureButton(QtGui.QIcon("icons/settings"), None)
-        widget.clicked.connect(self.actions.onActionSettings)
+        action = functools.partial(self.actions.onActionSettings, button=widget)
+        widget.clicked.connect(action)
 
-        factory.addWidget(widget, 128)
+        factory_header.addWidget(widget, 128)
 
     def _settings(self):
         from .settings import SettingsFactory

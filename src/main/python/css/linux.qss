@@ -2,6 +2,16 @@ QMainWindow {
 	background: rgb(236,236,236);
 }
 
+PictureButton {
+    min-width: 30px;
+    padding: 2px 2px;
+    margin: 0px 5px;
+}
+PictureButtonFlat {
+    min-width: 20px;
+    padding: 2px 2px;
+    margin: 0px 2px;
+}
 QTabBar {
 	background: rgb(236,236,236);
 	color: #4F4F4F;
@@ -82,11 +92,22 @@ SearchField {
     border: none;
 }
 
+FolderTree {
+    padding-left: 5px;
+}
+
 FolderTree,
 FolderTree::branch {
     background: #414649;
     alternate-background-color: #414649;
 	border: none;
+}
+
+FolderTree::branch:open {
+    image: url(icons/book-light);
+}
+FolderTree::branch:closed:has-children {
+    image: url(icons/book-closed-light);
 }
 
 FolderTree::item {
@@ -127,16 +148,13 @@ PreviewContainer NotePreviewDescription #previewTitle {
 
 
 TextEditorWidget,
-QWidget#FolderListContainer,
-SettingsScrollArea {
+QWidget#FolderListContainer {
 	background: #ffffff;
 	text-align: center;
 	border: none;
 }
 
-PreviewScrollArea,
-WizardDashboardScrollArea,
-SettingsScrollArea {
+PreviewScrollArea {
     background: #515659;
     padding: 0px 0px;
 	border: none;
@@ -144,28 +162,24 @@ SettingsScrollArea {
 }
 
 TextWriter,
-TextEditor,
-WidgetSettings {
+TextEditor {
 	border-radius: 0px;
 	border: none;
     margin: 0px;
 }
 
-WizardSettings {
-    background: #ffffff;
-	max-width: 600px;
-    border: none;
-}
 
 WidgetSettings {
+    text-align: center;
 	padding: 0px 30px 20px 30px;
-	background-color: #ffffff;
 	max-width: 600px;
+	border-bottom: 1px;
 }
 
 WidgetSettings SettingsTitle {
-	font-size: 26px;
-	padding: 15px 0px;
+    text-align: center;
+	font-size: 18px;
+	padding: 5px 0px;
 }
 
 WidgetSettings QPushButton{

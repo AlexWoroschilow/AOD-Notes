@@ -14,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt
 
 
 class SearchField(QtWidgets.QLineEdit):
@@ -22,6 +23,7 @@ class SearchField(QtWidgets.QLineEdit):
         super(SearchField, self).__init__(parent)
         self.setPlaceholderText('Enter the search string...')
         self.setObjectName('searchSearchField')
+        self.setFocusPolicy(Qt.StrongFocus)
 
         effect = QtWidgets.QGraphicsDropShadowEffect()
         effect.setBlurRadius(3)

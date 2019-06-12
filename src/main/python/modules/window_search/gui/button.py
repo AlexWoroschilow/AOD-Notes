@@ -21,5 +21,5 @@ from PyQt5 import QtCore
 class PictureButton(QtWidgets.QPushButton):
     def __init__(self, icon=None, text=None):
         super(PictureButton, self).__init__(icon, None)
-        self.setText(text)
-        self.setFlat(True)
+        self.setToolTipDuration(0)
+        self.setToolTip(text)

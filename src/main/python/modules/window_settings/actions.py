@@ -11,17 +11,16 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
+from PyQt5 import QtWidgets
+from PyQt5 import QtCore
+from PyQt5 import QtGui
+from .gui.menu import SettingsMenu
 
 
 class ModuleActions(object):
 
-    @inject.params(window='window', factory='settings_factory', logger='logger')
-    def onActionSettings(self, event=None, factory=None, window=None, logger=None):
-        if window is None: return None
-        if window.tab is None: return None
-        window.tab.emit((factory.widget, window.tr('Settings')))
-
-    @inject.params(config='config', kernel='kernel')
-    def onActionToggle(self, status, variable, config, kernel):
-        config.set(variable, '%s' % status)
-        kernel.dispatch('config_updated')
+    @inject.params(window='window', factory='settings_factory')
+    def onActionSettings(self, event=None, factory=None, window=None, button=None):
+        menu = QtWidgets.QMenu()
+        menu.addAction(SettingsMenu(button))
+        menu.exec_(QtGui.QCursor.pos())

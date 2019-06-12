@@ -17,7 +17,7 @@ from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 
-from .button import Button
+from .button import PictureButtonFlat
 from .text import Description
 from .label import Title
 
@@ -42,19 +42,16 @@ class NotePreviewDescription(QtWidgets.QGroupBox):
         description = Description(storage.fileContent(index))
         self.layout.addWidget(description, 1, 0, 4, 30)
 
-        self.buttonEdit = Button()
-        self.buttonEdit.setIcon(QtGui.QIcon("icons/file"))
+        self.buttonEdit = PictureButtonFlat(QtGui.QIcon("icons/note"))
         self.buttonEdit.clicked.connect(lambda x: self.edit.emit(index))
 
         self.layout.addWidget(self.buttonEdit, 0, 27, 1, 1)
 
-        self.buttonClone = Button()
-        self.buttonClone.setIcon(QtGui.QIcon("icons/copy"))
+        self.buttonClone = PictureButtonFlat(QtGui.QIcon("icons/copy"))
         self.buttonClone.clicked.connect(lambda x: self.clone.emit(index))
         self.layout.addWidget(self.buttonClone, 0, 28, 1, 1)
 
-        self.buttonDelete = Button()
-        self.buttonDelete.setIcon(QtGui.QIcon("icons/file-remove"))
+        self.buttonDelete = PictureButtonFlat(QtGui.QIcon("icons/trash"))
         self.buttonDelete.clicked.connect(lambda x: self.delete.emit(index))
         self.layout.addWidget(self.buttonDelete, 0, 29, 1, 1)
 

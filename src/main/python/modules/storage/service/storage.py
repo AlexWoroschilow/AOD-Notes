@@ -30,22 +30,40 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         self.setReadOnly(False)
 
     def touch(self, path=None, name=None):
-        if path is None or name is None: return None
+        if path is None or name is None:
+            return None
+
         if isinstance(path, QtCore.QModelIndex):
             path = self.filePath(path)
-        if path is None: return None
+
+        if path is None:
+            return None
+
         path = '{}/{}'.format(path, name)
-        return open(path, 'w').write('')
-        if path is None: return None
+        if os.path.exists(path):
+            raise Exception('File exists')
+
+        open(path, 'w').write('')
+
+        if path is None:
+            return None
+
         return self.index(path)
 
     def clone(self, path=None):
         if isinstance(path, QtCore.QModelIndex):
             path = self.filePath(path)
+
         if path is None: return None
         destination = '{}(clone)'.format(path)
-        shutil.copy2(path, destination)
-        if destination is None: return None
+        if os.path.exists(destination):
+            raise Exception('File exists')
+
+        if self.isFile(path):
+            shutil.copy2(path, destination)
+        elif self.isDir(path):
+            shutil.copytree(path, destination)
+
         return self.index(destination)
 
     def rootIndex(self):
@@ -55,30 +73,42 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
     def isDir(self, path=None):
         if isinstance(path, QtCore.QModelIndex):
             path = self.filePath(path)
-        if path is None: return None
+
+        if path is None:
+            return None
+
         return os.path.isdir(path)
 
     def isFile(self, path=None):
         if isinstance(path, QtCore.QModelIndex):
             path = self.filePath(path)
-        if path is None: return None
+
+        if path is None:
+            return None
+
         return os.path.isfile(path)
 
     def fileName(self, path=None):
         if not isinstance(path, QtCore.QModelIndex):
             path = self.index(path)
+
         return super(FilesystemStorage, self).fileName(path)
 
     def fileContent(self, path=None):
         if isinstance(path, QtCore.QModelIndex):
             path = self.filePath(path)
-        if self.isDir(path): return None
+
+        if self.isDir(path):
+            return None
+
         return open(path, 'r').read()
 
     def setFileContent(self, path, content):
         if isinstance(path, QtCore.QModelIndex):
             path = self.filePath(path)
+
         open(path, 'w').write(content)
+
         return self.index(path)
 
     def first(self):
@@ -95,6 +125,7 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
                     sources.append(path)
                     continue
                 return index
+        return None
 
     def entities(self, index=None):
         if index is None or not index:
@@ -104,13 +135,18 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         return self.entitiesByPath(source)
 
     def entitiesByPath(self, source=None):
-        if not os.path.exists(source): return None
+        if not os.path.exists(source):
+            return None
 
         response = []
         for path in glob.glob('{}/*'.format(source)):
             index = self.index(path)
-            if index is None: continue
-            if not index: continue
+
+            if index is None:
+                continue
+
+            if not index:
+                continue
 
             if os.path.isdir(path):
                 response.append(index)

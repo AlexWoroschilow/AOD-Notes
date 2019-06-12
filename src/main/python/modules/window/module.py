@@ -11,14 +11,8 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
-import functools
 
 from lib.plugin import Loader
-
-from PyQt5 import QtWidgets
-from PyQt5 import QtCore
-
-from PyQt5.QtCore import Qt
 
 from .gui.window import MainWindow
 from .gui.header import WidgetHeaderFactory
@@ -70,17 +64,11 @@ class Loader(Loader):
         height = int(config.get('window.height'))
         widget.resize(width, height)
 
-        wizard = container.get_instance('wizard')
-        if wizard is not None and wizard:
-            wizard.start.connect(self.test)
-            widget.setMainWidget(wizard)
-            return widget
-
         notepad = container.get_instance('notepad')
-        if notepad is None: return None
         widget.setMainWidget(notepad)
 
         widget.footer = widget.statusBar()
+        if widget.footer is None: return None
         widget.resizeEvent = self.actions.onActionWindowResize
 
         return widget

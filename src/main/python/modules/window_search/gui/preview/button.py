@@ -13,9 +13,9 @@
 from PyQt5 import QtWidgets
 
 
-class Button(QtWidgets.QPushButton):
+class PictureButtonFlat(QtWidgets.QPushButton):
 
-    def __init__(self, parent=None):
-        super(Button, self).__init__(parent)
-        self.setMaximumWidth(40)
+    def __init__(self, icon=None, parent=None):
+        super(PictureButtonFlat, self).__init__(parent)
+        self.setIcon(icon)
         self.setFlat(True)

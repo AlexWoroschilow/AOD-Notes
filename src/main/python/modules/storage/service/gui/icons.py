@@ -16,7 +16,10 @@ from PyQt5 import QtWidgets
 
 class IconProvider(QtWidgets.QFileIconProvider):
 
-    def icon(self, fileInfo):
-        if fileInfo.isDir():
-            return QtGui.QIcon("icons/folder-light.svg") 
-        return QtGui.QIcon("icons/file-light.svg") 
+    def icon(self, file_info=None):
+        if file_info is None:
+            return None
+
+        if file_info.isDir():
+            return QtGui.QIcon("icons/empty")
+        return QtGui.QIcon("icons/note-light")
