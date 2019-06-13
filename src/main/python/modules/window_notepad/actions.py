@@ -175,7 +175,7 @@ class ModuleActions(object):
 
         if widget.current and not storage.isDir(widget.current) and widget.editor:
             action = functools.partial(self.onActionFullScreen, event=None, widget=widget.editor)
-            menu.addAction('Open in a new tab', action)
+            menu.addAction(QtGui.QIcon("icons/tab-new"), 'Open in a new tab', action)
             menu.addSeparator()
 
         action = functools.partial(self.onActionNoteCreate, event=None, widget=widget)

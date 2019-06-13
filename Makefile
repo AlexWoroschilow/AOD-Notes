@@ -16,14 +16,14 @@ clean:
 
 dmg:
 	python3 		-m 	   fbs freeze
-	cp              -r     src/main/python/modules target/CryptoNotes.app/Contents/MacOS
-	cp              -r     src/main/python/plugins target/CryptoNotes.app/Contents/MacOS
-	cp              -r     src/main/python/template target/CryptoNotes.app/Contents/MacOS
-	cp              -r     src/main/python/icons target/CryptoNotes.app/Contents/MacOS
-	cp              -r     src/main/python/image target/CryptoNotes.app/Contents/MacOS
-	cp              -r     src/main/python/css target/CryptoNotes.app/Contents/MacOS
-	cp              -r     src/main/python/lib target/CryptoNotes.app/Contents/MacOS
-	cp              -r     src/main/python/application.py target/CryptoNotes.app/Contents/MacOS
+	cp              -r     src/main/python/modules target/$(project).app/Contents/MacOS
+	cp              -r     src/main/python/plugins target/$(project).app/Contents/MacOS
+	cp              -r     src/main/python/template target/$(project).app/Contents/MacOS
+	cp              -r     src/main/python/icons target/$(project).app/Contents/MacOS
+	cp              -r     src/main/python/image target/$(project).app/Contents/MacOS
+	cp              -r     src/main/python/css target/$(project).app/Contents/MacOS
+	cp              -r     src/main/python/lib target/$(project).app/Contents/MacOS
+	cp              -r     src/main/python/application.py target/$(project).app/Contents/MacOS
 	python3 		-m 	   fbs installer
 
 appimage:

@@ -2,37 +2,26 @@ QMainWindow {
 	background: rgb(236,236,236);
 }
 
-QTabBar {
-	background: rgb(236,236,236);
-	color: #4F4F4F;
-}
+QTabBar { background: rgb(236,236,236); color: #4F4F4F; }
 
-QTabBar::close-button {
-	image: url(icons/close.svg);
-	subcontrol-position: right;
-}
+QTabWidget { background: #ffffff; border: none; margin: 0px; }
+QTabWidget::pane { background: #ffffff; border: none; margin: 0px; }
+QTabWidget::tab-bar { left: 0px; color: #4F4F4F; }
 
-QTabWidget {
-	background: #ffffff;
-	border: none;
-	margin: 0px;
-}
 
-QTabWidget::pane {
-	background: #ffffff;
-	border: none;
-	margin: 0px;
-}
+QTabBar::tab { background: #414649; color: rgb(236,236,236); border-right: 1px solid #414649; padding: 5px; }
+QTabBar::tab:selected { background: #515659; }
+QTabBar::tab:!selected { background: #414649; }
+QTabBar::close-button { image: url(icons/close-light); }
 
 QTextEdit {
 	background: #fff;
 	border: 1px !important;
 }
 
-QSplitter {
-	background: #515659;
-	border: none;
-}
+QSplitter { background: #414649; border: none; }
+QSplitter::handle { image: url(icons/splitter-light); }
+QSplitter::handle:vertical { height: 5px; }
 
 QToolBar {
 	border: none;
@@ -82,29 +71,6 @@ SearchField {
     border: none;
 }
 
-FolderTree,
-FolderTree::branch {
-    background: #414649;
-    alternate-background-color: #414649;
-	border: none;
-}
-
-FolderTree::item {
-	border-bottom: 1px solid #515659;
-	color: #C0C0C0;
-	padding: 3px 0px;
-}
-
-FolderTree::item:hover,
-FolderTree::item:selected:active,
-FolderTree::item:hover:selected,
-FolderTree::item:selected {
-    alternate-background-color: #515659;
-	border-bottom: 1px solid #515659;
- 	background: #515659;
-}
-
-
 FolderTreeToolBar { 
     background: #3F4447;
     border-right: 3px solid qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #3F4447, stop:1 #414649);
@@ -127,63 +93,37 @@ PreviewContainer NotePreviewDescription #previewTitle {
 
 
 TextEditorWidget,
-QWidget#FolderListContainer,
-SettingsScrollArea {
+QWidget#FolderListContainer {
 	background: #ffffff;
 	text-align: center;
 	border: none;
 }
 
-PreviewScrollArea,
-WizardDashboardScrollArea,
-SettingsScrollArea {
-    background: #515659;
-    padding: 0px 0px;
-	border: none;
-    margin: 0px;
-}
+PreviewScrollArea { background: #414649; padding: 0px 0px; border: none; margin: 0px; }
 
-TextWriter,
-TextEditor,
-WidgetSettings {
-	border-radius: 0px;
-	border: none;
-    margin: 0px;
-}
+TextWriter { border-radius: 0px; border: none; margin: 0px; }
+TextEditor { border-radius: 0px; border: none; margin: 0px; }
 
-WizardSettings {
-    background: #ffffff;
-	max-width: 600px;
-    border: none;
-}
+WidgetSettings { border-radius: 0px; border: none; margin: 0px; }
+WidgetSettings { text-align: center; padding: 0px 30px 20px 30px; max-width: 600px; border-bottom: 1px; }
+WidgetSettings SettingsTitle { text-align: center; font-size: 18px; padding: 5px 0px; }
 
-WidgetSettings {
-	padding: 0px 30px 20px 30px;
-	background-color: #ffffff;
-	max-width: 600px;
-}
+SettingsScrollArea { background: rgb(236,236,236); padding: 0px 0px; border: none; margin: 0px; }
+SettingsScrollArea PictureButton { background: rgb(226,226,226); }
 
-WidgetSettings SettingsTitle {
-	font-size: 26px;
-	padding: 15px 0px;
-}
+PictureButton { min-width: 40px; padding: 5px 5px; margin: 0px 0px; }
+PictureButtonFlat { min-width: 20px; padding: 2px 2px; margin: 0px 2px; }
 
-WidgetSettings QPushButton{
-	padding: 5px 5px;
-}
 
-WizardSettings SettingsSubtitle {
-	font-size: 18px;
-}
 
-WizardButton {
-    max-width: 100px;
-    min-height: 35px;
-	font-size: 14px;
-}
-
-WizardButtonStart {
-    min-width: 120px;
-    min-height: 50px;
-	font-size: 20px;
-}
+FolderTree { background: #515659; alternate-background-color: #515659; border: none; }
+FolderTree::branch { border-bottom: 1px solid #515659; background: #515659; alternate-background-color: #515659; }
+FolderTree::branch:open { image: url(icons/minus-light); }
+FolderTree::branch:closed:has-children { image: url(icons/plus-light); }
+FolderTree::branch:hover { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
+FolderTree::branch:selected { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
+FolderTree::item { border-bottom: 1px solid #515659; color: #C0C0C0; padding: 3px 0px; }
+FolderTree::item:hover { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
+FolderTree::item:selected:active { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
+FolderTree::item:hover:selected { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
+FolderTree::item:selected { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
