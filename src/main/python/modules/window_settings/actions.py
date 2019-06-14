@@ -19,8 +19,7 @@ from .gui.menu import SettingsMenu
 
 class ModuleActions(object):
 
-    @inject.params(window='window', factory='settings_factory')
-    def onActionSettings(self, event=None, factory=None, window=None, button=None):
+    def onActionSettings(self, button, widget):
         menu = QtWidgets.QMenu()
-        menu.addAction(SettingsMenu(button))
+        menu.addAction(SettingsMenu(widget))
         menu.exec_(QtGui.QCursor.pos())

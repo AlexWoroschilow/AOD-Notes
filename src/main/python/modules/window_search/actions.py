@@ -30,7 +30,7 @@ class ModuleActions(object):
 
         preview = PreviewScrollArea(window)
         preview.edit.connect(self.onActionEditRequest)
-#
+        #
         result = search.search(text)
         result = [x['path'] for x in result]
         if result is None: return None
@@ -60,44 +60,35 @@ class ModuleActions(object):
             logger = logging.getLogger('search')
             logger.exception(ex)
 
-    @inject.params(storage='storage', config='config', dashboard='notepad.dashboard')
-    def onActionNoteImport(self, event=None, storage=None, config=None, dashboard=None):
-        if dashboard is None or storage is None or config is None: return None
+    @inject.params(storage='storage', search='search')
+    def onNoteCreated(self, index, storage, search):
+        # update search index only after
+        # the update was successful
+        name = storage.fileName(index)
+        path = storage.filePath(index)
 
-        currentwd = config.get('storage.lastimport', os.path.expanduser('~'))
-        selector = QtWidgets.QFileDialog(None, 'Select file', currentwd)
-        if not selector.exec_(): return None
+        content = storage.fileContent(index)
+        if not len(content): return None
 
-        for path in selector.selectedFiles():
-            if not os.path.exists(path) or os.path.isdir(path): continue
-            config.set('storage.lastimport', os.path.dirname(path))
+        search.append(name, path, content)
 
-            if os.path.getsize(path) / 1000000 >= 1:
-                message = "The file  '{}' is about {:>.2f} Mb, are you sure?".format(path, os.path.getsize(path) / 1000000)
-                reply = QtWidgets.QMessageBox.question(self._widget, 'Message', message, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
-                if reply == QtWidgets.QMessageBox.No: continue
+    @inject.params(storage='storage', search='search')
+    def onNoteUpdated(self, index, storage, search):
+        # update search index only after
+        # the update was successful
+        name = storage.fileName(index)
+        path = storage.filePath(index)
 
-            with open(path, 'r') as source:
+        content = storage.fileContent(index)
+        if not len(content): return None
 
-                index = dashboard.current
-                if index is None or not index:
-                    index = config.get('storage.location')
-                    index = storage.index(index)
+        search.update(name, path, content)
 
-                if not storage.isDir(index):
-                    index = config.get('storage.location')
-                    index = storage.index(index)
+    @inject.params(storage='storage', search='search')
+    def onNoteRemoved(self, index, storage, search):
+        # update search index only after
+        # the update was successful
+        path = storage.filePath(index)
+        if not len(path): return None
 
-                if storage.isFile(index):
-                    index = config.get('storage.location')
-                    index = storage.index(index)
-
-                name = os.path.basename(path)
-                index = storage.touch(index, name)
-                if index is None: return None
-                storage.setFileContent(index, source.read())
-
-                if index is None: return None
-                dashboard.created.emit(index)
-
-                source.close()
+        search.remove(path)

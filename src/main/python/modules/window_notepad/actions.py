@@ -10,6 +10,7 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import os
 import inject
 import functools
 
@@ -193,3 +194,60 @@ class ModuleActions(object):
             menu.addAction(QtGui.QIcon("icons/trash"), 'Remove selected element', action)
 
         menu.exec_(widget.tree.mapToGlobal(event))
+
+    @inject.params(storage='storage', config='config')
+    def onActionNoteImport(self, event=None, storage=None, config=None, widget=None):
+        if widget is None or storage is None or config is None: return None
+
+        currentwd = config.get('storage.lastimport', os.path.expanduser('~'))
+        selector = QtWidgets.QFileDialog(None, 'Select file', currentwd)
+        if not selector.exec_(): return None
+
+        for path in selector.selectedFiles():
+            if not os.path.exists(path) or os.path.isdir(path): continue
+            config.set('storage.lastimport', os.path.dirname(path))
+
+            if os.path.getsize(path) / 1000000 >= 1:
+                message = "The file  '{}' is about {:>.2f} Mb, are you sure?".format(path,
+                                                                                     os.path.getsize(path) / 1000000)
+                reply = QtWidgets.QMessageBox.question(widget, 'Message', message, QtWidgets.QMessageBox.Yes,
+                                                       QtWidgets.QMessageBox.No)
+                if reply == QtWidgets.QMessageBox.No: continue
+
+            with open(path, 'r') as source:
+
+                index = widget.current
+                if index is None or not index:
+                    index = config.get('storage.location')
+                    index = storage.index(index)
+
+                if not storage.isDir(index):
+                    index = config.get('storage.location')
+                    index = storage.index(index)
+
+                if storage.isFile(index):
+                    index = config.get('storage.location')
+                    index = storage.index(index)
+
+                name = os.path.basename(path)
+                index = storage.touch(index, name)
+                if index is None: return None
+                storage.setFileContent(index, source.read())
+
+                if index is None: return None
+                widget.created.emit(index)
+
+                source.close()
+
+    @inject.params(storage='storage', dashboard='notepad.dashboard')
+    def onActionStorageChanged(self, destination, storage, dashboard, widget):
+
+        print(destination, storage, dashboard)
+
+        dashboard.tree.setModel(storage)
+
+        index = storage.setRootPath(destination)
+        dashboard.tree.setRootIndex(index)
+        dashboard.tree.expandAll()
+
+        dashboard.group(index)

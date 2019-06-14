@@ -19,7 +19,7 @@ from .actions import ModuleActions
 from .factory import ToolbarFactory
 
 from .gui.dashboard import Notepad
-from .gui.widget import NotepadDashboard
+from .gui.dashboard import NotepadDashboard
 from .gui.editor.widget import TextEditorWidget
 
 
@@ -34,10 +34,12 @@ class Loader(Loader):
         binder.bind('toolbar_factory.formatbar', ToolbarFactory())
         binder.bind('toolbar_factory.rightbar', ToolbarFactory())
 
-        binder.bind_to_provider('notepad', self._notepad)
+        binder.bind_to_provider('notepad', self._notepad_tab)
         binder.bind_to_provider('notepad.editor', self._notepad_editor)
 
-        binder.bind_to_constructor('notepad.dashboard', self._notepad_dashboard)
+        binder.bind_to_constructor('notepad.dashboard', functools.partial(
+            self._notepad_dashboard, binder=binder
+        ))
 
     @inject.params(config='config', storage='storage', dashboard='notepad.dashboard')
     def boot(self, options=None, args=None, config=None, storage=None, dashboard=None):
@@ -55,7 +57,7 @@ class Loader(Loader):
         if storage.isFile(index): return dashboard.note(index)
 
     @inject.params(config='config', dashboard='notepad.dashboard')
-    def _notepad(self, config=None, dashboard=None):
+    def _notepad_tab(self, config=None, dashboard=None):
         if dashboard is None: return None
 
         content = Notepad()
@@ -93,28 +95,51 @@ class Loader(Loader):
         return widget
 
     @inject.params(config='config', storage='storage')
-    def _notepad_dashboard(self, config, storage):
+    def _notepad_dashboard(self, config, storage, binder):
 
         widget = NotepadDashboard(self.actions)
+
+        widget.storage_changed.connect(functools.partial(
+            self.actions.onActionStorageChanged, widget=widget
+        ))
+
+        widget.note_new.connect(functools.partial(
+            self.actions.onActionNoteCreate, widget=widget
+        ))
+
+        widget.note_import.connect(functools.partial(
+            self.actions.onActionNoteImport, widget=widget
+        ))
+
+        widget.group_new.connect(functools.partial(
+            self.actions.onActionFolderCreate, widget=widget
+        ))
+
+        widget.edit.connect(functools.partial(
+            self.actions.onActionNoteEdit, widget=widget
+        ))
+
+        widget.clone.connect(functools.partial(
+            self.actions.onActionCopy, widget=widget
+        ))
+
+        widget.delete.connect(functools.partial(
+            self.actions.onActionDelete, widget=widget
+        ))
+
+        storage.fileRenamed.connect(functools.partial(
+            self.actions.onActionFileRenamed, widget=widget
+        ))
+
+        widget.tree.customContextMenuRequested.connect(functools.partial(
+            self.actions.onActionContextMenu, widget=widget
+        ))
+
+        widget.tree.clicked.connect(functools.partial(
+            self.actions.onActionNoteSelect, widget=widget
+        ))
+
         widget.removed.connect(lambda x: widget.note(storage.first()))
         widget.created.connect(lambda x: widget.note(x))
-
-        action = functools.partial(self.actions.onActionNoteEdit, widget=widget)
-        widget.edit.connect(action)
-
-        action = functools.partial(self.actions.onActionCopy, widget=widget)
-        widget.clone.connect(action)
-
-        action = functools.partial(self.actions.onActionDelete, widget=widget)
-        widget.delete.connect(action)
-
-        action = functools.partial(self.actions.onActionFileRenamed, widget=widget)
-        storage.fileRenamed.connect(action)
-
-        action = functools.partial(self.actions.onActionContextMenu, widget=widget)
-        widget.tree.customContextMenuRequested.connect(action)
-
-        action = functools.partial(self.actions.onActionNoteSelect, widget=widget)
-        widget.tree.clicked.connect(action)
 
         return widget

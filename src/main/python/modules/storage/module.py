@@ -23,12 +23,6 @@ from lib.plugin import Loader
 class Loader(Loader):
     actions = ModuleActions()
 
-    def enabled(self, options=None, args=None):
-        return True
-
-    def config(self, binder=None):
-        binder.bind_to_constructor('storage', self._storage)
-
     def _storage_default(self):
         pool = [
             '~/Dropbox', '~/DropBox', '~/dropbox', '~/dropbox',
@@ -72,21 +66,30 @@ class Loader(Loader):
 
     @inject.params(config='config')
     def _widget_settings_storage(self, config=None):
-        if config is None:
-            return None
 
         from .gui.settings.storage import WidgetSettingsStorage
 
         widget = WidgetSettingsStorage()
         widget.location.setText(config.get('storage.location'))
-        action = functools.partial(self.actions.onActionStorageLocationChange, widget=widget)
-        widget.location.clicked.connect(action)
+        widget.location.clicked.connect(functools.partial(
+            self.actions.onActionStorageLocationChange
+        ))
 
         return widget
 
-    @inject.params(config='config', factory='settings_factory')
-    def boot(self, options=None, args=None, config=None, factory=None):
-        if options is None or args is None or factory is None:
-            return None
+    def enabled(self, options=None, args=None):
+        return True
 
-        factory.addWidget(self._widget_settings_storage)
+    def config(self, binder=None):
+        binder.bind_to_constructor('storage', self._storage)
+
+    @inject.params(config='config', factory='settings_factory', dashboard='notepad.dashboard')
+    def boot(self, options, args, config, factory, dashboard):
+
+        dashboard.storage.connect(functools.partial(
+            self.actions.onActionStorageLocationChange
+        ))
+
+        factory.addWidget(functools.partial(
+            self._widget_settings_storage
+        ))

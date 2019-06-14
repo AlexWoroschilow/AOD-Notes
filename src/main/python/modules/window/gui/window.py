@@ -52,18 +52,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tab.connect(self.onActionTabOpen)
         self.tabSwitch.connect(self.onActionTabSwitch)
 
-        self.header = self.addToolBar('main')
-        self.header.setObjectName('QToolBarTop')
-        self.header.setIconSize(QtCore.QSize(20, 20))
-        self.header.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
-        self.header.setFloatable(False)
-        self.header.setMovable(False)
-
-        for header_widget, priority in factory.widgets:
-            if isinstance(header_widget, QtWidgets.QAction):
-                self.header.addAction(header_widget)
-            if isinstance(header_widget, QtWidgets.QWidget):
-                self.header.addWidget(header_widget)
+        # self.header = self.addToolBar('main')
+        # self.header.setObjectName('QToolBarTop')
+        # self.header.setIconSize(QtCore.QSize(20, 20))
+        # self.header.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        # self.header.setFloatable(False)
+        # self.header.setMovable(False)
+        #
+        # for header_widget, priority in factory.widgets:
+        #     if isinstance(header_widget, QtWidgets.QAction):
+        #         self.header.addAction(header_widget)
+        #     if isinstance(header_widget, QtWidgets.QWidget):
+        #         self.header.addWidget(header_widget)
 
     def setMainWidget(self, widget=None):
         if self.layout is None: return None

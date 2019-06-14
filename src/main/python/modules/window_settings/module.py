@@ -13,13 +13,9 @@
 import inject
 import functools
 
-from PyQt5 import QtGui
-from PyQt5 import QtWidgets
-
 from .actions import ModuleActions
 
 from lib.plugin import Loader
-from .gui.button import PictureButton
 
 
 class Loader(Loader):
@@ -29,19 +25,11 @@ class Loader(Loader):
         return options.console is None
 
     def config(self, binder=None):
-        binder.bind_to_constructor('settings_factory', self._settings)
-
-    @inject.params(factory_header='window.header_factory')
-    def boot(self, options=None, args=None, factory_header=None):
-        if factory_header is None:
-            return None
-
-        widget = PictureButton(QtGui.QIcon("icons/settings"), None)
-        action = functools.partial(self.actions.onActionSettings, button=widget)
-        widget.clicked.connect(action)
-
-        factory_header.addWidget(widget, 128)
-
-    def _settings(self):
         from .settings import SettingsFactory
-        return SettingsFactory()
+        binder.bind('settings_factory', SettingsFactory())
+
+    @inject.params(dashboard='notepad.dashboard')
+    def boot(self, options, args, dashboard):
+        dashboard.settings.connect(functools.partial(
+            self.actions.onActionSettings, widget=dashboard
+        ))

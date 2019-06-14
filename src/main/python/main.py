@@ -27,7 +27,6 @@ import importlib
 import bs4
 import html5lib
 
-
 import whoosh
 from whoosh import fields
 
@@ -60,8 +59,7 @@ class ApplicationContainer(ApplicationContext):
 
         if module is None: return None
 
-        self.application = module.Application(options, args)
-        return self.application.exec_()
+        return module.Application(options, args).exec_()
 
 
 if __name__ == "__main__":

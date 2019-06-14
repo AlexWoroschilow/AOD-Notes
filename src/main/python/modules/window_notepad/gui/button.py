@@ -10,30 +10,40 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-from PyQt5 import QtCore
-from PyQt5 import QtWidgets
-
 import inject
 import functools
 
-from PyQt5 import QtGui
-from PyQt5 import QtWidgets
-from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
+from PyQt5 import QtCore
+from PyQt5 import QtWidgets
+from PyQt5 import QtGui
+
+from . import ToolBarButton
+from . import PictureButton
+from . import SearchField
 
 
-class PictureButton(QtWidgets.QPushButton):
+class ButtonDisabled(QtWidgets.QPushButton):
+
     def __init__(self, icon=None, text=None):
-        super(PictureButton, self).__init__(icon, None)
+        super(ButtonDisabled, self).__init__(icon, None)
+        self.setCheckable(False)
+        self.setFlat(True)
+        self.setDisabled(True)
+
+
+class ButtonPicture(QtWidgets.QPushButton):
+    def __init__(self, icon=None, text=None):
+        super(ButtonPicture, self).__init__(icon, None)
         self.setToolTipDuration(0)
         self.setToolTip(text)
 
 
-class ToolBarButton(QtWidgets.QPushButton):
+class ButtonToolBar(QtWidgets.QPushButton):
     activate = QtCore.pyqtSignal(object)
 
     def __init__(self, name=None):
-        super(ToolBarButton, self).__init__(name)
+        super(ButtonToolBar, self).__init__(name)
         self.setFlat(True)
 
     def connected(self):
@@ -42,18 +52,3 @@ class ToolBarButton(QtWidgets.QPushButton):
             return receiversCount > 0
         except (SyntaxError, RuntimeError) as err:
             return False
-
-
-class SearchField(QtWidgets.QLineEdit):
-
-    def __init__(self, parent=None):
-        super(SearchField, self).__init__(parent)
-        self.setPlaceholderText('Enter the search string...')
-        self.setObjectName('searchSearchField')
-        self.setFocusPolicy(Qt.StrongFocus)
-
-        effect = QtWidgets.QGraphicsDropShadowEffect()
-        effect.setBlurRadius(3)
-        effect.setOffset(0)
-
-        self.setGraphicsEffect(effect)

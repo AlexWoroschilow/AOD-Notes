@@ -17,21 +17,14 @@ from PyQt5 import QtWidgets
 
 class ModuleActions(object):
 
-    @inject.params(config='config', storage='storage', search='search', notepad='notepad.dashboard')
-    def onActionStorageLocationChange(self, event, config, widget, storage, search, notepad):
+    @inject.params(config='config', dashboard='notepad.dashboard')
+    def onActionStorageLocationChange(self, event, config, dashboard):
         message = "Select Directory"
-        destination = str(QtWidgets.QFileDialog.getExistingDirectory(widget, message, os.path.expanduser('~')))
+        destination = str(QtWidgets.QFileDialog.getExistingDirectory(dashboard, message, os.path.expanduser('~')))
         if destination is None or not len(destination):
             return None
 
-        widget.location.setText(destination)
         config.set('storage.location', destination)
         config.set('editor.current', destination)
 
-        notepad.tree.setModel(storage)
-
-        index = storage.setRootPath(destination)
-        notepad.tree.setRootIndex(index)
-        notepad.tree.expandAll()
-
-        notepad.group(index)
+        dashboard.storage_changed.emit(destination)

@@ -14,175 +14,37 @@ import os
 import inject
 import functools
 
-from PyQt5 import QtWidgets
-from PyQt5 import QtGui
-from PyQt5.QtCore import Qt
-
 from lib.plugin import Loader
 
 from .actions import ModuleActions
-from .gui.widget import SearchField
-from .gui.button import PictureButton
 from .gui.settings.search import WidgetSettingsSearch
 
 
 class Loader(Loader):
     actions = ModuleActions()
 
-    def __init__(self, options=None, args=None):
-        if options is None or args is None:
-            return None
-
-        self.buttonGroup = None
-        self.buttonNote = None
-        self.buttonImport = None
-        self.search = None
-        self.spacer = None
-
-    @inject.params(dashboard='notepad.dashboard')
-    def _widget_button_note(self, dashboard=None):
-        tooltip = 'Create new note. The new note will be created as a part of the selected group or in the root group.'
-        button = PictureButton(QtGui.QIcon("icons/note"), tooltip)
-        button.clicked.connect(functools.partial(dashboard.actions.onActionNoteCreate, widget=dashboard))
-        return button
-
-    @inject.params(dashboard='notepad.dashboard')
-    def _widget_button_group(self, dashboard=None):
-        tooltip = 'Create new note. The new note will be created as a part of the selected group or in the root group.'
-        button = PictureButton(QtGui.QIcon("icons/book"), tooltip)
-        button.clicked.connect(functools.partial(dashboard.actions.onActionFolderCreate, widget=dashboard))
-        return button
-
-    @inject.params(dashboard='notepad.dashboard')
-    def _widget_button_import(self, dashboard=None):
-        button = PictureButton(QtGui.QIcon("icons/import"), 'Import File')
-        button.clicked.connect(self.actions.onActionNoteImport)
-        return button
-
-    @inject.params(dashboard='notepad.dashboard', kernel='kernel')
-    def _widget_settings_search(self, kernel=None, dashboard=None):
-        if kernel is None or dashboard is None:
-            return None
-
+    @inject.params(config='config')
+    def _widget_settings_search(self, options, args, config):
         widget = WidgetSettingsSearch()
-        destination = os.path.dirname(kernel.options.config)
+
+        print(config.get('storage.location'))
+
+        destination = os.path.dirname(options.config)
         widget.searchIndex.setText(destination)
 
         return widget
 
-    def _widget_search(self):
-
-        search = SearchField()
-        search.clearFocus()
-
-        search.focusInEvent = functools.partial(self.onSearchFocusIn, widget=search)
-        search.focusOutEvent = functools.partial(self.onSearchFocusOut, widget=search)
-        search.returnPressed.connect(functools.partial(self.actions.onActionSearchRequest, widget=search))
-
-        shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+f"), search)
-        shortcut.activated.connect(self.onSearchFocusActivate)
-        shortcut.setEnabled(True)
-
-        return search
-
     def enabled(self, options=None, args=None):
         return options.console is None
 
-    def config(self, binder=None):
-        pass
+    @inject.params(dashboard='notepad.dashboard', factory='settings_factory')
+    def boot(self, options=None, args=None, dashboard=None, factory=None):
+        dashboard.created.connect(self.actions.onNoteCreated)
+        dashboard.updated.connect(self.actions.onNoteUpdated)
+        dashboard.search.connect(self.actions.onActionSearchRequest)
+        dashboard.removed.connect(self.actions.onNoteRemoved)
 
-    @inject.params(config='config', dashboard='notepad.dashboard', factory='window.header_factory',
-                   factory_settings='settings_factory')
-    def boot(self, options=None, args=None, config=None, dashboard=None, factory=None, factory_settings=None):
-
-        self.spacer = QtWidgets.QWidget()
-        self.spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
-
-        self.buttonNote = factory.addWidget(self._widget_button_note())
-        self.buttonGroup = factory.addWidget(self._widget_button_group())
-        self.buttonImport = factory.addWidget(self._widget_button_import())
-
-        factory.addWidget(self.spacer)
-
-        self.search = factory.addWidget(self._widget_search())
-
-        if dashboard is None or not dashboard: return None
-        dashboard.created.connect(self.onNoteCreated)
-        dashboard.updated.connect(self.onNoteUpdated)
-        dashboard.removed.connect(self.onNoteRemoved)
-
-        if factory_settings is None or not factory_settings: return None
-        factory_settings.addWidget(self._widget_settings_search)
-
-    @inject.params(storage='storage', search='search')
-    def onNoteCreated(self, index, storage, search):
-        # update search index only after
-        # the update was successful
-        name = storage.fileName(index)
-        path = storage.filePath(index)
-
-        content = storage.fileContent(index)
-        if not len(content): return None
-
-        search.append(name, path, content)
-
-    @inject.params(storage='storage', search='search')
-    def onNoteUpdated(self, index, storage, search):
-        # update search index only after
-        # the update was successful
-        name = storage.fileName(index)
-        path = storage.filePath(index)
-
-        content = storage.fileContent(index)
-        if not len(content): return None
-
-        search.update(name, path, content)
-
-    @inject.params(storage='storage', search='search')
-    def onNoteRemoved(self, index, storage, search):
-        # update search index only after
-        # the update was successful
-        path = storage.filePath(index)
-        if not len(path): return None
-
-        search.remove(path)
-
-    def onSearchFocusActivate(self, event=None):
-        if self.search is not None:
-            self.search.clearFocus()
-            self.search.setFocus()
-
-    def onSearchFocusIn(self, event=None, widget=None):
-
-        if self.search is not None:
-            self.search.setAlignment(Qt.AlignCenter)
-
-        if self.spacer is not None:
-            self.spacer.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
-            self.spacer.setVisible(False)
-
-        if self.buttonGroup is not None:
-            self.buttonGroup.setVisible(False)
-
-        if self.buttonNote is not None:
-            self.buttonNote.setVisible(False)
-
-        if self.buttonImport is not None:
-            self.buttonImport.setVisible(False)
-
-    def onSearchFocusOut(self, event, widget):
-        if self.search is not None:
-            self.search.setAlignment(Qt.AlignLeft)
-
-        if self.spacer is not None:
-            self.spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
-            self.spacer.setVisible(True)
-
-        if self.buttonGroup is not None:
-            self.buttonGroup.setVisible(True)
-
-        if self.buttonNote is not None:
-            self.buttonNote.setVisible(True)
-
-        if self.buttonImport is not None:
-            self.buttonImport.setVisible(True)
+        factory.addWidget(functools.partial(
+            self._widget_settings_search,
+            options=options, args=args
+        ))
