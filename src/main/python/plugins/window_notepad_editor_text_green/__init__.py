@@ -10,3 +10,34 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import inject
+
+from PyQt5 import QtGui
+
+from .gui.button import ToolBarButton
+
+
+class Loader(object):
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        pass
+
+    def _constructor(self):
+        widget = ToolBarButton()
+        widget.setIcon(QtGui.QIcon("icons/font-green.svg"))
+        widget.setToolTip(widget.tr("Change the text color to green"))
+        widget.clickedEvent = self.clickedEvent
+        return widget
+
+    def enabled(self, options=None, args=None):
+        return options.console is None
+
+    @inject.params(factory='toolbar_factory.rightbar')
+    def boot(self, options=None, args=None, factory=None):
+        factory.addWidget(self._constructor)
+
+    def clickedEvent(self, event=None, widget=None):
+        widget.setTextColor(QtGui.QColor.fromRgb(0, 127, 0))

@@ -10,3 +10,35 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import inject
+import functools
+
+from PyQt5 import QtWidgets
+
+from .actions import ModuleActions
+
+
+class Loader(object):
+    actions = ModuleActions()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        pass
+
+    def enabled(self, options=None, args=None):
+        return options.console is None
+
+    def configure(self, binder, options, args):
+        binder.bind_to_constructor('widget.statusbar', self._widget)
+
+    @inject.params(kernel='kernel')
+    def _widget(self, kernel=None):
+        widget = QtWidgets.QLabel()
+
+        kernel.listen('window_status', functools.partial(
+            self.actions.onActionStatus, widget=widget
+        ))
+
+        return widget

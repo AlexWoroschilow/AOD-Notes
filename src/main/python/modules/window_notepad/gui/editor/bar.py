@@ -17,7 +17,20 @@ from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 
-from lib.widget.button import ToolBarButton
+
+class ToolBarButton(QtWidgets.QPushButton):
+    activate = QtCore.pyqtSignal(object)
+
+    def __init__(self, parent=None):
+        super(ToolBarButton, self).__init__(parent)
+        self.setFlat(True)
+
+    def connected(self):
+        try:
+            receiversCount = self.receivers(self.clicked)
+            return receiversCount > 0
+        except (SyntaxError, RuntimeError) as err:
+            return False
 
 
 class ToolbarBase(QtWidgets.QToolBar):

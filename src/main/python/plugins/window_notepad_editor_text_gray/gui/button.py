@@ -10,18 +10,22 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import os
-import inject
-import platform
-
-from lib.plugin import Loader
+from PyQt5 import QtCore
+from PyQt5 import QtWidgets
 
 
-class Loader(Loader):
+class ToolBarButton(QtWidgets.QPushButton):
 
-    def enabled(self, options=None, args=None):
-        return platform.system() in ["Darwin"]
+    activate = QtCore.pyqtSignal(object)
 
-    @property
-    def config(self, binder=None):
-        pass
+    def __init__(self, parent=None):
+        super(ToolBarButton, self).__init__(parent)
+        self.setFlat(True)
+
+    def connected(self):
+        try:
+            receiversCount = self.receivers(self.clicked)
+            return receiversCount > 0
+        except (SyntaxError, RuntimeError) as err:
+            return False
+        

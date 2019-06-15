@@ -25,18 +25,17 @@ from . import SearchField
 from .button import ButtonDisabled
 
 
-class FolderTreeToolbarTop(QtWidgets.QWidget):
+class FolderTreeToolbarTop(QtWidgets.QFrame):
     storage = QtCore.pyqtSignal(object)
     storage_changed = QtCore.pyqtSignal(object)
 
     @inject.params(config='config')
     def __init__(self, config):
         super(FolderTreeToolbarTop, self).__init__()
-        self.setContentsMargins(0, 0, 0, 0)
 
         self.location = ToolBarButton(config.get('storage.location'))
         self.location.setIcon(QtGui.QIcon("icons/plus-light"))
-        self.location.setToolTip("Clone selected preview")
+        self.location.setToolTip("Select the notepad database or create a new one")
 
         self.location.clicked.connect(
             lambda event=None: self.storage.emit(event)
@@ -54,17 +53,15 @@ class FolderTreeToolbarTop(QtWidgets.QWidget):
         self.setLayout(self.layout)
 
 
-class NotepadEditorToolbarTop(QtWidgets.QGroupBox):
+class NotepadEditorToolbarTop(QtWidgets.QFrame):
     note_new = QtCore.pyqtSignal(object)
     note_import = QtCore.pyqtSignal(object)
     group_new = QtCore.pyqtSignal(object)
     settings = QtCore.pyqtSignal(object)
     search = QtCore.pyqtSignal(object)
 
-    @inject.params(config='config')
-    def __init__(self, parent=None, config=None):
-        super(NotepadEditorToolbarTop, self).__init__(parent)
-        self.setContentsMargins(0, 0, 0, 0)
+    def __init__(self):
+        super(NotepadEditorToolbarTop, self).__init__()
 
         self.layout = QtWidgets.QHBoxLayout()
         self.layout.setContentsMargins(0, 0, 0, 0)
@@ -106,12 +103,8 @@ class NotepadEditorToolbarTop(QtWidgets.QGroupBox):
         shortcut.activated.connect(lambda event=None: self.text_search.setText(None))
         shortcut.activated.connect(self.text_search.clearFocus)
 
-        self.text_search.focusInEvent = functools.partial(
-            self.on_search_focus_in, widget=self.text_search
-        )
-        self.text_search.focusOutEvent = functools.partial(
-            self.on_search_focus_out, widget=self.text_search
-        )
+        self.text_search.focusInEvent = self.on_search_focus_in
+        self.text_search.focusOutEvent = self.on_search_focus_out
 
         tooltip = 'Create new note. The new note will be created as a part of the selected group or in the root group.'
         self.button_settings = PictureButton(QtGui.QIcon("icons/settings"), tooltip)
@@ -121,7 +114,7 @@ class NotepadEditorToolbarTop(QtWidgets.QGroupBox):
 
         self.setLayout(self.layout)
 
-    def on_search_focus_in(self, event=None, widget=None):
+    def on_search_focus_in(self, event):
         self.text_search.setAlignment(Qt.AlignCenter)
 
         self.spacer.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
@@ -130,7 +123,7 @@ class NotepadEditorToolbarTop(QtWidgets.QGroupBox):
         self.group.setVisible(False)
         self.note.setVisible(False)
 
-    def on_search_focus_out(self, event=None, widget=None):
+    def on_search_focus_out(self, event):
         self.text_search.setAlignment(Qt.AlignLeft)
 
         self.spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)

@@ -10,3 +10,140 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import inject
+import functools
+
+from .actions import ModuleActions
+from .factory import ToolbarFactory
+
+from .gui.dashboard import Notepad
+from .gui.dashboard import NotepadDashboard
+from .gui.editor.widget import TextEditorWidget
+
+
+class Loader(object):
+    actions = ModuleActions()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        pass
+
+    @inject.params(config='config', dashboard='notepad.dashboard')
+    def _notepad_tab(self, config=None, dashboard=None):
+        if dashboard is None: return None
+
+        content = Notepad()
+        content.addTab(dashboard, content.tr('Dashboard'))
+
+        return content
+
+    @inject.params(config='config', factory_leftbar='toolbar_factory.leftbar',
+                   factory_rightbar='toolbar_factory.rightbar', factory_formatbar='toolbar_factory.formatbar')
+    def _notepad_editor(self, config=None, factory_leftbar=None, factory_rightbar=None, factory_formatbar=None):
+
+        widget = TextEditorWidget()
+
+        for plugin in factory_leftbar.widgets:
+            plugin.clicked.connect(functools.partial(plugin.clickedEvent, widget=widget))
+            widget.leftbar.addWidget(plugin)
+        widget.leftbar.setVisible(int(config.get('editor.leftbar')))
+
+        for plugin in factory_formatbar.widgets:
+            plugin.clicked.connect(functools.partial(plugin.clickedEvent, widget=widget))
+            widget.formatbar.addWidget(plugin)
+        widget.formatbar.setVisible(int(config.get('editor.formatbar')))
+
+        for plugin in factory_rightbar.widgets:
+            plugin.clicked.connect(functools.partial(plugin.clickedEvent, widget=widget))
+            widget.rightbar.addWidget(plugin)
+        widget.rightbar.setVisible(int(config.get('editor.rightbar')))
+
+        action = functools.partial(self.actions.onActionSave, widget=widget)
+        widget.save.connect(action)
+
+        action = functools.partial(self.actions.onActionFullScreen, widget=widget)
+        widget.fullscreen.connect(action)
+
+        return widget
+
+    @inject.params(config='config', storage='storage')
+    def _notepad_dashboard(self, config, storage, binder):
+
+        widget = NotepadDashboard(self.actions)
+
+        widget.storage_changed.connect(functools.partial(
+            self.actions.onActionStorageChanged, widget=widget
+        ))
+
+        widget.note_new.connect(functools.partial(
+            self.actions.onActionNoteCreate, widget=widget
+        ))
+
+        widget.note_import.connect(functools.partial(
+            self.actions.onActionNoteImport, widget=widget
+        ))
+
+        widget.group_new.connect(functools.partial(
+            self.actions.onActionFolderCreate, widget=widget
+        ))
+
+        widget.edit.connect(functools.partial(
+            self.actions.onActionNoteEdit, widget=widget
+        ))
+
+        widget.clone.connect(functools.partial(
+            self.actions.onActionCopy, widget=widget
+        ))
+
+        widget.delete.connect(functools.partial(
+            self.actions.onActionDelete, widget=widget
+        ))
+
+        storage.fileRenamed.connect(functools.partial(
+            self.actions.onActionFileRenamed, widget=widget
+        ))
+
+        widget.tree.customContextMenuRequested.connect(functools.partial(
+            self.actions.onActionContextMenu, widget=widget
+        ))
+
+        widget.tree.clicked.connect(functools.partial(
+            self.actions.onActionNoteSelect, widget=widget
+        ))
+
+        widget.removed.connect(lambda x: widget.note(storage.first()))
+        widget.created.connect(lambda x: widget.note(x))
+
+        return widget
+
+    def enabled(self, options=None, args=None):
+        return options.console is None
+
+    def configure(self, binder, options, args):
+        binder.bind('toolbar_factory.leftbar', ToolbarFactory())
+        binder.bind('toolbar_factory.formatbar', ToolbarFactory())
+        binder.bind('toolbar_factory.rightbar', ToolbarFactory())
+
+        binder.bind_to_provider('notepad', self._notepad_tab)
+        binder.bind_to_provider('notepad.editor', self._notepad_editor)
+
+        binder.bind_to_constructor('notepad.dashboard', functools.partial(
+            self._notepad_dashboard, binder=binder
+        ))
+
+    @inject.params(config='config', storage='storage', dashboard='notepad.dashboard')
+    def boot(self, options=None, args=None, config=None, storage=None, dashboard=None):
+
+        current = config.get('editor.current')
+        if current is None or not len(current):
+            return dashboard.note(storage.first())
+
+        # get last edited document from the confnig
+        # and open this document in the editor by default
+        index = storage.index(current)
+        if index is None: return None
+
+        if storage.isDir(index): return dashboard.group(index)
+        if storage.isFile(index): return dashboard.note(index)

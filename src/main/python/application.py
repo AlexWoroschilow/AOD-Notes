@@ -38,12 +38,11 @@ class Application(QtWidgets.QApplication):
         self.setApplicationName('AOD - Notepad')
         self.kernel = Kernel(options, args)
 
-    def exec_(self):
+    def exec_(self, options=None, args=None):
         container = inject.get_injector()
         if container is None: return None
 
-        kernel = container.get_instance('kernel')
-        if kernel.options.console: return None
+        if options.console: return None
 
         window = container.get_instance('window')
         if window is None: return None
@@ -68,4 +67,4 @@ if __name__ == "__main__":
     logging.basicConfig(level=options.loglevel, format=log_format)
 
     application = Application(options, args)
-    sys.exit(application.exec_())
+    sys.exit(application.exec_(options, args))

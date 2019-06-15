@@ -37,9 +37,9 @@ class PreviewScrollArea(QtWidgets.QScrollArea):
     clone = QtCore.pyqtSignal(object)
     columns = 1
 
-    def __init__(self, parent):
+    def __init__(self, parent, collection):
         super(PreviewScrollArea, self).__init__(parent)
-        self.collection = []
+        self.collection = collection
 
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -52,16 +52,14 @@ class PreviewScrollArea(QtWidgets.QScrollArea):
 
         self.setWidget(self.preview)
 
-    def resizeEvent(self, QResizeEvent):
-        columns = round(QResizeEvent.size().width() / 600)
+        self.show()
+
+    def resizeEvent(self, event):
+        columns = round(event.size().width() / 600)
         if columns and self.columns != columns:
             self.columns = columns if columns > 0 else 1
             self.show()
-        return super(PreviewScrollArea, self).resizeEvent(QResizeEvent)
-
-    def addPreview(self, index=None):
-        if index is None: return self
-        self.collection.append(index)
+        return super(PreviewScrollArea, self).resizeEvent(event)
 
     def show(self):
 

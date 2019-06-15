@@ -10,20 +10,22 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import inject
+from PyQt5 import QtCore
+from PyQt5 import QtWidgets
 
-from lib.plugin import Loader
 
+class ToolBarButton(QtWidgets.QPushButton):
 
-class Loader(Loader):
+    activate = QtCore.pyqtSignal(object)
 
-    def enabled(self, options=None, args=None):
-        return True
+    def __init__(self, parent=None):
+        super(ToolBarButton, self).__init__(parent)
+        self.setFlat(True)
 
-    def config(self, binder=None):
-        binder.bind_to_constructor('config', self._config)
-
-    @inject.params(kernel='kernel')
-    def _config(self, kernel=None):
-        from .service.config import ConfigFile
-        return ConfigFile(kernel.options.config)
+    def connected(self):
+        try:
+            receiversCount = self.receivers(self.clicked)
+            return receiversCount > 0
+        except (SyntaxError, RuntimeError) as err:
+            return False
+        

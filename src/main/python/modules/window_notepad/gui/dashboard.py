@@ -14,6 +14,8 @@ import inject
 
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt
+from PyQt5 import QtGui
 
 from .folder.tree import FolderTree
 from .demo.widget import DemoWidget
@@ -36,28 +38,37 @@ class Notepad(QtWidgets.QTabWidget):
         return super(Notepad, self).close()
 
 
-class NotepadDashboardLeft(QtWidgets.QGroupBox):
+class NotepadDashboardLeft(QtWidgets.QFrame):
     def __init__(self):
         super(NotepadDashboardLeft, self).__init__()
-        self.setContentsMargins(0, 0, 0, 0)
-
         self.setLayout(QtWidgets.QVBoxLayout())
         self.layout().setContentsMargins(0, 0, 0, 0)
+        self.layout().setSpacing(0)
 
     def addWidget(self, widget):
         self.layout().addWidget(widget)
 
 
-class NotepadDashboardRight(QtWidgets.QGroupBox):
+class NotepadDashboardRight(QtWidgets.QFrame):
     def __init__(self):
         super(NotepadDashboardRight, self).__init__()
-        self.setContentsMargins(0, 0, 0, 0)
-
         self.setLayout(QtWidgets.QVBoxLayout(self))
         self.layout().setContentsMargins(0, 0, 0, 0)
+        self.layout().setSpacing(0)
 
     def addWidget(self, widget):
         self.layout().addWidget(widget)
+
+    def clean(self):
+        layout = self.layout()
+        for i in range(0, layout.count()):
+            item = layout.itemAt(i)
+            if item is None:
+                layout.takeAt(i)
+
+            widget = item.widget()
+            if item is not None:
+                widget.close()
 
 
 class NotepadDashboard(QtWidgets.QSplitter):
@@ -109,11 +120,11 @@ class NotepadDashboard(QtWidgets.QSplitter):
         self.test = None
 
     @property
-    def current(self):
-        injector = inject.get_injector()
-        storage = injector.get_instance('storage')
-        if len(storage.filePath(self.tree.currentIndex())):
-            return self.tree.currentIndex()
+    @inject.params(storage='storage')
+    def current(self, storage):
+        index = self.tree.currentIndex()
+        if len(storage.filePath(index)):
+            return index
         return storage.rootIndex()
 
     def focus(self):
@@ -121,25 +132,14 @@ class NotepadDashboard(QtWidgets.QSplitter):
             self.editor.focus()
         return self
 
-    @inject.params(storage='storage', config='config')
-    def note(self, index, storage, config):
-        if storage.isDir(index): return self
-        current = storage.filePath(index)
-        if current is None: return self
-        config.set('editor.current', current)
+    @inject.params(storage='storage', config='config', editor='notepad.editor')
+    def note(self, index, storage, config, editor):
+        if storage.isDir(index):
+            return self
 
-        layout = self.container.layout()
-        if layout is None: return self
+        config.set('editor.current', storage.filePath(index))
 
-        for i in range(layout.count()):
-            layout.itemAt(i).widget().close()
-
-        container = inject.get_injector()
-        if container is None: return self
-
-        self.editor = container.get_instance('notepad.editor')
-        if self.editor is None: return self
-
+        self.editor = editor
         self.editor.index = index
 
         toolbar = NotepadEditorToolbarTop()
@@ -148,42 +148,36 @@ class NotepadDashboard(QtWidgets.QSplitter):
         toolbar.group_new.connect(lambda event=None: self.group_new.emit(event))
         toolbar.search.connect(lambda event=None: self.search.emit(event))
         toolbar.settings.connect(lambda event=None: self.settings.emit(event))
-        layout.addWidget(toolbar)
-        layout.addWidget(self.editor)
+
+        self.container.clean()
+        self.container.addWidget(toolbar)
+        self.container.addWidget(self.editor)
         self.editor.focus()
 
-        if self.current == index: return self
-        # highlight the current note if the
-        # selected not and editable not are different
-        # this happens of the edition was started programmatically
-        # or in any other way except the preview tree view
+        if self.current == index:
+            return self
+
         self.tree.setCurrentIndex(index)
+
         return self
 
     @inject.params(storage='storage', config='config')
     def group(self, index, storage, config):
-        current = storage.filePath(index)
-        config.set('editor.current', current)
+        if storage.isFile(index):
+            return self
 
-        layout = self.container.layout()
-        for i in range(0, layout.count()):
-            item = layout.itemAt(i)
-            if item is None: layout.takeAt(i)
-            widget = item.widget()
-            if item is not None:
-                widget.close()
+        config.set('editor.current', storage.filePath(index))
 
-        widget = PreviewScrollArea(self)
+        widget = PreviewScrollArea(self, [
+            index for index in storage.entities(index)
+            if storage.isFile(index)
+        ])
+
         widget.edit.connect(self.edit.emit)
         widget.delete.connect(self.delete.emit)
         widget.delete.connect(lambda x: self.group(index))
         widget.clone.connect(self.clone.emit)
         widget.clone.connect(lambda x: self.group(index))
-
-        for entity in storage.entities(index):
-            if storage.isDir(entity):
-                continue
-            widget.addPreview(entity)
 
         toolbar = NotepadEditorToolbarTop()
         toolbar.note_new.connect(lambda event=None: self.note_new.emit(event))
@@ -192,16 +186,18 @@ class NotepadDashboard(QtWidgets.QSplitter):
         toolbar.search.connect(lambda event=None: self.search.emit(event))
         toolbar.settings.connect(lambda event=None: self.settings.emit(event))
 
-        layout.addWidget(toolbar)
-        layout.addWidget(widget)
-        widget.show()
+        self.container.clean()
+        self.container.addWidget(toolbar)
+        self.container.addWidget(widget)
+
         return self
 
     def demo(self):
-        layout = self.container.layout()
-        for i in range(layout.count()):
-            layout.itemAt(i).widget().close()
-        layout.addWidget(DemoWidget())
+        demo = DemoWidget()
+
+        self.container.clean()
+        self.container.addWidget(demo)
+
         return self
 
     @inject.params(storage='storage')

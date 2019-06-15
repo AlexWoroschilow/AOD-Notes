@@ -10,3 +10,34 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import inject
+
+from PyQt5 import QtGui
+
+from .gui.button import ToolBarButton
+
+
+class Loader(object):
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        pass
+
+    def enabled(self, options=None, args=None):
+        return options.console is None
+
+    @inject.params(factory='toolbar_factory.rightbar')
+    def boot(self, options=None, args=None, factory=None):
+        factory.addWidget(self._constructor)
+
+    def _constructor(self):
+        widget = ToolBarButton()
+        widget.setIcon(QtGui.QIcon("icons/line.svg"))
+        widget.setToolTip(widget.tr('Add a line'))
+        widget.clickedEvent = self.clickedEvent
+        return widget
+
+    def clickedEvent(self, event=None, widget=None):
+        widget.insertHtml('<hr></hr>')

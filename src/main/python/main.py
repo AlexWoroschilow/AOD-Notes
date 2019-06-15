@@ -15,6 +15,7 @@
 import os
 import sys
 import math
+import hashlib
 import logging
 import optparse
 import inject
@@ -51,7 +52,7 @@ from lib.kernel import Kernel
 
 class ApplicationContainer(ApplicationContext):
 
-    def run(self, options, args):
+    def run(self, options=None, args=None):
         self.app.setAttribute(Qt.AA_ShareOpenGLContexts)
 
         spec = util.find_spec('application')
@@ -59,7 +60,8 @@ class ApplicationContainer(ApplicationContext):
 
         if module is None: return None
 
-        return module.Application(options, args).exec_()
+        return module.Application(options, args) \
+            .exec_(options, args)
 
 
 if __name__ == "__main__":

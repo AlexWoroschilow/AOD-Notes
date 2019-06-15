@@ -10,3 +10,47 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import inject
+
+from PyQt5 import QtGui
+
+from .gui.button import ToolBarButton
+
+
+class Loader(object):
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        pass
+
+    def enabled(self, options=None, args=None):
+        return options.console is None
+
+    @inject.params(factory='toolbar_factory.leftbar')
+    def boot(self, options=None, args=None, factory=None):
+        factory.addWidget(self._zoomIn)
+        factory.addWidget(self._zoomOut)
+
+    def _zoomIn(self):
+        zoomIn = ToolBarButton()
+        zoomIn.setShortcut("Ctrl+=")
+        zoomIn.setIcon(QtGui.QIcon("icons/zoomIn.svg"))
+        zoomIn.setToolTip(zoomIn.tr("Change the text color to blue"))
+        zoomIn.clickedEvent = self.zoomInEvent
+        return zoomIn
+
+    def _zoomOut(self):
+        zoomOut = ToolBarButton()
+        zoomOut.setShortcut("Ctrl+-")
+        zoomOut.setIcon(QtGui.QIcon("icons/zoomOut.svg"))
+        zoomOut.setToolTip(zoomOut.tr("Change the text color to blue"))
+        zoomOut.clickedEvent = self.zoomOutEvent
+        return zoomOut
+
+    def zoomOutEvent(self, event=None, widget=None):
+        widget.zoomOut(5)
+
+    def zoomInEvent(self, event=None, widget=None):
+        widget.zoomIn(5)
