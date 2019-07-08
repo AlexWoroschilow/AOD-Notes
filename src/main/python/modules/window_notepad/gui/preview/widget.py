@@ -11,6 +11,8 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import math
+import inject
+
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
@@ -61,7 +63,8 @@ class PreviewScrollArea(QtWidgets.QScrollArea):
             self.show()
         return super(PreviewScrollArea, self).resizeEvent(event)
 
-    def show(self):
+    @inject.params(status='status')
+    def show(self, status):
 
         layout = self.preview.layout()
         for i in range(0, layout.count()):
@@ -80,6 +83,8 @@ class PreviewScrollArea(QtWidgets.QScrollArea):
             i = math.floor(current / self.columns)
             j = math.floor(current % self.columns)
             self.preview.layout().addWidget(widget, i, j)
+
+        status.info('{} notes found'.format(len(self.collection)))
 
         return super(PreviewScrollArea, self).show()
 

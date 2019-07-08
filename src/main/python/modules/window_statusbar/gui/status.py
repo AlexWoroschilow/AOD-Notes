@@ -32,5 +32,8 @@ class Status(QtWidgets.QWidget):
         text = '{}!'.format(text)
         self.text.setText(text)
 
+    def info(self, text):
+        self.text.setText(text)
+
     def addWidget(self, widget):
         self.layout().addWidget(widget)
