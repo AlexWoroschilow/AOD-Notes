@@ -112,6 +112,18 @@ SettingsScrollArea PictureButton { background: rgb(226,226,226); }
 PictureButton { min-width: 40px; padding: 5px 5px; margin: 0px 0px; }
 PictureButtonFlat { min-width: 20px; padding: 2px 2px; margin: 0px 2px; }
 
+QSplitter { background: #414649; border: none; }
+QSplitter::handle { image: url(icons/splitter-light); }
+QSplitter::handle:vertical { height: 5px; }
+
+QTabBar { background: rgb(236,236,236); color: #4F4F4F; }
+QTabWidget { background: #ffffff; border: none; margin: 0px; }
+QTabWidget::pane { background: #ffffff; border: none; margin: 0px; }
+QTabWidget::tab-bar { left: 0px; color: #4F4F4F; }
+QTabBar::tab { background: #414649; color: rgb(236,236,236); border-right: 1px solid #414649; padding: 5px; }
+QTabBar::tab:selected { background: #515659; }
+QTabBar::tab:!selected { background: #414649; }
+QTabBar::close-button { image: url(icons/close-light); }
 
 
 FolderTree { background: #515659; alternate-background-color: #515659; border: none; }
@@ -125,3 +137,12 @@ FolderTree::item:hover { alternate-background-color: #414649; border-bottom: 1px
 FolderTree::item:selected:active { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
 FolderTree::item:hover:selected { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
 FolderTree::item:selected { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
+
+NotepadDashboardLeft { background: #515659; padding: 0px; margin: 0px; border: none; }
+NotepadDashboardLeft FolderTreeToolbarTop {  background: #515659; padding: 0px; margin: 0px; border: none; }
+NotepadDashboardLeft FolderTreeToolbarTop ToolBarButton { background: #515659; color: rgb(236,236,236); padding: 5px; margin: 0px; }
+NotepadDashboardLeft FolderTreeToolbarTop ToolBarButton:pressed { background-color: #414649; border-color: #515659; border-style: inset; border-width: 0px; }
+NotepadDashboardLeft FolderTreeToolbarTop ToolBarButton:hover { background-color: #414649; border-style: inset; border-width: 0px; border-color: #515659; }
+
+NotepadDashboardRight { padding: 0px; margin: 0px; border: none; background: #ffffff; }
+NotepadDashboardRight  NotepadEditorToolbarTop { background: rgb(236,236,236); padding: 0px; border: none; }

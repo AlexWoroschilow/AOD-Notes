@@ -10,12 +10,7 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import inject
-import functools
-
-from PyQt5 import QtGui
 from PyQt5 import QtWidgets
-from PyQt5 import QtCore
 
 
 class PictureButton(QtWidgets.QPushButton):

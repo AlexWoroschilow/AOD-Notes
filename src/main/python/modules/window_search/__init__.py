@@ -15,7 +15,6 @@ import inject
 import functools
 
 from .actions import ModuleActions
-from .gui.settings.search import WidgetSettingsSearch
 
 
 class Loader(object):
@@ -29,6 +28,7 @@ class Loader(object):
 
     @inject.params(config='config')
     def _widget_settings_search(self, options, args, config):
+        from .gui.settings.search import WidgetSettingsSearch
         widget = WidgetSettingsSearch()
 
         destination = os.path.dirname(options.config)
