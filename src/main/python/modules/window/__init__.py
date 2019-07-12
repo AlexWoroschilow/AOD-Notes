@@ -13,8 +13,6 @@
 import inject
 
 from .gui.window import MainWindow
-from .gui.header import WidgetHeaderFactory
-
 from .actions import ModuleActions
 
 
@@ -27,36 +25,14 @@ class Loader(object):
     def __exit__(self, type, value, traceback):
         pass
 
-    @inject.params(window='window')
-    def _widget_header(self, window=None):
-        if window.header is None: return None
-        return window.header
-
-    @inject.params(window='window')
-    def _widget_content(self, window=None):
-        if window.content is None: return None
-        return window.content
-
-    @inject.params(window='window')
-    def _widget_footer(self, window=None):
-        if window.footer is None: return None
-        return window.footer
-
-    @inject.params(window='window')
-    def _widget_status(self, window=None):
-        return window.statusBar()
-
-    @inject.params(config='config', factory='window.header_factory')
-    def _widget(self, config=None, factory=None):
-        container = inject.get_injector()
-        if container is None: return None
+    @inject.params(config='config', notepad='notepad')
+    def _widget(self, config=None, notepad=None):
 
         widget = MainWindow()
         width = int(config.get('window.width'))
         height = int(config.get('window.height'))
         widget.resize(width, height)
 
-        notepad = container.get_instance('notepad')
         widget.setMainWidget(notepad)
 
         widget.footer = widget.statusBar()
@@ -65,11 +41,33 @@ class Loader(object):
 
         return widget
 
+    @inject.params(window='window')
+    def _widget_header(self, window=None):
+        if window is None: return None
+        if window.header is None: return None
+        return window.header
+
+    @inject.params(window='window')
+    def _widget_content(self, window=None):
+        if window is None: return None
+        if window.content is None: return None
+        return window.content
+
+    @inject.params(window='window')
+    def _widget_footer(self, window=None):
+        if window is None: return None
+        if window.footer is None: return None
+        return window.footer
+
+    @inject.params(window='window')
+    def _widget_status(self, window=None):
+        if window is None: return None
+        return window.statusBar()
+
     def enabled(self, options=None, args=None):
         return options.console is None
 
     def configure(self, binder, options, args):
-        binder.bind('window.header_factory', WidgetHeaderFactory())
 
         binder.bind_to_constructor('window', self._widget)
         binder.bind_to_provider('window.header', self._widget_header)

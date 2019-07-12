@@ -31,14 +31,11 @@ class Loader(object):
         return options.console is None
 
     def configure(self, binder, options, args):
-        binder.bind_to_constructor('widget.statusbar', self._widget)
+        binder.bind_to_constructor('status', self._widget)
 
-    @inject.params(kernel='kernel')
-    def _widget(self, kernel=None):
-        widget = QtWidgets.QLabel()
-
-        kernel.listen('window_status', functools.partial(
-            self.actions.onActionStatus, widget=widget
-        ))
-
+    @inject.params(status='window.status')
+    def _widget(self, status=None):
+        from .gui.status import Status
+        widget = Status()
+        status.addWidget(widget)
         return widget

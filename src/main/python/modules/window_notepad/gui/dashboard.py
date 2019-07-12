@@ -216,3 +216,7 @@ class NotepadDashboard(QtWidgets.QSplitter):
                 current = parent
 
         return True
+
+    def close(self):
+        super(NotepadDashboard, self).deleteLater()
+        return super(NotepadDashboard, self).close()

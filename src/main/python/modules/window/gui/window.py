@@ -11,30 +11,29 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
-import inject
 import platform
 from PyQt5 import QtGui
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
-from PyQt5.QtCore import Qt
 
 
 class MainWindow(QtWidgets.QMainWindow):
     tab = QtCore.pyqtSignal(object)
     tabSwitch = QtCore.pyqtSignal(int)
 
-    @inject.params(factory='window.header_factory')
-    def __init__(self, parent=None, factory=None):
+    def __init__(self, parent=None):
+        self.content = None
+
         super(MainWindow, self).__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
 
-        self.layout = QtWidgets.QVBoxLayout()
-        self.layout.setContentsMargins(0, 0, 0, 0)
+        layout = QtWidgets.QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
 
-        container = QtWidgets.QWidget()
-        container.setLayout(self.layout)
+        self.container = QtWidgets.QWidget()
+        self.container.setLayout(layout)
 
-        self.setCentralWidget(container)
+        self.setCentralWidget(self.container)
 
         spacer = QtWidgets.QWidget()
         spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
@@ -52,32 +51,28 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tab.connect(self.onActionTabOpen)
         self.tabSwitch.connect(self.onActionTabSwitch)
 
-        # self.header = self.addToolBar('main')
-        # self.header.setObjectName('QToolBarTop')
-        # self.header.setIconSize(QtCore.QSize(20, 20))
-        # self.header.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
-        # self.header.setFloatable(False)
-        # self.header.setMovable(False)
-        #
-        # for header_widget, priority in factory.widgets:
-        #     if isinstance(header_widget, QtWidgets.QAction):
-        #         self.header.addAction(header_widget)
-        #     if isinstance(header_widget, QtWidgets.QWidget):
-        #         self.header.addWidget(header_widget)
+    def clean(self):
+        layout = self.container.layout()
+        for i in range(0, layout.count()):
+            item = layout.itemAt(i)
+            if item is not None:
+                widget = item.widget()
+                if widget is not None:
+                    widget.close()
+            layout.takeAt(i)
+        return True
 
     def setMainWidget(self, widget=None):
-        if self.layout is None: return None
-        for index in range(0, self.layout.count()):
-            item = self.layout.itemAt(index)
-            if item is None: continue
-            self.layout.removeItem(item)
 
-        if widget is None: return None
+        if not self.clean():
+            return None
 
         self.content = widget
         if hasattr(self.content, 'tabCloseRequested'):
             self.content.tabCloseRequested.connect(self.onActionTabClose)
-        self.layout.addWidget(self.content)
+
+        layout = self.container.layout()
+        layout.addWidget(self.content)
 
     def onActionTabSwitch(self, index=None):
         if index is None: return None
@@ -95,9 +90,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.content.setCurrentIndex(index)
 
     def onActionTabClose(self, index=None):
+        # Do not close the first one tab
+        if index in [0]:
+            return None
+
         if self.content is None: return None
-        # Do not close the first one tab 
-        if index in [0]: return None
         widget = self.content.widget(index)
         if widget is not None: widget.close()
         self.content.removeTab(index)

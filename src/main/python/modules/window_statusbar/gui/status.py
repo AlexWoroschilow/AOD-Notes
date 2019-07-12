@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 # -*- coding: utf-8 -*-
 # Copyright 2015 Alex Woroschilow (alex.woroschilow@gmail.com)
 #
@@ -10,18 +12,28 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import inject
-
 from PyQt5 import QtWidgets
-from PyQt5 import QtCore
-
 from PyQt5.QtCore import Qt
 
 
-class WidgetHeaderFactory(object):
-    widgets = []
+class Status(QtWidgets.QWidget):
 
-    def addWidget(self, widget, priority=1):
-        self.widgets.append((widget, priority))
-        self.widgets.sort(key=lambda x: x[1])
-        return widget
+    def __init__(self, parent=None):
+        super(Status, self).__init__(parent)
+        self.setContentsMargins(0, 0, 0, 0)
+
+        self.setLayout(QtWidgets.QHBoxLayout())
+        self.layout().setContentsMargins(0, 0, 0, 0)
+
+        self.text = QtWidgets.QLabel('')
+        self.addWidget(self.text)
+
+    def error(self, text):
+        text = '{}!'.format(text)
+        self.text.setText(text)
+
+    def info(self, text):
+        self.text.setText(text)
+
+    def addWidget(self, widget):
+        self.layout().addWidget(widget)
