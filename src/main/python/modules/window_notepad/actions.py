@@ -56,16 +56,11 @@ class ModuleActions(object):
                 index = config.get('storage.location')
                 index = storage.index(index)
 
-            if not storage.isDir(index):
-                index = config.get('storage.location')
-                index = storage.index(index)
-
             if storage.isFile(index):
-                index = config.get('storage.location')
-                index = storage.index(index)
+                index = storage.fileDir(index)
 
             index = storage.touch(index, 'New note')
-            if index is None:
+            if index is None or not index:
                 return None
 
             widget.created.emit(index)
@@ -114,16 +109,11 @@ class ModuleActions(object):
                 index = config.get('storage.location')
                 index = storage.index(index)
 
-            if not storage.isDir(index):
-                index = config.get('storage.location')
-                index = storage.index(index)
-
             if storage.isFile(index):
-                index = config.get('storage.location')
-                index = storage.index(index)
+                index = storage.fileDir(index)
 
             index = storage.mkdir(index, 'New group')
-            if index is None:
+            if index is None or not index:
                 return None
 
             return widget.group(index)
@@ -165,9 +155,10 @@ class ModuleActions(object):
             if index is None:
                 return None
 
-            widget.removed.emit(index)
+            storage.remove(index)
 
-            return storage.remove(index)
+            index = storage.fileDir(index)
+            return widget.removed.emit(index)
 
         except Exception as ex:
             getLogger('app').exception(ex)

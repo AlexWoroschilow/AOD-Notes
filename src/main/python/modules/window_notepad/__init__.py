@@ -113,7 +113,7 @@ class Loader(object):
             self.actions.onActionNoteSelect, widget=widget
         ))
 
-        widget.removed.connect(lambda x: widget.note(storage.first()))
+        widget.removed.connect(lambda x: widget.group(x))
         widget.created.connect(lambda x: widget.note(x))
 
         return widget

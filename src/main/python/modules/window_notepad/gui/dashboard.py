@@ -150,6 +150,12 @@ class NotepadDashboard(QtWidgets.QSplitter):
             self.editor.focus()
         return self
 
+    @inject.params(storage='storage')
+    def open(self, index, storage):
+        if storage.isFile(index):
+            return self.note(index)
+        return self.group(index)
+
     @inject.params(storage='storage', config='config', editor='notepad.editor')
     def note(self, index, storage, config, editor):
         if storage.isDir(index):
@@ -203,7 +209,7 @@ class NotepadDashboard(QtWidgets.QSplitter):
     @inject.params(storage='storage', config='config')
     def group(self, index, storage, config):
         if storage.isFile(index):
-            return self
+            index = storage.fileDir(index)
 
         config.set('editor.current', storage.filePath(index))
 
