@@ -14,15 +14,8 @@ PictureButtonFlat {
 }
 
 
-QTextEdit {
-	background: #fff;
-	border: 1px !important;
-}
-
-QToolBar {
-	border: none;
-    margin: 5px 0px;
-}
+QTextEdit {	background: #fff; 	border: 1px !important; }
+QToolBar { 	border: none;     margin: 5px 0px; }
 
 
 QToolButton:pressed {
@@ -75,28 +68,6 @@ FolderTreeToolBar {
 	color: #A0A0A0;
 }
 
-PreviewContainer { 
-	border: none;
-}
-
-PreviewContainer NotePreviewDescription {
-	background-color: #ffffff;
-	border-radius: 0px;
-	padding: 10px 30px;
-}
-
-PreviewContainer NotePreviewDescription #previewTitle {
-	background: #ffffff;
-}
-
-
-TextEditorWidget {
-	background: #ffffff;
-	text-align: center;
-	border: none;
-}
-
-
 
 TextWriter,
 TextEditor {
@@ -119,12 +90,21 @@ WidgetSettings SettingsTitle {
 	padding: 5px 0px;
 }
 
+TextEditorWidget { background: #ffffff; text-align: center; border: none; }
+
+
+PreviewScrollArea PreviewContainer { border: none; }
+PreviewScrollArea PreviewContainer NotePreviewDescription { background-color: #ffffff; border-radius: 0px; padding: 10px 30px; }
+PreviewScrollArea PreviewContainer NotePreviewDescription #previewTitle { background: #ffffff; }
 PreviewScrollArea { background: #414649; padding: 0px 0px; border: none; margin: 0px; }
 
 
 QSplitter { background: #414649; border: none; }
 QSplitter::handle { image: url(icons/splitter-light); }
 QSplitter::handle:vertical { height: 5px; }
+
+DashboardSplitter { background: #ffffff; }
+
 
 QTabBar { background: rgb(236,236,236); color: #4F4F4F; font-size: 16px; }
 QTabWidget { background: #ffffff; border: none; margin: 0px; }

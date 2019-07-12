@@ -28,7 +28,7 @@ class NotePreviewDescription(QtWidgets.QGroupBox):
     @inject.params(storage='storage')
     def __init__(self, index, storage):
         super(NotePreviewDescription, self).__init__()
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding);
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.setContentsMargins(0, 0, 0, 0)
 
         self.layout = QtWidgets.QGridLayout()

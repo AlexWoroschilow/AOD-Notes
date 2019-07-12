@@ -34,11 +34,11 @@ class FolderTree(QtWidgets.QTreeView):
 
         location = config.get('storage.location')
         self.setRootIndex(storage.index(location))
-        
+
         self.setColumnHidden(1, True)
         self.setColumnHidden(2, True)
         self.setColumnHidden(3, True)
-        
+
         self.expandAll(storage)
 
     @inject.params(storage='storage')
@@ -50,7 +50,7 @@ class FolderTree(QtWidgets.QTreeView):
     def collapseAll(self, storage):
         for index in storage.entities():
             self.collapse(index)
-        
+
     @property
     def current(self):
         for index in self.selectedIndexes():

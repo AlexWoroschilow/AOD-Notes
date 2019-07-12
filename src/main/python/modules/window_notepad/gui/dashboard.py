@@ -10,6 +10,7 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import os
 import inject
 
 from PyQt5 import QtCore
@@ -71,6 +72,16 @@ class NotepadDashboardRight(QtWidgets.QFrame):
                 widget.close()
 
 
+class DashboardSplitter(QtWidgets.QSplitter):
+    def __init__(self):
+        super(DashboardSplitter, self).__init__()
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+
+    def close(self):
+        super(DashboardSplitter, self).deleteLater()
+        return super(DashboardSplitter, self).close()
+
+
 class NotepadDashboard(QtWidgets.QSplitter):
     edit = QtCore.pyqtSignal(object)
     delete = QtCore.pyqtSignal(object)
@@ -119,6 +130,13 @@ class NotepadDashboard(QtWidgets.QSplitter):
         self.actions = actions
         self.test = None
 
+    def _note(self, index=None):
+        if index is None:
+            return None
+
+        if self.editor is not None:
+            self.editor.index = index
+
     @property
     @inject.params(storage='storage')
     def current(self, storage):
@@ -141,6 +159,10 @@ class NotepadDashboard(QtWidgets.QSplitter):
 
         self.editor = editor
         self.editor.index = index
+        self.editor.setMinimumWidth(500)
+
+        splitter = DashboardSplitter()
+        splitter.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
         toolbar = NotepadEditorToolbarTop()
         toolbar.note_new.connect(lambda event=None: self.note_new.emit(event))
@@ -149,9 +171,26 @@ class NotepadDashboard(QtWidgets.QSplitter):
         toolbar.search.connect(lambda event=None: self.search.emit(event))
         toolbar.settings.connect(lambda event=None: self.settings.emit(event))
 
+        parent = storage.fileDir(index)
+        collection = [index for index in storage.entities(parent)
+                      if storage.isFile(index)]
+
+        preview = PreviewScrollArea(self, collection)
+        preview.edit.connect(self._note)
+        preview.delete.connect(self.delete.emit)
+        preview.delete.connect(lambda x: self.group(index))
+        preview.clone.connect(self.clone.emit)
+        preview.clone.connect(lambda x: self.group(index))
+        preview.setMinimumWidth(400)
+
+        splitter.addWidget(preview)
+        splitter.addWidget(self.editor)
+        splitter.setStretchFactor(1, 1)
+        splitter.setStretchFactor(2, 2)
+
         self.container.clean()
         self.container.addWidget(toolbar)
-        self.container.addWidget(self.editor)
+        self.container.addWidget(splitter)
         self.editor.focus()
 
         if self.current == index:
@@ -168,11 +207,10 @@ class NotepadDashboard(QtWidgets.QSplitter):
 
         config.set('editor.current', storage.filePath(index))
 
-        widget = PreviewScrollArea(self, [
-            index for index in storage.entities(index)
-            if storage.isFile(index)
-        ])
+        collection = [index for index in storage.entities(index)
+                      if storage.isFile(index)]
 
+        widget = PreviewScrollArea(self, collection)
         widget.edit.connect(self.edit.emit)
         widget.delete.connect(self.delete.emit)
         widget.delete.connect(lambda x: self.group(index))

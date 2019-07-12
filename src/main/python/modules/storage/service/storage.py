@@ -25,6 +25,8 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
 
     def __init__(self, location=None):
         super(FilesystemStorage, self).__init__()
+        self.setFilter(QtCore.QDir.Dirs | QtCore.QDir.NoDotAndDotDot)
+
         self.setIconProvider(IconProvider())
         self.setRootPath(location)
         self.setReadOnly(False)
@@ -87,6 +89,15 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
             return None
 
         return os.path.isfile(path)
+
+    def fileDir(self, path=None):
+        if isinstance(path, QtCore.QModelIndex):
+            path = self.filePath(path)
+
+        if self.isDir(path):
+            return path
+
+        return self.index(os.path.dirname(path))
 
     def fileName(self, path=None):
         if not isinstance(path, QtCore.QModelIndex):

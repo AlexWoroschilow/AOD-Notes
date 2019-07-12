@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
 from PyQt5.QtCore import Qt
-    
+
 from PyQt5 import QtPrintSupport
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
@@ -26,7 +26,6 @@ from .scroll import TextWriter
 
 
 class TextEditorWidget(QtWidgets.QWidget):
-
     fullscreen = QtCore.pyqtSignal(object)
     save = QtCore.pyqtSignal(object)
 
@@ -35,7 +34,7 @@ class TextEditorWidget(QtWidgets.QWidget):
     def __init__(self):
         super(TextEditorWidget, self).__init__()
         self.setContentsMargins(0, 0, 0, 0)
-        
+
         self._index = None
 
         self.writer = TextWriter(self)
@@ -45,7 +44,7 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.statusbar.setAlignment(Qt.AlignCenter)
 
         self.leftbar = ToolbarWidgetLeft()
-        
+
         self.leftbar.printAction.clicked.connect(self.onActionPrint)
         self.leftbar.previewAction.clicked.connect(self.onActionPreview)
         self.leftbar.cutAction.clicked.connect(self.writer.text.cut)
@@ -90,14 +89,12 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.setLayout(layout)
 
     def focus(self):
-        print(self.writer.hasFocus())
-        if self.writer is None: return self 
+        if self.writer is None: return self
         cursor = self.writer.text.textCursor()
         if cursor is None: return self
         cursor.setPosition(0)
-        self.writer.text.setTextCursor(cursor)        
+        self.writer.text.setTextCursor(cursor)
         self.writer.focus()
-        print(self.writer.hasFocus())
 
         return self
 
@@ -112,11 +109,16 @@ class TextEditorWidget(QtWidgets.QWidget):
         content = storage.fileContent(value)
         self.insertHtml(content)
 
+    def clean(self):
+        self.writer.text.setHtml('')
+        self._index = None
+        return self
+
     def zoomIn(self, value):
         if self.writer is None:
             return None
         self.writer.zoomIn(value)
-        
+
     def zoomOut(self, value):
         if self.writer is None:
             return None
@@ -140,7 +142,8 @@ class TextEditorWidget(QtWidgets.QWidget):
 
     def onActionInsertImage(self):
         filename = \
-        QtWidgets.QFileDialog.getOpenFileName(self, 'Insert image', ".", "Images (*.png *.xpm *.jpg *.bmp *.gif)")[0]
+            QtWidgets.QFileDialog.getOpenFileName(self, 'Insert image', ".", "Images (*.png *.xpm *.jpg *.bmp *.gif)")[
+                0]
         if filename:
             image = QtGui.QImage(filename)
             if image.isNull():
@@ -160,7 +163,7 @@ class TextEditorWidget(QtWidgets.QWidget):
 
     def insertHtml(self, html=None):
         if self.writer is not None and html is not None:
-            self.writer.text.insertHtml(html)
+            self.writer.text.setHtml(html)
 
     def setTextColor(self, color=None):
         if self.writer is not None and color is not None:

@@ -20,7 +20,7 @@ from PyQt5.QtCore import Qt
 from .preview import NotePreviewDescription
 
 
-class PreviewContainer(QtWidgets.QWidget):
+class PreviewContainer(QtWidgets.QGroupBox):
     edit = QtCore.pyqtSignal(object)
     delete = QtCore.pyqtSignal(object)
     clone = QtCore.pyqtSignal(object)
