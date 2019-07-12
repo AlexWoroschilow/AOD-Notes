@@ -10,6 +10,7 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import os
 import inject
 import functools
 
@@ -33,8 +34,9 @@ class FolderTreeToolbarTop(QtWidgets.QFrame):
     def __init__(self, config):
         super(FolderTreeToolbarTop, self).__init__()
 
-        self.location = ToolBarButton(config.get('storage.location'))
-        self.location.setIcon(QtGui.QIcon("icons/plus-light"))
+        location = config.get('storage.location')
+        self.location = ToolBarButton(location.replace(os.path.expanduser('~'), '~'))
+        self.location.setIcon(QtGui.QIcon("icons/book-light"))
         self.location.setToolTip("Select the notepad database or create a new one")
 
         self.location.clicked.connect(

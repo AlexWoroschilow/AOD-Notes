@@ -25,6 +25,8 @@ from .preview.widget import PreviewScrollArea
 from .bar import FolderTreeToolbarTop
 from .bar import NotepadEditorToolbarTop
 
+from .splitter import DashboardSplitter
+
 
 class Notepad(QtWidgets.QTabWidget):
 
@@ -70,16 +72,6 @@ class NotepadDashboardRight(QtWidgets.QFrame):
             widget = item.widget()
             if item is not None:
                 widget.close()
-
-
-class DashboardSplitter(QtWidgets.QSplitter):
-    def __init__(self):
-        super(DashboardSplitter, self).__init__()
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-
-    def close(self):
-        super(DashboardSplitter, self).deleteLater()
-        return super(DashboardSplitter, self).close()
 
 
 class NotepadDashboard(QtWidgets.QSplitter):
@@ -168,7 +160,6 @@ class NotepadDashboard(QtWidgets.QSplitter):
         self.editor.setMinimumWidth(500)
 
         splitter = DashboardSplitter()
-        splitter.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
         toolbar = NotepadEditorToolbarTop()
         toolbar.note_new.connect(lambda event=None: self.note_new.emit(event))
@@ -182,12 +173,12 @@ class NotepadDashboard(QtWidgets.QSplitter):
                       if storage.isFile(index)]
 
         preview = PreviewScrollArea(self, collection)
-        preview.edit.connect(self._note)
         preview.delete.connect(self.delete.emit)
-        preview.delete.connect(lambda x: self.group(index))
         preview.clone.connect(self.clone.emit)
-        preview.clone.connect(lambda x: self.group(index))
+        preview.edit.connect(preview.scrollTo)
+        preview.edit.connect(self._note)
         preview.setMinimumWidth(400)
+        preview.scrollTo(index)
 
         splitter.addWidget(preview)
         splitter.addWidget(self.editor)
@@ -219,9 +210,7 @@ class NotepadDashboard(QtWidgets.QSplitter):
         widget = PreviewScrollArea(self, collection)
         widget.edit.connect(self.edit.emit)
         widget.delete.connect(self.delete.emit)
-        widget.delete.connect(lambda x: self.group(index))
         widget.clone.connect(self.clone.emit)
-        widget.clone.connect(lambda x: self.group(index))
 
         toolbar = NotepadEditorToolbarTop()
         toolbar.note_new.connect(lambda event=None: self.note_new.emit(event))

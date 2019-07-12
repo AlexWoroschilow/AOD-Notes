@@ -20,7 +20,7 @@ from PyQt5.QtCore import Qt
 from .preview import NotePreviewDescription
 
 
-class PreviewContainer(QtWidgets.QGroupBox):
+class PreviewContainer(QtWidgets.QWidget):
     edit = QtCore.pyqtSignal(object)
     delete = QtCore.pyqtSignal(object)
     clone = QtCore.pyqtSignal(object)
@@ -43,9 +43,13 @@ class PreviewScrollArea(QtWidgets.QScrollArea):
     clone = QtCore.pyqtSignal(object)
     columns = 1
 
-    def __init__(self, parent, collection):
+    @inject.params(storage='storage')
+    def __init__(self, parent, collection, storage):
         super(PreviewScrollArea, self).__init__(parent)
-        self.collection = collection
+
+        self.collection = {}
+        for position, index in enumerate(collection):
+            self.collection[storage.filePath(index)] = (position, index)
 
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -67,8 +71,26 @@ class PreviewScrollArea(QtWidgets.QScrollArea):
             self.show()
         return super(PreviewScrollArea, self).resizeEvent(event)
 
-    @inject.params(status='status')
-    def show(self, status):
+    @inject.params(storage='storage')
+    def scrollTo(self, index, storage):
+        path = storage.filePath(index)
+        if path is None: return None
+
+        scrollbar = self.verticalScrollBar()
+        if path in self.collection.keys():
+            position, index = self.collection[path]
+            if position is None or position == 0:
+                minimum = scrollbar.minimum()
+                return scrollbar.setValue(minimum)
+
+            total = len(self.collection.keys())
+            if total is not None and total > 0:
+                maximum = scrollbar.maximum()
+                position = position * maximum / (total - 1)
+                return scrollbar.setValue(position)
+
+    @inject.params(status='status', storage='storage')
+    def show(self, status=None, storage=None):
 
         layout = self.preview.layout()
         for i in range(0, layout.count()):
@@ -77,16 +99,19 @@ class PreviewScrollArea(QtWidgets.QScrollArea):
             widget = item.widget()
             if item is not None: widget.close()
 
-        for current, index in enumerate(self.collection):
+        for path in self.collection.keys():
+            position, index = self.collection[path]
+
             widget = NotePreviewDescription(index)
             widget.edit.connect(self.edit.emit)
             widget.delete.connect(self.delete.emit)
             widget.clone.connect(self.clone.emit)
             widget.setFixedHeight(500)
 
-            i = math.floor(current / self.columns)
-            j = math.floor(current % self.columns)
+            i = math.floor(position / self.columns)
+            j = math.floor(position % self.columns)
             self.preview.layout().addWidget(widget, i, j)
+            self.collection[path] = (i, index)
 
         status.info('{} notes found'.format(len(self.collection)))
 

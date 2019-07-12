@@ -34,6 +34,8 @@ class ToolBarButton(QtWidgets.QPushButton):
 
     def __init__(self, name=None):
         super(ToolBarButton, self).__init__(name)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+
         self.setFlat(True)
 
     def connected(self):

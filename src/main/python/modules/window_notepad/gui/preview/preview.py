@@ -22,7 +22,7 @@ from .text import Description
 from .label import Title
 
 
-class NotePreviewDescription(QtWidgets.QGroupBox):
+class NotePreviewDescription(QtWidgets.QFrame):
     edit = QtCore.pyqtSignal(object)
     delete = QtCore.pyqtSignal(object)
     clone = QtCore.pyqtSignal(object)

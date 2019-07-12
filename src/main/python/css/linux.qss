@@ -92,7 +92,6 @@ WidgetSettings SettingsTitle {
 
 TextEditorWidget { background: #ffffff; text-align: center; border: none; }
 
-
 PreviewScrollArea PreviewContainer { border: none; }
 PreviewScrollArea PreviewContainer NotePreviewDescription { background-color: #ffffff; border-radius: 0px; padding: 10px 30px; }
 PreviewScrollArea PreviewContainer NotePreviewDescription #previewTitle { background: #ffffff; }

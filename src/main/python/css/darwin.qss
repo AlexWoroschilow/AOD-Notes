@@ -75,21 +75,6 @@ FolderTreeToolBar {
 	color: #A0A0A0;
 }
 
-PreviewContainer { 
-	border: none;
-}
-
-PreviewContainer NotePreviewDescription {
-	background-color: #ffffff;
-	border-radius: 0px;
-	padding: 10px 30px;
-}
-
-PreviewContainer NotePreviewDescription #previewTitle {
-	background: #ffffff;
-}
-
-
 TextEditorWidget,
 QWidget#FolderListContainer {
 	background: #ffffff;
@@ -97,7 +82,11 @@ QWidget#FolderListContainer {
 	border: none;
 }
 
-PreviewScrollArea { background: #414649; padding: 0px 0px; border: none; margin: 0px; }
+PreviewScrollArea PreviewContainer { border: none; }
+PreviewScrollArea PreviewContainer NotePreviewDescription { background-color: #ffffff; border-radius: 0px; padding: 10px 30px; }
+PreviewScrollArea PreviewContainer NotePreviewDescription #previewTitle { background: #ffffff; }
+PreviewScrollArea { background: #414649; padding: 0px; margin: 0px; border: none; }
+PreviewScrollArea PreviewContainer QWidget:hover { border: 5px #E0FFFF; }
 
 TextWriter { border-radius: 0px; border: none; margin: 0px; }
 TextEditor { border-radius: 0px; border: none; margin: 0px; }
@@ -116,7 +105,9 @@ QSplitter { background: #414649; border: none; }
 QSplitter::handle { image: url(icons/splitter-light); }
 QSplitter::handle:vertical { height: 5px; }
 
-QTabBar { background: rgb(236,236,236); color: #4F4F4F; }
+DashboardSplitter { background: #ffffff; }
+
+QTabBar { background: rgb(236,236,236); color: #4F4F4F; font-size: 16px; }
 QTabWidget { background: #ffffff; border: none; margin: 0px; }
 QTabWidget::pane { background: #ffffff; border: none; margin: 0px; }
 QTabWidget::tab-bar { left: 0px; color: #4F4F4F; }
@@ -126,7 +117,7 @@ QTabBar::tab:!selected { background: #414649; }
 QTabBar::close-button { image: url(icons/close-light); }
 
 
-FolderTree { background: #515659; alternate-background-color: #515659; border: none; }
+FolderTree { background: #515659; alternate-background-color: #515659; border: none; font-size: 16px; }
 FolderTree::branch { border-bottom: 1px solid #515659; background: #515659; alternate-background-color: #515659; }
 FolderTree::branch:open { image: url(icons/minus-light); }
 FolderTree::branch:closed:has-children { image: url(icons/plus-light); }
@@ -140,7 +131,7 @@ FolderTree::item:selected { alternate-background-color: #414649; border-bottom: 
 
 NotepadDashboardLeft { background: #515659; padding: 0px; margin: 0px; border: none; }
 NotepadDashboardLeft FolderTreeToolbarTop {  background: #515659; padding: 0px; margin: 0px; border: none; }
-NotepadDashboardLeft FolderTreeToolbarTop ToolBarButton { background: #515659; color: rgb(236,236,236); padding: 5px; margin: 0px; }
+NotepadDashboardLeft FolderTreeToolbarTop ToolBarButton { background: #515659; color: rgb(236,236,236); padding: 5px; margin: 0px; font-size: 16px; }
 NotepadDashboardLeft FolderTreeToolbarTop ToolBarButton:pressed { background-color: #414649; border-color: #515659; border-style: inset; border-width: 0px; }
 NotepadDashboardLeft FolderTreeToolbarTop ToolBarButton:hover { background-color: #414649; border-style: inset; border-width: 0px; border-color: #515659; }
 
