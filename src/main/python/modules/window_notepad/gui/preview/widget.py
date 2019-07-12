@@ -30,6 +30,10 @@ class PreviewContainer(QtWidgets.QWidget):
         layout.setAlignment(Qt.AlignTop)
         self.setLayout(layout)
 
+    def close(self):
+        super(PreviewContainer, self).deleteLater()
+        return super(PreviewContainer, self).close()
+
 
 class PreviewScrollArea(QtWidgets.QScrollArea):
     edit = QtCore.pyqtSignal(object)

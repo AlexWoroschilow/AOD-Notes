@@ -56,3 +56,7 @@ class NotePreviewDescription(QtWidgets.QGroupBox):
         self.layout.addWidget(self.buttonDelete, 0, 29, 1, 1)
 
         self.setLayout(self.layout)
+
+    def close(self):
+        super(NotePreviewDescription, self).deleteLater()
+        return super(NotePreviewDescription, self).close()

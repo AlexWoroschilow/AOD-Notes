@@ -18,7 +18,7 @@ from PyQt5 import QtCore
 
 
 class TextEditor(QtWidgets.QTextEdit):
-    
+
     def __init__(self, parent=None):
         super(TextEditor, self).__init__(parent)
         self.setWordWrapMode(QtGui.QTextOption.WordWrap)
@@ -29,7 +29,7 @@ class TextEditor(QtWidgets.QTextEdit):
         self.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        
+
         self._entity = None
 
     @property
@@ -41,7 +41,7 @@ class TextEditor(QtWidgets.QTextEdit):
         self.entity = value
 
     def wheelEvent(self, event):
-        point = event.angleDelta() 
+        point = event.angleDelta()
         if event.modifiers() == QtCore.Qt.ControlModifier:
             if point.y() > 0:
                 self.zoomIn(5)
@@ -49,3 +49,6 @@ class TextEditor(QtWidgets.QTextEdit):
                 self.zoomOut(5)
         return super(TextEditor, self).wheelEvent(event)
 
+    def close(self):
+        super(TextEditor, self).deleteLater()
+        return super(TextEditor, self).close()

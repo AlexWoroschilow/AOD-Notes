@@ -31,9 +31,6 @@ class Loader(object):
     def _widget_settings_search(self, options, args, config):
         widget = WidgetSettingsSearch()
 
-        destination = os.path.dirname(options.config)
-        widget.searchIndex.setText(destination)
-
         return widget
 
     def enabled(self, options=None, args=None):
