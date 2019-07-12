@@ -135,7 +135,7 @@ QTabBar::tab:selected { background: #515659; }
 QTabBar::tab:!selected { background: #414649; }
 QTabBar::close-button { image: url(icons/close-light); }
 
-FolderTree { background: #515659; alternate-background-color: #515659; border-top: 1px solid #414649;  }
+FolderTree { background: #515659; alternate-background-color: #515659; border-top: 1px solid #414649; font-size: 16px;  }
 FolderTree::branch { border-bottom: 1px solid #515659; background: #515659; alternate-background-color: #515659; }
 FolderTree::branch:open { image: url(icons/minus-light); }
 FolderTree::branch:closed:has-children { image: url(icons/plus-light); }
