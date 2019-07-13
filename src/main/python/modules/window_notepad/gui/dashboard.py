@@ -51,6 +51,17 @@ class NotepadDashboardLeft(QtWidgets.QFrame):
     def addWidget(self, widget):
         self.layout().addWidget(widget)
 
+    def clean(self):
+        layout = self.layout()
+        for i in range(0, layout.count()):
+            item = layout.itemAt(i)
+            if item is None:
+                layout.takeAt(i)
+
+            widget = item.widget()
+            if item is not None:
+                widget.close()
+
 
 class NotepadDashboardRight(QtWidgets.QFrame):
     def __init__(self):
@@ -249,6 +260,17 @@ class NotepadDashboard(QtWidgets.QSplitter):
                 current = parent
 
         return True
+
+    def clean(self):
+        layout = self.layout()
+        for i in range(0, layout.count()):
+            item = layout.itemAt(i)
+            if item is None:
+                layout.takeAt(i)
+
+            widget = item.widget()
+            if item is not None:
+                widget.close()
 
     def close(self):
         super(NotepadDashboard, self).deleteLater()
