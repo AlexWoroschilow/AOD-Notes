@@ -56,5 +56,5 @@ appimage:
 	find 			$(project).AppDir -name '__pycache__' -exec rm -rf {} +
 	find 			$(project).AppDir -name '.pyc*' -exec rm -rf {} +
 	export 			ARCH=x86_64
-	exec 			bin/appimagetool $(project).AppDir bin/AOD-Notepad.$(GLIBC_VERSION).AppImage
+	exec 			bin/appimagetool $(project).AppDir bin/$(project).$(GLIBC_VERSION).AppImage
 

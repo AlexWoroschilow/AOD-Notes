@@ -165,6 +165,10 @@ class TextEditorWidget(QtWidgets.QWidget):
         if self.writer is not None and html is not None:
             self.writer.text.setHtml(html)
 
+    def appendHtml(self, html=None):
+        if self.writer is not None and html is not None:
+            self.writer.text.insertHtml(html)
+
     def setTextColor(self, color=None):
         if self.writer is not None and color is not None:
             self.writer.text.setTextColor(color)

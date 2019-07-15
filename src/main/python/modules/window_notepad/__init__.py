@@ -46,17 +46,20 @@ class Loader(object):
         widget = TextEditorWidget()
 
         for plugin in factory_leftbar.widgets:
-            plugin.clicked.connect(functools.partial(plugin.clickedEvent, widget=widget))
+            if hasattr(plugin, 'clickedEvent') and callable(plugin.clickedEvent):
+                plugin.clicked.connect(functools.partial(plugin.clickedEvent, widget=widget))
             widget.leftbar.addWidget(plugin)
         widget.leftbar.setVisible(int(config.get('editor.leftbar')))
 
         for plugin in factory_formatbar.widgets:
-            plugin.clicked.connect(functools.partial(plugin.clickedEvent, widget=widget))
+            if hasattr(plugin, 'clickedEvent') and callable(plugin.clickedEvent):
+                plugin.clicked.connect(functools.partial(plugin.clickedEvent, widget=widget))
             widget.formatbar.addWidget(plugin)
         widget.formatbar.setVisible(int(config.get('editor.formatbar')))
 
         for plugin in factory_rightbar.widgets:
-            plugin.clicked.connect(functools.partial(plugin.clickedEvent, widget=widget))
+            if hasattr(plugin, 'clickedEvent') and callable(plugin.clickedEvent):
+                plugin.clicked.connect(functools.partial(plugin.clickedEvent, widget=widget))
             widget.rightbar.addWidget(plugin)
         widget.rightbar.setVisible(int(config.get('editor.rightbar')))
 

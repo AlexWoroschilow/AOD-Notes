@@ -40,4 +40,4 @@ class Loader(object):
         return widget
 
     def clickedEvent(self, event=None, widget=None):
-        widget.insertHtml('<hr></hr>')
+        widget.appendHtml('<hr></hr>')
