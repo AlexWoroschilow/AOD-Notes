@@ -27,9 +27,9 @@ class FolderTree(QtWidgets.QTreeView):
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setAnimated(True)
-
         self.setHeaderHidden(True)
+        # self.setAnimated(True)
+
         self.setModel(storage)
 
         location = config.get('storage.location')
@@ -38,8 +38,6 @@ class FolderTree(QtWidgets.QTreeView):
         self.setColumnHidden(1, True)
         self.setColumnHidden(2, True)
         self.setColumnHidden(3, True)
-
-        self.expandAll(storage)
 
     @inject.params(storage='storage')
     def expandAll(self, storage):

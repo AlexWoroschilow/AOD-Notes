@@ -279,6 +279,4 @@ class ModuleActions(object):
 
         index = storage.setRootPath(destination)
         dashboard.tree.setRootIndex(index)
-        dashboard.tree.expandAll()
-
         dashboard.group(index)

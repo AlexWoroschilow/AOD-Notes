@@ -108,8 +108,6 @@ class NotepadDashboard(QtWidgets.QSplitter):
         self.setContentsMargins(0, 0, 0, 0)
 
         self.tree = FolderTree()
-        self.tree.expandAll()
-
         self.tree_toolbar = FolderTreeToolbarTop()
         self.tree_toolbar.storage.connect(lambda event=None: self.storage.emit(event))
         self.storage_changed.connect(lambda text: self.tree_toolbar.storage_changed.emit(text))

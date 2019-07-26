@@ -13,6 +13,7 @@
 import math
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
+from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 
 from .preview import NotePreviewDescription
@@ -65,16 +66,21 @@ class PreviewScrollArea(QtWidgets.QScrollArea):
         if index is None: return self
         self.collection.append(index)
 
-    def show(self):
-
+    def clean(self):
         layout = self.preview.layout()
         for i in range(0, layout.count()):
             item = layout.itemAt(i)
             if item is None: layout.takeAt(i)
             widget = item.widget()
             if item is not None: widget.close()
+        return True
+
+    def show(self):
+        if not self.clean():
+            return None
 
         for current, index in enumerate(self.collection):
+
             widget = NotePreviewDescription(index)
             widget.edit.connect(self.edit.emit)
             widget.setFixedHeight(500)

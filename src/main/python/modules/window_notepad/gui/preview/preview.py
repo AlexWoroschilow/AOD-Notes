@@ -32,6 +32,7 @@ class NotePreviewDescription(QtWidgets.QFrame):
         super(NotePreviewDescription, self).__init__()
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.setContentsMargins(0, 0, 0, 0)
+        self.index = index
 
         self.layout = QtWidgets.QGridLayout()
         self.layout.setAlignment(Qt.AlignTop)
@@ -56,6 +57,21 @@ class NotePreviewDescription(QtWidgets.QFrame):
         self.layout.addWidget(self.buttonDelete, 0, 29, 1, 1)
 
         self.setLayout(self.layout)
+
+    def event(self, QEvent):
+        if QEvent.type() == QtCore.QEvent.Enter:
+            effect = QtWidgets.QGraphicsDropShadowEffect()
+            effect.setColor(QtGui.QColor('#0000FF'))
+            effect.setBlurRadius(20)
+            effect.setOffset(0)
+
+            self.setGraphicsEffect(effect)
+        if QEvent.type() == QtCore.QEvent.Leave:
+            self.setGraphicsEffect(None)
+
+        if QEvent.type() == QtCore.QEvent.MouseButtonRelease:
+            self.edit.emit(self.index)
+        return super(NotePreviewDescription, self).event(QEvent)
 
     def close(self):
         super(NotePreviewDescription, self).deleteLater()
