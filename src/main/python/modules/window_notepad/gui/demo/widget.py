@@ -13,6 +13,7 @@
 from PyQt5 import QtWidgets
 
 from .text import TextView
+import inject
 
 
 class DemoWidget(QtWidgets.QWidget):
@@ -23,5 +24,5 @@ class DemoWidget(QtWidgets.QWidget):
 
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(TextView())
-        
+
         self.setLayout(layout)

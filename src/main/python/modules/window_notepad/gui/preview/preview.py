@@ -40,11 +40,11 @@ class NotePreviewDescription(QtWidgets.QFrame):
         title = Title(storage.fileName(index))
         self.layout.addWidget(title, 0, 0, 1, 27)
 
-        description = Description(storage.fileContent(index))
-        self.layout.addWidget(description, 1, 0, 4, 30)
+        self.description = Description(storage.fileContent(index))
+        self.layout.addWidget(self.description, 1, 0, 4, 30)
 
         self.buttonEdit = PictureButtonFlat(QtGui.QIcon("icons/note"))
-        self.buttonEdit.clicked.connect(lambda x: self.edit.emit(index))
+        self.buttonEdit.clicked.connect(lambda x: self.edit.emit((index, self.document())))
 
         self.layout.addWidget(self.buttonEdit, 0, 27, 1, 1)
 
@@ -58,6 +58,11 @@ class NotePreviewDescription(QtWidgets.QFrame):
 
         self.setLayout(self.layout)
 
+    def document(self):
+        if self.description is None:
+            return None
+        return self.description.document()
+
     def event(self, QEvent):
         if QEvent.type() == QtCore.QEvent.Enter:
             effect = QtWidgets.QGraphicsDropShadowEffect()
@@ -70,7 +75,7 @@ class NotePreviewDescription(QtWidgets.QFrame):
             self.setGraphicsEffect(None)
 
         if QEvent.type() == QtCore.QEvent.MouseButtonRelease:
-            self.edit.emit(self.index)
+            self.edit.emit((self.index, None))
         return super(NotePreviewDescription, self).event(QEvent)
 
     def close(self):

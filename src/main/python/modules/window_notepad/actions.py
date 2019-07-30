@@ -87,11 +87,11 @@ class ModuleActions(object):
     def onActionSave(self, event, storage, dashboard, status, widget):
         try:
 
-            index, content = event
+            index, document = event
             if index is None:
                 return None
 
-            index = storage.setFileContent(index, content)
+            index = storage.setFileContent(index, document.toHtml())
             if index is None:
                 return None
 

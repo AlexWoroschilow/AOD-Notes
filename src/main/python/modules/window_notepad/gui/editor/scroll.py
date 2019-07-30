@@ -28,17 +28,29 @@ class TextWriter(QtWidgets.QScrollArea):
         self.text = TextEditor(self)
         self.setWidgetResizable(True)
         self.setWidget(self.text)
-        
+
         effect = QtWidgets.QGraphicsDropShadowEffect()
         effect.setBlurRadius(10)
         effect.setOffset(0)
 
         self.setGraphicsEffect(effect)
-        
+
         self._entity = None
 
+    def document(self):
+        if self.text is not None:
+            return self.text.document()
+        return None
+
+    def setDocument(self, document=None):
+        if document is None:
+            return None
+        if self.text is not None:
+            return self.text.setDocument(document)
+        return None
+
     def focus(self):
-        if self.text is not None: 
+        if self.text is not None:
             self.text.setFocus()
         return self
 
@@ -46,7 +58,7 @@ class TextWriter(QtWidgets.QScrollArea):
         if self.text is None:
             return None
         self.text.zoomIn(value)
-        
+
     def zoomOut(self, value):
         if self.text is None:
             return None

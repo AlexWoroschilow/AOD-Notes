@@ -28,6 +28,7 @@ from .scroll import TextWriter
 class TextEditorWidget(QtWidgets.QWidget):
     fullscreen = QtCore.pyqtSignal(object)
     save = QtCore.pyqtSignal(object)
+    update = QtCore.pyqtSignal(object)
 
     fullscreenAction = QtCore.pyqtSignal(object)
 
@@ -53,7 +54,8 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.leftbar.undoAction.clicked.connect(self.writer.text.undo)
         self.leftbar.redoAction.clicked.connect(self.writer.text.redo)
 
-        self.leftbar.saveAction.clicked.connect(lambda x: self.save.emit((self.index, self.getHtml())))
+        self.leftbar.saveAction.clicked.connect(lambda x: self.save.emit((self.index, self.writer.document())))
+        # self.leftbar.saveAction.clicked.connect(lambda x: self.update.emit(self.writer.document()))
         self.leftbar.fullscreenAction.clicked.connect(lambda x: self.fullscreen.emit(x))
 
         self.formatbar = FormatbarWidget()
@@ -88,6 +90,18 @@ class TextEditorWidget(QtWidgets.QWidget):
 
         self.setLayout(layout)
 
+    def setIndex(self, index=None):
+        if index is None:
+            return None
+        self._index = index
+
+    def setDocument(self, document=None):
+        if document is None:
+            return None
+        if self.writer is not None:
+            self.writer.setDocument(document)
+        return None
+
     def focus(self):
         if self.writer is None: return self
         cursor = self.writer.text.textCursor()
@@ -105,9 +119,10 @@ class TextEditorWidget(QtWidgets.QWidget):
     @index.setter
     @inject.params(storage='storage')
     def index(self, value, storage):
-        self._index = value
-        content = storage.fileContent(value)
-        self.insertHtml(content)
+        pass
+        # self._index = value
+        # content = storage.fileContent(value)
+        # self.insertHtml(content)
 
     def clean(self):
         self.writer.text.setHtml('')

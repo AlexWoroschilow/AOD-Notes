@@ -131,12 +131,16 @@ class NotepadDashboard(QtWidgets.QSplitter):
         self.actions = actions
         self.test = None
 
-    def _note(self, index=None):
-        if index is None:
+    def _note(self, event=None):
+        index, document = event
+        if index is None or document is None:
             return None
 
-        if self.editor is not None:
-            self.editor.index = index
+        if self.editor is None:
+            return None
+
+        self.editor.setDocument(document)
+        self.editor.setIndex(index)
 
     @property
     @inject.params(storage='storage')
@@ -164,10 +168,6 @@ class NotepadDashboard(QtWidgets.QSplitter):
 
         config.set('editor.current', storage.filePath(index))
 
-        self.editor = editor
-        self.editor.index = index
-        self.editor.setMinimumWidth(500)
-
         splitter = DashboardSplitter()
 
         toolbar = NotepadEditorToolbarTop()
@@ -187,7 +187,14 @@ class NotepadDashboard(QtWidgets.QSplitter):
         preview.edit.connect(preview.scrollTo)
         preview.edit.connect(self._note)
         preview.setMinimumWidth(400)
-        preview.scrollTo(index)
+        preview.scrollTo((index, None))
+
+        self.editor = editor
+        self.editor.setMinimumWidth(500)
+        document = preview.getDocumentByIndex(index)
+        if document is not None and document:
+            self.editor.setDocument(document)
+            self.editor.setIndex(index)
 
         splitter.addWidget(preview)
         splitter.addWidget(self.editor)
