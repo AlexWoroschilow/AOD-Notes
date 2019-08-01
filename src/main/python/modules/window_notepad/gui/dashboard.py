@@ -10,13 +10,10 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import os
 import inject
 
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt
-from PyQt5 import QtGui
 
 from .folder.tree import FolderTree
 from .demo.widget import DemoWidget
@@ -26,75 +23,8 @@ from .bar import FolderTreeToolbarTop
 from .bar import NotepadEditorToolbarTop
 
 from .splitter import DashboardSplitter
-
-
-class Notepad(QtWidgets.QTabWidget):
-
-    def __init__(self):
-        super(Notepad, self).__init__()
-        self.setContentsMargins(0, 0, 0, 0)
-        self.setTabPosition(QtWidgets.QTabWidget.West)
-        self.setTabsClosable(True)
-
-    def event(self, event):
-        if type(event) == QtGui.QKeyEvent:
-            if event.key() == Qt.Key_Escape:
-                index = self.currentIndex()
-                if index is not None and index not in [0]:
-                    widget = self.widget(index)
-                    if widget is not None:
-                        widget.close()
-                    self.removeTab(index)
-
-        return super(Notepad, self).event(event)
-
-    def close(self):
-        super(Notepad, self).deleteLater()
-        return super(Notepad, self).close()
-
-
-class NotepadDashboardLeft(QtWidgets.QFrame):
-    def __init__(self):
-        super(NotepadDashboardLeft, self).__init__()
-        self.setLayout(QtWidgets.QVBoxLayout())
-        self.layout().setContentsMargins(0, 0, 0, 0)
-        self.layout().setSpacing(0)
-
-    def addWidget(self, widget):
-        self.layout().addWidget(widget)
-
-    def clean(self):
-        layout = self.layout()
-        for i in range(0, layout.count()):
-            item = layout.itemAt(i)
-            if item is None:
-                layout.takeAt(i)
-
-            widget = item.widget()
-            if item is not None:
-                widget.close()
-
-
-class NotepadDashboardRight(QtWidgets.QFrame):
-    def __init__(self):
-        super(NotepadDashboardRight, self).__init__()
-        self.setLayout(QtWidgets.QVBoxLayout(self))
-        self.layout().setContentsMargins(0, 0, 0, 0)
-        self.layout().setSpacing(0)
-
-    def addWidget(self, widget):
-        self.layout().addWidget(widget)
-
-    def clean(self):
-        layout = self.layout()
-        for i in range(0, layout.count()):
-            item = layout.itemAt(i)
-            if item is None:
-                layout.takeAt(i)
-
-            widget = item.widget()
-            if item is not None:
-                widget.close()
+from .frame import NotepadDashboardLeft
+from .frame import NotepadDashboardRight
 
 
 class NotepadDashboard(QtWidgets.QSplitter):
@@ -160,6 +90,7 @@ class NotepadDashboard(QtWidgets.QSplitter):
 
         self.editor.setDocument(document)
         self.editor.setIndex(index)
+        self.editor.resize()
 
     @property
     @inject.params(storage='storage')
@@ -204,6 +135,7 @@ class NotepadDashboard(QtWidgets.QSplitter):
         preview.clone.connect(self.clone.emit)
         preview.edit.connect(self.edit.emit)
         preview.scrollTo((index, None))
+        preview.setMinimumWidth(400)
 
         self.editor = editor
         self.editor.setMinimumWidth(500)
@@ -243,6 +175,7 @@ class NotepadDashboard(QtWidgets.QSplitter):
         preview.delete.connect(self.delete.emit)
         preview.clone.connect(self.clone.emit)
         preview.scrollTo((collection[0], None))
+        preview.setMinimumWidth(400)
 
         toolbar = NotepadEditorToolbarTop()
         toolbar.note_new.connect(self.note_new.emit)

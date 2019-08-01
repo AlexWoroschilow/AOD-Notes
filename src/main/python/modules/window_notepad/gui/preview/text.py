@@ -18,6 +18,7 @@ class Description(QtWidgets.QTextEdit):
 
     def __init__(self, text=None):
         super(Description, self).__init__()
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setEnabled(False)

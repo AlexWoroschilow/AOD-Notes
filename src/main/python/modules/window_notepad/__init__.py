@@ -16,7 +16,6 @@ import functools
 from .actions import ModuleActions
 from .factory import ToolbarFactory
 
-from .gui.dashboard import Notepad
 from .gui.dashboard import NotepadDashboard
 from .gui.editor.widget import TextEditorWidget
 
@@ -32,7 +31,10 @@ class Loader(object):
 
     @inject.params(config='config', dashboard='notepad.dashboard')
     def _notepad_tab(self, config=None, dashboard=None):
-        if dashboard is None: return None
+        if dashboard is None:
+            return None
+
+        from .gui.tab import Notepad
 
         content = Notepad()
         content.addTab(dashboard, content.tr('Dashboard'))
