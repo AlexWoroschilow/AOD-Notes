@@ -36,6 +36,18 @@ class Notepad(QtWidgets.QTabWidget):
         self.setTabPosition(QtWidgets.QTabWidget.West)
         self.setTabsClosable(True)
 
+    def event(self, event):
+        if type(event) == QtGui.QKeyEvent:
+            if event.key() == Qt.Key_Escape:
+                index = self.currentIndex()
+                if index is not None and index not in [0]:
+                    widget = self.widget(index)
+                    if widget is not None:
+                        widget.close()
+                    self.removeTab(index)
+
+        return super(Notepad, self).event(event)
+
     def close(self):
         super(Notepad, self).deleteLater()
         return super(Notepad, self).close()
@@ -224,7 +236,7 @@ class NotepadDashboard(QtWidgets.QSplitter):
                       if storage.isFile(index)]
 
         widget = PreviewScrollArea(self, collection)
-        widget.edit.connect(self.edit.emit)
+        widget.edit.connect(lambda x: self.edit.emit(x[0]))
         widget.delete.connect(self.delete.emit)
         widget.clone.connect(self.clone.emit)
 

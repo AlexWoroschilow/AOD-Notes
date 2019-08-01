@@ -28,7 +28,8 @@ class FolderTree(QtWidgets.QTreeView):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHeaderHidden(True)
-        # self.setAnimated(True)
+        self.setAnimated(True)
+        self.expandAll()
 
         self.setModel(storage)
 
