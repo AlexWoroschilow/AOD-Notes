@@ -46,6 +46,7 @@ class PreviewScrollArea(QtWidgets.QScrollArea):
     @inject.params(storage='storage')
     def __init__(self, parent, collection, storage):
         super(PreviewScrollArea, self).__init__(parent)
+        self.setMinimumWidth(400)
 
         self.collection = {}
         for position, index in enumerate(collection):
@@ -59,6 +60,7 @@ class PreviewScrollArea(QtWidgets.QScrollArea):
         self.preview.edit.connect(self.edit.emit)
         self.preview.delete.connect(self.delete.emit)
         self.preview.clone.connect(self.clone.emit)
+        self.edit.connect(self.scrollTo)
 
         self.setWidget(self.preview)
 

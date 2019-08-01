@@ -25,7 +25,7 @@ class ModuleActions(object):
         return self.onActionNoteSelect((source, old, new), widget=widget)
 
     def onActionNoteSelect(self, event=None, widget=None):
-        return self.onActionNoteEdit(widget.current, widget=widget)
+        return self.onActionNoteEdit((widget.current, None), widget=widget)
 
     def onActionClone(self, event=None, widget=None):
         return self.onActionCopy(widget.tree.current, widget=widget)
@@ -34,7 +34,8 @@ class ModuleActions(object):
         return self.onActionDelete(widget.tree.current, widget=widget)
 
     @inject.params(storage='storage', logger='logger')
-    def onActionNoteEdit(self, index, storage, logger, widget):
+    def onActionNoteEdit(self, event, storage, logger, widget):
+        index, document = event
         try:
 
             if storage.isDir(index):

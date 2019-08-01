@@ -101,18 +101,25 @@ class NotepadDashboard(QtWidgets.QSplitter):
     edit = QtCore.pyqtSignal(object)
     delete = QtCore.pyqtSignal(object)
     clone = QtCore.pyqtSignal(object)
+
     created = QtCore.pyqtSignal(object)
     removed = QtCore.pyqtSignal(object)
     updated = QtCore.pyqtSignal(object)
+
     note_new = QtCore.pyqtSignal(object)
     note_import = QtCore.pyqtSignal(object)
     group_new = QtCore.pyqtSignal(object)
-    search = QtCore.pyqtSignal(object)
+
     settings = QtCore.pyqtSignal(object)
+
     saveAction = QtCore.pyqtSignal(object)
+    search = QtCore.pyqtSignal(object)
+
     storage = QtCore.pyqtSignal(object)
     storage_changed = QtCore.pyqtSignal(object)
+
     fullscreenAction = QtCore.pyqtSignal(object)
+
     editor = None
 
     def __init__(self, actions):
@@ -183,22 +190,19 @@ class NotepadDashboard(QtWidgets.QSplitter):
         splitter = DashboardSplitter()
 
         toolbar = NotepadEditorToolbarTop()
-        toolbar.note_new.connect(lambda event=None: self.note_new.emit(event))
-        toolbar.note_import.connect(lambda event=None: self.note_import.emit(event))
-        toolbar.group_new.connect(lambda event=None: self.group_new.emit(event))
-        toolbar.search.connect(lambda event=None: self.search.emit(event))
-        toolbar.settings.connect(lambda event=None: self.settings.emit(event))
+        toolbar.note_new.connect(self.note_new.emit)
+        toolbar.group_new.connect(self.group_new.emit)
+        toolbar.note_import.connect(self.note_import.emit)
+        toolbar.settings.connect(self.settings.emit)
+        toolbar.search.connect(self.search.emit)
 
         parent = storage.fileDir(index)
-        collection = [index for index in storage.entities(parent)
-                      if storage.isFile(index)]
+        collection = [x for x in storage.entities(parent) if storage.isFile(x)]
 
         preview = PreviewScrollArea(self, collection)
         preview.delete.connect(self.delete.emit)
         preview.clone.connect(self.clone.emit)
-        preview.edit.connect(preview.scrollTo)
-        preview.edit.connect(self._note)
-        preview.setMinimumWidth(400)
+        preview.edit.connect(self.edit.emit)
         preview.scrollTo((index, None))
 
         self.editor = editor
@@ -232,24 +236,24 @@ class NotepadDashboard(QtWidgets.QSplitter):
 
         config.set('editor.current', storage.filePath(index))
 
-        collection = [index for index in storage.entities(index)
-                      if storage.isFile(index)]
+        collection = [x for x in storage.entities(index) if storage.isFile(x)]
 
-        widget = PreviewScrollArea(self, collection)
-        widget.edit.connect(lambda x: self.edit.emit(x[0]))
-        widget.delete.connect(self.delete.emit)
-        widget.clone.connect(self.clone.emit)
+        preview = PreviewScrollArea(self, collection)
+        preview.edit.connect(self.edit.emit)
+        preview.delete.connect(self.delete.emit)
+        preview.clone.connect(self.clone.emit)
+        preview.scrollTo((collection[0], None))
 
         toolbar = NotepadEditorToolbarTop()
-        toolbar.note_new.connect(lambda event=None: self.note_new.emit(event))
-        toolbar.note_import.connect(lambda event=None: self.note_import.emit(event))
-        toolbar.group_new.connect(lambda event=None: self.group_new.emit(event))
-        toolbar.search.connect(lambda event=None: self.search.emit(event))
-        toolbar.settings.connect(lambda event=None: self.settings.emit(event))
+        toolbar.note_new.connect(self.note_new.emit)
+        toolbar.group_new.connect(self.group_new.emit)
+        toolbar.note_import.connect(self.note_import.emit)
+        toolbar.settings.connect(self.settings.emit)
+        toolbar.search.connect(self.search.emit)
 
         self.container.clean()
         self.container.addWidget(toolbar)
-        self.container.addWidget(widget)
+        self.container.addWidget(preview)
 
         return self
 
