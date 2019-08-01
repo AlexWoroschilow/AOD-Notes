@@ -12,6 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 from PyQt5.QtCore import Qt
 from PyQt5 import QtWidgets
+from PyQt5 import QtCore
+from PyQt5 import QtGui
 
 from .text import TextEditor
 
@@ -45,8 +47,11 @@ class TextWriter(QtWidgets.QScrollArea):
     def setDocument(self, document=None):
         if document is None:
             return None
-        if self.text is not None:
-            return self.text.setDocument(document)
+        if self.text is None:
+            return None
+
+        self.text.setDocument(document)
+        self.focus()
         return None
 
     def focus(self):

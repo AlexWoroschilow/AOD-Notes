@@ -98,8 +98,11 @@ class TextEditorWidget(QtWidgets.QWidget):
     def setDocument(self, document=None):
         if document is None:
             return None
-        if self.writer is not None:
-            self.writer.setDocument(document)
+        if self.writer is None:
+            return None
+
+        self.writer.setDocument(document)
+
         return None
 
     def focus(self):

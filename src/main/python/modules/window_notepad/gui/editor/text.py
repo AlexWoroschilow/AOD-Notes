@@ -36,6 +36,10 @@ class TextEditor(QtWidgets.QTextEdit):
     def entity(self):
         return self._entity
 
+    def setDocument(self, QTextDocument):
+        print(QTextDocument.textWidth(), self.size())
+        return super(TextEditor, self).setDocument(QTextDocument)
+
     @entity.setter
     def entity(self, value):
         self.entity = value

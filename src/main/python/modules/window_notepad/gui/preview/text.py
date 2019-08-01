@@ -27,9 +27,11 @@ class Description(QtWidgets.QTextEdit):
 
     def resizeEvent(self, *args, **kwargs):
         document = self.document()
-        if document is None: return None
+        if document is None:
+            return None
         size = document.size()
-        if size is None: return None
+        if size is None:
+            return None
 
         self.setFixedHeight(size.height())
         return QtWidgets.QTextEdit.resizeEvent(self, *args, **kwargs)

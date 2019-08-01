@@ -14,6 +14,7 @@ import inject
 
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
+from PyQt5 import QtGui
 
 from .folder.tree import FolderTree
 from .demo.widget import DemoWidget
@@ -90,7 +91,6 @@ class NotepadDashboard(QtWidgets.QSplitter):
 
         self.editor.setDocument(document)
         self.editor.setIndex(index)
-        self.editor.resize()
 
     @property
     @inject.params(storage='storage')
@@ -135,7 +135,7 @@ class NotepadDashboard(QtWidgets.QSplitter):
         preview.clone.connect(self.clone.emit)
         preview.edit.connect(self.edit.emit)
         preview.scrollTo((index, None))
-        preview.setMinimumWidth(400)
+        preview.setMinimumWidth(350)
 
         self.editor = editor
         self.editor.setMinimumWidth(500)
@@ -175,7 +175,7 @@ class NotepadDashboard(QtWidgets.QSplitter):
         preview.delete.connect(self.delete.emit)
         preview.clone.connect(self.clone.emit)
         preview.scrollTo((collection[0], None))
-        preview.setMinimumWidth(400)
+        preview.setMinimumWidth(350)
 
         toolbar = NotepadEditorToolbarTop()
         toolbar.note_new.connect(self.note_new.emit)
