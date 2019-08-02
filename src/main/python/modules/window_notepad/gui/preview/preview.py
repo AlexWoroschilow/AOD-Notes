@@ -75,7 +75,13 @@ class NotePreviewDescription(QtWidgets.QFrame):
             self.setGraphicsEffect(None)
 
         if QEvent.type() == QtCore.QEvent.MouseButtonRelease:
-            self.edit.emit((self.index, None))
+            self.edit.emit((self.index, self.description.document()))
+
+            effect = QtWidgets.QGraphicsDropShadowEffect()
+            effect.setColor(QtGui.QColor('#0000FF'))
+            effect.setBlurRadius(20)
+            effect.setOffset(0)
+
         return super(NotePreviewDescription, self).event(QEvent)
 
     def close(self):

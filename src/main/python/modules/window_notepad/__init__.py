@@ -65,61 +65,22 @@ class Loader(object):
             widget.rightbar.addWidget(plugin)
         widget.rightbar.setVisible(int(config.get('editor.rightbar')))
 
-        action = functools.partial(self.actions.onActionSave, widget=widget)
-        widget.save.connect(action)
-
-        action = functools.partial(self.actions.onActionFullScreen, widget=widget)
-        widget.fullscreen.connect(action)
+        widget.fullscreen.connect(functools.partial(self.actions.onActionFullScreen, widget=widget))
+        widget.save.connect(functools.partial(self.actions.onActionSave, widget=widget))
 
         return widget
 
     @inject.params(config='config', storage='storage')
     def _notepad_dashboard(self, config, storage, binder):
 
-        widget = NotepadDashboard(self.actions)
-
-        widget.storage_changed.connect(functools.partial(
-            self.actions.onActionStorageChanged, widget=widget
-        ))
-
-        widget.note_new.connect(functools.partial(
-            self.actions.onActionNoteCreate, widget=widget
-        ))
-
-        widget.note_import.connect(functools.partial(
-            self.actions.onActionNoteImport, widget=widget
-        ))
-
-        widget.group_new.connect(functools.partial(
-            self.actions.onActionFolderCreate, widget=widget
-        ))
-
-        widget.edit.connect(functools.partial(
-            self.actions.onActionNoteEdit, widget=widget
-        ))
-
-        widget.clone.connect(functools.partial(
-            self.actions.onActionCopy, widget=widget
-        ))
-
-        widget.delete.connect(functools.partial(
-            self.actions.onActionDelete, widget=widget
-        ))
-
-        storage.fileRenamed.connect(functools.partial(
-            self.actions.onActionFileRenamed, widget=widget
-        ))
-
-        widget.tree.customContextMenuRequested.connect(functools.partial(
-            self.actions.onActionContextMenu, widget=widget
-        ))
-
-        widget.tree.clicked.connect(functools.partial(
-            self.actions.onActionNoteSelect, widget=widget
-        ))
-
-        widget.removed.connect(lambda x: widget.group(x))
-        widget.created.connect(lambda x: widget.note(x))
+        widget = NotepadDashboard()
+        widget.storage_changed.connect(functools.partial(self.actions.onActionStorageChanged, widget=widget))
+        widget.note_new.connect(functools.partial(self.actions.onActionNoteCreate, widget=widget))
+        widget.note_import.connect(functools.partial(self.actions.onActionNoteImport, widget=widget))
+        widget.group_new.connect(functools.partial(self.actions.onActionFolderCreate, widget=widget))
+        widget.clone.connect(functools.partial(self.actions.onActionCopy, widget=widget))
+        widget.delete.connect(functools.partial(self.actions.onActionDelete, widget=widget))
+        widget.menu.connect(functools.partial(self.actions.onActionContextMenu, widget=widget))
 
         return widget
 
@@ -150,5 +111,6 @@ class Loader(object):
         index = storage.index(current)
         if index is None: return None
 
-        if storage.isDir(index): return dashboard.group(index)
-        if storage.isFile(index): return dashboard.note(index)
+        if storage.isDir(index):
+            return dashboard.group(index)
+        return dashboard.note(index)

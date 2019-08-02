@@ -17,11 +17,16 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 
 
-class FolderTree(QtWidgets.QTreeView):
+class NotepadDashboardTree(QtWidgets.QTreeView):
+    note = QtCore.pyqtSignal(object)
+    group = QtCore.pyqtSignal(object)
+    menu = QtCore.pyqtSignal(object)
 
     @inject.params(config='config', storage='storage')
     def __init__(self, config=None, storage=None):
-        super(FolderTree, self).__init__()
+        super(NotepadDashboardTree, self).__init__()
+        self.customContextMenuRequested.connect(self.menu.emit)
+        self.clicked.connect(self.noteSelectEvent)
 
         self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -39,6 +44,18 @@ class FolderTree(QtWidgets.QTreeView):
         self.setColumnHidden(1, True)
         self.setColumnHidden(2, True)
         self.setColumnHidden(3, True)
+
+    @inject.params(config='config', storage='storage')
+    def noteSelectEvent(self, index=None, config=None, storage=None):
+        if index is None:
+            return None
+
+        path = storage.filePath(index)
+        config.set('editor.current', path)
+
+        if storage.isDir(index):
+            return self.group.emit((index, None))
+        return self.note.emit((index, None))
 
     @inject.params(storage='storage')
     def expandAll(self, storage):

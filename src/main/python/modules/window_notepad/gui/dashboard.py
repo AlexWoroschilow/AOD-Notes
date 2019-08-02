@@ -16,9 +16,8 @@ from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 
-from .folder.tree import FolderTree
-from .demo.widget import DemoWidget
-from .preview.widget import PreviewScrollArea
+from .folder.tree import NotepadDashboardTree
+from .preview.scroll import PreviewScrollArea
 
 from .bar import FolderTreeToolbarTop
 from .bar import NotepadEditorToolbarTop
@@ -32,6 +31,7 @@ class NotepadDashboard(QtWidgets.QSplitter):
     edit = QtCore.pyqtSignal(object)
     delete = QtCore.pyqtSignal(object)
     clone = QtCore.pyqtSignal(object)
+    menu = QtCore.pyqtSignal(object)
 
     created = QtCore.pyqtSignal(object)
     removed = QtCore.pyqtSignal(object)
@@ -53,14 +53,21 @@ class NotepadDashboard(QtWidgets.QSplitter):
 
     editor = None
 
-    def __init__(self, actions):
+    def __init__(self):
         super(NotepadDashboard, self).__init__()
+        self.removed.connect(lambda event: self.group(event))
+        self.created.connect(lambda event: self.note(event))
+        self.edit.connect(lambda x: self.open(x[0]))
         self.setContentsMargins(0, 0, 0, 0)
 
-        self.tree = FolderTree()
+        self.tree = NotepadDashboardTree()
+        self.tree.note.connect(lambda x: self.note(x[0]))
+        self.tree.group.connect(lambda x: self.group(x[0]))
+        self.tree.menu.connect(self.menu.emit)
+
         self.tree_toolbar = FolderTreeToolbarTop()
-        self.tree_toolbar.storage.connect(lambda event=None: self.storage.emit(event))
-        self.storage_changed.connect(lambda text: self.tree_toolbar.storage_changed.emit(text))
+        self.tree_toolbar.storage.connect(self.storage.emit)
+        self.storage_changed.connect(self.tree_toolbar.storage_changed.emit)
 
         self.container_left = NotepadDashboardLeft()
         self.container_left.addWidget(self.tree_toolbar)
@@ -68,8 +75,8 @@ class NotepadDashboard(QtWidgets.QSplitter):
 
         self.addWidget(self.container_left)
 
-        self.container = NotepadDashboardRight()
-        self.addWidget(self.container)
+        self.container_right = NotepadDashboardRight()
+        self.addWidget(self.container_right)
 
         self.setCollapsible(0, True)
         self.setCollapsible(1, False)
@@ -77,20 +84,6 @@ class NotepadDashboard(QtWidgets.QSplitter):
 
         self.setStretchFactor(1, 2)
         self.setStretchFactor(2, 3)
-
-        self.actions = actions
-        self.test = None
-
-    def _note(self, event=None):
-        index, document = event
-        if index is None or document is None:
-            return None
-
-        if self.editor is None:
-            return None
-
-        self.editor.setDocument(document)
-        self.editor.setIndex(index)
 
     @property
     @inject.params(storage='storage')
@@ -100,120 +93,76 @@ class NotepadDashboard(QtWidgets.QSplitter):
             return index
         return storage.rootIndex()
 
-    def focus(self):
-        if self.editor is None:
-            self.editor.focus()
-        return self
-
     @inject.params(storage='storage')
-    def open(self, index, storage):
+    def open(self, index=None, storage=None):
         if storage.isFile(index):
             return self.note(index)
         return self.group(index)
 
-    @inject.params(storage='storage', config='config', editor='notepad.editor')
-    def note(self, index, storage, config, editor):
+    def scrollTo(self, index=None):
+        if self.tree is None or index is None:
+            return None
+        self.tree.setCurrentIndex(index)
+
+    @inject.params(storage='storage', editor='notepad.editor')
+    def note(self, index=None, storage=None, editor=None):
+        self.scrollTo(index)
         if storage.isDir(index):
             return self
 
-        config.set('editor.current', storage.filePath(index))
+        preview = NotepadEditorToolbarTop()
+        preview.note_new.connect(self.note_new.emit)
+        preview.group_new.connect(self.group_new.emit)
+        preview.note_import.connect(self.note_import.emit)
+        preview.settings.connect(self.settings.emit)
+        preview.search.connect(self.search.emit)
 
-        splitter = DashboardSplitter()
+        splitter = DashboardSplitter(index)
+        splitter.delete.connect(self.delete.emit)
+        splitter.clicked.connect(self.scrollTo)
+        splitter.clone.connect(self.clone.emit)
+        splitter.scrollTo(index)
 
-        toolbar = NotepadEditorToolbarTop()
-        toolbar.note_new.connect(self.note_new.emit)
-        toolbar.group_new.connect(self.group_new.emit)
-        toolbar.note_import.connect(self.note_import.emit)
-        toolbar.settings.connect(self.settings.emit)
-        toolbar.search.connect(self.search.emit)
+        self.container_right.clean()
+        self.container_right.addWidget(preview)
+        self.container_right.addWidget(splitter)
 
-        parent = storage.fileDir(index)
-        collection = [x for x in storage.entities(parent) if storage.isFile(x)]
-
-        preview = PreviewScrollArea(self, collection)
-        preview.delete.connect(self.delete.emit)
-        preview.clone.connect(self.clone.emit)
-        preview.edit.connect(self.edit.emit)
-        preview.scrollTo((index, None))
-        preview.setMinimumWidth(350)
-
-        self.editor = editor
-        self.editor.setMinimumWidth(500)
-        document = preview.getDocumentByIndex(index)
-        if document is not None and document:
-            self.editor.setDocument(document)
-            self.editor.setIndex(index)
-
-        splitter.addWidget(preview)
-        splitter.addWidget(self.editor)
-        splitter.setStretchFactor(1, 1)
-        splitter.setStretchFactor(2, 2)
-
-        self.container.clean()
-        self.container.addWidget(toolbar)
-        self.container.addWidget(splitter)
-        self.editor.focus()
-
-        if self.current == index:
-            return self
-
-        self.tree.setCurrentIndex(index)
-
-        return self
-
-    @inject.params(storage='storage', config='config')
-    def group(self, index, storage, config):
-        if storage.isFile(index):
-            index = storage.fileDir(index)
-
-        config.set('editor.current', storage.filePath(index))
-
-        collection = [x for x in storage.entities(index) if storage.isFile(x)]
-
-        preview = PreviewScrollArea(self, collection)
-        preview.edit.connect(self.edit.emit)
-        preview.delete.connect(self.delete.emit)
-        preview.clone.connect(self.clone.emit)
-        preview.scrollTo((collection[0], None))
-        preview.setMinimumWidth(350)
-
-        toolbar = NotepadEditorToolbarTop()
-        toolbar.note_new.connect(self.note_new.emit)
-        toolbar.group_new.connect(self.group_new.emit)
-        toolbar.note_import.connect(self.note_import.emit)
-        toolbar.settings.connect(self.settings.emit)
-        toolbar.search.connect(self.search.emit)
-
-        self.container.clean()
-        self.container.addWidget(toolbar)
-        self.container.addWidget(preview)
-
-        return self
-
-    def demo(self):
-        demo = DemoWidget()
-
-        self.container.clean()
-        self.container.addWidget(demo)
+        self.tree.note.disconnect()
+        # Reconnect event to work locally without
+        # the recreation of the all note environment
+        self.tree.note.connect(splitter.previewSelected)
 
         return self
 
     @inject.params(storage='storage')
-    def toggle(self, collection=[], state=False, storage=None):
-        for index in storage.entities():
-            row, parent = (index.row(), index.parent())
-            self.tree.setRowHidden(row, parent, state)
-            if index not in collection:
-                continue
+    def group(self, index=None, storage=None):
+        index = storage.filePath(index) \
+            if storage.isDir(index) \
+            else storage.fileDir(index)
 
-            current = index
-            while current != storage.rootIndex():
-                row, parent = (current.row(), current.parent())
-                self.tree.setRowHidden(row, parent, False)
-                self.tree.expand(current)
-                current = parent
+        toolbar = NotepadEditorToolbarTop()
+        toolbar.note_new.connect(self.note_new.emit)
+        toolbar.group_new.connect(self.group_new.emit)
+        toolbar.note_import.connect(self.note_import.emit)
+        toolbar.settings.connect(self.settings.emit)
+        toolbar.search.connect(self.search.emit)
 
-        return True
+        preview = PreviewScrollArea(self)
+        preview.open(storage.entitiesByFileType(index))
+        preview.edit.connect(self.edit.emit)
+        preview.delete.connect(self.delete.emit)
+        preview.clone.connect(self.clone.emit)
+
+        self.container_right.clean()
+        self.container_right.addWidget(toolbar)
+        self.container_right.addWidget(preview)
+
+        self.tree.note.disconnect()
+        # Reconnect event to be able
+        # to open the notes as usial
+        self.tree.note.connect(lambda x: self.note(x[0]))
+
+        return self
 
     def clean(self):
         layout = self.layout()

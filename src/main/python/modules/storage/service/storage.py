@@ -141,24 +141,32 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
     def entities(self, index=None):
         if index is None or not index:
             index = self.index(self.rootPath())
-
         source = self.filePath(index)
         return self.entitiesByPath(source)
+
+    def entitiesByFileType(self, source=None):
+        if isinstance(source, QtCore.QModelIndex):
+            source = self.filePath(source)
+        if not os.path.exists(source):
+            return None
+        response = []
+        for path in glob.glob('{}/*'.format(source)):
+            index = self.index(path)
+            if index is None:
+                continue
+            if os.path.isdir(path):
+                continue
+            response.append(index)
+        return response
 
     def entitiesByPath(self, source=None):
         if not os.path.exists(source):
             return None
-
         response = []
         for path in glob.glob('{}/*'.format(source)):
             index = self.index(path)
-
             if index is None:
                 continue
-
-            if not index:
-                continue
-
             if os.path.isdir(path):
                 response.append(index)
                 children = self.entitiesByPath(path)

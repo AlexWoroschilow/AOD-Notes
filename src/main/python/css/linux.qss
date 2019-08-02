@@ -114,17 +114,17 @@ QTabBar::tab:selected { background: #515659; }
 QTabBar::tab:!selected { background: #414649; }
 QTabBar::close-button { image: url(icons/close-light); }
 
-FolderTree { background: #515659; alternate-background-color: #515659; border-top: 1px solid #414649; font-size: 16px;  }
-FolderTree::branch { border-bottom: 1px solid #515659; background: #515659; alternate-background-color: #515659; }
-FolderTree::branch:open { image: url(icons/minus-light); }
-FolderTree::branch:closed:has-children { image: url(icons/plus-light); }
-FolderTree::branch:hover { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
-FolderTree::branch:selected { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
-FolderTree::item { border-bottom: 1px solid #515659; color: #C0C0C0; padding: 3px 0px; }
-FolderTree::item:hover { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
-FolderTree::item:selected:active { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
-FolderTree::item:hover:selected { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
-FolderTree::item:selected { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
+NotepadDashboardTree { background: #515659; alternate-background-color: #515659; border-top: 1px solid #414649; font-size: 16px;  }
+NotepadDashboardTree::branch { border-bottom: 1px solid #515659; background: #515659; alternate-background-color: #515659; }
+NotepadDashboardTree::branch:open { image: url(icons/minus-light); }
+NotepadDashboardTree::branch:closed:has-children { image: url(icons/plus-light); }
+NotepadDashboardTree::branch:hover { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
+NotepadDashboardTree::branch:selected { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
+NotepadDashboardTree::item { border-bottom: 1px solid #515659; color: #C0C0C0; padding: 3px 0px; }
+NotepadDashboardTree::item:hover { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
+NotepadDashboardTree::item:selected:active { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
+NotepadDashboardTree::item:hover:selected { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
+NotepadDashboardTree::item:selected { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
 
 NotepadDashboardLeft { background: #515659; padding: 0px; margin: 0px; border: none; }
 NotepadDashboardLeft FolderTreeToolbarTop {  background: #515659; padding: 0px; margin: 0px; border: none; }

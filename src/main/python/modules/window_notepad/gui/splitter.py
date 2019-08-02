@@ -10,19 +10,80 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import os
 import inject
+import functools
 
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt
 from PyQt5 import QtGui
+
+from .preview.scroll import PreviewScrollArea
 
 
 class DashboardSplitter(QtWidgets.QSplitter):
-    def __init__(self):
+    delete = QtCore.pyqtSignal(object)
+    clicked = QtCore.pyqtSignal(object)
+    clone = QtCore.pyqtSignal(object)
+
+    @inject.params(storage='storage', editor='notepad.editor')
+    def __init__(self, index=None, storage=None, editor=None):
         super(DashboardSplitter, self).__init__()
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+
+        self.preview = PreviewScrollArea(self)
+        self.preview.edit.connect(functools.partial(self.previewClickedEvent, editor=editor))
+        self.preview.delete.connect(self.delete.emit)
+        self.preview.clone.connect(self.clone.emit)
+        self.preview.setMinimumWidth(400)
+
+        parent = storage.fileDir(index)
+        self.preview.open(storage.entitiesByFileType(parent))
+
+        self.editor = editor
+        self.editor.setDocument(self.preview.getDocumentByIndex(index))
+        self.editor.setIndex(index)
+        self.editor.setMinimumWidth(500)
+        self.editor.focus()
+
+        self.addWidget(self.preview)
+        self.addWidget(self.editor)
+
+        self.setStretchFactor(1, 1)
+        self.setStretchFactor(2, 2)
+        self.show()
+
+    def scrollTo(self, index=None):
+        if index is None:
+            return None
+
+        self.preview.scrollTo((index, None))
+
+    @inject.params(storage='storage')
+    def previewSelected(self, event=None, storage=None):
+        index, document = event
+        if self.preview is None or index is None:
+            return None
+
+        document = self.preview.getDocumentByIndex(index)
+        if document is None or not document:
+            parent = storage.fileDir(index)
+            self.preview.open(storage.entitiesByFileType(parent))
+            document = self.preview.getDocumentByIndex(index)
+        self.scrollTo(index)
+        return self.preview.edit.emit((index, document))
+
+    def previewClickedEvent(self, event, editor):
+        index, document = event
+        if index is None or document is None:
+            return None
+
+        if editor is None:
+            return None
+
+        editor.setDocument(document)
+        editor.setIndex(index)
+
+        self.clicked.emit(index)
 
     def close(self):
         super(DashboardSplitter, self).deleteLater()
