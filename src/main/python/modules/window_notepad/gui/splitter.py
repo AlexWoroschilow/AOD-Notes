@@ -18,6 +18,7 @@ from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 
 from .preview.scroll import PreviewScrollArea
+from .document import HtmlDocument
 
 
 class DashboardSplitter(QtWidgets.QSplitter):
@@ -25,24 +26,26 @@ class DashboardSplitter(QtWidgets.QSplitter):
     clicked = QtCore.pyqtSignal(object)
     clone = QtCore.pyqtSignal(object)
 
-    @inject.params(storage='storage', editor='notepad.editor')
-    def __init__(self, index=None, storage=None, editor=None):
+    @inject.params(storage='storage')
+    def __init__(self, index=None, storage=None):
         super(DashboardSplitter, self).__init__()
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
         self.preview = PreviewScrollArea(self)
-        self.preview.edit.connect(functools.partial(self.previewClickedEvent, editor=editor))
+        self.preview.edit.connect(self.previewClickedEvent)
         self.preview.delete.connect(self.delete.emit)
         self.preview.clone.connect(self.clone.emit)
         self.preview.setMinimumWidth(400)
 
         parent = storage.fileDir(index)
         self.preview.open(storage.entitiesByFileType(parent))
+        self.preview.scrollTo((index, None))
 
-        self.editor = editor
-        self.editor.setDocument(self.preview.getDocumentByIndex(index))
-        self.editor.setIndex(index)
+        self.editor = inject.instance('notepad.editor')
         self.editor.setMinimumWidth(500)
+        content = storage.fileContent(index)
+        self.editor.setDocument(HtmlDocument(content))
+        self.editor.setIndex(index)
         self.editor.focus()
 
         self.addWidget(self.preview)
@@ -69,19 +72,18 @@ class DashboardSplitter(QtWidgets.QSplitter):
             parent = storage.fileDir(index)
             self.preview.open(storage.entitiesByFileType(parent))
             document = self.preview.getDocumentByIndex(index)
-        self.scrollTo(index)
         return self.preview.edit.emit((index, document))
 
-    def previewClickedEvent(self, event, editor):
+    def previewClickedEvent(self, event):
         index, document = event
         if index is None or document is None:
             return None
 
-        if editor is None:
+        if self.editor is None:
             return None
 
-        editor.setDocument(document)
-        editor.setIndex(index)
+        self.editor.setDocument(document)
+        self.editor.setIndex(index)
 
         self.clicked.emit(index)
 

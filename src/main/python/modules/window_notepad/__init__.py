@@ -65,7 +65,7 @@ class Loader(object):
             widget.rightbar.addWidget(plugin)
         widget.rightbar.setVisible(int(config.get('editor.rightbar')))
 
-        widget.fullscreen.connect(functools.partial(self.actions.onActionFullScreen, widget=widget))
+        widget.fullscreen.connect(self.actions.onActionFullScreen)
         widget.save.connect(functools.partial(self.actions.onActionSave, widget=widget))
 
         return widget

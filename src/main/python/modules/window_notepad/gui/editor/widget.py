@@ -56,7 +56,8 @@ class TextEditorWidget(QtWidgets.QWidget):
 
         self.leftbar.saveAction.clicked.connect(lambda x: self.save.emit((self.index, self.writer.document())))
         # self.leftbar.saveAction.clicked.connect(lambda x: self.update.emit(self.writer.document()))
-        self.leftbar.fullscreenAction.clicked.connect(lambda x: self.fullscreen.emit(x))
+        self.leftbar.fullscreenAction.clicked.connect(
+            lambda x: self.fullscreen.emit((self.index, self.writer.document())))
 
         self.formatbar = FormatbarWidget()
         self.formatbar.fontSize.valueChanged.connect(lambda size: self.writer.text.setFontPointSize(size))
@@ -90,10 +91,19 @@ class TextEditorWidget(QtWidgets.QWidget):
 
         self.setLayout(layout)
 
+    def index(self):
+        return self._index
+
     def setIndex(self, index=None):
         if index is None:
             return None
         self._index = index
+
+    def document(self):
+        if self.writer is None:
+            return None
+
+        return self.writer.document()
 
     def setDocument(self, document=None):
         if document is None:

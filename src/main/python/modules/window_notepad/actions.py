@@ -101,16 +101,15 @@ class ModuleActions(object):
             getLogger('app').exception(ex)
             status.error(ex.__str__())
 
-    @inject.params(window='window', editor='notepad.editor', storage='storage')
-    def onActionFullScreen(self, event, widget, window, editor, storage):
+    @inject.params(window='window', storage='storage')
+    def onActionFullScreen(self, event, window, storage):
         try:
+            index, document = event
+            editor = inject.instance('notepad.editor')
+            editor.setDocument(document)
+            editor.setIndex(index)
 
-            editor.index = widget.index
-            name = storage.fileName(widget.index)
-            if name is None:
-                return None
-
-            window.tab.emit((editor, name))
+            window.tab.emit((editor, storage.fileName(index)))
 
         except Exception as ex:
             getLogger('app').exception(ex)

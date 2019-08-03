@@ -63,6 +63,13 @@ class NotePreviewDescription(QtWidgets.QFrame):
             return None
         return self.description.document()
 
+    def setDocument(self, document=None):
+        if document is None:
+            return None
+        if self.description is None:
+            return None
+        return self.description.setDocument(document)
+
     def event(self, QEvent):
         if QEvent.type() == QtCore.QEvent.Enter:
             effect = QtWidgets.QGraphicsDropShadowEffect()

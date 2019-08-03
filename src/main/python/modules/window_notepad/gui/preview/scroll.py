@@ -40,6 +40,7 @@ class PreviewScrollArea(QtWidgets.QScrollArea):
         self.columns = self.getColumnNumber(self.size())
         self.container = PreviewContainer(self)
         self.setWidget(self.container)
+        self.show()
 
     @inject.params(storage='storage')
     def open(self, collection=None, storage=None):

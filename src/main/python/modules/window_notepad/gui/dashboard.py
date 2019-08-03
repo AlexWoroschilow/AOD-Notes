@@ -55,14 +55,14 @@ class NotepadDashboard(QtWidgets.QSplitter):
 
     def __init__(self):
         super(NotepadDashboard, self).__init__()
-        self.removed.connect(lambda event: self.group(event))
-        self.created.connect(lambda event: self.note(event))
+        self.removed.connect(lambda event: self.open(event))
+        self.created.connect(lambda event: self.open(event))
         self.edit.connect(lambda x: self.open(x[0]))
         self.setContentsMargins(0, 0, 0, 0)
 
         self.tree = NotepadDashboardTree()
-        self.tree.note.connect(lambda x: self.note(x[0]))
-        self.tree.group.connect(lambda x: self.group(x[0]))
+        self.tree.note.connect(lambda x: self.open(x[0]))
+        self.tree.group.connect(lambda x: self.open(x[0]))
         self.tree.menu.connect(self.menu.emit)
 
         self.tree_toolbar = FolderTreeToolbarTop()
@@ -104,8 +104,8 @@ class NotepadDashboard(QtWidgets.QSplitter):
             return None
         self.tree.setCurrentIndex(index)
 
-    @inject.params(storage='storage', editor='notepad.editor')
-    def note(self, index=None, storage=None, editor=None):
+    @inject.params(storage='storage')
+    def note(self, index=None, storage=None):
         self.scrollTo(index)
         if storage.isDir(index):
             return self
@@ -126,6 +126,7 @@ class NotepadDashboard(QtWidgets.QSplitter):
         self.container_right.clean()
         self.container_right.addWidget(preview)
         self.container_right.addWidget(splitter)
+        self.container_right.show()
 
         self.tree.note.disconnect()
         # Reconnect event to work locally without
@@ -156,6 +157,7 @@ class NotepadDashboard(QtWidgets.QSplitter):
         self.container_right.clean()
         self.container_right.addWidget(toolbar)
         self.container_right.addWidget(preview)
+        self.container_right.show()
 
         self.tree.note.disconnect()
         # Reconnect event to be able
