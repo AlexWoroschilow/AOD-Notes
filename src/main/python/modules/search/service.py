@@ -123,11 +123,14 @@ class Search(object):
             self.writer.commit()
 
     def search(self, string=None, fields=["title", "content"]):
+        query_parser = qparser.MultifieldParser(fields, self.ix.schema, group=qparser.OrGroup)
+        query_parser.remove_plugin_class(qparser.PhrasePlugin)
+        query_parser.add_plugin(qparser.FuzzyTermPlugin())
+        query_parser.add_plugin(qparser.SequencePlugin())
+
         with self.ix.searcher(weighting=scoring.BM25F) as searcher:
-            query_parser = qparser.MultifieldParser(fields, self.ix.schema)
-            query_parser.add_plugin(qparser.WhitespacePlugin())
-            query_parser.add_plugin(qparser.WildcardPlugin())
-            pattern = query_parser.parse(u"*{}*".format(string))
+            pattern = query_parser.parse(u'"{}"'.format(string))
+            print(pattern)
             for result in searcher.search(pattern, limit=None):
                 yield result['path']
 
