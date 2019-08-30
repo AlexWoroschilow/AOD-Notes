@@ -101,8 +101,8 @@ class NotepadEditorToolbarTop(QtWidgets.QFrame):
         shortcut.setEnabled(True)
 
         shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Esc"), self.text_search)
-        shortcut.activatedAmbiguously.connect(self.text_search.clearFocus)
         shortcut.activated.connect(lambda event=None: self.text_search.setText(None))
+        shortcut.activatedAmbiguously.connect(self.text_search.clearFocus)
         shortcut.activated.connect(self.text_search.clearFocus)
 
         self.text_search.focusInEvent = self.on_search_focus_in

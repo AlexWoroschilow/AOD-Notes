@@ -130,7 +130,6 @@ class Search(object):
 
         with self.ix.searcher(weighting=scoring.BM25F) as searcher:
             pattern = query_parser.parse(u'"{}"'.format(string))
-            print(pattern)
             for result in searcher.search(pattern, limit=None):
                 yield result['path']
 

@@ -65,12 +65,7 @@ class NotepadDashboard(QtWidgets.QSplitter):
         self.tree.group.connect(lambda x: self.open(x[0]))
         self.tree.menu.connect(self.menu.emit)
 
-        self.tree_toolbar = FolderTreeToolbarTop()
-        self.tree_toolbar.storage.connect(self.storage.emit)
-        self.storage_changed.connect(self.tree_toolbar.storage_changed.emit)
-
         self.container_left = NotepadDashboardLeft()
-        self.container_left.addWidget(self.tree_toolbar)
         self.container_left.addWidget(self.tree)
 
         self.addWidget(self.container_left)
