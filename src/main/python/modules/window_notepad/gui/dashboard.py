@@ -49,7 +49,7 @@ class NotepadDashboard(QtWidgets.QSplitter):
     storage = QtCore.pyqtSignal(object)
     storage_changed = QtCore.pyqtSignal(object)
 
-    fullscreenAction = QtCore.pyqtSignal(object)
+    fullscreen = QtCore.pyqtSignal(object)
 
     editor = None
 
@@ -119,6 +119,7 @@ class NotepadDashboard(QtWidgets.QSplitter):
 
         splitter = DashboardSplitter(index)
         splitter.delete.connect(self.delete.emit)
+        splitter.fullscreen.connect(self.fullscreen.emit)
         splitter.clicked.connect(self.scrollTo)
         splitter.clone.connect(self.clone.emit)
         splitter.scrollTo(index)
@@ -150,9 +151,10 @@ class NotepadDashboard(QtWidgets.QSplitter):
 
         preview = PreviewScrollArea(self)
         preview.open(storage.entitiesByFileType(index))
-        preview.edit.connect(self.edit.emit)
+        preview.fullscreen.connect(self.fullscreen.emit)
         preview.delete.connect(self.delete.emit)
         preview.clone.connect(self.clone.emit)
+        preview.edit.connect(self.edit.emit)
 
         self.container_right.clean()
         self.container_right.addWidget(toolbar)

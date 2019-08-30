@@ -24,6 +24,7 @@ from .document import HtmlDocument
 class DashboardSplitter(QtWidgets.QSplitter):
     delete = QtCore.pyqtSignal(object)
     clicked = QtCore.pyqtSignal(object)
+    fullscreen = QtCore.pyqtSignal(object)
     clone = QtCore.pyqtSignal(object)
 
     @inject.params(storage='storage')
@@ -33,16 +34,16 @@ class DashboardSplitter(QtWidgets.QSplitter):
 
         self.preview = PreviewScrollArea(self)
         self.preview.edit.connect(self.previewClickedEvent)
+        self.preview.fullscreen.connect(self.fullscreen.emit)
         self.preview.delete.connect(self.delete.emit)
         self.preview.clone.connect(self.clone.emit)
-        self.preview.setMinimumWidth(400)
 
         parent = storage.fileDir(index)
         self.preview.open(storage.entitiesByFileType(parent))
         self.preview.scrollTo((index, None))
 
         self.editor = inject.instance('notepad.editor')
-        self.editor.setMinimumWidth(500)
+        # self.editor.setMinimumWidth(500)
         content = storage.fileContent(index)
         self.editor.setDocument(HtmlDocument(content))
         self.editor.setIndex(index)
@@ -82,8 +83,8 @@ class DashboardSplitter(QtWidgets.QSplitter):
         if self.editor is None:
             return None
 
-        self.editor.setDocument(document)
         self.editor.setIndex(index)
+        self.editor.setDocument(document)
 
         self.clicked.emit(index)
 

@@ -55,6 +55,7 @@ class NotepadDashboardTree(QtWidgets.QTreeView):
 
         if storage.isDir(index):
             return self.group.emit((index, None))
+
         return self.note.emit((index, None))
 
     @inject.params(storage='storage')

@@ -106,16 +106,16 @@ class ModuleActions(object):
         try:
             index, document = event
             editor = inject.instance('notepad.editor')
-            editor.setDocument(document)
             editor.setIndex(index)
+            editor.setDocument(document)
 
             window.tab.emit((editor, storage.fileName(index)))
 
         except Exception as ex:
             getLogger('app').exception(ex)
 
-    @inject.params(storage='storage', search='search', status='status')
-    def onActionDelete(self, index, widget, storage, search, status):
+    @inject.params(storage='storage', status='status')
+    def onActionDelete(self, index, widget, storage, status):
 
         message = widget.tr("Are you sure you want to remove this element: {} ?".format(
             storage.fileName(index)
@@ -146,7 +146,6 @@ class ModuleActions(object):
     def onActionConfigUpdated(self, event, config, widget, status):
 
         try:
-
             visible = int(config.get('folders.toolbar'))
             widget.toolbar.setVisible(visible)
 
@@ -182,8 +181,8 @@ class ModuleActions(object):
 
         menu = QtWidgets.QMenu()
 
-        if widget.current and not storage.isDir(widget.current) and widget.editor:
-            action = functools.partial(self.onActionFullScreen, event=None, widget=widget.editor)
+        if widget.current and not storage.isDir(widget.current):
+            action = functools.partial(self.onActionFullScreen, event=(widget.current, None))
             menu.addAction(QtGui.QIcon("icons/tab-new"), 'Open in a new tab', action)
             menu.addSeparator()
 
@@ -223,7 +222,6 @@ class ModuleActions(object):
                 if reply == QtWidgets.QMessageBox.No: continue
 
             with open(path, 'r') as source:
-
                 index = widget.current
                 if index is None or not index:
                     index = config.get('storage.location')
@@ -252,9 +250,7 @@ class ModuleActions(object):
 
     @inject.params(storage='storage', dashboard='notepad.dashboard')
     def onActionStorageChanged(self, destination, storage, dashboard, widget):
-
         dashboard.tree.setModel(storage)
-
         index = storage.setRootPath(destination)
         dashboard.tree.setRootIndex(index)
         dashboard.group(index)

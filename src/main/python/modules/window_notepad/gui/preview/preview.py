@@ -24,6 +24,7 @@ from .label import Title
 
 class NotePreviewDescription(QtWidgets.QFrame):
     edit = QtCore.pyqtSignal(object)
+    fullscreen = QtCore.pyqtSignal(object)
     delete = QtCore.pyqtSignal(object)
     clone = QtCore.pyqtSignal(object)
 
@@ -43,10 +44,10 @@ class NotePreviewDescription(QtWidgets.QFrame):
         self.description = Description(storage.fileContent(index))
         self.layout.addWidget(self.description, 1, 0, 4, 30)
 
-        self.buttonEdit = PictureButtonFlat(QtGui.QIcon("icons/note"))
-        self.buttonEdit.clicked.connect(lambda x: self.edit.emit((index, self.document())))
+        self.buttonFullscreen = PictureButtonFlat(QtGui.QIcon("icons/fullscreen"))
+        self.buttonFullscreen.clicked.connect(lambda x: self.fullscreen.emit((index, self.document())))
 
-        self.layout.addWidget(self.buttonEdit, 0, 27, 1, 1)
+        self.layout.addWidget(self.buttonFullscreen, 0, 27, 1, 1)
 
         self.buttonClone = PictureButtonFlat(QtGui.QIcon("icons/copy"))
         self.buttonClone.clicked.connect(lambda x: self.clone.emit(index))
@@ -80,6 +81,9 @@ class NotePreviewDescription(QtWidgets.QFrame):
             self.setGraphicsEffect(effect)
         if QEvent.type() == QtCore.QEvent.Leave:
             self.setGraphicsEffect(None)
+
+        if QEvent.type() == QtCore.QEvent.MouseButtonDblClick:
+            self.fullscreen.emit((self.index, self.description.document()))
 
         if QEvent.type() == QtCore.QEvent.MouseButtonRelease:
             self.edit.emit((self.index, self.description.document()))

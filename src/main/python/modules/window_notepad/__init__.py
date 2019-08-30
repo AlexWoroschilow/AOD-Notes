@@ -74,6 +74,7 @@ class Loader(object):
     def _notepad_dashboard(self, config, storage, binder):
 
         widget = NotepadDashboard()
+        widget.fullscreen.connect(self.actions.onActionFullScreen)
         widget.storage_changed.connect(functools.partial(self.actions.onActionStorageChanged, widget=widget))
         widget.note_new.connect(functools.partial(self.actions.onActionNoteCreate, widget=widget))
         widget.note_import.connect(functools.partial(self.actions.onActionNoteImport, widget=widget))

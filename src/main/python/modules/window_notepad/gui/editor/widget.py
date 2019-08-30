@@ -91,26 +91,19 @@ class TextEditorWidget(QtWidgets.QWidget):
 
         self.setLayout(layout)
 
-    def index(self):
-        return self._index
-
-    def setIndex(self, index=None):
-        if index is None:
-            return None
-        self._index = index
-
     def document(self):
         if self.writer is None:
             return None
 
         return self.writer.document()
 
-    def setDocument(self, document=None):
+    @inject.params(storage='storage')
+    def setDocument(self, document=None, storage=None):
         if document is None:
-            return None
+            content = storage.fileContent(self.index)
+            return self.insertHtml(content)
         if self.writer is None:
             return None
-
         self.writer.setDocument(document)
 
         return None
@@ -129,13 +122,10 @@ class TextEditorWidget(QtWidgets.QWidget):
     def index(self):
         return self._index
 
-    @index.setter
-    @inject.params(storage='storage')
-    def index(self, value, storage):
-        pass
-        # self._index = value
-        # content = storage.fileContent(value)
-        # self.insertHtml(content)
+    def setIndex(self, index=None):
+        if index is None:
+            return None
+        self._index = index
 
     def clean(self):
         self.writer.text.setHtml('')

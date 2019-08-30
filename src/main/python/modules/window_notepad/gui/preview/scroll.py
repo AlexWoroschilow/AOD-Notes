@@ -24,6 +24,7 @@ from .widget import PreviewContainer
 class PreviewScrollArea(QtWidgets.QScrollArea):
     edit = QtCore.pyqtSignal(object)
     delete = QtCore.pyqtSignal(object)
+    fullscreen = QtCore.pyqtSignal(object)
     clone = QtCore.pyqtSignal(object)
 
     def __init__(self, parent=None):
@@ -31,6 +32,7 @@ class PreviewScrollArea(QtWidgets.QScrollArea):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setWidgetResizable(True)
+        self.setMinimumWidth(400)
 
         self.edit.connect(self.scrollTo)
 
@@ -104,9 +106,12 @@ class PreviewScrollArea(QtWidgets.QScrollArea):
             position, index = self.hashmap_positions[path]
 
             preview = NotePreviewDescription(index)
-            preview.edit.connect(self.edit.emit)
+            preview.fullscreen.connect(self.fullscreen.emit)
             preview.delete.connect(self.delete.emit)
             preview.clone.connect(self.clone.emit)
+            preview.edit.connect(self.edit.emit)
+            if self.columns is None or self.columns in [0, 1]:
+                preview.setMinimumWidth(self.width() * 0.95)
             preview.setFixedHeight(500)
 
             i = math.floor(position / self.columns)
@@ -116,7 +121,6 @@ class PreviewScrollArea(QtWidgets.QScrollArea):
             self.hashmap_widgets[path] = preview
 
         status.info('{} notes found'.format(len(self.hashmap_widgets)))
-
         return super(PreviewScrollArea, self).show()
 
     def clear(self):
