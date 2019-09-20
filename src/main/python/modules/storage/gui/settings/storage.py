@@ -19,26 +19,39 @@ from PyQt5 import QtCore
 
 from . import SettingsTitle
 from . import WidgetSettings
+from PyQt5 import QtGui
 
 
 class WidgetSettingsStorage(WidgetSettings):
 
-    def __init__(self):
+    @inject.params(config='config')
+    def __init__(self, config):
         super(WidgetSettingsStorage, self).__init__()
 
-        self.layout = QtWidgets.QGridLayout()
+        self.layout = QtWidgets.QVBoxLayout()
         self.layout.setAlignment(Qt.AlignLeft)
 
-        self.layout.addWidget(SettingsTitle('The notes are stored in:'), 0, 0, 1, 5)
+        self.layout.addWidget(SettingsTitle('Shortcuts'))
+        self.layout.addWidget(QtWidgets.QLabel('Ctl+N - create new note'))
+        self.layout.addWidget(QtWidgets.QLabel('Ctl+R - create new group'))
+        self.layout.addWidget(QtWidgets.QLabel('Ctl+I - import note from a file'))
+        self.layout.addWidget(QtWidgets.QLabel('Ctl+F - start fulltext search'))
 
-        self.location = QtWidgets.QPushButton('Change')
+        spacer = QtWidgets.QWidget()
+        spacer.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        self.layout.addWidget(spacer)
+
+        location = config.get('storage.location')
+        location = location.replace(os.path.expanduser('~'), '~')
+
+        self.layout.addWidget(SettingsTitle('Storage'))
+        self.location = QtWidgets.QPushButton(' {}'.format(location))
+        self.location.setIcon(QtGui.QIcon("icons/save"))
         self.location.setToolTip("Clone selected preview")
         self.location.setFlat(True)
-        self.layout.addWidget(self.location, 1, 0, 1, 5)
+        self.layout.addWidget(self.location)
 
         self.setLayout(self.layout)
-
-        self.show()
 
     def quit(self):
         self.thread.exit()

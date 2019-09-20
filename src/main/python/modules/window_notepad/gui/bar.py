@@ -113,7 +113,7 @@ class NotepadEditorToolbarTop(QtWidgets.QFrame):
         self.text_search.focusOutEvent = self.on_search_focus_out
 
         tooltip = 'Create new note. The new note will be created as a part of the selected group or in the root group.'
-        self.button_settings = PictureButton(QtGui.QIcon("icons/settings"), tooltip)
+        self.button_settings = PictureButton(QtGui.QIcon("icons/icons"), tooltip)
         self.button_settings.clicked.connect(lambda event=None: self.settings.emit(self.button_settings))
         self.button_settings.setFlat(True)
         self.layout.addWidget(self.button_settings)

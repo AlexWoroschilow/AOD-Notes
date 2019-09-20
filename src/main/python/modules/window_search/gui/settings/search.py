@@ -17,7 +17,7 @@ from PyQt5.QtCore import Qt
 from . import SettingsTitle
 from . import WidgetSettings
 from PyQt5 import QtCore
-
+from PyQt5 import QtGui
 
 class SearchThread(QtCore.QThread):
     progress = QtCore.pyqtSignal(int)
@@ -58,9 +58,10 @@ class WidgetSettingsSearch(WidgetSettings):
         self.layout = QtWidgets.QGridLayout()
         self.layout.setAlignment(Qt.AlignLeft)
 
-        self.layout.addWidget(SettingsTitle('Search engine:'), 0, 0, 1, 5)
+        self.layout.addWidget(SettingsTitle('Fulltext search'), 0, 0, 1, 5)
 
-        self.rebuild = QtWidgets.QPushButton('Rebuild the search index')
+        self.rebuild = QtWidgets.QPushButton('update search index')
+        self.rebuild.setIcon(QtGui.QIcon("icons/refresh"))
         self.rebuild.setToolTip("Rebuild the search index")
         self.rebuild.clicked.connect(self.onActionRebuild)
         self.rebuild.setFlat(True)

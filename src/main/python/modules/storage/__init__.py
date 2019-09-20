@@ -73,7 +73,6 @@ class Loader(object):
         from .gui.settings.storage import WidgetSettingsStorage
 
         widget = WidgetSettingsStorage()
-        widget.location.setText(config.get('storage.location'))
         widget.location.clicked.connect(functools.partial(
             self.actions.onActionStorageLocationChange
         ))
