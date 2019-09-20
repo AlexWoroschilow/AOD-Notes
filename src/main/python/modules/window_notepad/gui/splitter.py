@@ -73,15 +73,20 @@ class DashboardSplitter(QtWidgets.QSplitter):
             parent = storage.fileDir(index)
             self.preview.open(storage.entitiesByFileType(parent))
             document = self.preview.getDocumentByIndex(index)
+
         return self.preview.edit.emit((index, document))
 
-    def previewClickedEvent(self, event):
-        index, document = event
-        if index is None or document is None:
-            return None
+    @inject.params(storage='storage')
+    def previewClickedEvent(self, event, storage):
+        if self.editor is None: return None
 
-        if self.editor is None:
-            return None
+        index, document = event
+        if document is None: return None
+        if index is None: return None
+
+        content = storage.fileContent(index)
+        if content is None: return None
+        document.setHtml(content)
 
         self.editor.setIndex(index)
         self.editor.setDocument(document)

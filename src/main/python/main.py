@@ -38,7 +38,7 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from importlib import util
 
-from fbs_runtime.application_context.PyQt5 import ApplicationContext
+from fbs_runtime.application_context import ApplicationContext
 
 abspath = os.path.abspath(__file__)
 os.chdir(os.path.dirname(abspath))
