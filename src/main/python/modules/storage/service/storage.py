@@ -106,12 +106,14 @@ class FilesystemStorage(QtWidgets.QFileSystemModel):
         return super(FilesystemStorage, self).fileName(path)
 
     def fileContent(self, path=None):
+        if path is None: return None
         if isinstance(path, QtCore.QModelIndex):
             path = self.filePath(path)
 
         if self.isDir(path):
             return None
 
+        if not len(path): return None
         return open(path, 'r').read()
 
     def setFileContent(self, path, content):

@@ -46,6 +46,7 @@ class PreviewScrollArea(QtWidgets.QScrollArea):
 
     @inject.params(storage='storage')
     def open(self, collection=None, storage=None):
+        if collection is None: return None
         self.hashmap_widgets = {}
         self.hashmap_positions = {}
         for position, index in enumerate(collection):

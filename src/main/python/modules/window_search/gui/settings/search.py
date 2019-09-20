@@ -58,15 +58,13 @@ class WidgetSettingsSearch(WidgetSettings):
         self.layout = QtWidgets.QGridLayout()
         self.layout.setAlignment(Qt.AlignLeft)
 
-        self.layout.addWidget(SettingsTitle('Search engine settings'), 0, 0, 1, 5)
+        self.layout.addWidget(SettingsTitle('Search engine:'), 0, 0, 1, 5)
 
-        self.layout.addWidget(QtWidgets.QLabel('Rebuild index:'), 1, 0)
-
-        self.rebuild = QtWidgets.QPushButton('create new index')
+        self.rebuild = QtWidgets.QPushButton('Rebuild the search index')
         self.rebuild.setToolTip("Rebuild the search index")
         self.rebuild.clicked.connect(self.onActionRebuild)
         self.rebuild.setFlat(True)
-        self.layout.addWidget(self.rebuild, 1, 1)
+        self.layout.addWidget(self.rebuild, 1, 0, 1, 2)
 
         self.progress = QtWidgets.QProgressBar(self)
         self.progress.setVisible(False)

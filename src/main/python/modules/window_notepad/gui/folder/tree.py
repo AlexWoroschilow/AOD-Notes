@@ -15,10 +15,12 @@ import inject
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
+from PyQt5 import QtGui
 
 
 class NotepadDashboardTree(QtWidgets.QTreeView):
     note = QtCore.pyqtSignal(object)
+    delete = QtCore.pyqtSignal(object)
     group = QtCore.pyqtSignal(object)
     menu = QtCore.pyqtSignal(object)
 
@@ -44,6 +46,15 @@ class NotepadDashboardTree(QtWidgets.QTreeView):
         self.setColumnHidden(1, True)
         self.setColumnHidden(2, True)
         self.setColumnHidden(3, True)
+
+    def keyPressEvent(self, event):
+        if event.key() in [Qt.Key_Delete, Qt.Key_Backspace]:
+            index = self.currentIndex()
+            return self.delete.emit(index)
+        if event.key() in [Qt.Key_Space, Qt.Key_Return]:
+            index = self.currentIndex()
+            return self.note.emit((index, None))
+        return super(NotepadDashboardTree, self).keyPressEvent(event)
 
     @inject.params(config='config', storage='storage')
     def noteSelectEvent(self, index=None, config=None, storage=None):

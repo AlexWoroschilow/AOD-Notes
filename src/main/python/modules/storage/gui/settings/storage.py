@@ -29,13 +29,12 @@ class WidgetSettingsStorage(WidgetSettings):
         self.layout = QtWidgets.QGridLayout()
         self.layout.setAlignment(Qt.AlignLeft)
 
-        self.layout.addWidget(SettingsTitle('Storage settings'), 0, 0, 1, 5)
-        self.layout.addWidget(QtWidgets.QLabel('Database:'), 1, 0)
+        self.layout.addWidget(SettingsTitle('The notes are stored in:'), 0, 0, 1, 5)
 
         self.location = QtWidgets.QPushButton('Change')
         self.location.setToolTip("Clone selected preview")
         self.location.setFlat(True)
-        self.layout.addWidget(self.location, 1, 1)
+        self.layout.addWidget(self.location, 1, 0, 1, 5)
 
         self.setLayout(self.layout)
 

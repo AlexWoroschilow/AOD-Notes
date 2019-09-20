@@ -63,6 +63,7 @@ class NotepadDashboard(QtWidgets.QSplitter):
         self.tree = NotepadDashboardTree()
         self.tree.note.connect(lambda x: self.open(x[0]))
         self.tree.group.connect(lambda x: self.open(x[0]))
+        self.tree.delete.connect(self.delete.emit)
         self.tree.menu.connect(self.menu.emit)
 
         self.container_left = NotepadDashboardLeft()
