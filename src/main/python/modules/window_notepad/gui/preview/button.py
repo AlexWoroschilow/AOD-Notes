@@ -11,11 +11,11 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 from PyQt5 import QtWidgets
+from PyQt5 import QtCore
+from PyQt5 import QtGui
 
 
 class PictureButtonFlat(QtWidgets.QPushButton):
     def __init__(self, icon=None, text=None):
         super(PictureButtonFlat, self).__init__(icon, None)
-        self.setToolTipDuration(0)
         self.setToolTip(text)
-        self.setFlat(True)

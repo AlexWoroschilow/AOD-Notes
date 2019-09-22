@@ -74,7 +74,7 @@ class NotePreviewDescription(QtWidgets.QFrame):
     def event(self, QEvent):
         if QEvent.type() == QtCore.QEvent.Enter:
             effect = QtWidgets.QGraphicsDropShadowEffect()
-            effect.setColor(QtGui.QColor('#0000FF'))
+            effect.setColor(QtGui.QColor('#1E90FF'))
             effect.setBlurRadius(20)
             effect.setOffset(0)
 
@@ -89,7 +89,7 @@ class NotePreviewDescription(QtWidgets.QFrame):
             self.edit.emit((self.index, self.description.document()))
 
             effect = QtWidgets.QGraphicsDropShadowEffect()
-            effect.setColor(QtGui.QColor('#0000FF'))
+            effect.setColor(QtGui.QColor('#1E90FF'))
             effect.setBlurRadius(20)
             effect.setOffset(0)
 

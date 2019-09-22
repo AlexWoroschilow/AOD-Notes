@@ -1,15 +1,7 @@
-QMainWindow, QMenu, SettingsScrollArea { background: rgb(236,236,236); }
+QMainWindow { background: #ffffff; }
+QMenu, SettingsScrollArea { background: #ffffff; }
+SettingsScrollArea { background: #ffffff; }
 
-PictureButton {
-    min-width: 30px;
-    padding: 2px 2px;
-    margin: 0px 0px;
-}
-PictureButtonFlat {
-    min-width: 20px;
-    padding: 2px 2px;
-    margin: 0px 2px;
-}
 
 
 QTextEdit {	background: #fff; 	border: 1px !important; }
@@ -93,10 +85,10 @@ TextEditorWidget { background: #ffffff; text-align: center; border: none; }
 PreviewScrollArea PreviewContainer { border: none; }
 PreviewScrollArea PreviewContainer NotePreviewDescription { background-color: #ffffff; border-radius: 0px; padding: 10px 30px; }
 PreviewScrollArea PreviewContainer NotePreviewDescription #previewTitle { background: #ffffff; }
-PreviewScrollArea { background: #414649; padding: 0px 0px; border: none; margin: 0px; }
+PreviewScrollArea PreviewContainer NotePreviewDescription Description { color: #000; }
+PreviewScrollArea { background: #d0d0d0; padding: 0px 0px; border: none; margin: 0px; }
 
-
-QSplitter { background: #414649; border: none; }
+QSplitter { background: #ffffff; border: none; }
 QSplitter::handle { image: url(icons/splitter-light); }
 QSplitter::handle:vertical { height: 5px; }
 
@@ -107,28 +99,29 @@ QTabBar { background: rgb(236,236,236); color: #4F4F4F; font-size: 16px; }
 QTabWidget { background: #ffffff; border: none; margin: 0px; }
 QTabWidget::pane { background: #ffffff; border: none; margin: 0px; }
 QTabWidget::tab-bar { left: 0px; color: #4F4F4F; }
-QTabBar::tab { background: #414649; color: rgb(236,236,236); border-right: 1px solid #414649; padding: 5px; }
-QTabBar::tab:selected { background: #515659; }
-QTabBar::tab:!selected { background: #414649; }
-QTabBar::close-button { image: url(icons/close-light); }
+QTabBar::tab { background: #ffffff; color: 4a4a4a; border-right: 1px solid #d0d0d0; padding: 5px; }
+QTabBar::tab:selected { background: #d0d0d0; }
+QTabBar::tab:!selected { background: #ffffff; }
+QTabBar::close-button { image: url(icons/close); }
 
-NotepadDashboardTree { background: #515659; alternate-background-color: #515659; border-top: 1px solid #414649; font-size: 16px;  }
-NotepadDashboardTree::branch { border-bottom: 1px solid #515659; background: #515659; alternate-background-color: #515659; }
-NotepadDashboardTree::branch:open { image: url(icons/minus-light); }
-NotepadDashboardTree::branch:closed:has-children { image: url(icons/plus-light); }
-NotepadDashboardTree::branch:hover { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
-NotepadDashboardTree::branch:selected { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
-NotepadDashboardTree::item { border-bottom: 1px solid #515659; color: #C0C0C0; padding: 3px 0px; }
-NotepadDashboardTree::item:hover { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
-NotepadDashboardTree::item:selected:active { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
-NotepadDashboardTree::item:hover:selected { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
-NotepadDashboardTree::item:selected { alternate-background-color: #414649; border-bottom: 1px solid #414649; background: #414649; }
+NotepadDashboardTree { background: #ffffff; alternate-background-color: #ffffff; border: none; border-left: 1px solid #c0c0c0; font-size: 16px;  }
+NotepadDashboardTree::branch { border-bottom: 1px solid #ffffff; background: #ffffff; alternate-background-color: #ffffff; }
+NotepadDashboardTree::branch:open { image: url(icons/minus); }
+NotepadDashboardTree::branch:closed:has-children { image: url(icons/plus); }
+NotepadDashboardTree::branch:hover { alternate-background-color: #f0f0f0; border-bottom: 1px solid #f0f0f0; background: #f0f0f0; }
+NotepadDashboardTree::branch:selected { alternate-background-color: #d0d0d0; border-bottom: 1px solid #d0d0d0; background: #d0d0d0; }
+NotepadDashboardTree::branch:hover:selected { alternate-background-color: #e4e4e4; border-bottom: 1px solid #e4e4e4; background: #e4e4e4; }
+NotepadDashboardTree::item { border-bottom: 1px solid #ffffff; color: #4a4a4a; padding: 3px 0px; }
+NotepadDashboardTree::item:hover { alternate-background-color: #f0f0f0; border-bottom: 1px solid #f0f0f0; background: #f0f0f0; }
+NotepadDashboardTree::item:selected:active { alternate-background-color: #d0d0d0; border-bottom: 1px solid #d0d0d0; background: #d0d0d0; }
+NotepadDashboardTree::item:hover:selected { alternate-background-color: #e4e4e4; border-bottom: 1px solid #e4e4e4; background: #e4e4e4; }
+NotepadDashboardTree::item:selected { alternate-background-color: #d0d0d0; border-bottom: 1px solid #d0d0d0; background: #d0d0d0; }
 
-NotepadDashboardLeft { background: #515659; padding: 0px; margin: 0px; border: none; }
+NotepadDashboardLeft { background: #c0c0c0; padding: 0px; margin: 0px; border: none; }
 NotepadDashboardLeft FolderTreeToolbarTop {  background: #515659; padding: 0px; margin: 0px; border: none; }
 NotepadDashboardLeft FolderTreeToolbarTop ToolBarButton { background: #515659; color: rgb(236,236,236); padding: 5px; margin: 0px; font-size: 16px; }
 NotepadDashboardLeft FolderTreeToolbarTop ToolBarButton:pressed { background-color: #414649; border-color: #515659; border-style: inset; border-width: 0px; }
 NotepadDashboardLeft FolderTreeToolbarTop ToolBarButton:hover { background-color: #414649; border-style: inset; border-width: 0px; border-color: #515659; }
 
 NotepadDashboardRight { padding: 0px; margin: 0px; border: none; background: #ffffff; }
-NotepadDashboardRight  NotepadEditorToolbarTop { background: rgb(236,236,236); padding: 5px; border: none; }
+NotepadEditorToolbarTop { background: #fff; padding: 5px 5px 10px 5px; border-bottom: 1px solid #c0c0c0; }
