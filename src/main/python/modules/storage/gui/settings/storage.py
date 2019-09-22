@@ -32,6 +32,7 @@ class WidgetSettingsStorage(WidgetSettings):
         self.layout.setAlignment(Qt.AlignLeft)
 
         self.layout.addWidget(SettingsTitle('Shortcuts'))
+
         self.layout.addWidget(QtWidgets.QLabel('Ctl+N - create new note'))
         self.layout.addWidget(QtWidgets.QLabel('Ctl+R - create new group'))
         self.layout.addWidget(QtWidgets.QLabel('Ctl+I - import note from a file'))

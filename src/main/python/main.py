@@ -21,7 +21,6 @@ import optparse
 import inject
 import glob
 import pdfkit
-import secrets
 import configparser
 import html
 import importlib

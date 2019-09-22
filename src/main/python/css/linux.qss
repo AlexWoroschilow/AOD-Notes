@@ -1,6 +1,4 @@
-QMainWindow {
-	background: rgb(236,236,236);
-}
+QMainWindow, QMenu, SettingsScrollArea { background: rgb(236,236,236); }
 
 PictureButton {
     min-width: 30px;
