@@ -103,7 +103,7 @@ QTabBar::tab:selected { background: #ffffff; border-right: 2px solid #4a4a4a; }
 QTabBar::tab:!selected { background: #ffffff; }
 QTabBar::close-button { image: url(icons/close); }
 
-NotepadDashboardTree { background: #f9f9f9; alternate-background-color: #f9f9f9; border: none; border-left: 1px solid #c0c0c0; font-size: 16px;  }
+NotepadDashboardTree { background: #f9f9f9; alternate-background-color: #f9f9f9; border: none; border-left: 1px solid #f0f0f0; font-size: 16px;  }
 NotepadDashboardTree::branch { border-bottom: 1px solid #f9f9f9; background: #f9f9f9; alternate-background-color: #f9f9f9; }
 NotepadDashboardTree::branch:open { image: url(icons/minus); }
 NotepadDashboardTree::branch:closed:has-children { image: url(icons/plus); }
@@ -123,7 +123,7 @@ NotepadDashboardLeft FolderTreeToolbarTop ToolBarButton:pressed { background-col
 NotepadDashboardLeft FolderTreeToolbarTop ToolBarButton:hover { background-color: #414649; border-style: inset; border-width: 0px; border-color: #515659; }
 
 NotepadDashboardRight { padding: 0px; margin: 0px; border: none; background: #ffffff; }
-NotepadEditorToolbarTop { background: #fff; padding: 5px 5px 10px 5px; border-bottom: 1px solid #c0c0c0; border-left: 1px solid #d0d0d0; }
+NotepadEditorToolbarTop { background: #fff; padding: 5px 5px 10px 5px; border-bottom: 1px solid #f0f0f0; border-left: 1px solid #f0f0f0; }
 
 QProgressBar { border: none;     border-radius: 5px;     text-align: center }
 QProgressBar::chunk { background-color: #6cccfc; margin: 1px; max-height: 10px; }
