@@ -35,7 +35,7 @@ class ToolBarButton(QtWidgets.QPushButton):
     def event(self, QEvent):
         if QEvent.type() == QtCore.QEvent.Enter:
             effect = QtWidgets.QGraphicsDropShadowEffect()
-            effect.setColor(QtGui.QColor('#1E90FF'))
+            effect.setColor(QtGui.QColor('#6cccfc'))
             effect.setBlurRadius(10)
             effect.setOffset(0)
 
@@ -45,7 +45,7 @@ class ToolBarButton(QtWidgets.QPushButton):
 
         if QEvent.type() == QtCore.QEvent.MouseButtonRelease:
             effect = QtWidgets.QGraphicsDropShadowEffect()
-            effect.setColor(QtGui.QColor('#1E90FF'))
+            effect.setColor(QtGui.QColor('#6cccfc'))
             effect.setBlurRadius(10)
             effect.setOffset(0)
 

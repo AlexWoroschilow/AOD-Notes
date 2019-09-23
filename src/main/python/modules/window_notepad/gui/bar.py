@@ -69,7 +69,7 @@ class NotepadEditorToolbarTop(QtWidgets.QFrame):
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.setAlignment(Qt.AlignCenter)
 
-        self.layout.addWidget(ButtonDisabled(QtGui.QIcon("icons/plus"), None))
+        self.layout.addWidget(ButtonDisabled(QtGui.QIcon("icons/plus-light"), None))
 
         tooltip = 'Create new note. The new note will be created as a part of the selected group or in the root group.'
         self.note = PictureButton(QtGui.QIcon("icons/note"), tooltip)

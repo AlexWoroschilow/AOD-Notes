@@ -16,17 +16,23 @@ from PyQt5.QtCore import Qt
 
 from . import SettingsTitle
 from . import WidgetSettings
+from . import PictureButton
+
 from PyQt5 import QtCore
 from PyQt5 import QtGui
 
+
 class SearchThread(QtCore.QThread):
-    progress = QtCore.pyqtSignal(int)
+    progress = QtCore.pyqtSignal(object)
+    started = QtCore.pyqtSignal(object)
+    finished = QtCore.pyqtSignal(object)
 
     @inject.params(storage='storage', search='search')
     def run(self, storage=None, search=None):
         if not search.clean():
             return None
 
+        self.started.emit(0)
         collection = storage.entities()
         for progress, index in enumerate(collection, start=1):
             self.progress.emit(progress / len(collection) * 100)
@@ -47,6 +53,7 @@ class SearchThread(QtCore.QThread):
 
             search.append(name, path, content)
         self.progress.emit(100)
+        self.finished.emit(100)
 
 
 class WidgetSettingsSearch(WidgetSettings):
@@ -55,39 +62,35 @@ class WidgetSettingsSearch(WidgetSettings):
     def __init__(self):
         super(WidgetSettingsSearch, self).__init__()
 
-        self.layout = QtWidgets.QGridLayout()
+        self.layout = QtWidgets.QVBoxLayout()
         self.layout.setAlignment(Qt.AlignLeft)
 
-        self.layout.addWidget(SettingsTitle('Fulltext search'), 0, 0, 1, 5)
+        self.layout.addWidget(SettingsTitle('Fulltext search'))
 
-        self.rebuild = QtWidgets.QPushButton('update search index')
+        self.rebuild = PictureButton('update search index')
         self.rebuild.setIcon(QtGui.QIcon("icons/refresh"))
         self.rebuild.setToolTip("Rebuild the search index")
-        self.rebuild.clicked.connect(self.onActionRebuild)
+        self.rebuild.clicked.connect(self.thread.start)
         self.rebuild.setFlat(True)
-        self.layout.addWidget(self.rebuild, 1, 0, 1, 2)
+        self.layout.addWidget(self.rebuild)
 
         self.progress = QtWidgets.QProgressBar(self)
         self.progress.setVisible(False)
-        self.layout.addWidget(self.progress, 2, 0, 1, 5)
+        self.layout.addWidget(self.progress)
 
         self.setLayout(self.layout)
 
+        self.thread.started.connect(lambda x: self.rebuild.setVisible(False))
+        self.thread.progress.connect(lambda x: self.rebuild.setVisible(False))
+        self.thread.finished.connect(lambda x: self.rebuild.setVisible(True))
+
+        self.thread.started.connect(lambda x: self.progress.setVisible(True))
+        self.thread.progress.connect(lambda x: self.progress.setVisible(True))
+        self.thread.progress.connect(lambda x: self.progress.setValue(x))
+        self.thread.finished.connect(lambda x: self.progress.setVisible(False))
+
+        self.thread.finished.connect(self.thread.exit)
         self.show()
-
-    def onActionRebuild(self, event):
-        self.thread.progress.connect(self.onActionRebuildProgress)
-        self.thread.start()
-        self.thread.exit()
-
-    def onActionRebuildProgress(self, value):
-        if not self.progress.isVisible() and value > 0:
-            self.progress.setVisible(True)
-
-        self.progress.setValue(value)
-
-        if self.progress.isVisible() and value == 100:
-            self.progress.setVisible(False)
 
     def quit(self):
         self.thread.exit()

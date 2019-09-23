@@ -17,6 +17,7 @@ from logging import getLogger
 
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
+import platform
 
 
 class ModuleActions(object):
@@ -179,7 +180,9 @@ class ModuleActions(object):
     @inject.params(storage='storage')
     def onActionContextMenu(self, event, widget, storage):
 
-        menu = QtWidgets.QMenu()
+        from .gui.menu import SettingsMenu
+
+        menu = SettingsMenu(widget)
 
         if widget.current and not storage.isDir(widget.current):
             action = functools.partial(self.onActionFullScreen, event=(widget.current, None))

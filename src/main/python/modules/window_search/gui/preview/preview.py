@@ -50,7 +50,7 @@ class NotePreviewDescription(QtWidgets.QGroupBox):
     def event(self, QEvent):
         if QEvent.type() == QtCore.QEvent.Enter:
             effect = QtWidgets.QGraphicsDropShadowEffect()
-            effect.setColor(QtGui.QColor('#0000FF'))
+            effect.setColor(QtGui.QColor('#6cccfc'))
             effect.setBlurRadius(20)
             effect.setOffset(0)
 

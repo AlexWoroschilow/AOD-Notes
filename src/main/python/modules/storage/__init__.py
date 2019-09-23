@@ -60,12 +60,21 @@ class Loader(object):
         if storage.first() is None or not storage.first():
             index = storage.index(location)
             if index is None: return storage
-            index = storage.mkdir(index, 'Example group')
-            if index is None: return storage
-            index = storage.touch(index, 'Example note')
-            if index is None: return storage
 
-        return storage
+            group01 = storage.mkdir(index, 'Example group 01')
+            if group01 is None: return storage
+
+            group02 = storage.mkdir(index, 'Example group 02')
+            if group02 is None: return storage
+
+            group03 = storage.mkdir(index, 'Example group 03')
+            if group03 is None: return storage
+
+            storage.touch(group01, 'Example note 01')
+            storage.touch(group02, 'Example note 02')
+            storage.touch(group02, 'Example note 03')
+
+        return FilesystemStorage(location)
 
     @inject.params(config='config')
     def _widget_settings_storage(self, config=None):
