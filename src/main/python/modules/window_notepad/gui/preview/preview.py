@@ -59,6 +59,11 @@ class NotePreviewDescription(QtWidgets.QFrame):
 
         self.setLayout(self.layout)
 
+        effect = QtWidgets.QGraphicsDropShadowEffect()
+        effect.setBlurRadius(10)
+        effect.setOffset(0)
+        self.setGraphicsEffect(effect)
+
     def document(self):
         if self.description is None:
             return None
@@ -80,7 +85,10 @@ class NotePreviewDescription(QtWidgets.QFrame):
 
             self.setGraphicsEffect(effect)
         if QEvent.type() == QtCore.QEvent.Leave:
-            self.setGraphicsEffect(None)
+            effect = QtWidgets.QGraphicsDropShadowEffect()
+            effect.setBlurRadius(10)
+            effect.setOffset(0)
+            self.setGraphicsEffect(effect)
 
         if QEvent.type() == QtCore.QEvent.MouseButtonDblClick:
             self.fullscreen.emit((self.index, self.description.document()))

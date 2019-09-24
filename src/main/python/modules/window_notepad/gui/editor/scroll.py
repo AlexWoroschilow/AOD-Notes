@@ -71,3 +71,25 @@ class TextWriter(QtWidgets.QScrollArea):
 
     def html(self):
         return self.text.toHtml()
+
+    def event(self, QEvent):
+        if QEvent.type() == QtCore.QEvent.Enter:
+            effect = QtWidgets.QGraphicsDropShadowEffect()
+            effect.setColor(QtGui.QColor('#6cccfc'))
+            effect.setBlurRadius(20)
+            effect.setOffset(0)
+
+            self.setGraphicsEffect(effect)
+        if QEvent.type() == QtCore.QEvent.Leave:
+            effect = QtWidgets.QGraphicsDropShadowEffect()
+            effect.setBlurRadius(10)
+            effect.setOffset(0)
+            self.setGraphicsEffect(effect)
+
+        if QEvent.type() == QtCore.QEvent.MouseButtonRelease:
+            effect = QtWidgets.QGraphicsDropShadowEffect()
+            effect.setColor(QtGui.QColor('#6cccfc'))
+            effect.setBlurRadius(20)
+            effect.setOffset(0)
+
+        return super(TextWriter, self).event(QEvent)
