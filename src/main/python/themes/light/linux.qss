@@ -1,0 +1,135 @@
+QMainWindow { background: #ffffff; }
+SettingsScrollArea { background: #ffffff; }
+
+
+
+QTextEdit {	background: #fff; 	border: 1px !important; }
+QToolBar { 	border: none;     margin: 5px 0px; }
+
+
+QToolButton:pressed {
+    border: none;
+    background-color:#AFAFAF;
+    padding: 0px;
+}
+QToolButton:hover,
+QToolButton:!hover {
+    border: none;
+    padding: 0px;
+}
+
+
+ToolbarWidgetLeft,
+ToolbarWidgetRight,
+FormatbarWidget,
+FolderTreeToolBar {
+    padding: 0px;
+    margin: 0px;
+}
+
+FolderTreeToolBar ToolBarButton,
+ToolbarWidgetLeft ToolBarButton,
+ToolbarWidgetRight ToolBarButton,
+FormatbarWidget ToolBarButton {
+	border: none;
+    padding: 5px;
+    margin: 0px;
+}
+
+FolderTreeToolBar ToolBarButton:pressed,
+ToolbarWidgetLeft ToolBarButton:pressed,
+ToolbarWidgetRight ToolBarButton:pressed,
+FormatbarWidget ToolBarButton:pressed {
+    background-color: rgb(236,236,236);
+    padding: 5px;
+}
+
+SearchField {
+    margin: 0px;
+    padding: 5px;
+    border: none;
+}
+
+
+FolderTreeToolBar { 
+    background: #3F4447;
+    border-right: 3px solid qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #3F4447, stop:1 #414649);
+	color: #A0A0A0;
+}
+
+
+TextWriter,
+TextEditor {
+	border-radius: 0px;
+	border: none;
+    margin: 0px;
+}
+
+
+WidgetSettings {
+    text-align: center;
+	padding: 0px 30px 20px 30px;
+	max-width: 600px;
+	border-bottom: 1px;
+}
+
+WidgetSettings SettingsTitle {
+    text-align: center;
+	font-size: 18px;
+	padding: 5px 0px;
+}
+
+TextEditorWidget { background: #ffffff; text-align: center; border: none; }
+
+PreviewScrollArea PreviewContainer { border: none; }
+PreviewScrollArea PreviewContainer NotePreviewDescription { background-color: #ffffff; border-radius: 0px; padding: 10px 30px; }
+PreviewScrollArea PreviewContainer NotePreviewDescription #previewTitle { background: #ffffff; }
+PreviewScrollArea PreviewContainer NotePreviewDescription Description { color: #000000; }
+PreviewScrollArea { background: #e0e0e0; padding: 0px 0px; border: none; margin: 0px; }
+
+QSplitter { background: #f9f9f9; border: none; }
+QSplitter::handle { image: url(icons/splitter-light); }
+QSplitter::handle:vertical { height: 5px; }
+
+DashboardSplitter { background: #ffffff; }
+
+
+QTabBar { background: rgb(236,236,236); color: #4F4F4F; font-size: 16px; }
+QTabWidget { background: #ffffff; border: none; margin: 0px; }
+QTabWidget::pane { background: #ffffff; border: none; margin: 0px; }
+QTabWidget::tab-bar { left: 0px; color: #4F4F4F; }
+QTabBar::tab { background: #ffffff; color: #000000; border-right: 2px solid #ffffff; padding: 5px; }
+QTabBar::tab:selected { background: #ffffff; border-right: 2px solid #4a4a4a; }
+QTabBar::tab:!selected { background: #ffffff; }
+QTabBar::close-button { image: url(icons/close); }
+
+NotepadDashboardTree { background: #f9f9f9; alternate-background-color: #f9f9f9; border: none; border-left: 1px solid #f0f0f0; font-size: 16px;  }
+NotepadDashboardTree::branch { border-bottom: 1px dotted #e4e4e4; background: #f9f9f9; alternate-background-color: #f9f9f9; }
+NotepadDashboardTree::branch:open { image: url(icons/minus); }
+NotepadDashboardTree::branch:closed:has-children { image: url(icons/plus); }
+NotepadDashboardTree::branch:hover { alternate-background-color: #f0f0f0; border-bottom: 1px solid #f0f0f0; background: #f0f0f0; }
+NotepadDashboardTree::branch:selected { alternate-background-color: #eeeeee; border-bottom: 1px solid #eeeeee; background: #eeeeee; }
+NotepadDashboardTree::branch:hover:selected { alternate-background-color: #e4e4e4; border-bottom: 1px solid #e4e4e4; background: #e4e4e4; }
+NotepadDashboardTree::item { border-bottom: 1px dotted #e4e4e4; color: #000000; padding: 3px 0px; }
+NotepadDashboardTree::item:hover { alternate-background-color: #f0f0f0; border-bottom: 1px solid #f0f0f0; background: #f0f0f0; }
+NotepadDashboardTree::item:selected:active { alternate-background-color: #eeeeee; border-bottom: 1px solid #eeeeee; background: #eeeeee; }
+NotepadDashboardTree::item:hover:selected { alternate-background-color: #e4e4e4; border-bottom: 1px solid #e4e4e4; background: #e4e4e4; }
+NotepadDashboardTree::item:selected { alternate-background-color: #eeeeee; border-bottom: 1px solid #eeeeee; background: #eeeeee; }
+
+NotepadDashboardLeft { background: #c0c0c0; padding: 0px; margin: 0px; border: none; }
+NotepadDashboardLeft FolderTreeToolbarTop {  background: #515659; padding: 0px; margin: 0px; border: none; }
+NotepadDashboardLeft FolderTreeToolbarTop ToolBarButton { background: #515659; color: #ffffff; padding: 5px; margin: 0px; font-size: 16px; }
+NotepadDashboardLeft FolderTreeToolbarTop ToolBarButton:pressed { background-color: #414649; border-color: #515659; border-style: inset; border-width: 0px; }
+NotepadDashboardLeft FolderTreeToolbarTop ToolBarButton:hover { background-color: #414649; border-style: inset; border-width: 0px; border-color: #515659; }
+
+NotepadDashboardRight { padding: 0px; margin: 0px; border: none; background: #ffffff; }
+NotepadEditorToolbarTop { background: #fff; padding: 5px 5px 10px 5px; border-bottom: 1px solid #f0f0f0; border-left: 1px solid #f0f0f0; }
+
+QProgressBar { border: none;     border-radius: 5px;     text-align: center }
+QProgressBar::chunk { background-color: #6cccfc; margin: 1px; max-height: 10px; }
+
+QMenu { background-color: #ffffff; border: 1px solid #d0d0d0; }
+QMenu::item { padding: 5px 25px 5px 30px; border: 1px solid transparent; color: #4a4a4a; }
+QMenu::icon { padding: 0px 5px 0px 5px; }
+QMenu::item:selected { border-color: #e4e4e4; background: #e4e4e4; }
+QMenu::icon:checked { background: #ffffff; border: 1px inset #ffffff; position: absolute; top: 1px; right: 1px; bottom: 1px; left: 1px; }
