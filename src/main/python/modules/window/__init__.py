@@ -29,15 +29,11 @@ class Loader(object):
     def _widget(self, config=None, notepad=None):
 
         widget = MainWindow()
-        width = int(config.get('window.width'))
-        height = int(config.get('window.height'))
-        widget.resize(width, height)
-
         widget.setMainWidget(notepad)
+        widget.resize.connect(self.actions.onActionWindowResize)
 
         widget.footer = widget.statusBar()
         if widget.footer is None: return None
-        widget.resizeEvent = self.actions.onActionWindowResize
 
         return widget
 

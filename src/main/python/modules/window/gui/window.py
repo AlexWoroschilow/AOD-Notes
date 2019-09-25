@@ -19,7 +19,8 @@ from PyQt5 import QtCore
 
 class MainWindow(QtWidgets.QMainWindow):
     tab = QtCore.pyqtSignal(object)
-    tabSwitch = QtCore.pyqtSignal(int)
+    tabSwitch = QtCore.pyqtSignal(object)
+    resize = QtCore.pyqtSignal(object)
 
     def __init__(self, parent=None):
         self.content = None
@@ -50,6 +51,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.tab.connect(self.onActionTabOpen)
         self.tabSwitch.connect(self.onActionTabSwitch)
+
+    def resizeEvent(self, event):
+        self.resize.emit(event)
 
     def clean(self):
         layout = self.container.layout()

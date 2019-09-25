@@ -29,6 +29,8 @@ sys.path.append(os.path.join(os.getcwd(), 'lib'))
 sys.path.append(os.path.join(os.getcwd(), 'modules'))
 sys.path.append(os.path.join(os.getcwd(), 'plugins'))
 
+from PyQt5 import QtCore
+
 
 class Application(QtWidgets.QApplication):
     kernel = None
@@ -47,7 +49,19 @@ class Application(QtWidgets.QApplication):
         window = container.get_instance('window')
         if window is None: return None
 
+        config = container.get_instance('config')
+        if config is None: return None
+
         window.show()
+
+        width = int(config.get('window.width'))
+        height = int(config.get('window.height'))
+
+        animation = QtCore.QPropertyAnimation(window, b'size')
+        animation.setEndValue(QtCore.QSize(width, height))
+        animation.setStartValue(QtCore.QSize(800, 600))
+        animation.setDuration(200)
+        animation.start()
 
         return super(Application, self).exec_()
 

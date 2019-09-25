@@ -18,6 +18,32 @@ from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 
 
+class ToolBarSpinBox(QtWidgets.QSpinBox):
+    def __init__(self, parent=None):
+        super(ToolBarSpinBox, self).__init__(parent)
+        self.setSuffix(" pt")
+        self.setValue(14)
+
+    def event(self, QEvent):
+        if QEvent.type() == QtCore.QEvent.Enter:
+            effect = QtWidgets.QGraphicsDropShadowEffect()
+            effect.setColor(QtGui.QColor('#6cccfc'))
+            effect.setBlurRadius(10)
+            effect.setOffset(0)
+
+            self.setGraphicsEffect(effect)
+        if QEvent.type() == QtCore.QEvent.Leave:
+            self.setGraphicsEffect(None)
+
+        if QEvent.type() == QtCore.QEvent.MouseButtonRelease:
+            effect = QtWidgets.QGraphicsDropShadowEffect()
+            effect.setColor(QtGui.QColor('#6cccfc'))
+            effect.setBlurRadius(10)
+            effect.setOffset(0)
+
+        return super(ToolBarSpinBox, self).event(QEvent)
+
+
 class ToolBarButton(QtWidgets.QPushButton):
     activate = QtCore.pyqtSignal(object)
 
@@ -183,9 +209,7 @@ class FormatbarWidget(ToolbarBase):
         self.setObjectName('editorFormatBarWidget')
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
 
-        self.fontSize = QtWidgets.QSpinBox(self)
-        self.fontSize.setSuffix(" pt")
-        self.fontSize.setValue(14)
+        self.fontSize = ToolBarSpinBox(self)
 
         self.bulletAction = ToolBarButton()
         self.bulletAction.setIcon(QtGui.QIcon("icons/bullet"))

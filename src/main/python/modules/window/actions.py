@@ -17,6 +17,16 @@ class ModuleActions(object):
 
     @inject.params(config='config')
     def onActionWindowResize(self, event=None, config=None):
-        config.set('window.width', '%s' % event.size().width())
-        config.set('window.height', '%s' % event.size().height())
+        size = event.size()
+        if size is None:
+            return None
+
+        width = size.width()
+        if width is not None and width >= 1000:
+            config.set('window.width', width)
+
+        height = size.height()
+        if height is not None and height >= 800:
+            config.set('window.height', height)
+
         return event.accept()
