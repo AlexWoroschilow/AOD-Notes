@@ -11,6 +11,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
+import inject
 import platform
 from PyQt5 import QtGui
 from PyQt5 import QtWidgets
@@ -22,7 +23,8 @@ class MainWindow(QtWidgets.QMainWindow):
     tabSwitch = QtCore.pyqtSignal(object)
     resize = QtCore.pyqtSignal(object)
 
-    def __init__(self, parent=None):
+    @inject.params(themes='themes')
+    def __init__(self, parent=None, themes=None):
         self.content = None
 
         super(MainWindow, self).__init__(parent)
@@ -42,9 +44,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.setWindowTitle('AOD - Notepad')
 
-        stylesheet = 'css/{}.qss'.format(platform.system().lower())
-        if not os.path.exists(stylesheet): return None
-        self.setStyleSheet(open(stylesheet).read())
+        self.setStyleSheet(themes.get_stylesheet())
 
         if not os.path.exists('icons/icon.svg'): return None
         self.setWindowIcon(QtGui.QIcon('icons/icon.svg'))

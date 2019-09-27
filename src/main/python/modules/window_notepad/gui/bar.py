@@ -72,20 +72,20 @@ class NotepadEditorToolbarTop(QtWidgets.QFrame):
         self.layout.addWidget(ButtonDisabled(QtGui.QIcon("icons/plus-light"), None))
 
         tooltip = 'Create new note. The new note will be created as a part of the selected group or in the root group.'
-        self.note = PictureButton(QtGui.QIcon("icons/note"), tooltip)
+        self.note = PictureButton(QtGui.QIcon("icons/note-main"), tooltip)
         self.note.setShortcut("Ctrl+N")
 
         self.note.clicked.connect(lambda event=None: self.note_new.emit(event))
         self.layout.addWidget(self.note)
 
         tooltip = 'Create new note. The new note will be created as a part of the selected group or in the root group.'
-        self.group = PictureButton(QtGui.QIcon("icons/book"), tooltip)
+        self.group = PictureButton(QtGui.QIcon("icons/book-main"), tooltip)
         self.group.setShortcut("Ctrl+G")
         self.group.clicked.connect(lambda event=None: self.group_new.emit(event))
         self.layout.addWidget(self.group)
 
         tooltip = 'Create new note. The new note will be created as a part of the selected group or in the root group.'
-        self.importing = PictureButton(QtGui.QIcon("icons/import"), tooltip)
+        self.importing = PictureButton(QtGui.QIcon("icons/import-main"), tooltip)
         self.importing.setShortcut("Ctrl+I")
         self.importing.clicked.connect(lambda event=None: self.note_import.emit(event))
         self.layout.addWidget(self.importing)

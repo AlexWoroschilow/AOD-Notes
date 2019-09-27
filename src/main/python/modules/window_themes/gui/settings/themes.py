@@ -10,6 +10,7 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import copy
 import inject
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
@@ -22,15 +23,18 @@ from PyQt5 import QtCore
 from PyQt5 import QtGui
 
 
-class PreviewLabel(QtWidgets.QLabel):
+class ThemeLabel(QtWidgets.QLabel):
     clicked = QtCore.pyqtSignal(object)
 
-    def __init__(self, parent, picture=None):
-        super(PreviewLabel, self).__init__(parent)
-        self.setPixmap(picture.scaledToWidth(300, Qt.FastTransformation))
+    def __init__(self, parent, theme=None):
+        super(ThemeLabel, self).__init__(parent)
+        pixmap = QtGui.QPixmap(theme.preview)
+        self.setPixmap(pixmap.scaledToWidth(300, Qt.FastTransformation))
+        self.setToolTip('Apply {} theme'.format(theme.name))
+        self.theme = theme
 
     def mousePressEvent(self, event):
-        self.clicked.emit(event)
+        self.clicked.emit(self.theme)
 
     def event(self, QEvent):
         if QEvent.type() == QtCore.QEvent.Enter:
@@ -49,12 +53,14 @@ class PreviewLabel(QtWidgets.QLabel):
             effect.setBlurRadius(20)
             effect.setOffset(0)
 
-        return super(PreviewLabel, self).event(QEvent)
+        return super(ThemeLabel, self).event(QEvent)
 
 
 class WidgetSettingsThemes(WidgetSettings):
+    theme = QtCore.pyqtSignal(object)
 
-    def __init__(self):
+    @inject.params(themes='themes')
+    def __init__(self, themes=None):
         super(WidgetSettingsThemes, self).__init__()
 
         self.layout = QtWidgets.QVBoxLayout()
@@ -62,11 +68,10 @@ class WidgetSettingsThemes(WidgetSettings):
 
         self.layout.addWidget(SettingsTitle('Themes'))
 
-        pixmap = QtGui.QPixmap('themes/light/preview.png')
-        label = PreviewLabel(self, pixmap)
-        label.setToolTip('Apply light theme')
-
-        self.layout.addWidget(label)
+        for theme in themes.get_stylesheets():
+            label = ThemeLabel(self, theme)
+            label.clicked.connect(self.theme.emit)
+            self.layout.addWidget(label)
 
         self.setLayout(self.layout)
 

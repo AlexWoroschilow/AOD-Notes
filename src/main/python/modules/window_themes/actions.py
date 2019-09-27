@@ -15,4 +15,13 @@ from logging import getLogger
 
 
 class ModuleActions(object):
-    pass
+
+    @inject.params(config='config', window='window')
+    def on_action_theme(self, theme=None, config=None, window=None, widget=None):
+        if theme is None: return None
+        if config is None: return None
+        if window is None: return None
+        if widget is None: return None
+
+        config.set('themes.theme', theme.name)
+        window.setStyleSheet(theme.stylesheet)

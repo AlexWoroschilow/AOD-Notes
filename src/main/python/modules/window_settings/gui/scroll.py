@@ -40,6 +40,7 @@ class SettingsScrollArea(QtWidgets.QScrollArea):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setAlignment(Qt.AlignTop)
         self.setWidgetResizable(True)
+        self.setMinimumHeight(600)
 
         self.container = WidgetSettings()
         self.setWidget(self.container)
