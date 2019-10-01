@@ -35,6 +35,7 @@ appimage:
 	cp              -r     src/main/python/image target/$(project)
 	cp              -r     src/main/python/css target/$(project)
 	cp              -r     src/main/python/lib target/$(project)
+	cp              -r     src/main/python/themes target/$(project)
 	cp              -r     src/main/python/application.py target/$(project)
 
 	rm              -rf    $(project).AppDir
