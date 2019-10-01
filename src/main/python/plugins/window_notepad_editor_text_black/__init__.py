@@ -38,7 +38,7 @@ class Loader(object):
 
     @inject.params(factory='toolbar_factory.rightbar')
     def boot(self, options=None, args=None, factory=None):
-        factory.addWidget(self._constructor)
+        factory.addWidget(self._constructor, 50)
 
     def clickedEvent(self, event=None, widget=None):
         widget.setTextColor(QtGui.QColor.fromRgb(0, 0, 0))

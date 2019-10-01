@@ -26,9 +26,9 @@ class TextEditor(QtWidgets.QTextEdit):
         self.setAcceptRichText(True)
         self.setAcceptDrops(True)
 
-        self.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setFrameShape(QtWidgets.QFrame.NoFrame)
 
         self._entity = None
 
@@ -39,10 +39,6 @@ class TextEditor(QtWidgets.QTextEdit):
     @entity.setter
     def entity(self, value):
         self.entity = value
-
-    def resizeEvent(self, QResizeEvent):
-        print(QResizeEvent.size())
-        return super(TextEditor, self).resizeEvent(QResizeEvent)
 
     def wheelEvent(self, event):
         point = event.angleDelta()

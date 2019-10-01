@@ -19,7 +19,6 @@ from PyQt5 import QtGui
 from .folder.tree import NotepadDashboardTree
 from .preview.scroll import PreviewScrollArea
 
-from .bar import FolderTreeToolbarTop
 from .bar import NotepadEditorToolbarTop
 
 from .splitter import DashboardSplitter

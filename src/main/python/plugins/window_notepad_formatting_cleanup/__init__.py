@@ -11,6 +11,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
+from bs4 import BeautifulSoup
 
 from PyQt5 import QtGui
 
@@ -28,16 +29,29 @@ class Loader(object):
     def enabled(self, options=None, args=None):
         return options.console is None
 
-    @inject.params(factory='toolbar_factory.rightbar')
+    @inject.params(factory='toolbar_factory.leftbar')
     def boot(self, options=None, args=None, factory=None):
-        factory.addWidget(self._constructor, 54)
+        factory.addWidget(self._constructor, 80)
 
     def _constructor(self):
         widget = ToolBarButton()
-        widget.setIcon(QtGui.QIcon("icons/font-red.svg"))
-        widget.setToolTip(widget.tr("Change the text color to red"))
+        widget.setIcon(QtGui.QIcon("icons/cleanup"))
+        widget.setToolTip(widget.tr("Cleanup the document formatting"))
         widget.clickedEvent = self.clickedEvent
         return widget
 
+    def _strip_tags(self, html=None):
+        if html is None:
+            return None
+
+        soup = BeautifulSoup(html, "html5lib")
+        [x.extract() for x in soup.find_all('script')]
+        [x.extract() for x in soup.find_all('style')]
+        [x.extract() for x in soup.find_all('meta')]
+        [x.extract() for x in soup.find_all('noscript')]
+        [x.extract() for x in soup.find_all('iframe')]
+        return soup.text
+
     def clickedEvent(self, event=None, widget=None):
-        widget.setTextColor(QtGui.QColor.fromRgb(127, 0, 0))
+        content = widget.document().toRawText()
+        widget.document().setPlainText(content)

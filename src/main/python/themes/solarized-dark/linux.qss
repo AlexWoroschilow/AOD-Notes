@@ -22,47 +22,16 @@ QToolButton:!hover {
 }
 
 
-ToolbarWidgetLeft,
-ToolbarWidgetRight,
-FormatbarWidget,
-FolderTreeToolBar {
-    padding: 0px;
-    margin: 0px;
-}
+ToolbarBase  { padding: 0px; margin: 0px; }
+ToolbarBase ToolBarButton { border: none; padding: 5px; margin: 0px; }
+ToolbarBase ToolBarSpinBox { background-color: #4a4a4a; color: #fff; }
+ToolbarBase ToolBarButton:pressed { padding: 5px; }
 
-FolderTreeToolBar ToolBarButton,
-ToolbarWidgetLeft ToolBarButton,
-ToolbarWidgetRight ToolBarButton,
-FormatbarWidget ToolBarButton {
-	border: none;
-    padding: 5px;
-    margin: 0px;
-}
-
-FolderTreeToolBar ToolBarButton:pressed,
-ToolbarWidgetLeft ToolBarButton:pressed,
-ToolbarWidgetRight ToolBarButton:pressed,
-FormatbarWidget ToolBarButton:pressed {
-    background-color: rgb(236,236,236);
-    padding: 5px;
-}
-
-SearchField {
-    margin: 0px;
-    padding: 5px;
-    border: none;
-}
-
-
-FolderTreeToolBar {
-    background: #3F4447;
-    border-right: 3px solid qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #3F4447, stop:1 #073642);
-	color: #A0A0A0;
-}
-
+SearchField { background-color: #2d7393; color: #fff; margin: 0px; padding: 5px; border: none; }
 
 
 WidgetSettings {
+    background-color: #00212b;
     text-align: center;
 	padding: 0px 30px 20px 30px;
 	max-width: 600px;
@@ -70,17 +39,23 @@ WidgetSettings {
 }
 
 WidgetSettings SettingsTitle {
+    color: #2486cb;
     text-align: center;
 	font-size: 18px;
 	padding: 5px 0px;
 }
 
+WidgetSettings  QPushButton { color: #2486cb; }
+WidgetSettings  QLabel { color: #2486cb; }
+
+
 TextEditorWidget { background: #002b36; text-align: center; border: none; }
 
 PreviewScrollArea PreviewContainer { border: none; }
 PreviewScrollArea PreviewContainer NotePreviewDescription { background-color: #002b36; border-radius: 0px; padding: 10px 30px; }
-PreviewScrollArea PreviewContainer NotePreviewDescription #previewTitle { background: #002b36; }
+PreviewScrollArea PreviewContainer NotePreviewDescription Title { color: #2486cb; }
 PreviewScrollArea PreviewContainer NotePreviewDescription Description {  color: #2486cb; }
+PreviewScrollArea PreviewContainer NotePreviewDescription PictureButtonFlat {  background: #2d7393; border: none; padding: 5px; margin: 0px;  }
 PreviewScrollArea { background: #073642; padding: 0px 0px; border: none; margin: 0px; }
 
 QSplitter { background: #00212b; border: none; }
@@ -90,11 +65,11 @@ QSplitter::handle:vertical { height: 5px; }
 DashboardSplitter { background: #00212b; }
 
 
-QTabBar { background: rgb(236,236,236); color: #4F4F4F; font-size: 16px; }
+QTabBar { background: rgb(236,236,236); color: #2486cb; font-size: 16px; }
 QTabWidget { background: #00212b; border: none; margin: 0px; }
 QTabWidget::pane { background: #00212b; border: none; margin: 0px; border-left: 1px solid #002b36; }
-QTabWidget::tab-bar { left: 0px; color: #4F4F4F; }
-QTabBar::tab { background: #00212b; color: #839496; border-right: 2px solid #002b36; padding: 5px; }
+QTabWidget::tab-bar { left: 0px; color: #2486cb; }
+QTabBar::tab { background: #00212b; color: #2486cb; border-right: 2px solid #002b36; padding: 5px; }
 QTabBar::tab:selected { background: #002b36; border-right: 2px solid #002b36; }
 QTabBar::tab:!selected { background: #00212b; }
 QTabBar::close-button { image: url(icons/close); }
@@ -106,7 +81,7 @@ NotepadDashboardTree::branch:closed:has-children { image: url(icons/plus); }
 NotepadDashboardTree::branch:hover { alternate-background-color: #082933; border-bottom: 1px solid #082933; background: #082933; }
 NotepadDashboardTree::branch:selected { alternate-background-color: #082933; border-bottom: 1px solid #082933; background: #082933; }
 NotepadDashboardTree::branch:hover:selected { alternate-background-color: #073642; border-bottom: 1px solid #073642; background: #073642; }
-NotepadDashboardTree::item { border-bottom: 1px dotted #073642; color: #839496; padding: 3px 0px; }
+NotepadDashboardTree::item { border-bottom: 1px dotted #073642; color: #2486cb; padding: 3px 0px; }
 NotepadDashboardTree::item:hover { alternate-background-color: #082933; border-bottom: 1px solid #082933; background: #082933; }
 NotepadDashboardTree::item:selected:active { alternate-background-color: #082933; border-bottom: 1px solid #082933; background: #082933; }
 NotepadDashboardTree::item:hover:selected { alternate-background-color: #073642; border-bottom: 1px solid #073642; background: #073642; }
@@ -114,18 +89,19 @@ NotepadDashboardTree::item:selected { alternate-background-color: #082933; borde
 
 NotepadDashboardLeft { background: #c0c0c0; padding: 0px; margin: 0px; border: none; }
 NotepadDashboardLeft FolderTreeToolbarTop {  background: #515659; padding: 0px; margin: 0px; border: none; }
-NotepadDashboardLeft FolderTreeToolbarTop ToolBarButton { background: #515659; color: #00212b; padding: 5px; margin: 0px; font-size: 16px; }
+NotepadDashboardLeft FolderTreeToolbarTop ToolBarButton { background: #515659; color: #2486cb; padding: 5px; margin: 0px; font-size: 16px; }
 NotepadDashboardLeft FolderTreeToolbarTop ToolBarButton:pressed { background-color: #073642; border-color: #515659; border-style: inset; border-width: 0px; }
 NotepadDashboardLeft FolderTreeToolbarTop ToolBarButton:hover { background-color: #073642; border-style: inset; border-width: 0px; border-color: #515659; }
 
 NotepadDashboardRight { padding: 0px; margin: 0px; border: none; background: #00212b; }
 NotepadEditorToolbarTop { background: #00212b; padding: 5px 5px 10px 5px; border-bottom: 1px solid #00212b; border-left: 1px solid #00212b; }
+NotepadEditorToolbarTop PictureButton { background: #00212b; }
 
 QProgressBar { border: none;     border-radius: 5px;     text-align: center }
 QProgressBar::chunk { background-color: #6cccfc; margin: 1px; max-height: 10px; }
 
-QMenu { background-color: #00212b; border: 1px solid #d0d0d0; }
-QMenu::item { padding: 5px 25px 5px 30px; border: 1px solid transparent; color: #4a4a4a; }
+QMenu { background-color: #00212b; border: 1px solid #00212b; }
+QMenu::item { padding: 5px 25px 5px 30px; border: 1px solid transparent; color: #2486cb; }
 QMenu::icon { padding: 0px 5px 0px 5px; }
 QMenu::item:selected { border-color: #073642; background: #073642; }
 QMenu::icon:checked { background: #00212b; border: 1px inset #00212b; position: absolute; top: 1px; right: 1px; bottom: 1px; left: 1px; }

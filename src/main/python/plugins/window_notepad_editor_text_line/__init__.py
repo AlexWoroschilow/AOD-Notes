@@ -30,7 +30,7 @@ class Loader(object):
 
     @inject.params(factory='toolbar_factory.rightbar')
     def boot(self, options=None, args=None, factory=None):
-        factory.addWidget(self._constructor)
+        factory.addWidget(self._constructor, 70)
 
     def _constructor(self):
         widget = ToolBarButton()
