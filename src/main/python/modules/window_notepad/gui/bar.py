@@ -26,35 +26,6 @@ from . import SearchField
 from .button import ButtonDisabled
 
 
-class FolderTreeToolbarTop(QtWidgets.QFrame):
-    storage = QtCore.pyqtSignal(object)
-    storage_changed = QtCore.pyqtSignal(object)
-
-    @inject.params(config='config')
-    def __init__(self, config):
-        super(FolderTreeToolbarTop, self).__init__()
-
-        location = config.get('storage.location')
-        self.location = ToolBarButton(location.replace(os.path.expanduser('~'), '~'))
-        self.location.setIcon(QtGui.QIcon("icons/book-light"))
-        self.location.setToolTip("Select the notepad database or create a new one")
-
-        self.location.clicked.connect(
-            lambda event=None: self.storage.emit(event)
-        )
-
-        self.layout = QtWidgets.QHBoxLayout()
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        self.layout.setAlignment(Qt.AlignLeft)
-        self.layout.addWidget(self.location)
-
-        self.storage_changed.connect(
-            lambda text: self.location.setText(text)
-        )
-
-        self.setLayout(self.layout)
-
-
 class NotepadEditorToolbarTop(QtWidgets.QFrame):
     note_new = QtCore.pyqtSignal(object)
     note_import = QtCore.pyqtSignal(object)

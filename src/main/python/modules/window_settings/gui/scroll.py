@@ -10,6 +10,7 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import inject
 import os
 import platform
 from PyQt5.QtCore import Qt
@@ -34,7 +35,8 @@ class WidgetSettings(QtWidgets.QWidget):
 
 class SettingsScrollArea(QtWidgets.QScrollArea):
 
-    def __init__(self, parent=None):
+    @inject.params(themes='themes')
+    def __init__(self, parent=None, themes=None):
         super(SettingsScrollArea, self).__init__(parent)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -45,11 +47,7 @@ class SettingsScrollArea(QtWidgets.QScrollArea):
         self.container = WidgetSettings()
         self.setWidget(self.container)
 
-        stylesheet = 'css/{}.qss'.format(platform.system().lower())
-        if not os.path.exists(stylesheet):
-            return None
-
-        self.setStyleSheet(open(stylesheet).read())
+        self.setStyleSheet(themes.get_stylesheet())
 
     def addWidget(self, widget):
         self.container.addWidget(widget)

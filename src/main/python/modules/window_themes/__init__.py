@@ -43,7 +43,7 @@ class Loader(object):
         factory.addWidget(functools.partial(
             self._constructor_settings,
             options=options, args=args
-        ))
+        ), 128)
 
         themes_default = config.get('themes.default', 'themes/')
         themes_custom = config.get('themes.custom', '~/.config/AOD-Notepad/themes')

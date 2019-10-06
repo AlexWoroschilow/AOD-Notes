@@ -12,10 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
 
-from PyQt5 import QtGui
-
-from .gui.button import ToolBarButton
-
 
 class Loader(object):
 
@@ -26,18 +22,9 @@ class Loader(object):
         pass
 
     def enabled(self, options=None, args=None):
-        return options.console is None
+        return True
 
-    @inject.params(factory='toolbar_factory.rightbar')
-    def boot(self, options=None, args=None, factory=None):
-        factory.addWidget(self._constructor, 54)
+    def configure(self, binder, options, args):
+        from .gui.text import TextEditor
 
-    def _constructor(self):
-        widget = ToolBarButton()
-        widget.setIcon(QtGui.QIcon("icons/font-red.svg"))
-        widget.setToolTip(widget.tr("Change the text color to red"))
-        widget.clickedEvent = self.clickedEvent
-        return widget
-
-    def clickedEvent(self, event=None, widget=None):
-        widget.setTextColor(QtGui.QColor.fromRgb(127, 0, 0))
+        binder.bind_to_provider('text_editor', TextEditor)

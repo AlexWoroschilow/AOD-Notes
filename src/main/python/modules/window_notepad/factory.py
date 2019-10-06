@@ -17,13 +17,13 @@ class ToolbarFactory(object):
     def __init__(self):
         self.collection = []
 
-    def addWidget(self, constructor=None):
+    def addWidget(self, constructor=None, priority=0):
         if constructor is None: return None
         if not callable(constructor): return None
-        self.collection.append(constructor)
+        self.collection.append((priority, constructor))
 
     @property
     def widgets(self):
-        for constructor in self.collection:
+        for index, constructor in sorted(self.collection, key=lambda i: i[0]):
             if not callable(constructor): continue
             yield constructor()

@@ -28,8 +28,7 @@ class ThemeLabel(QtWidgets.QLabel):
 
     def __init__(self, parent, theme=None):
         super(ThemeLabel, self).__init__(parent)
-        pixmap = QtGui.QPixmap(theme.preview)
-        self.setPixmap(pixmap.scaledToWidth(300, Qt.FastTransformation))
+        self.setPixmap(QtGui.QPixmap(theme.preview))
         self.setToolTip('Apply {} theme'.format(theme.name))
         self.theme = theme
 

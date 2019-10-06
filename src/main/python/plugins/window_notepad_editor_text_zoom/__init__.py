@@ -30,8 +30,8 @@ class Loader(object):
 
     @inject.params(factory='toolbar_factory.leftbar')
     def boot(self, options=None, args=None, factory=None):
-        factory.addWidget(self._zoomIn)
-        factory.addWidget(self._zoomOut)
+        factory.addWidget(self._zoomIn, 70)
+        factory.addWidget(self._zoomOut, 71)
 
     def _zoomIn(self):
         zoomIn = ToolBarButton()

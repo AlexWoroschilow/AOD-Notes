@@ -10,24 +10,24 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import inject
 from PyQt5.QtCore import Qt
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 from PyQt5 import QtGui
 
-from .text import TextEditor
-
 
 class TextWriter(QtWidgets.QScrollArea):
 
-    def __init__(self, parent=None):
+    @inject.params(editor='text_editor')
+    def __init__(self, parent=None, editor=None):
         super(TextWriter, self).__init__(parent)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setAlignment(Qt.AlignHCenter)
         self.setContentsMargins(0, 0, 0, 0)
 
-        self.text = TextEditor(self)
+        self.text = editor
         self.setWidgetResizable(True)
         self.setWidget(self.text)
 
