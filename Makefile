@@ -22,6 +22,7 @@ dmg:
 	cp              -r     src/main/python/icons target/$(project).app/Contents/MacOS
 	cp              -r     src/main/python/image target/$(project).app/Contents/MacOS
 	cp              -r     src/main/python/css target/$(project).app/Contents/MacOS
+	cp              -r     src/main/python/themes target/$(project).app/Contents/MacOS
 	cp              -r     src/main/python/lib target/$(project).app/Contents/MacOS
 	cp              -r     src/main/python/application.py target/$(project).app/Contents/MacOS
 	python3 		-m 	   fbs installer
@@ -32,6 +33,7 @@ appimage:
 	cp              -r     src/main/python/plugins target/$(project)
 	cp              -r     src/main/python/template target/$(project)
 	cp              -r     src/main/python/icons target/$(project)
+	cp              -r     src/main/python/themes target/$(project)
 	cp              -r     src/main/python/image target/$(project)
 	cp              -r     src/main/python/css target/$(project)
 	cp              -r     src/main/python/lib target/$(project)
