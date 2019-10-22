@@ -17,7 +17,6 @@ from logging import getLogger
 
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
-import platform
 
 
 class ModuleActions(object):
@@ -63,24 +62,6 @@ class ModuleActions(object):
             getLogger('app').exception(ex)
             status.error(ex.__str__())
 
-    @inject.params(storage='storage', dashboard='notepad.dashboard', status='status')
-    def onActionSave(self, event, storage, dashboard, status, widget):
-        try:
-
-            index, document = event
-            if index is None:
-                return None
-
-            index = storage.setFileContent(index, document.toHtml())
-            if index is None:
-                return None
-
-            dashboard.updated.emit(index)
-
-        except Exception as ex:
-            getLogger('app').exception(ex)
-            status.error(ex.__str__())
-
     @inject.params(storage='storage', config='config', status='status')
     def onActionFolderCreate(self, event, widget, storage, config, status):
         try:
@@ -103,7 +84,7 @@ class ModuleActions(object):
             status.error(ex.__str__())
 
     @inject.params(window='window', storage='storage')
-    def onActionFullScreen(self, event, window, storage):
+    def onActionFullScreen(self, event, window, storage, widget):
         try:
             index, document = event
             editor = inject.instance('notepad.editor')

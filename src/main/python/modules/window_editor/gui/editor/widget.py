@@ -55,7 +55,8 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.leftbar.redoAction.clicked.connect(self.writer.text.redo)
 
         self.leftbar.saveAction.clicked.connect(lambda x: self.save.emit((self.index, self.writer.document())))
-        self.leftbar.fullscreenAction.clicked.connect(lambda x: self.fullscreen.emit((self.index, self.writer.document())))
+        self.leftbar.fullscreenAction.clicked.connect(
+            lambda x: self.fullscreen.emit((self.index, self.writer.document())))
 
         self.formatbar = FormatbarWidget()
         self.formatbar.fontSize.valueChanged.connect(lambda size: self.writer.text.setFontPointSize(size))
