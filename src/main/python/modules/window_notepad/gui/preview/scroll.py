@@ -121,7 +121,7 @@ class PreviewScrollArea(QtWidgets.QScrollArea):
             self.container.layout().addWidget(preview, i, j)
             self.hashmap_widgets[path] = preview
 
-        status.info('{} notes found'.format(len(self.hashmap_widgets)))
+        status.info('{} records found '.format(len(self.hashmap_widgets)))
         return super(PreviewScrollArea, self).show()
 
     def clear(self):

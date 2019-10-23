@@ -68,7 +68,7 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.formatbar.alignJustify.clicked.connect(self.onActionAlignJustify)
         self.formatbar.indentAction.clicked.connect(self.onActionIndent)
         self.formatbar.dedentAction.clicked.connect(self.onActionDedent)
-        self.formatbar.imageAction.clicked.connect(self.onActionInsertImage)
+        self.formatbar.imageAction.clicked.connect(self.writer.text.imageInsertEvent)
 
         self.rightbar = ToolBarWidgetRight()
         self.rightbar.italicAction.clicked.connect(self.onActionItalic)
@@ -156,24 +156,6 @@ class TextEditorWidget(QtWidgets.QWidget):
         dialog = QtPrintSupport.QPrintDialog()
         if dialog.exec_() == QtWidgets.QDialog.Accepted:
             self.writer.text.document().print_(dialog.printer())
-
-    def onActionInsertImage(self):
-        filename = \
-            QtWidgets.QFileDialog.getOpenFileName(self, 'Insert image', ".", "Images (*.png *.xpm *.jpg *.bmp *.gif)")[
-                0]
-        if filename:
-            image = QtGui.QImage(filename)
-            if image.isNull():
-                popup = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Critical,
-                                              "Image load error",
-                                              "Could not load image file!",
-                                              QtWidgets.QMessageBox.Ok,
-                                              self)
-                popup.show()
-            else:
-                cursor = self.writer.text.textCursor()
-                image = image.scaled(800, 600, Qt.KeepAspectRatio)
-                cursor.insertImage(image, filename)
 
     def getHtml(self):
         return self.writer.text.toHtml()
