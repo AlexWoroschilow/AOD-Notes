@@ -34,8 +34,6 @@ class PreviewScrollArea(QtWidgets.QScrollArea):
         self.setWidgetResizable(True)
         self.setMinimumWidth(400)
 
-        self.edit.connect(self.scrollTo)
-
         self.hashmap_widgets = {}
         self.hashmap_positions = {}
 
@@ -88,11 +86,21 @@ class PreviewScrollArea(QtWidgets.QScrollArea):
         if path in self.hashmap_positions.keys():
             position, index = self.hashmap_positions[path]
             if position is None or position == 0:
+
+                preview = self.hashmap_widgets[path]
+                if preview is not None and index is not None:
+                    preview.edit.emit((index, preview.document()))
+
                 minimum = scrollbar.minimum()
                 return scrollbar.setValue(minimum)
 
             total = len(self.hashmap_positions.keys())
             if total is not None and total > 0:
+
+                preview = self.hashmap_widgets[path]
+                if preview is not None and index is not None:
+                    preview.edit.emit((index, preview.document()))
+
                 maximum = scrollbar.maximum()
                 position = position * maximum / (total - 1)
                 return scrollbar.setValue(position)

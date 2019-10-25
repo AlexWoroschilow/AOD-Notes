@@ -27,8 +27,10 @@ class DashboardSplitter(QtWidgets.QSplitter):
     fullscreen = QtCore.pyqtSignal(object)
     clone = QtCore.pyqtSignal(object)
 
-    @inject.params(storage='storage')
-    def __init__(self, index=None, storage=None):
+    editor = None
+
+    @inject.params(storage='storage', editor='notepad.editor')
+    def __init__(self, index=None, storage=None, editor=None):
         super(DashboardSplitter, self).__init__()
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
@@ -42,11 +44,8 @@ class DashboardSplitter(QtWidgets.QSplitter):
         self.preview.open(storage.entitiesByFileType(parent))
         self.preview.scrollTo((index, None))
 
-        self.editor = inject.instance('notepad.editor')
-        # self.editor.setMinimumWidth(500)
-        content = storage.fileContent(index)
-        self.editor.setDocument(HtmlDocument(content))
-        self.editor.setIndex(index)
+        self.editor = editor
+        self.editor.setMinimumWidth(500)
         self.editor.focus()
 
         self.addWidget(self.preview)
@@ -64,29 +63,32 @@ class DashboardSplitter(QtWidgets.QSplitter):
 
     @inject.params(storage='storage')
     def previewSelected(self, event=None, storage=None):
-        index, document = event
-        if self.preview is None or index is None:
+        if self.preview is None:
             return None
 
-        document = self.preview.getDocumentByIndex(index)
-        if document is None or not document:
-            parent = storage.fileDir(index)
-            self.preview.open(storage.entitiesByFileType(parent))
-            document = self.preview.getDocumentByIndex(index)
+        index, document = event
+        if index is None: return None
 
-        return self.preview.edit.emit((index, document))
+        document = self.preview.getDocumentByIndex(index)
+        if index is not None and document is not None:
+            return self.preview.scrollTo((index, document))
+
+        parent = storage.fileDir(index)
+        if parent is None: return None
+
+        self.preview.open(storage.entitiesByFileType(parent))
+        document = self.preview.getDocumentByIndex(index)
+        if index is not None and document is not None:
+            return self.preview.scrollTo((index, document))
 
     @inject.params(storage='storage')
     def previewClickedEvent(self, event, storage):
-        if self.editor is None: return None
+        if self.editor is None:
+            return None
 
         index, document = event
-        if document is None: return None
-        if index is None: return None
-
-        content = storage.fileContent(index)
-        if content is None: return None
-        document.setHtml(content)
+        if document is None or index is None:
+            return None
 
         self.editor.setIndex(index)
         self.editor.setDocument(document)
