@@ -11,22 +11,19 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
+from PyQt5 import QtWidgets
+from PyQt5 import QtCore
+
+from .widget import ImageResizeWidget
 
 
-class ModuleActions(object):
+class ImageResizeAction(QtWidgets.QWidgetAction):
+    sizeChanged = QtCore.pyqtSignal(object)
 
-    @inject.params(config='config')
-    def onActionWindowResize(self, event=None, config=None):
-        size = event.size()
-        if size is None:
-            return None
+    def __init__(self, parent, name, width):
+        super(ImageResizeAction, self).__init__(parent)
 
-        width = size.width()
-        if width is not None and width >= 1000:
-            config.set('window.width', width)
+        widget = ImageResizeWidget(parent, name, width)
+        widget.sizeChanged.connect(self.sizeChanged.emit)
 
-        height = size.height()
-        if height is not None and height >= 800:
-            config.set('window.height', height)
-
-        return event.accept()
+        self.setDefaultWidget(widget)

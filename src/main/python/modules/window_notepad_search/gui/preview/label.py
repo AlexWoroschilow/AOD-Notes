@@ -10,23 +10,14 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import inject
+from PyQt5 import QtWidgets
 
 
-class ModuleActions(object):
+class Title(QtWidgets.QLabel):
 
-    @inject.params(config='config')
-    def onActionWindowResize(self, event=None, config=None):
-        size = event.size()
-        if size is None:
-            return None
-
-        width = size.width()
-        if width is not None and width >= 1000:
-            config.set('window.width', width)
-
-        height = size.height()
-        if height is not None and height >= 800:
-            config.set('window.height', height)
-
-        return event.accept()
+    def __init__(self, text):
+        super(Title, self).__init__(text)
+        font = self.font()
+        font.setPixelSize(20)
+        self.setFont(font)
+        self.setWordWrap(True)

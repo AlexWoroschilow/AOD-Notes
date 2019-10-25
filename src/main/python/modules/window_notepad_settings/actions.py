@@ -11,22 +11,15 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
+from PyQt5 import QtWidgets
+from PyQt5 import QtCore
+from PyQt5 import QtGui
+from .gui.menu import SettingsMenu
 
 
 class ModuleActions(object):
 
-    @inject.params(config='config')
-    def onActionWindowResize(self, event=None, config=None):
-        size = event.size()
-        if size is None:
-            return None
-
-        width = size.width()
-        if width is not None and width >= 1000:
-            config.set('window.width', width)
-
-        height = size.height()
-        if height is not None and height >= 800:
-            config.set('window.height', height)
-
-        return event.accept()
+    def onActionSettings(self, button, widget):
+        menu = QtWidgets.QMenu()
+        menu.addAction(SettingsMenu(widget))
+        menu.exec_(QtGui.QCursor.pos())

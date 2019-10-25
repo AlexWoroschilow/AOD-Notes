@@ -10,23 +10,20 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import inject
 
 
-class ModuleActions(object):
+class ToolbarFactory(object):
 
-    @inject.params(config='config')
-    def onActionWindowResize(self, event=None, config=None):
-        size = event.size()
-        if size is None:
-            return None
+    def __init__(self):
+        self.collection = []
 
-        width = size.width()
-        if width is not None and width >= 1000:
-            config.set('window.width', width)
+    def addWidget(self, constructor=None, priority=0):
+        if constructor is None: return None
+        if not callable(constructor): return None
+        self.collection.append((priority, constructor))
 
-        height = size.height()
-        if height is not None and height >= 800:
-            config.set('window.height', height)
-
-        return event.accept()
+    @property
+    def widgets(self):
+        for index, constructor in sorted(self.collection, key=lambda i: i[0]):
+            if not callable(constructor): continue
+            yield constructor()

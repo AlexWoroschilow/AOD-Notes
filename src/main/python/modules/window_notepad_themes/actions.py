@@ -11,22 +11,17 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
+from logging import getLogger
 
 
 class ModuleActions(object):
 
-    @inject.params(config='config')
-    def onActionWindowResize(self, event=None, config=None):
-        size = event.size()
-        if size is None:
-            return None
+    @inject.params(config='config', window='window')
+    def on_action_theme(self, theme=None, config=None, window=None, widget=None):
+        if theme is None: return None
+        if config is None: return None
+        if window is None: return None
+        if widget is None: return None
 
-        width = size.width()
-        if width is not None and width >= 1000:
-            config.set('window.width', width)
-
-        height = size.height()
-        if height is not None and height >= 800:
-            config.set('window.height', height)
-
-        return event.accept()
+        config.set('themes.theme', theme.name)
+        window.setStyleSheet(theme.stylesheet)
