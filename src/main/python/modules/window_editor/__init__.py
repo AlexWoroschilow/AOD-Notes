@@ -15,7 +15,6 @@ import functools
 
 from .actions import ModuleActions
 
-from .gui.text import TextEditor
 from .gui.editor.widget import TextEditorWidget
 from .factory import ToolbarFactory
 
@@ -62,7 +61,6 @@ class Loader(object):
 
     def configure(self, binder, options, args):
 
-        binder.bind_to_provider('text_editor', TextEditor)
         binder.bind_to_provider('notepad.editor', self._notepad_editor)
 
         binder.bind('toolbar_factory.leftbar', ToolbarFactory())

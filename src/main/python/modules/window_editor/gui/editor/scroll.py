@@ -10,16 +10,43 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import inject
-from PyQt5.QtCore import Qt
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 from PyQt5 import QtGui
+from PyQt5.QtCore import Qt
+
+from .text import TextEditor
 
 
 class TextWriter(QtWidgets.QScrollArea):
+    printAction = QtCore.pyqtSignal(object)
+    previewAction = QtCore.pyqtSignal(object)
+    cutAction = QtCore.pyqtSignal(object)
+    copyAction = QtCore.pyqtSignal(object)
+    pasteAction = QtCore.pyqtSignal(object)
+    undoAction = QtCore.pyqtSignal(object)
+    redoAction = QtCore.pyqtSignal(object)
+    saveAction = QtCore.pyqtSignal(object)
+    fullscreenAction = QtCore.pyqtSignal(object)
+    fontSizeAction = QtCore.pyqtSignal(object)
+    bulletAction = QtCore.pyqtSignal(object)
+    numberedAction = QtCore.pyqtSignal(object)
+    alignLeftAction = QtCore.pyqtSignal(object)
+    alignCenterAction = QtCore.pyqtSignal(object)
+    alignRightAction = QtCore.pyqtSignal(object)
+    alignJustifyAction = QtCore.pyqtSignal(object)
+    indentAction = QtCore.pyqtSignal(object)
+    dedentAction = QtCore.pyqtSignal(object)
+    imageAction = QtCore.pyqtSignal(object)
+    italicAction = QtCore.pyqtSignal(object)
+    superAction = QtCore.pyqtSignal(object)
+    strikeAction = QtCore.pyqtSignal(object)
+    fontColorAction = QtCore.pyqtSignal(object)
+    backColorAction = QtCore.pyqtSignal(object)
+    subAction = QtCore.pyqtSignal(object)
+    boldAction = QtCore.pyqtSignal(object)
+    underlAction = QtCore.pyqtSignal(object)
 
-    @inject.params(editor='text_editor')
     def __init__(self, parent=None, editor=None):
         super(TextWriter, self).__init__(parent)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -27,7 +54,35 @@ class TextWriter(QtWidgets.QScrollArea):
         self.setAlignment(Qt.AlignHCenter)
         self.setContentsMargins(0, 0, 0, 0)
 
-        self.text = editor
+        self.text = TextEditor(self)
+        self.printAction.connect(self.text.printEvent)
+        self.previewAction.connect(self.text.previewEvent)
+        self.cutAction.connect(self.text.cut)
+        self.copyAction.connect(self.text.copy)
+        self.pasteAction.connect(self.text.paste)
+        self.undoAction.connect(self.text.undo)
+        self.redoAction.connect(self.text.redo)
+
+        self.bulletAction.connect(self.text.onActionBulletList)
+        self.numberedAction.connect(self.text.onActionNumberList)
+        self.alignLeftAction.connect(self.text.onActionAlignLeft)
+        self.alignCenterAction.connect(self.text.onActionAlignCenter)
+        self.alignRightAction.connect(self.text.onActionAlignRight)
+        self.alignJustifyAction.connect(self.text.onActionAlignJustify)
+        self.indentAction.connect(self.text.onActionIndent)
+        self.dedentAction.connect(self.text.onActionDedent)
+        self.imageAction.connect(self.text.imageInsertEvent)
+        self.fontSizeAction.connect(self.text.setFontPointSize)
+
+        self.italicAction.connect(self.text.onActionItalic)
+        self.superAction.connect(self.text.onActionSuperScript)
+        self.strikeAction.connect(self.text.onActionStrike)
+        self.fontColorAction.connect(self.text.onActionFontColor)
+        self.backColorAction.connect(self.text.onActionHighlight)
+        self.subAction.connect(self.text.onActionSubScript)
+        self.boldAction.connect(self.text.onActionBold)
+        self.underlAction.connect(self.text.onActionUnderline)
+
         self.setWidgetResizable(True)
         self.setWidget(self.text)
 
