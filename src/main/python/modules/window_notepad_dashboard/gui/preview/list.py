@@ -19,11 +19,12 @@ from PyQt5.QtCore import Qt
 from .preview import NotePreviewDescription
 
 
-class BookItem(QtWidgets.QListWidgetItem):
+class NoteItem(QtWidgets.QListWidgetItem):
 
     def __init__(self, book=None):
-        super(BookItem, self).__init__()
+        super(NoteItem, self).__init__()
         self.setSizeHint(QtCore.QSize(400, 500))
+        self.setTextAlignment(Qt.AlignCenter)
 
 
 class PreviewScrollArea(QtWidgets.QListWidget):
@@ -48,7 +49,7 @@ class PreviewScrollArea(QtWidgets.QListWidget):
         self.hashmap_index = {}
 
         for position, index in enumerate(collection):
-            item = BookItem()
+            item = NoteItem()
             self.addItem(item)
 
             widget = NotePreviewDescription(index)
@@ -77,7 +78,7 @@ class PreviewScrollArea(QtWidgets.QListWidget):
             if parent is None: return self
 
             for index in storage.entitiesByFileType(parent):
-                item = BookItem()
+                item = NoteItem()
                 self.addItem(item)
 
                 widget = NotePreviewDescription(index)

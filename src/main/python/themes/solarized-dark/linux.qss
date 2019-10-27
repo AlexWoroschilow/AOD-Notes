@@ -51,11 +51,11 @@ WidgetSettings  QLabel { color: #2486cb; }
 
 TextEditorWidget { background: #002b36; text-align: center; border: none; }
 
-PreviewScrollArea NotePreviewDescription { background-color: #002b36; border-radius: 0px; padding: 10px 30px; }
+PreviewScrollArea NotePreviewDescription { background-color: #002b36; border-radius: 0px; padding: 10px 30px; margin: 3px; }
 PreviewScrollArea NotePreviewDescription Title { color: #2486cb; }
 PreviewScrollArea NotePreviewDescription Description {  color: #2486cb; }
 PreviewScrollArea NotePreviewDescription PictureButtonFlat {  background: #2d7393; border: none; padding: 5px; margin: 0px;  }
-PreviewScrollArea { background: #073642; padding: 5px 5px; border: none; margin: 0px; }
+PreviewScrollArea { background: #073642; padding: 0px 0px; border: none; margin: 0px; }
 
 QSplitter { background: #00212b; border: none; }
 QSplitter::handle { image: url(icons/splitter-light); }

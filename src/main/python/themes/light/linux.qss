@@ -81,10 +81,10 @@ WidgetSettings SettingsTitle {
 
 TextEditorWidget { background: #ffffff; text-align: center; border: none; }
 
-PreviewScrollArea NotePreviewDescription { background-color: #ffffff; border-radius: 0px; padding: 10px 30px; }
+PreviewScrollArea NotePreviewDescription { background-color: #ffffff; border-radius: 0px; padding: 10px 30px; margin: 3px; }
 PreviewScrollArea NotePreviewDescription #previewTitle { background: #ffffff; }
 PreviewScrollArea NotePreviewDescription Description { color: #000000; }
-PreviewScrollArea { background: #e0e0e0; padding: 5px 5px; border: none; margin: 0px; }
+PreviewScrollArea { background: #e0e0e0; padding: 0px 0px; border: none; margin: 0px; }
 
 QSplitter { background: #f9f9f9; border: none; }
 QSplitter::handle { image: url(icons/splitter-light); }
