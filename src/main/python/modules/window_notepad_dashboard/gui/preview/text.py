@@ -25,13 +25,14 @@ class Description(QtWidgets.QTextEdit):
         self.setHtml(text)
         self.show()
 
-    def resizeEvent(self, *args, **kwargs):
-        document = self.document()
-        if document is None:
-            return None
-        size = document.size()
-        if size is None:
-            return None
+        self.setFixedHeight(500)
 
-        self.setFixedHeight(size.height())
-        return QtWidgets.QTextEdit.resizeEvent(self, *args, **kwargs)
+    # def resizeEvent(self, *args, **kwargs):
+    #     document = self.document()
+    #     if document is None:
+    #         return None
+    #     size = document.size()
+    #     if size is None:
+    #         return None
+    #
+    #     return QtWidgets.QTextEdit.resizeEvent(self, *args, **kwargs)

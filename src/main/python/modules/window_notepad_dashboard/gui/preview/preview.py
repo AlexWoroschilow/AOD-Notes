@@ -23,10 +23,10 @@ from .label import Title
 
 
 class NotePreviewDescription(QtWidgets.QFrame):
-    edit = QtCore.pyqtSignal(object)
-    fullscreen = QtCore.pyqtSignal(object)
-    delete = QtCore.pyqtSignal(object)
-    clone = QtCore.pyqtSignal(object)
+    editAction = QtCore.pyqtSignal(object)
+    fullscreenAction = QtCore.pyqtSignal(object)
+    deleteAction = QtCore.pyqtSignal(object)
+    cloneAction = QtCore.pyqtSignal(object)
 
     @inject.params(storage='storage')
     def __init__(self, index, storage):
@@ -39,23 +39,18 @@ class NotePreviewDescription(QtWidgets.QFrame):
         self.layout.setAlignment(Qt.AlignTop)
 
         title = Title(storage.fileName(index))
-        self.layout.addWidget(title, 0, 0, 1, 27)
+        self.layout.addWidget(title, 0, 0, 1, 30)
 
         self.description = Description(storage.fileContent(index))
-        self.layout.addWidget(self.description, 1, 0, 4, 30)
-
-        self.buttonFullscreen = PictureButtonFlat(QtGui.QIcon("icons/fullscreen"))
-        self.buttonFullscreen.clicked.connect(lambda x: self.fullscreen.emit((index, self.document())))
-
-        self.layout.addWidget(self.buttonFullscreen, 0, 27, 1, 1)
+        self.layout.addWidget(self.description, 1, 0, 10, 30)
 
         self.buttonClone = PictureButtonFlat(QtGui.QIcon("icons/copy"))
         self.buttonClone.clicked.connect(lambda x: self.clone.emit(index))
-        self.layout.addWidget(self.buttonClone, 0, 28, 1, 1)
+        self.layout.addWidget(self.buttonClone, 1, 30)
 
         self.buttonDelete = PictureButtonFlat(QtGui.QIcon("icons/trash"))
         self.buttonDelete.clicked.connect(lambda x: self.delete.emit(index))
-        self.layout.addWidget(self.buttonDelete, 0, 29, 1, 1)
+        self.layout.addWidget(self.buttonDelete, 2, 30)
 
         self.setLayout(self.layout)
 
@@ -91,10 +86,10 @@ class NotePreviewDescription(QtWidgets.QFrame):
             self.setGraphicsEffect(effect)
 
         if QEvent.type() == QtCore.QEvent.MouseButtonDblClick:
-            self.fullscreen.emit((self.index, self.description.document()))
+            self.fullscreenAction.emit((self.index, self.description.document()))
 
         if QEvent.type() == QtCore.QEvent.MouseButtonRelease:
-            self.edit.emit((self.index, self.description.document()))
+            self.editAction.emit((self.index, self.description.document()))
 
             effect = QtWidgets.QGraphicsDropShadowEffect()
             effect.setColor(QtGui.QColor('#6cccfc'))

@@ -17,12 +17,12 @@ from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 
-from .preview.scroll import PreviewScrollArea
-from .document import HtmlDocument
+from .preview.list import PreviewScrollArea
 
 
 class DashboardSplitter(QtWidgets.QSplitter):
     delete = QtCore.pyqtSignal(object)
+    edit = QtCore.pyqtSignal(object)
     clicked = QtCore.pyqtSignal(object)
     fullscreen = QtCore.pyqtSignal(object)
     clone = QtCore.pyqtSignal(object)
@@ -34,15 +34,13 @@ class DashboardSplitter(QtWidgets.QSplitter):
         super(DashboardSplitter, self).__init__()
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
-        self.preview = PreviewScrollArea(self)
-        self.preview.edit.connect(self.previewClickedEvent)
-        self.preview.fullscreen.connect(self.fullscreen.emit)
-        self.preview.delete.connect(self.delete.emit)
-        self.preview.clone.connect(self.clone.emit)
+        self.preview = PreviewScrollArea(self, [])
+        self.preview.editAction.connect(self.previewClickedEvent)
+        self.preview.fullscreenAction.connect(self.fullscreen.emit)
+        self.preview.deleteAction.connect(self.delete.emit)
+        self.preview.cloneAction.connect(self.clone.emit)
 
-        parent = storage.fileDir(index)
-        self.preview.open(storage.entitiesByFileType(parent))
-        self.preview.scrollTo((index, None))
+        self.preview.open(index)
 
         self.editor = editor
         self.editor.setMinimumWidth(500)
@@ -55,11 +53,10 @@ class DashboardSplitter(QtWidgets.QSplitter):
         self.setStretchFactor(2, 2)
         self.show()
 
-    def scrollTo(self, index=None):
-        if index is None:
-            return None
-
-        self.preview.scrollTo((index, None))
+    def open(self, index=None):
+        if index is None: return None
+        self.preview.open(index)
+        return self
 
     @inject.params(storage='storage')
     def previewSelected(self, event=None, storage=None):
@@ -69,17 +66,7 @@ class DashboardSplitter(QtWidgets.QSplitter):
         index, document = event
         if index is None: return None
 
-        document = self.preview.getDocumentByIndex(index)
-        if index is not None and document is not None:
-            return self.preview.scrollTo((index, document))
-
-        parent = storage.fileDir(index)
-        if parent is None: return None
-
-        self.preview.open(storage.entitiesByFileType(parent))
-        document = self.preview.getDocumentByIndex(index)
-        if index is not None and document is not None:
-            return self.preview.scrollTo((index, document))
+        return self.preview.open(index)
 
     @inject.params(storage='storage')
     def previewClickedEvent(self, event, storage):
@@ -87,11 +74,11 @@ class DashboardSplitter(QtWidgets.QSplitter):
             return None
 
         index, document = event
-        if document is None or index is None:
-            return None
+        if document is None: return None
+        if index is None: return None
 
-        self.editor.setIndex(index)
         self.editor.setDocument(document)
+        self.editor.setIndex(index)
 
         self.clicked.emit(index)
 

@@ -81,11 +81,10 @@ WidgetSettings SettingsTitle {
 
 TextEditorWidget { background: #fdf6e3; text-align: center; border: none; }
 
-PreviewScrollArea PreviewContainer { border: none; }
-PreviewScrollArea PreviewContainer NotePreviewDescription { background-color: #fdf6e3; border-radius: 0px; padding: 10px 30px; }
-PreviewScrollArea PreviewContainer NotePreviewDescription #previewTitle { background: #fdf6e3; }
-PreviewScrollArea PreviewContainer NotePreviewDescription Description { color: #4d5357; }
-PreviewScrollArea { background: #e0e0e0; padding: 0px 0px; border: none; margin: 0px; }
+PreviewScrollArea NotePreviewDescription { background-color: #fdf6e3; border-radius: 0px; padding: 10px 30px; }
+PreviewScrollArea NotePreviewDescription #previewTitle { background: #fdf6e3; }
+PreviewScrollArea NotePreviewDescription Description { color: #4d5357; }
+PreviewScrollArea { background: #e0e0e0; padding: 5px 5px; border: none; margin: 0px; }
 
 QSplitter { background: #ffffff; border: none; }
 QSplitter::handle { image: url(icons/splitter-light); }

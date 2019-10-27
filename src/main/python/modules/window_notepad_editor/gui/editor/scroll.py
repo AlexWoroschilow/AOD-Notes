@@ -100,13 +100,13 @@ class TextWriter(QtWidgets.QScrollArea):
         return None
 
     def setDocument(self, document=None):
-        if document is None:
-            return None
-        if self.text is None:
-            return None
+        if self.text is None: return None
+        if document is None: return None
 
+        document.setParent(self.text)
         self.text.setDocument(document)
         self.focus()
+
         return None
 
     def focus(self):

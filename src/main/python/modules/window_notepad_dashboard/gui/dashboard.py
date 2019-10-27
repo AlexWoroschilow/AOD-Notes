@@ -17,7 +17,7 @@ from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 
 from .folder.tree import NotepadDashboardTree
-from .preview.scroll import PreviewScrollArea
+from .preview.list import PreviewScrollArea
 
 from .bar import NotepadEditorToolbarTop
 
@@ -54,8 +54,8 @@ class NotepadDashboard(QtWidgets.QSplitter):
 
     def __init__(self):
         super(NotepadDashboard, self).__init__()
-        self.removed.connect(lambda event: self.open(event))
-        self.created.connect(lambda event: self.open(event))
+        self.removed.connect(self.open)
+        self.created.connect(self.open)
         self.edit.connect(lambda x: self.open(x[0]))
         self.setContentsMargins(0, 0, 0, 0)
 
@@ -117,7 +117,7 @@ class NotepadDashboard(QtWidgets.QSplitter):
         splitter.fullscreen.connect(self.fullscreen.emit)
         splitter.clicked.connect(self.scrollTo)
         splitter.clone.connect(self.clone.emit)
-        splitter.scrollTo(index)
+        splitter.open(index)
 
         self.container_right.clean()
         self.container_right.addWidget(preview)
@@ -133,9 +133,6 @@ class NotepadDashboard(QtWidgets.QSplitter):
 
     @inject.params(storage='storage')
     def group(self, index=None, storage=None):
-        index = storage.filePath(index) \
-            if storage.isDir(index) \
-            else storage.fileDir(index)
 
         toolbar = NotepadEditorToolbarTop()
         toolbar.note_new.connect(self.note_new.emit)
@@ -144,12 +141,12 @@ class NotepadDashboard(QtWidgets.QSplitter):
         toolbar.settings.connect(self.settings.emit)
         toolbar.search.connect(self.search.emit)
 
-        preview = PreviewScrollArea(self)
-        preview.open(storage.entitiesByFileType(index))
-        preview.fullscreen.connect(self.fullscreen.emit)
-        preview.delete.connect(self.delete.emit)
-        preview.clone.connect(self.clone.emit)
-        preview.edit.connect(self.edit.emit)
+        preview = PreviewScrollArea(self, [])
+        preview.fullscreenAction.connect(self.fullscreen.emit)
+        preview.deleteAction.connect(self.delete.emit)
+        preview.cloneAction.connect(self.clone.emit)
+        preview.editAction.connect(self.edit.emit)
+        preview.open(index)
 
         self.container_right.clean()
         self.container_right.addWidget(toolbar)
