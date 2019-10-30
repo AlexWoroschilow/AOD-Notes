@@ -18,17 +18,9 @@ class Description(QtWidgets.QTextEdit):
 
     def __init__(self, text=None):
         super(Description, self).__init__()
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setEnabled(False)
         self.setHtml(text)
         self.show()
-
-    def resizeEvent(self, *args, **kwargs):
-        document = self.document()
-        if document is None: return None
-        size = document.size()
-        if size is None: return None
-
-        self.setFixedHeight(size.height())
-        return QtWidgets.QTextEdit.resizeEvent(self, *args, **kwargs)

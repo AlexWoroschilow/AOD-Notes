@@ -88,10 +88,10 @@ class NotePreviewDescription(QtWidgets.QFrame):
             self.setGraphicsEffect(effect)
 
         if QEvent.type() == QtCore.QEvent.MouseButtonDblClick:
-            self.fullscreenAction.emit((self.index, self.description.document()))
+            self.fullscreenAction.emit((self.index, self.document()))
 
         if QEvent.type() == QtCore.QEvent.MouseButtonRelease:
-            self.editAction.emit((self.index, self.description.document()))
+            self.editAction.emit((self.index, self.document()))
 
             effect = QtWidgets.QGraphicsDropShadowEffect()
             effect.setColor(QtGui.QColor('#6cccfc'))

@@ -13,7 +13,8 @@
 import inject
 from logging import getLogger
 
-from .gui.preview.widget import PreviewScrollArea
+# from .gui.preview.widget import PreviewScrollArea
+from .gui.preview.list import PreviewScrollArea
 
 
 class ModuleActions(object):
@@ -26,7 +27,7 @@ class ModuleActions(object):
             return None
 
         preview = PreviewScrollArea(window)
-        preview.edit.connect(self.onActionEditRequest)
+        preview.editAction.connect(self.onActionEditRequest)
 
         for path in search.search(widget.text()):
             index = storage.index(path)
@@ -41,8 +42,12 @@ class ModuleActions(object):
         window.tab.emit((preview, title))
 
     @inject.params(storage='storage', window='window', dashboard='notepad.dashboard')
-    def onActionEditRequest(self, index, storage, window, dashboard):
+    def onActionEditRequest(self, event, storage, window, dashboard):
         try:
+
+            index, document = event
+            if document is None: return None
+            if index is None: return None
 
             if storage.isDir(index):
                 dashboard.group(index)

@@ -23,7 +23,8 @@ from .button import PictureButtonFlat
 
 
 class NotePreviewDescription(QtWidgets.QGroupBox):
-    edit = QtCore.pyqtSignal(object)
+    fullscreenAction = QtCore.pyqtSignal(object)
+    editAction = QtCore.pyqtSignal(object)
 
     @inject.params(storage='storage')
     def __init__(self, index, storage):
@@ -38,14 +39,23 @@ class NotePreviewDescription(QtWidgets.QGroupBox):
         title = Title(storage.fileName(index))
         self.layout.addWidget(title, 0, 0, 1, 27)
 
-        description = Description(storage.fileContent(index))
-        self.layout.addWidget(description, 1, 0, 4, 30)
-
-        self.buttonEdit = PictureButtonFlat(QtGui.QIcon("icons/note"))
-        self.buttonEdit.clicked.connect(lambda x: self.edit.emit(index))
-        self.layout.addWidget(self.buttonEdit, 0, 29, 1, 1)
+        self.description = Description(storage.fileContent(index))
+        self.description.setFixedHeight(self.height() * 0.85)
+        self.layout.addWidget(self.description, 1, 0, 4, 30)
 
         self.setLayout(self.layout)
+
+    def document(self):
+        if self.description is None:
+            return None
+        return self.description.document()
+
+    def setDocument(self, document=None):
+        if document is None:
+            return None
+        if self.description is None:
+            return None
+        return self.description.setDocument(document)
 
     def event(self, QEvent):
         if QEvent.type() == QtCore.QEvent.Enter:
@@ -55,9 +65,16 @@ class NotePreviewDescription(QtWidgets.QGroupBox):
             effect.setOffset(0)
 
             self.setGraphicsEffect(effect)
+
         if QEvent.type() == QtCore.QEvent.Leave:
             self.setGraphicsEffect(None)
 
         if QEvent.type() == QtCore.QEvent.MouseButtonRelease:
-            self.edit.emit(self.index)
+            self.editAction.emit((self.index, self.document()))
+            return super(NotePreviewDescription, self).event(QEvent)
+
         return super(NotePreviewDescription, self).event(QEvent)
+
+    def close(self):
+        super(NotePreviewDescription, self).deleteLater()
+        return super(NotePreviewDescription, self).close()

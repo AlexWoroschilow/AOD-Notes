@@ -20,7 +20,6 @@ dmg:
 	cp              -r     src/main/python/plugins target/$(project).app/Contents/MacOS
 	cp              -r     src/main/python/template target/$(project).app/Contents/MacOS
 	cp              -r     src/main/python/icons target/$(project).app/Contents/MacOS
-	cp              -r     src/main/python/image target/$(project).app/Contents/MacOS
 	cp              -r     src/main/python/css target/$(project).app/Contents/MacOS
 	cp              -r     src/main/python/themes target/$(project).app/Contents/MacOS
 	cp              -r     src/main/python/lib target/$(project).app/Contents/MacOS
@@ -34,7 +33,6 @@ appimage:
 	cp              -r     src/main/python/template target/$(project)
 	cp              -r     src/main/python/icons target/$(project)
 	cp              -r     src/main/python/themes target/$(project)
-	cp              -r     src/main/python/image target/$(project)
 	cp              -r     src/main/python/css target/$(project)
 	cp              -r     src/main/python/lib target/$(project)
 	cp              -r     src/main/python/themes target/$(project)
