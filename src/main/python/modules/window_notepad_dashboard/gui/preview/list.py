@@ -33,8 +33,8 @@ class PreviewScrollArea(QtWidgets.QListWidget):
     deleteAction = QtCore.pyqtSignal(object)
     cloneAction = QtCore.pyqtSignal(object)
 
-    @inject.params(storage='storage')
-    def __init__(self, parent=None, collection=None, storage=None):
+    @inject.params(storage='storage', status='status')
+    def __init__(self, parent=None, collection=None, storage=None, status=None):
         super(PreviewScrollArea, self).__init__(parent)
         self.setViewMode(QtWidgets.QListView.IconMode)
         self.setResizeMode(QtWidgets.QListView.Adjust)
@@ -65,8 +65,11 @@ class PreviewScrollArea(QtWidgets.QListWidget):
 
             self.hashmap_index[path] = (item, widget)
 
-    @inject.params(storage='storage')
-    def open(self, index_to_open=None, storage=None):
+        if not len(collection): return None
+        status.info("{} records found".format(len(collection)))
+
+    @inject.params(storage='storage', status='status')
+    def open(self, index_to_open=None, storage=None, status=None):
 
         item = self.getWidgetItemByIndex(index_to_open)
 
@@ -93,6 +96,8 @@ class PreviewScrollArea(QtWidgets.QListWidget):
                 if path is None: continue
 
                 self.hashmap_index[path] = (item, widget)
+
+            status.info("{} records found".format(len(self.hashmap_index.keys())))
 
         item = self.getWidgetItemByIndex(index_to_open)
         if item is None: return None

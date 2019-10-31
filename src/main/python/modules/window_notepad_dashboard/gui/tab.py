@@ -10,6 +10,8 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import inject
+
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5 import QtGui
@@ -34,6 +36,10 @@ class Notepad(QtWidgets.QTabWidget):
                     self.removeTab(index)
 
         return super(Notepad, self).event(event)
+
+    def removeTab(self, p_int):
+        inject.instance('status').reset()
+        return super(Notepad, self).removeTab(p_int)
 
     def close(self):
         super(Notepad, self).deleteLater()

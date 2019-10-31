@@ -19,8 +19,8 @@ from .gui.preview.list import PreviewScrollArea
 
 class ModuleActions(object):
 
-    @inject.params(search='search', storage='storage', window='window')
-    def onActionSearchRequest(self, widget=None, search=None, storage=None, window=None):
+    @inject.params(search='search', storage='storage', window='window', status='status')
+    def onActionSearchRequest(self, widget=None, search=None, storage=None, window=None, status=None):
 
         text = widget.text()
         if len(text) == 0:
@@ -29,12 +29,11 @@ class ModuleActions(object):
         preview = PreviewScrollArea(window)
         preview.editAction.connect(self.onActionEditRequest)
 
-        for path in search.search(widget.text()):
-            index = storage.index(path)
-            if index is None:
-                continue
+        index = 0
+        for index, path in enumerate(search.search(widget.text()), start=1):
+            preview.addPreview(storage.index(path))
 
-            preview.addPreview(index)
+        status.info("Search request: '{}', {} records found".format(text, index))
 
         title = text if len(text) <= 25 else \
             "{}...".format(text[0:22])

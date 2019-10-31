@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
 import inject
-import platform
+
 from PyQt5 import QtGui
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
@@ -49,8 +49,8 @@ class MainWindow(QtWidgets.QMainWindow):
         if not os.path.exists('icons/icon.svg'): return None
         self.setWindowIcon(QtGui.QIcon('icons/icon.svg'))
 
-        self.tab.connect(self.onActionTabOpen)
         self.tabSwitch.connect(self.onActionTabSwitch)
+        self.tab.connect(self.onActionTabOpen)
 
     def resizeEvent(self, event):
         self.resize.emit(event)

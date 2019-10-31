@@ -10,6 +10,9 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import os
+import inject
+
 from PyQt5.QtCore import Qt
 from PyQt5 import QtPrintSupport
 from PyQt5 import QtWidgets
@@ -184,36 +187,39 @@ class TextEditor(QtWidgets.QTextEdit):
     def mouseDoubleClickEvent(self, event):
         cursor = self.textCursor()
         iterator = cursor.block().begin()
+
         while not iterator.atEnd():
             fragment = iterator.fragment()
-            if fragment is None: break
+            if not fragment.isValid(): break
 
-            if not fragment.isValid() or not fragment.charFormat().isImageFormat():
-                break
+            if fragment.charFormat().isImageFormat():
 
-            image = fragment.charFormat().toImageFormat()
-            if image is None: break
+                image = fragment.charFormat().toImageFormat()
+                if image is None: break
 
-            width = 800 if not image.width() else image.width()
-            if width is None: break
+                width = 800 if not image.width() else image.width()
+                if width is None: break
 
-            popup = ImageResizeAction(self, image.name(), width)
-            popup.sizeChanged.connect(self.resizeImageEvent)
+                popup = ImageResizeAction(self, image.name(), width)
+                popup.sizeChanged.connect(self.resizeImageEvent)
 
-            menu = QtWidgets.QMenu()
-            menu.addAction(popup)
-            menu.exec_(QtGui.QCursor.pos())
-            break
+                menu = QtWidgets.QMenu()
+                menu.addAction(popup)
+                menu.setFocus()
+                menu.exec_(QtGui.QCursor.pos())
 
             iterator += 1
 
         return super(TextEditor, self).mouseDoubleClickEvent(event)
 
-    def imageInsertEvent(self):
+    @inject.params(config='config')
+    def imageInsertEvent(self, event, config=None):
 
         title = 'Insert image'
         formats = "Images (*.png *.xpm *.jpg *.bmp *.gif)"
-        filename, formats = QtWidgets.QFileDialog.getOpenFileName(self, title, ".", formats)
+
+        folder = config.get('editor.import_image', os.path.expanduser('~'))
+        filename, formats = QtWidgets.QFileDialog.getOpenFileName(self, title, folder, formats)
         if filename is None: return None
 
         image = QtGui.QImage(filename)
@@ -221,6 +227,7 @@ class TextEditor(QtWidgets.QTextEdit):
 
         cursor = self.textCursor()
         cursor.insertImage(image.scaled(800, 600, Qt.KeepAspectRatio), filename)
+        config.set('editor.import_image', os.path.dirname(filename))
 
         popup = ImageResizeAction(self, filename, 800)
         popup.sizeChanged.connect(self.resizeImageEvent)

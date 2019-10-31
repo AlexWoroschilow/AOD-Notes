@@ -79,7 +79,6 @@ WidgetSettings SettingsTitle {
 	padding: 5px 0px;
 }
 
-TextEditorWidget { background: #ffffff; text-align: center; border: none; }
 
 PreviewScrollArea NotePreviewDescription { background-color: #ffffff; border-radius: 0px; padding: 10px 30px; margin: 3px; }
 PreviewScrollArea NotePreviewDescription #previewTitle { background: #ffffff; }
@@ -132,3 +131,8 @@ QMenu::item { padding: 5px 25px 5px 30px; border: 1px solid transparent; color: 
 QMenu::icon { padding: 0px 5px 0px 5px; }
 QMenu::item:selected { border-color: #e4e4e4; background: #e4e4e4; }
 QMenu::icon:checked { background: #ffffff; border: 1px inset #ffffff; position: absolute; top: 1px; right: 1px; bottom: 1px; left: 1px; }
+
+TextEditorWidget { background: #ffffff; text-align: center; border: none; }
+TextEditorWidget QLabel { color:#4d5357; font-size: 10px; }
+
+Status QLabel { color:#4d5357; font-size: 10px; }

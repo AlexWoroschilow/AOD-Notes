@@ -26,47 +26,15 @@ class Loader(object):
         pass
 
     @inject.params(config='config', notepad='notepad')
-    def _widget(self, config=None, notepad=None):
-
+    def _constructor_window(self, config=None, notepad=None):
         widget = MainWindow()
-        widget.setMainWidget(notepad)
         widget.resize.connect(self.actions.onActionWindowResize)
-
-        widget.footer = widget.statusBar()
-        if widget.footer is None: return None
+        widget.setMainWidget(notepad)
 
         return widget
-
-    @inject.params(window='window')
-    def _widget_header(self, window=None):
-        if window is None: return None
-        if window.header is None: return None
-        return window.header
-
-    @inject.params(window='window')
-    def _widget_content(self, window=None):
-        if window is None: return None
-        if window.content is None: return None
-        return window.content
-
-    @inject.params(window='window')
-    def _widget_footer(self, window=None):
-        if window is None: return None
-        if window.footer is None: return None
-        return window.footer
-
-    @inject.params(window='window')
-    def _widget_status(self, window=None):
-        if window is None: return None
-        return window.statusBar()
 
     def enabled(self, options=None, args=None):
         return options.console is None
 
     def configure(self, binder, options, args):
-
-        binder.bind_to_constructor('window', self._widget)
-        binder.bind_to_provider('window.header', self._widget_header)
-        binder.bind_to_provider('window.content', self._widget_content)
-        binder.bind_to_provider('window.footer', self._widget_footer)
-        binder.bind_to_provider('window.status', self._widget_status)
+        binder.bind_to_constructor('window', self._constructor_window)

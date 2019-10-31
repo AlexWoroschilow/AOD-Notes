@@ -28,12 +28,18 @@ class Status(QtWidgets.QWidget):
         self.text = QtWidgets.QLabel('')
         self.addWidget(self.text)
 
+        self.stack = []
+
     def error(self, text):
         text = '{}!'.format(text)
         self.text.setText(text)
 
     def info(self, text):
+        self.stack.append(text)
         self.text.setText(text)
+
+    def reset(self):
+        pass
 
     def addWidget(self, widget):
         self.layout().addWidget(widget)

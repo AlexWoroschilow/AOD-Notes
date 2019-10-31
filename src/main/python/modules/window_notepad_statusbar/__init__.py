@@ -16,6 +16,7 @@ import functools
 from PyQt5 import QtWidgets
 
 from .actions import ModuleActions
+from .gui.status import Status
 
 
 class Loader(object):
@@ -33,9 +34,11 @@ class Loader(object):
     def configure(self, binder, options, args):
         binder.bind_to_constructor('status', self._widget)
 
-    @inject.params(status='window.status')
-    def _widget(self, status=None):
-        from .gui.status import Status
+    @inject.params(window='window')
+    def _widget(self, window=None):
+        if window is None: return None
+
         widget = Status()
-        status.addWidget(widget)
+        window.statusBar().addWidget(widget)
+
         return widget
