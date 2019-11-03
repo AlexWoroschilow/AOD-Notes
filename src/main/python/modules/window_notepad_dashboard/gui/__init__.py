@@ -28,22 +28,44 @@ class PictureButton(QtWidgets.QPushButton):
         self.setToolTipDuration(0)
         self.setToolTip(text)
 
+        effect = QtWidgets.QGraphicsDropShadowEffect()
+        effect.setBlurRadius(5)
+        effect.setOffset(0)
+        self.setGraphicsEffect(effect)
+
     def event(self, QEvent):
         if QEvent.type() == QtCore.QEvent.Enter:
             effect = QtWidgets.QGraphicsDropShadowEffect()
             effect.setColor(QtGui.QColor('#6cccfc'))
-            effect.setBlurRadius(10)
+            effect.setBlurRadius(5)
             effect.setOffset(0)
-
             self.setGraphicsEffect(effect)
-        if QEvent.type() == QtCore.QEvent.Leave:
-            self.setGraphicsEffect(None)
 
-        if QEvent.type() == QtCore.QEvent.MouseButtonRelease:
+        if QEvent.type() == QtCore.QEvent.Leave:
+            effect = QtWidgets.QGraphicsDropShadowEffect()
+            effect.setBlurRadius(5)
+            effect.setOffset(0)
+            self.setGraphicsEffect(effect)
+
+        return super(PictureButton, self).event(QEvent)
+
+
+class PictureButtonFlat(PictureButton):
+    def __init__(self, icon=None, text=None):
+        super(QtWidgets.QPushButton, self).__init__(icon, None)
+        self.setToolTipDuration(0)
+        self.setToolTip(text)
+
+    def event(self, QEvent):
+        if QEvent.type() == QtCore.QEvent.Enter:
             effect = QtWidgets.QGraphicsDropShadowEffect()
             effect.setColor(QtGui.QColor('#6cccfc'))
-            effect.setBlurRadius(10)
+            effect.setBlurRadius(5)
             effect.setOffset(0)
+            self.setGraphicsEffect(effect)
+
+        if QEvent.type() == QtCore.QEvent.Leave:
+            self.setGraphicsEffect(None)
 
         return super(PictureButton, self).event(QEvent)
 

@@ -83,6 +83,7 @@ WidgetSettings SettingsTitle {
 PreviewScrollArea NotePreviewDescription { background-color: #fdf6e3; border-radius: 0px; padding: 10px 30px; margin: 3px; }
 PreviewScrollArea NotePreviewDescription #previewTitle { background: #fdf6e3; }
 PreviewScrollArea NotePreviewDescription Description { color: #4d5357; }
+PreviewScrollArea NotePreviewDescription PictureButtonFlat {  background: #fdf6e3; border: none; padding: 5px; margin: 0px;  }
 PreviewScrollArea { background: #e0e0e0; padding: 0px 0px; border: none; margin: 0px; }
 
 QSplitter { background: #fefbf4; border: none; }
@@ -122,6 +123,8 @@ NotepadDashboardLeft FolderTreeToolbarTop ToolBarButton:hover { background-color
 
 NotepadDashboardRight { padding: 0px; margin: 0px; border: none; background: #fefbf4; }
 NotepadEditorToolbarTop { background: #fefbf4; padding: 5px 5px 10px 5px; border-bottom: 1px solid #fdf6e3; border-left: 1px solid #fdf6e3; }
+NotepadEditorToolbarTop PictureButton { background: #fefbf4; border: none; padding: 5px;  }
+NotepadEditorToolbarTop PictureButtonFlat { border: none; padding: 5px;  }
 
 QProgressBar { border: none;     border-radius: 5px;     text-align: center }
 QProgressBar::chunk { background-color: #6cccfc; margin: 1px; max-height: 10px; }
