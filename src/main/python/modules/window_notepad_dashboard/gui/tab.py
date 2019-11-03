@@ -37,10 +37,6 @@ class Notepad(QtWidgets.QTabWidget):
 
         return super(Notepad, self).event(event)
 
-    def removeTab(self, p_int):
-        inject.instance('status').reset()
-        return super(Notepad, self).removeTab(p_int)
-
     def close(self):
         super(Notepad, self).deleteLater()
         return super(Notepad, self).close()

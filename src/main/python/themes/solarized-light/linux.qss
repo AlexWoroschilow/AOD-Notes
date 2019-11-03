@@ -107,7 +107,7 @@ NotepadDashboardTree::branch:closed:has-children { image: url(icons/plus); }
 NotepadDashboardTree::branch:hover { alternate-background-color: #f0f0f0; border-bottom: 1px solid #f0f0f0; background: #f0f0f0; }
 NotepadDashboardTree::branch:selected { alternate-background-color: #eeeeee; border-bottom: 1px solid #eeeeee; background: #eeeeee; }
 NotepadDashboardTree::branch:hover:selected { alternate-background-color: #e4e4e4; border-bottom: 1px solid #e4e4e4; background: #e4e4e4; }
-NotepadDashboardTree::item { border-bottom: 1px dotted #e4e4e4; color: #000000; padding: 3px 0px; }
+NotepadDashboardTree::item { border-bottom: 1px dotted #e4e4e4; color: #2ca7f8; padding: 3px 0px; }
 NotepadDashboardTree::item:hover { alternate-background-color: #f0f0f0; border-bottom: 1px solid #f0f0f0; background: #f0f0f0; }
 NotepadDashboardTree::item:selected:active { alternate-background-color: #eeeeee; border-bottom: 1px solid #eeeeee; background: #eeeeee; }
 NotepadDashboardTree::item:hover:selected { alternate-background-color: #e4e4e4; border-bottom: 1px solid #e4e4e4; background: #e4e4e4; }

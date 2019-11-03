@@ -80,6 +80,10 @@ class PreviewScrollArea(QtWidgets.QListWidget):
             parent = storage.fileDir(index_to_open)
             if parent is None: return self
 
+            collection = storage.entitiesByFileType(parent)
+            if collection is None or not len(collection):
+                return None
+
             for index in storage.entitiesByFileType(parent):
                 item = NoteItem()
                 self.addItem(item)

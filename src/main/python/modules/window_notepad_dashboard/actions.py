@@ -83,15 +83,19 @@ class ModuleActions(object):
             getLogger('app').exception(ex)
             status.error(ex.__str__())
 
-    @inject.params(window='window', storage='storage')
-    def onActionFullScreen(self, event, window, storage, widget):
+    @inject.params(window='window', storage='storage', editor='notepad.editor')
+    def onActionFullScreen(self, event, window, storage, editor, widget):
         try:
             index, document = event
-            editor = inject.instance('notepad.editor')
-            editor.setIndex(index)
-            editor.setDocument(document)
+            if index is None: return None
 
-            window.tab.emit((editor, storage.fileName(index)))
+            # We need a custom document in a new tab to have it open even by switch of the parent folder
+            # the prices is the synchronisation between the tab and the document open at the dashboard.
+            # For now there are no synchronisation between the tabs and dashboard and it may even be a feature
+            editor.open(index, None)
+
+            name = storage.fileName(index)
+            window.tab.emit((editor, name))
 
         except Exception as ex:
             getLogger('app').exception(ex)

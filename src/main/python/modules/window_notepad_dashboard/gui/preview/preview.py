@@ -47,11 +47,11 @@ class NotePreviewDescription(QtWidgets.QFrame):
         self.layout.addWidget(self.description, 1, 0, 20, 30)
 
         self.buttonClone = PictureButtonFlat(QtGui.QIcon("icons/copy"))
-        self.buttonClone.clicked.connect(lambda x: self.clone.emit(index))
+        self.buttonClone.clicked.connect(lambda x: self.cloneAction.emit(index))
         self.layout.addWidget(self.buttonClone, 1, 30)
 
         self.buttonDelete = PictureButtonFlat(QtGui.QIcon("icons/trash"))
-        self.buttonDelete.clicked.connect(lambda x: self.delete.emit(index))
+        self.buttonDelete.clicked.connect(lambda x: self.deleteAction.emit(index))
         self.layout.addWidget(self.buttonDelete, 2, 30)
 
         self.setLayout(self.layout)

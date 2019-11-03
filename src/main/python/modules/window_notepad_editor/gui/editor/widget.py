@@ -93,8 +93,26 @@ class TextEditorWidget(QtWidgets.QWidget):
         return self.writer.document()
 
     @inject.params(storage='storage')
+    def open(self, index=None, document=None, storage=None):
+        if storage is None: return self
+        if index is None: return self
+
+        self.setIndex(index)
+
+        if document is not None:
+            self.writer.setDocument(document)
+            return self
+
+        content = storage.fileContent(index)
+        if content is None: return self
+
+        self.insertHtml(content)
+
+        return self
+
+    @inject.params(storage='storage')
     def setDocument(self, document=None, storage=None):
-        if document is None:
+        if document is None and self.index is not None:
             content = storage.fileContent(self.index)
             return self.insertHtml(content)
         if self.writer is None:
