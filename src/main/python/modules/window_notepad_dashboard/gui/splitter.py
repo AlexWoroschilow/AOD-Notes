@@ -40,10 +40,11 @@ class DashboardSplitter(QtWidgets.QSplitter):
         self.preview.deleteAction.connect(self.delete.emit)
         self.preview.cloneAction.connect(self.clone.emit)
 
+        self.preview.setMinimumWidth(550)
         self.preview.open(index)
 
         self.editor = editor
-        self.editor.setMinimumWidth(500)
+        self.editor.setMinimumWidth(620)
         self.editor.focus()
 
         self.addWidget(self.preview)

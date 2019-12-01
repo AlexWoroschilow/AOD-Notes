@@ -41,8 +41,7 @@ class PreviewScrollArea(QtWidgets.QListWidget):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setMovement(QtWidgets.QListView.Static)
-
-        self.setMinimumWidth(400)
+        self.setMinimumWidth(550)
 
         self.itemClicked.connect(self.itemClickedEvent)
 

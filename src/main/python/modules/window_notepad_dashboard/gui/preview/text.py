@@ -22,5 +22,6 @@ class Description(QtWidgets.QTextEdit):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setEnabled(False)
+        self.setFixedWidth(500)
         self.setHtml(text)
         self.show()

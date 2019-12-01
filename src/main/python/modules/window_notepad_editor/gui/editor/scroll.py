@@ -52,7 +52,10 @@ class TextWriter(QtWidgets.QScrollArea):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setAlignment(Qt.AlignHCenter)
-        self.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(QtWidgets.QVBoxLayout())
+        self.layout().setContentsMargins(20, 20, 20, 20)
+        self.layout().setAlignment(Qt.AlignHCenter)
+        self.setMinimumWidth(550)
 
         self.text = TextEditor(self)
         self.printAction.connect(self.text.printEvent)
@@ -84,13 +87,7 @@ class TextWriter(QtWidgets.QScrollArea):
         self.underlAction.connect(self.text.onActionUnderline)
 
         self.setWidgetResizable(True)
-        self.setWidget(self.text)
-
-        effect = QtWidgets.QGraphicsDropShadowEffect()
-        effect.setBlurRadius(10)
-        effect.setOffset(0)
-
-        self.setGraphicsEffect(effect)
+        self.layout().addWidget(self.text)
 
         self._entity = None
 
@@ -126,25 +123,3 @@ class TextWriter(QtWidgets.QScrollArea):
 
     def html(self):
         return self.text.toHtml()
-
-    def event(self, QEvent):
-        if QEvent.type() == QtCore.QEvent.Enter:
-            effect = QtWidgets.QGraphicsDropShadowEffect()
-            effect.setColor(QtGui.QColor('#6cccfc'))
-            effect.setBlurRadius(20)
-            effect.setOffset(0)
-
-            self.setGraphicsEffect(effect)
-        if QEvent.type() == QtCore.QEvent.Leave:
-            effect = QtWidgets.QGraphicsDropShadowEffect()
-            effect.setBlurRadius(10)
-            effect.setOffset(0)
-            self.setGraphicsEffect(effect)
-
-        if QEvent.type() == QtCore.QEvent.MouseButtonRelease:
-            effect = QtWidgets.QGraphicsDropShadowEffect()
-            effect.setColor(QtGui.QColor('#6cccfc'))
-            effect.setBlurRadius(20)
-            effect.setOffset(0)
-
-        return super(TextWriter, self).event(QEvent)

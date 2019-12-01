@@ -27,15 +27,22 @@ class TextEditor(QtWidgets.QTextEdit):
     def __init__(self, parent=None):
         super(TextEditor, self).__init__(parent)
         self.setWordWrapMode(QtGui.QTextOption.WordWrap)
-        self.setViewportMargins(40, 20, 20, 20)
+        self.setContentsMargins(0, 0, 0, 0)
+
         self.setAcceptRichText(True)
         self.setAcceptDrops(True)
 
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.setFixedWidth(500)
 
         self._entity = None
+
+        effect = QtWidgets.QGraphicsDropShadowEffect()
+        effect.setBlurRadius(10)
+        effect.setOffset(0)
+
+        self.setGraphicsEffect(effect)
 
     @property
     def entity(self):
@@ -244,6 +251,28 @@ class TextEditor(QtWidgets.QTextEdit):
             if point.y() < 0:
                 self.zoomOut(5)
         return super(TextEditor, self).wheelEvent(event)
+
+    def event(self, QEvent):
+        if QEvent.type() == QtCore.QEvent.Enter:
+            effect = QtWidgets.QGraphicsDropShadowEffect()
+            effect.setColor(QtGui.QColor('#6cccfc'))
+            effect.setBlurRadius(20)
+            effect.setOffset(0)
+
+            self.setGraphicsEffect(effect)
+        if QEvent.type() == QtCore.QEvent.Leave:
+            effect = QtWidgets.QGraphicsDropShadowEffect()
+            effect.setBlurRadius(10)
+            effect.setOffset(0)
+            self.setGraphicsEffect(effect)
+
+        if QEvent.type() == QtCore.QEvent.MouseButtonRelease:
+            effect = QtWidgets.QGraphicsDropShadowEffect()
+            effect.setColor(QtGui.QColor('#6cccfc'))
+            effect.setBlurRadius(20)
+            effect.setOffset(0)
+
+        return super(TextEditor, self).event(QEvent)
 
     def close(self):
         super(TextEditor, self).deleteLater()

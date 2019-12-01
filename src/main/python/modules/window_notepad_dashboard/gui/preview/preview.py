@@ -33,6 +33,7 @@ class NotePreviewDescription(QtWidgets.QFrame):
         super(NotePreviewDescription, self).__init__()
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.setContentsMargins(0, 0, 0, 0)
+        self.setFixedWidth(550)
 
         self.index = index
 
