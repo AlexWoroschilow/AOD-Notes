@@ -84,7 +84,7 @@ class ModuleActions(object):
             status.error(ex.__str__())
 
     @inject.params(window='window', storage='storage', editor='notepad.editor')
-    def onActionFullScreen(self, event, window, storage, editor):
+    def onActionFullScreen(self, event, window, storage, editor, widget=None):
         try:
             index, document = event
             if index is None: return None

@@ -119,8 +119,8 @@ NotepadDashboardLeft FolderTreeToolbarTop ToolBarButton:hover { background-color
 
 NotepadDashboardRight { padding: 0px; margin: 0px; border: none; background: #ffffff; }
 NotepadEditorToolbarTop { background: #ffffff; padding: 5px 5px 10px 5px; border-bottom: 1px solid #fdf6e3; border-left: 1px solid #fdf6e3; }
-NotepadEditorToolbarTop PictureButton { background: #ffffff; border: none; padding: 5px;  }
-NotepadEditorToolbarTop PictureButtonFlat { border: none; padding: 5px;  }
+NotepadEditorToolbarTop PictureButton { background: #2ca7f8; border: 1px; border-radius: 4px; padding: 5px; color: #ffffff; }
+NotepadEditorToolbarTop PictureButtonFlat { background: #ffffff; padding: 5px;  }
 
 QProgressBar { border: none;     border-radius: 5px;     text-align: center }
 QProgressBar::chunk { background-color: #6cccfc; margin: 1px; max-height: 10px; }
