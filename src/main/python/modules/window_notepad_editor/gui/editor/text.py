@@ -23,6 +23,33 @@ from .menu.action import ImageResizeAction
 
 
 class TextEditor(QtWidgets.QTextEdit):
+    printAction = QtCore.pyqtSignal(object)
+    previewAction = QtCore.pyqtSignal(object)
+    cutAction = QtCore.pyqtSignal(object)
+    copyAction = QtCore.pyqtSignal(object)
+    pasteAction = QtCore.pyqtSignal(object)
+    undoAction = QtCore.pyqtSignal(object)
+    redoAction = QtCore.pyqtSignal(object)
+    saveAction = QtCore.pyqtSignal(object)
+    fullscreenAction = QtCore.pyqtSignal(object)
+    fontSizeAction = QtCore.pyqtSignal(object)
+    bulletAction = QtCore.pyqtSignal(object)
+    numberedAction = QtCore.pyqtSignal(object)
+    alignLeftAction = QtCore.pyqtSignal(object)
+    alignCenterAction = QtCore.pyqtSignal(object)
+    alignRightAction = QtCore.pyqtSignal(object)
+    alignJustifyAction = QtCore.pyqtSignal(object)
+    indentAction = QtCore.pyqtSignal(object)
+    dedentAction = QtCore.pyqtSignal(object)
+    imageAction = QtCore.pyqtSignal(object)
+    italicAction = QtCore.pyqtSignal(object)
+    superAction = QtCore.pyqtSignal(object)
+    strikeAction = QtCore.pyqtSignal(object)
+    fontColorAction = QtCore.pyqtSignal(object)
+    backColorAction = QtCore.pyqtSignal(object)
+    subAction = QtCore.pyqtSignal(object)
+    boldAction = QtCore.pyqtSignal(object)
+    underlAction = QtCore.pyqtSignal(object)
 
     def __init__(self, parent=None):
         super(TextEditor, self).__init__(parent)
@@ -43,6 +70,34 @@ class TextEditor(QtWidgets.QTextEdit):
         effect.setOffset(0)
 
         self.setGraphicsEffect(effect)
+
+        self.printAction.connect(self.printEvent)
+        self.previewAction.connect(self.previewEvent)
+        self.cutAction.connect(self.cut)
+        self.copyAction.connect(self.copy)
+        self.pasteAction.connect(self.paste)
+        self.undoAction.connect(self.undo)
+        self.redoAction.connect(self.redo)
+
+        self.bulletAction.connect(self.onActionBulletList)
+        self.numberedAction.connect(self.onActionNumberList)
+        self.alignLeftAction.connect(self.onActionAlignLeft)
+        self.alignCenterAction.connect(self.onActionAlignCenter)
+        self.alignRightAction.connect(self.onActionAlignRight)
+        self.alignJustifyAction.connect(self.onActionAlignJustify)
+        self.indentAction.connect(self.onActionIndent)
+        self.dedentAction.connect(self.onActionDedent)
+        self.imageAction.connect(self.imageInsertEvent)
+        self.fontSizeAction.connect(self.setFontPointSize)
+
+        self.italicAction.connect(self.onActionItalic)
+        self.superAction.connect(self.onActionSuperScript)
+        self.strikeAction.connect(self.onActionStrike)
+        self.fontColorAction.connect(self.onActionFontColor)
+        self.backColorAction.connect(self.onActionHighlight)
+        self.subAction.connect(self.onActionSubScript)
+        self.boldAction.connect(self.onActionBold)
+        self.underlAction.connect(self.onActionUnderline)
 
     @property
     def entity(self):

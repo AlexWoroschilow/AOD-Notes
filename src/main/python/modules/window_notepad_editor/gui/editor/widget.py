@@ -22,6 +22,7 @@ from .bar import ToolBarWidgetRight
 from .bar import FormatbarWidget
 
 from .scroll import TextWriter
+from .text import TextEditor
 
 
 class TextEditorWidget(QtWidgets.QWidget):
@@ -33,11 +34,12 @@ class TextEditorWidget(QtWidgets.QWidget):
     def __init__(self):
         super(TextEditorWidget, self).__init__()
         self.setContentsMargins(0, 0, 0, 0)
+        self.setFixedWidth(500)
 
         self._index = None
 
-        self.writer = TextWriter(self)
-        self.writer.text.cursorPositionChanged.connect(self.cursorPosition)
+        self.writer = TextEditor(self)
+        self.writer.cursorPositionChanged.connect(self.cursorPosition)
 
         self.statusbar = QtWidgets.QLabel()
         self.statusbar.setAlignment(Qt.AlignCenter)
@@ -123,11 +125,11 @@ class TextEditorWidget(QtWidgets.QWidget):
 
     def focus(self):
         if self.writer is None: return self
-        cursor = self.writer.text.textCursor()
+        cursor = self.writer.textCursor()
         if cursor is None: return self
         cursor.setPosition(0)
-        self.writer.text.setTextCursor(cursor)
-        self.writer.focus()
+        self.writer.setTextCursor(cursor)
+        self.writer.setFocus()
 
         return self
 
@@ -166,29 +168,29 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.writer.zoomOut(value)
 
     def cursorPosition(self):
-        cursor = self.writer.text.textCursor()
+        cursor = self.writer.textCursor()
         line = cursor.blockNumber() + 1
         col = cursor.columnNumber()
         self.statusbar.setText("Line: {}, Column: {}".format(line, col))
 
     def getHtml(self):
-        return self.writer.text.toHtml()
+        return self.writer.toHtml()
 
     def insertHtml(self, html=None):
         if self.writer is not None and html is not None:
-            self.writer.text.setHtml(html)
+            self.writer.setHtml(html)
 
     def appendHtml(self, html=None):
         if self.writer is not None and html is not None:
-            self.writer.text.insertHtml(html)
+            self.writer.insertHtml(html)
 
     def setTextColor(self, color=None):
         if self.writer is not None and color is not None:
-            self.writer.text.setTextColor(color)
+            self.writer.setTextColor(color)
 
     def setFontPointSize(self, size=None):
         if self.writer is not None and size is not None:
-            self.writer.text.setFontPointSize(size)
+            self.writer.setFontPointSize(size)
 
     def close(self):
         super(TextEditorWidget, self).deleteLater()
