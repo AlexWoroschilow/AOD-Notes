@@ -102,14 +102,14 @@ NotepadDashboardTree { background: #ffffff; alternate-background-color: #ffffff;
 NotepadDashboardTree::branch { border: none; background: #ffffff; alternate-background-color: #ffffff; }
 NotepadDashboardTree::branch:open { image: url(icons/minus); }
 NotepadDashboardTree::branch:closed:has-children { image: url(icons/plus); }
-NotepadDashboardTree::branch:hover { alternate-background-color: #f0f0f0; border: none; background: #f0f0f0; }
-NotepadDashboardTree::branch:selected { alternate-background-color: #eeeeee; border: none; background: #eeeeee; }
-NotepadDashboardTree::branch:hover:selected { alternate-background-color: #e4e4e4; border: none; background: #e4e4e4; }
+NotepadDashboardTree::branch:hover { border: none; background: #d0e8fa; color: #2ca7f8; }
+NotepadDashboardTree::branch:selected { border: none; background: #d0e8fa; color: #2ca7f8; }
+NotepadDashboardTree::branch:hover:selected { border: none; background: #d0e8fa; color: #2ca7f8; }
 NotepadDashboardTree::item { border: none; color: #4F4F4F; padding: 3px 0px; }
-NotepadDashboardTree::item:hover { alternate-background-color: #f0f0f0; border: none; background: #f0f0f0; }
-NotepadDashboardTree::item:selected:active { alternate-background-color: #eeeeee; border: none; background: #eeeeee; }
-NotepadDashboardTree::item:hover:selected { alternate-background-color: #e4e4e4; border: none; background: #e4e4e4; }
-NotepadDashboardTree::item:selected { alternate-background-color: #eeeeee; border: none; background: #eeeeee; }
+NotepadDashboardTree::item:hover { border: none; background: #d0e8fa; color: #2ca7f8; }
+NotepadDashboardTree::item:selected:active { border: none; background: #d0e8fa; color: #2ca7f8; }
+NotepadDashboardTree::item:hover:selected { border: none; background: #d0e8fa; color: #2ca7f8; }
+NotepadDashboardTree::item:selected { border: none; background: #d0e8fa; color: #2ca7f8; }
 
 NotepadDashboardLeft { background: #c0c0c0; padding: 0px; margin: 0px; border: none; }
 NotepadDashboardLeft FolderTreeToolbarTop {  background: #515659; padding: 0px; margin: 0px; border: none; }
