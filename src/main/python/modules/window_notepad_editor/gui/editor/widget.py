@@ -34,7 +34,6 @@ class TextEditorWidget(QtWidgets.QWidget):
     def __init__(self):
         super(TextEditorWidget, self).__init__()
         self.setContentsMargins(0, 0, 0, 0)
-        self.setFixedWidth(500)
 
         self._index = None
 
@@ -87,6 +86,11 @@ class TextEditorWidget(QtWidgets.QWidget):
         self.layout().addWidget(self.formatbar, 1, 1)
         self.layout().addWidget(self.writer, 2, 1)
         self.layout().addWidget(self.statusbar, 3, 1)
+
+    def setFixedWidth(self, p_int, factor=0.85):
+        print(p_int, p_int * factor)
+        self.writer.setFixedWidth(p_int * factor)
+        return super(TextEditorWidget, self).setFixedWidth(p_int)
 
     def document(self):
         if self.writer is None:

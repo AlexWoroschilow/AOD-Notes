@@ -55,7 +55,6 @@ class TextWriter(QtWidgets.QScrollArea):
         self.setLayout(QtWidgets.QVBoxLayout())
         self.layout().setContentsMargins(20, 20, 20, 20)
         self.layout().setAlignment(Qt.AlignHCenter)
-        self.setMinimumWidth(550)
 
         self.text = TextEditor(self)
         self.printAction.connect(self.text.printEvent)

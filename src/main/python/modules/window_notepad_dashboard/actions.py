@@ -84,7 +84,7 @@ class ModuleActions(object):
             status.error(ex.__str__())
 
     @inject.params(window='window', storage='storage', editor='notepad.editor')
-    def onActionFullScreen(self, event, window, storage, editor, widget):
+    def onActionFullScreen(self, event, window, storage, editor):
         try:
             index, document = event
             if index is None: return None
@@ -169,6 +169,7 @@ class ModuleActions(object):
 
         menu = SettingsMenu(widget)
 
+        print(widget)
         if widget.current and not storage.isDir(widget.current):
             action = functools.partial(self.onActionFullScreen, event=(widget.current, None))
             menu.addAction(QtGui.QIcon("icons/tab-new"), 'Open in a new tab', action)

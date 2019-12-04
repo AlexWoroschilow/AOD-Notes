@@ -61,7 +61,6 @@ class TextEditor(QtWidgets.QTextEdit):
 
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setFixedWidth(500)
 
         self._entity = None
 

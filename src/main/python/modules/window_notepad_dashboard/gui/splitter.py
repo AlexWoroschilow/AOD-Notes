@@ -44,7 +44,7 @@ class DashboardSplitter(QtWidgets.QSplitter):
         self.preview.open(index)
 
         self.editor = editor
-        self.editor.setMinimumWidth(620)
+        self.editor.setFixedWidth(500 / 0.85)
         self.editor.focus()
 
         self.addWidget(self.preview)
