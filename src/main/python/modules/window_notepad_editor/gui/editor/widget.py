@@ -25,7 +25,7 @@ from .scroll import TextWriter
 from .text import TextEditor
 
 
-class TextEditorWidget(QtWidgets.QWidget):
+class TextEditorWidget(QtWidgets.QFrame):
     fullscreen = QtCore.pyqtSignal(object)
     fullscreenAction = QtCore.pyqtSignal(object)
     save = QtCore.pyqtSignal(object)

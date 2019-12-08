@@ -45,6 +45,11 @@ class NotePreviewDescription(QtWidgets.QGroupBox):
 
         self.setLayout(self.layout)
 
+        effect = QtWidgets.QGraphicsDropShadowEffect()
+        effect.setBlurRadius(10)
+        effect.setOffset(0)
+        self.setGraphicsEffect(effect)
+
     def document(self):
         if self.description is None:
             return None
@@ -67,7 +72,10 @@ class NotePreviewDescription(QtWidgets.QGroupBox):
             self.setGraphicsEffect(effect)
 
         if QEvent.type() == QtCore.QEvent.Leave:
-            self.setGraphicsEffect(None)
+            effect = QtWidgets.QGraphicsDropShadowEffect()
+            effect.setBlurRadius(10)
+            effect.setOffset(0)
+            self.setGraphicsEffect(effect)
 
         if QEvent.type() == QtCore.QEvent.MouseButtonRelease:
             self.editAction.emit((self.index, self.document()))
