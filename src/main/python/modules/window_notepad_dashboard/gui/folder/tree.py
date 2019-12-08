@@ -35,6 +35,7 @@ class NotepadDashboardTree(QtWidgets.QTreeView):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setIconSize(QtCore.QSize(0, 0))
+        self.setMinimumWidth(200)
 
         self.setHeaderHidden(True)
         self.setAnimated(True)
