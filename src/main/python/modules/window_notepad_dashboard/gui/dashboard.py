@@ -24,9 +24,12 @@ from .bar import NotepadEditorToolbarTop
 from .splitter import DashboardSplitter
 from .frame import NotepadDashboardLeft
 from .frame import NotepadDashboardRight
+from .frame import NotepadDashboardTop
+
+from .header import NotepadDashboardHeader
 
 
-class NotepadDashboard(QtWidgets.QSplitter):
+class NotepadDashboard(QtWidgets.QWidget):
     edit = QtCore.pyqtSignal(object)
     delete = QtCore.pyqtSignal(object)
     clone = QtCore.pyqtSignal(object)
@@ -51,13 +54,21 @@ class NotepadDashboard(QtWidgets.QSplitter):
     fullscreen = QtCore.pyqtSignal(object)
 
     editor = None
+    preview = None
 
-    def __init__(self):
+    @inject.params(editor='notepad.editor')
+    def __init__(self, editor=None):
         super(NotepadDashboard, self).__init__()
-        self.removed.connect(self.open)
-        self.created.connect(self.open)
-        self.edit.connect(lambda x: self.open(x[0]))
-        self.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(QtWidgets.QVBoxLayout())
+
+        self.editor = editor
+        self.header = NotepadDashboardHeader()
+        self.header.note_new.connect(self.note_new.emit)
+        self.header.group_new.connect(self.group_new.emit)
+        self.header.note_import.connect(self.note_import.emit)
+        self.header.settings.connect(self.settings.emit)
+        self.header.search.connect(self.search.emit)
+        self.layout().addWidget(self.header)
 
         self.tree = NotepadDashboardTree()
         self.tree.note.connect(lambda x: self.open(x[0]))
@@ -65,20 +76,28 @@ class NotepadDashboard(QtWidgets.QSplitter):
         self.tree.delete.connect(self.delete.emit)
         self.tree.menu.connect(self.menu.emit)
 
-        self.container_left = NotepadDashboardLeft()
-        self.container_left.addWidget(self.tree)
+        self.preview = PreviewScrollArea(self, [])
+        self.preview.fullscreenAction.connect(self.fullscreen.emit)
+        self.preview.deleteAction.connect(self.delete.emit)
+        self.preview.cloneAction.connect(self.clone.emit)
+        self.preview.editAction.connect(self.edit.emit)
 
-        self.addWidget(self.container_left)
+        self.splitter = QtWidgets.QSplitter()
+        self.splitter.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.splitter.addWidget(self.tree)
+        self.splitter.addWidget(self.preview)
+        self.splitter.addWidget(self.editor)
 
-        self.container_right = NotepadDashboardRight()
-        self.addWidget(self.container_right)
+        self.splitter.setCollapsible(0, True)
+        self.splitter.setCollapsible(1, False)
+        self.splitter.setCollapsible(2, True)
 
-        self.setCollapsible(0, True)
-        self.setCollapsible(1, False)
-        self.setCollapsible(2, False)
+        self.splitter.setStretchFactor(1, 2)
+        self.splitter.setStretchFactor(2, 3)
+        self.splitter.setStretchFactor(3, 3)
+        self.splitter.setSizes([2, 0])
 
-        self.setStretchFactor(1, 2)
-        self.setStretchFactor(2, 3)
+        self.layout().addWidget(self.splitter)
 
     @property
     @inject.params(storage='storage')
@@ -99,64 +118,21 @@ class NotepadDashboard(QtWidgets.QSplitter):
             return None
         self.tree.setCurrentIndex(index)
 
-    @inject.params(storage='storage')
-    def note(self, index=None, storage=None):
+    @inject.params(storage='storage', editor='notepad.editor')
+    def note(self, index=None, storage=None, editor=None):
         self.scrollTo(index)
         if storage.isDir(index):
             return self
 
-        preview = NotepadEditorToolbarTop()
-        preview.note_new.connect(self.note_new.emit)
-        preview.group_new.connect(self.group_new.emit)
-        preview.note_import.connect(self.note_import.emit)
-        preview.settings.connect(self.settings.emit)
-        preview.search.connect(self.search.emit)
-
-        splitter = DashboardSplitter(index)
-        splitter.delete.connect(self.delete.emit)
-        splitter.fullscreen.connect(self.fullscreen.emit)
-        splitter.clicked.connect(self.scrollTo)
-        splitter.clone.connect(self.clone.emit)
-        splitter.open(index)
-
-        self.container_right.clean()
-        self.container_right.addWidget(preview)
-        self.container_right.addWidget(splitter)
-        self.container_right.show()
-
-        self.tree.note.disconnect()
-        # Reconnect event to work locally without
-        # the recreation of the all note environment
-        self.tree.note.connect(splitter.previewSelected)
-
+        if self.editor is not None:
+            self.editor.open(index)
         return self
 
     @inject.params(storage='storage')
     def group(self, index=None, storage=None):
 
-        toolbar = NotepadEditorToolbarTop()
-        toolbar.note_new.connect(self.note_new.emit)
-        toolbar.group_new.connect(self.group_new.emit)
-        toolbar.note_import.connect(self.note_import.emit)
-        toolbar.settings.connect(self.settings.emit)
-        toolbar.search.connect(self.search.emit)
-
-        preview = PreviewScrollArea(self, [])
-        preview.fullscreenAction.connect(self.fullscreen.emit)
-        preview.deleteAction.connect(self.delete.emit)
-        preview.cloneAction.connect(self.clone.emit)
-        preview.editAction.connect(self.edit.emit)
-        preview.open(index)
-
-        self.container_right.clean()
-        self.container_right.addWidget(toolbar)
-        self.container_right.addWidget(preview)
-        self.container_right.show()
-
-        self.tree.note.disconnect()
-        # Reconnect event to be able
-        # to open the notes as usial
-        self.tree.note.connect(lambda x: self.note(x[0]))
+        if self.preview is not None:
+            return self.preview.open(index)
 
         return self
 

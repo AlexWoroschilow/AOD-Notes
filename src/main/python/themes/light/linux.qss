@@ -95,7 +95,7 @@ QTabWidget { background: #ffffff; border: none; margin: 0px; }
 QTabWidget::pane { background: #ffffff; border: none; margin: 0px; border-left: 1px solid #eeeeee; }
 QTabWidget::tab-bar { left: 0px; color: #4F4F4F; }
 QTabBar::tab { background: #ffffff; color: #4d5357; border-right: 2px solid #ffffff; padding: 5px; }
-QTabBar::tab:selected { background: #ffffff; border-right: 2px solid #2ca7f8; color: #2ca7f8; }
+QTabBar::tab:selected { background: #ffffff; border-right: 2px solid #2ca7f8; }
 QTabBar::tab:!selected { background: #ffffff; }
 QTabBar::close-button { image: url(icons/close); }
 

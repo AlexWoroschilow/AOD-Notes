@@ -13,6 +13,28 @@
 from PyQt5 import QtWidgets
 
 
+class NotepadDashboardTop(QtWidgets.QFrame):
+    def __init__(self):
+        super(NotepadDashboardTop, self).__init__()
+        self.setLayout(QtWidgets.QVBoxLayout())
+        self.layout().setContentsMargins(0, 0, 0, 0)
+        self.layout().setSpacing(0)
+
+    def addWidget(self, widget):
+        self.layout().addWidget(widget)
+
+    def clean(self):
+        layout = self.layout()
+        for i in range(0, layout.count()):
+            item = layout.itemAt(i)
+            if item is None:
+                layout.takeAt(i)
+
+            widget = item.widget()
+            if item is not None:
+                widget.close()
+
+
 class NotepadDashboardLeft(QtWidgets.QFrame):
     def __init__(self):
         super(NotepadDashboardLeft, self).__init__()

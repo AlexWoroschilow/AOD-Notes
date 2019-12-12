@@ -33,7 +33,7 @@ class PreviewScrollArea(QtWidgets.QListWidget):
     deleteAction = QtCore.pyqtSignal(object)
     cloneAction = QtCore.pyqtSignal(object)
 
-    @inject.params(storage='storage', status='status')
+    @inject.params(storage='storage')
     def __init__(self, parent=None, collection=None, storage=None, status=None):
         super(PreviewScrollArea, self).__init__(parent)
         self.setViewMode(QtWidgets.QListView.IconMode)
