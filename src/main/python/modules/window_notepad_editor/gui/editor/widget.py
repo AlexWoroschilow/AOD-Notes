@@ -138,9 +138,7 @@ class TextEditorWidget(QtWidgets.QFrame):
         ))
 
     def fullscreenEvent(self, event=None):
-        return self.fullscreen.emit((
-            self.index, self.document()
-        ))
+        return self.fullscreen.emit(self.index)
 
     def zoomIn(self, value):
         if self.writer is None:

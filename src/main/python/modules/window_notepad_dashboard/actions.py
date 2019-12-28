@@ -169,7 +169,7 @@ class ModuleActions(object):
 
         print(widget)
         if widget.current and not storage.isDir(widget.current):
-            action = functools.partial(self.onActionFullScreen, event=(widget.current, None))
+            action = functools.partial(self.onActionFullScreen, event=widget.current)
             menu.addAction(QtGui.QIcon("icons/tab-new"), 'Open in a new tab', action)
             menu.addSeparator()
 

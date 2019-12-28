@@ -83,7 +83,7 @@ class NotePreviewDescription(QtWidgets.QFrame):
             self.setGraphicsEffect(effect)
 
         if QEvent.type() == QtCore.QEvent.MouseButtonDblClick:
-            self.fullscreenAction.emit((self.index, self.document()))
+            self.fullscreenAction.emit(self.index)
 
         if QEvent.type() == QtCore.QEvent.MouseButtonRelease:
             self.editAction.emit(self.index)
