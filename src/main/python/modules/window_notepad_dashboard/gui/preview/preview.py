@@ -63,16 +63,10 @@ class NotePreviewDescription(QtWidgets.QFrame):
         self.setGraphicsEffect(effect)
 
     def document(self):
-        if self.description is None:
-            return None
-        return self.description.document()
+        return None
 
     def setDocument(self, document=None):
-        if document is None:
-            return None
-        if self.description is None:
-            return None
-        return self.description.setDocument(document)
+        return None
 
     def event(self, QEvent):
         if QEvent.type() == QtCore.QEvent.Enter:
@@ -92,7 +86,7 @@ class NotePreviewDescription(QtWidgets.QFrame):
             self.fullscreenAction.emit((self.index, self.document()))
 
         if QEvent.type() == QtCore.QEvent.MouseButtonRelease:
-            self.editAction.emit((self.index, self.document()))
+            self.editAction.emit(self.index)
 
             effect = QtWidgets.QGraphicsDropShadowEffect()
             effect.setColor(QtGui.QColor('#6cccfc'))

@@ -65,9 +65,7 @@ class PreviewScrollArea(QtWidgets.QListWidget):
     def itemClickedEvent(self, item):
         widget = self.itemWidget(item)
         if widget is None: return None
-        return self.editAction.emit((
-            widget.index, widget.document()
-        ))
+        return self.editAction.emit(widget.index)
 
     @inject.params(storage='storage')
     def document(self, index=None, storage=None):

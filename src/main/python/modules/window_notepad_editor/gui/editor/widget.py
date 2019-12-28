@@ -87,11 +87,6 @@ class TextEditorWidget(QtWidgets.QFrame):
         self.layout().addWidget(self.writer, 2, 1)
         self.layout().addWidget(self.statusbar, 3, 1)
 
-    def setFixedWidth(self, p_int, factor=0.85):
-        print(p_int, p_int * factor)
-        self.writer.setFixedWidth(p_int * factor)
-        return super(TextEditorWidget, self).setFixedWidth(p_int)
-
     def document(self):
         if self.writer is None:
             return None
@@ -102,29 +97,11 @@ class TextEditorWidget(QtWidgets.QFrame):
     def open(self, index=None, document=None, storage=None):
         if storage is None: return self
         if index is None: return self
-
         self.setIndex(index)
-
-        if document is not None:
-            self.writer.setDocument(document)
-            return self
-
-        content = storage.fileContent(index)
-        if content is None: return self
-
-        self.insertHtml(content)
-
         return self
 
     @inject.params(storage='storage')
     def setDocument(self, document=None, storage=None):
-        if document is None and self.index is not None:
-            content = storage.fileContent(self.index)
-            return self.insertHtml(content)
-        if self.writer is None:
-            return None
-        self.writer.setDocument(document)
-
         return None
 
     def focus(self):
@@ -141,10 +118,14 @@ class TextEditorWidget(QtWidgets.QFrame):
     def index(self):
         return self._index
 
-    def setIndex(self, index=None):
+    @inject.params(storage='storage')
+    def setIndex(self, index=None, storage=None):
         if index is None:
             return None
         self._index = index
+
+        content = storage.fileContent(index)
+        return self.insertHtml(content)
 
     def clean(self):
         self.writer.text.setHtml('')

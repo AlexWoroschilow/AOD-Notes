@@ -44,14 +44,13 @@ class DashboardSplitter(QtWidgets.QSplitter):
         self.preview.open(index)
 
         self.editor = editor
-        self.editor.setFixedWidth(500 / 0.85)
         self.editor.focus()
 
         self.addWidget(self.preview)
         self.addWidget(self.editor)
 
+        self.setStretchFactor(0, 3)
         self.setStretchFactor(1, 1)
-        self.setStretchFactor(2, 2)
         self.show()
 
     def open(self, index=None):
@@ -60,27 +59,16 @@ class DashboardSplitter(QtWidgets.QSplitter):
         return self
 
     @inject.params(storage='storage')
-    def previewSelected(self, event=None, storage=None):
-        if self.preview is None:
-            return None
-
-        index, document = event
+    def previewSelected(self, index=None, storage=None):
+        if self.preview is None: return None
         if index is None: return None
-
         return self.preview.open(index)
 
     @inject.params(storage='storage')
-    def previewClickedEvent(self, event, storage):
-        if self.editor is None:
-            return None
-
-        index, document = event
-        if document is None: return None
+    def previewClickedEvent(self, index, storage):
+        if self.editor is None: return None
         if index is None: return None
-
-        self.editor.setDocument(document)
         self.editor.setIndex(index)
-
         self.clicked.emit(index)
 
     def close(self):

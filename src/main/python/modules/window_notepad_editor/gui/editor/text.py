@@ -55,6 +55,7 @@ class TextEditor(QtWidgets.QTextEdit):
         super(TextEditor, self).__init__(parent)
         self.setWordWrapMode(QtGui.QTextOption.WordWrap)
         self.setContentsMargins(0, 0, 0, 0)
+        self.setMinimumWidth(500)
 
         self.setAcceptRichText(True)
         self.setAcceptDrops(True)

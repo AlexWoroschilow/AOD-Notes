@@ -19,6 +19,7 @@ class NotepadDashboardLeft(QtWidgets.QFrame):
         self.setLayout(QtWidgets.QVBoxLayout())
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setSpacing(0)
+        self.setMinimumWidth(250)
 
     def addWidget(self, widget):
         self.layout().addWidget(widget)

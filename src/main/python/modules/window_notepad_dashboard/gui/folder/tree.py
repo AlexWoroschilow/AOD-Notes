@@ -56,7 +56,7 @@ class NotepadDashboardTree(QtWidgets.QTreeView):
             return self.delete.emit(index)
         if event.key() in [Qt.Key_Space, Qt.Key_Return]:
             index = self.currentIndex()
-            return self.note.emit((index, None))
+            return self.note.emit(index)
         return super(NotepadDashboardTree, self).keyPressEvent(event)
 
     @inject.params(config='config', storage='storage')
@@ -68,9 +68,9 @@ class NotepadDashboardTree(QtWidgets.QTreeView):
         config.set('editor.current', path)
 
         if storage.isDir(index):
-            return self.group.emit((index, None))
+            return self.group.emit(index)
 
-        return self.note.emit((index, None))
+        return self.note.emit(index)
 
     @inject.params(storage='storage')
     def expandAll(self, storage):

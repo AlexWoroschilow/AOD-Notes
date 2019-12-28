@@ -56,12 +56,12 @@ class NotepadDashboard(QtWidgets.QSplitter):
         super(NotepadDashboard, self).__init__()
         self.removed.connect(self.open)
         self.created.connect(self.open)
-        self.edit.connect(lambda x: self.open(x[0]))
+        self.edit.connect(self.open)
         self.setContentsMargins(0, 0, 0, 0)
 
         self.tree = NotepadDashboardTree()
-        self.tree.note.connect(lambda x: self.open(x[0]))
-        self.tree.group.connect(lambda x: self.open(x[0]))
+        self.tree.note.connect(self.open)
+        self.tree.group.connect(self.open)
         self.tree.delete.connect(self.delete.emit)
         self.tree.menu.connect(self.menu.emit)
 
@@ -75,10 +75,9 @@ class NotepadDashboard(QtWidgets.QSplitter):
 
         self.setCollapsible(0, True)
         self.setCollapsible(1, False)
-        self.setCollapsible(2, False)
 
+        self.setStretchFactor(0, 1)
         self.setStretchFactor(1, 2)
-        self.setStretchFactor(2, 3)
 
     @property
     @inject.params(storage='storage')
@@ -156,7 +155,7 @@ class NotepadDashboard(QtWidgets.QSplitter):
         self.tree.note.disconnect()
         # Reconnect event to be able
         # to open the notes as usial
-        self.tree.note.connect(lambda x: self.note(x[0]))
+        self.tree.note.connect(self.note)
 
         return self
 

@@ -14,14 +14,14 @@ from PyQt5.QtCore import Qt
 from PyQt5 import QtWidgets
 
 
-class Description(QtWidgets.QTextEdit):
+class Description(QtWidgets.QLabel):
 
     def __init__(self, text=None):
         super(Description, self).__init__()
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setAlignment(Qt.AlignTop | Qt.AlignLeft)
         self.setEnabled(False)
         self.setFixedWidth(500)
-        self.setHtml(text)
+        self.setWordWrap(True)
+        self.setText(text)
         self.show()

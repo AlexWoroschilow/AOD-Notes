@@ -27,12 +27,10 @@ class ModuleActions(object):
         try:
 
             index, document = event
-            if index is None:
-                return None
+            if index is None: return None
 
             index = storage.setFileContent(index, document.toHtml())
-            if index is None:
-                return None
+            if index is None: return None
 
             dashboard.updated.emit(index)
 
@@ -41,12 +39,12 @@ class ModuleActions(object):
             status.error(ex.__str__())
 
     @inject.params(window='window', storage='storage')
-    def onActionFullScreen(self, event, window, storage):
+    def onActionFullScreen(self, index, window, storage):
         try:
-            index, document = event
+
+            if index is None: return None
             editor = inject.instance('notepad.editor')
             editor.setIndex(index)
-            editor.setDocument(document)
 
             window.tab.emit((editor, storage.fileName(index)))
 

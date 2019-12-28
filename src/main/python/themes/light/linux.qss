@@ -132,6 +132,7 @@ QMenu::icon { padding: 0px 5px 0px 5px; }
 QMenu::item:selected { border-color: #e4e4e4; background: #e4e4e4; }
 QMenu::icon:checked { background: #ffffff; border: 1px inset #ffffff; position: absolute; top: 1px; right: 1px; bottom: 1px; left: 1px; }
 
+TextEditor { padding: 20px; }
 TextEditorWidget { background: #ffffff; text-align: center; border: none; }
 TextEditorWidget QLabel { color:#4d5357; font-size: 10px; }
 

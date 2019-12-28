@@ -78,7 +78,7 @@ class NotePreviewDescription(QtWidgets.QGroupBox):
             self.setGraphicsEffect(effect)
 
         if QEvent.type() == QtCore.QEvent.MouseButtonRelease:
-            self.editAction.emit((self.index, self.document()))
+            self.editAction.emit(self.index)
             return super(NotePreviewDescription, self).event(QEvent)
 
         return super(NotePreviewDescription, self).event(QEvent)
