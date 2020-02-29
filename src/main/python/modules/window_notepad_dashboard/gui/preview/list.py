@@ -10,6 +10,7 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import pydux
 import inject
 
 from PyQt5 import QtGui
@@ -21,144 +22,45 @@ from .preview import NotePreviewDescription
 
 class NoteItem(QtWidgets.QListWidgetItem):
 
-    def __init__(self, book=None):
+    def __init__(self, document=None):
         super(NoteItem, self).__init__()
-        self.setSizeHint(QtCore.QSize(400, 500))
+        self.setSizeHint(QtCore.QSize(400, 550))
         self.setTextAlignment(Qt.AlignCenter)
+        self.setData(0, document)
 
 
 class PreviewScrollArea(QtWidgets.QListWidget):
-    editAction = QtCore.pyqtSignal(object)
-    fullscreenAction = QtCore.pyqtSignal(object)
-    deleteAction = QtCore.pyqtSignal(object)
-    cloneAction = QtCore.pyqtSignal(object)
+    fullscreenNoteAction = QtCore.pyqtSignal(object)
+    editNoteAction = QtCore.pyqtSignal(object)
+    removeNoteAction = QtCore.pyqtSignal(object)
+    cloneNoteAction = QtCore.pyqtSignal(object)
 
-    @inject.params(storage='storage', status='status')
-    def __init__(self, parent=None, collection=None, storage=None, status=None):
-        super(PreviewScrollArea, self).__init__(parent)
+    def __init__(self, store=None, status=None):
+        super(PreviewScrollArea, self).__init__()
         self.setViewMode(QtWidgets.QListView.IconMode)
         self.setResizeMode(QtWidgets.QListView.Adjust)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setMovement(QtWidgets.QListView.Static)
-        self.setMinimumWidth(550)
 
-        self.itemClicked.connect(self.itemClickedEvent)
+    def addItemRow(self, document):
+        item = NoteItem(document)
+        self.addItem(item)
 
-        self.hashmap_index = {}
+        widget = NotePreviewDescription(document)
+        self.setItemWidget(item, widget)
 
-        for position, index in enumerate(collection):
-            item = NoteItem()
-            self.addItem(item)
+        widget.editNoteAction.connect(self.editNoteAction.emit)
+        widget.fullscreenNoteAction.connect(self.fullscreenNoteAction.emit)
+        widget.removeNoteAction.connect(self.removeNoteAction.emit)
+        widget.cloneNoteAction.connect(self.cloneNoteAction.emit)
 
-            widget = NotePreviewDescription(index)
-            widget.deleteAction.connect(self.deleteAction.emit)
-            widget.fullscreenAction.connect(self.fullscreenAction.emit)
-            widget.cloneAction.connect(self.cloneAction.emit)
-            widget.editAction.connect(self.editAction.emit)
+    def open(self, index_to_open=None):
+        pass
 
-            self.setItemWidget(item, widget)
-
-            path = storage.filePath(index)
-            if path is None: continue
-
-            self.hashmap_index[path] = (item, widget)
-
-        if not len(collection): return None
-        status.info("{} records found".format(len(collection)))
-
-    @inject.params(storage='storage', status='status')
-    def open(self, index_to_open=None, storage=None, status=None):
-
-        item = self.getWidgetItemByIndex(index_to_open)
-
-        if not self.count() or item is None:
-            self.clear()
-            self.hashmap_index = {}
-
-            parent = storage.fileDir(index_to_open)
-            if parent is None: return self
-
-            collection = storage.entitiesByFileType(parent)
-            if collection is None or not len(collection):
-                return None
-
-            for index in storage.entitiesByFileType(parent):
-                item = NoteItem()
-                self.addItem(item)
-
-                widget = NotePreviewDescription(index)
-                widget.deleteAction.connect(self.deleteAction.emit)
-                widget.fullscreenAction.connect(self.fullscreenAction.emit)
-                widget.cloneAction.connect(self.cloneAction.emit)
-                widget.editAction.connect(self.editAction.emit)
-
-                self.setItemWidget(item, widget)
-
-                path = storage.filePath(index)
-                if path is None: continue
-
-                self.hashmap_index[path] = (item, widget)
-
-            status.info("{} records found".format(len(self.hashmap_index.keys())))
-
-        item = self.getWidgetItemByIndex(index_to_open)
-        if item is None: return None
-
-        self.setCurrentItem(item)
-
-        widget = self.itemWidget(item)
-        if widget is None: return None
-        return self.editAction.emit(widget.index)
-
-    def itemClickedEvent(self, item):
-        widget = self.itemWidget(item)
-        if widget is None: return None
-        return self.editAction.emit(widget.index)
-
-    @inject.params(storage='storage')
-    def document(self, index=None, storage=None):
-        if index is None: return None
-
-        path = storage.filePath(index)
-        if path is None: return None
-
-        if path not in self.hashmap_index.keys():
-            return None
-
-        item, widget = self.hashmap_index[path]
-        if widget is None: return None
-        if item is None: return None
-
-        return widget.document()
-
-    @inject.params(storage='storage')
-    def getWidgetItemByIndex(self, index=None, storage=None):
-        path = storage.filePath(index)
-        if path is None: return None
-
-        if path not in self.hashmap_index.keys():
-            return None
-
-        item, widget = self.hashmap_index[path]
-        if widget is None: return None
-        if item is None: return None
-
-        return item
-
-    @inject.params(storage='storage')
-    def getWidgetByIndex(self, index=None, storage=None):
-        path = storage.filePath(index)
-        if path is None: return None
-
-        if path not in self.hashmap_index.keys():
-            return None
-
-        item, widget = self.hashmap_index[path]
-        if widget is None: return None
-        if item is None: return None
-
-        return widget
-
-    def count(self):
-        return len(self.hashmap_index.keys())
+    @inject.params(store='store')
+    def itemClickedEvent(self, item, store=None):
+        store.dispatch({
+            'type': '@@app/storage/resource/selected/document',
+            'entity': item.data(0)
+        })

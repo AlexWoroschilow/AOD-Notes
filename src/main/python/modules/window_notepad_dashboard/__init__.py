@@ -41,16 +41,23 @@ class Loader(object):
 
     @inject.params(config='config', storage='storage')
     def _notepad_dashboard(self, config, storage, binder):
-
         widget = NotepadDashboard()
-        widget.fullscreen.connect(functools.partial(self.actions.onActionFullScreen, widget=widget))
-        widget.storage_changed.connect(functools.partial(self.actions.onActionStorageChanged, widget=widget))
-        widget.note_new.connect(functools.partial(self.actions.onActionNoteCreate, widget=widget))
-        widget.note_import.connect(functools.partial(self.actions.onActionNoteImport, widget=widget))
-        widget.group_new.connect(functools.partial(self.actions.onActionFolderCreate, widget=widget))
-        widget.clone.connect(functools.partial(self.actions.onActionCopy, widget=widget))
-        widget.delete.connect(functools.partial(self.actions.onActionDelete, widget=widget))
-        widget.menu.connect(functools.partial(self.actions.onActionContextMenu, widget=widget))
+        widget.newNoteAction.connect(self.actions.onActionCreateNote)
+        widget.newGroupAction.connect(self.actions.onActionCreateGroup)
+        # widget.importNoteAction.connect(self.actions.onActionNoteImport)
+        widget.fullscreenNoteAction.connect(self.actions.onActionFullScreen)
+        widget.saveNoteAction.connect(self.actions.onActionSaveNote)
+        widget.editNoteAction.connect(self.actions.onActionEditNote)
+        widget.removeNoteAction.connect(self.actions.onActionRemove)
+        widget.cloneNoteAction.connect(self.actions.onActionClone)
+        widget.menuAction.connect(functools.partial(self.actions.onActionContextMenu, widget=widget))
+        # widget.fullscreen.connect(functools.partial(self.actions.onActionFullScreen, widget=widget))
+        # widget.storage_changed.connect(functools.partial(self.actions.onActionStorageChanged, widget=widget))
+        # widget.note_new.connect(functools.partial(self.actions.onActionNoteCreate, widget=widget))
+        # widget.note_import.connect(functools.partial(self.actions.onActionNoteImport, widget=widget))
+        # widget.group_new.connect(functools.partial(self.actions.onActionFolderCreate, widget=widget))
+        # widget.clone.connect(functools.partial(self.actions.onActionCopy, widget=widget))
+        # widget.delete.connect(functools.partial(self.actions.onActionDelete, widget=widget))
 
         return widget
 
@@ -58,22 +65,11 @@ class Loader(object):
         return options.console is None
 
     def configure(self, binder, options, args):
-
         binder.bind_to_provider('notepad', self._notepad_tab)
-        binder.bind_to_constructor('notepad.dashboard', functools.partial(self._notepad_dashboard, binder=binder))
+        binder.bind_to_constructor('notepad.dashboard', functools.partial(
+            self._notepad_dashboard, binder=binder
+        ))
 
-    @inject.params(config='config', storage='storage', dashboard='notepad.dashboard')
-    def boot(self, options=None, args=None, config=None, storage=None, dashboard=None):
-
-        current = config.get('editor.current')
-        if current is None or not len(current):
-            return dashboard.note(storage.first())
-
-        # get last edited document from the confnig
-        # and open this document in the editor by default
-        index = storage.index(current)
-        if index is None: return None
-
-        if storage.isDir(index):
-            return dashboard.group(index)
-        return dashboard.note(index)
+    @inject.params(dashboard='notepad.dashboard')
+    def boot(self, options=None, args=None, dashboard=None):
+        pass

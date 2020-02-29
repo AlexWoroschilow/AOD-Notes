@@ -18,22 +18,61 @@ from PyQt5.QtCore import Qt
 from PyQt5 import QtGui
 
 
-class NotepadDashboardTree(QtWidgets.QTreeView):
-    note = QtCore.pyqtSignal(object)
-    delete = QtCore.pyqtSignal(object)
-    group = QtCore.pyqtSignal(object)
-    menu = QtCore.pyqtSignal(object)
+class NotepadDashboardTreeModel(QtGui.QStandardItemModel):
+    done = QtCore.pyqtSignal(object)
 
-    @inject.params(config='config', storage='storage')
-    def __init__(self, config=None, storage=None):
-        super(NotepadDashboardTree, self).__init__()
-        self.customContextMenuRequested.connect(self.menu.emit)
+    @inject.params(store='store')
+    def __init__(self, store=None):
+        super(NotepadDashboardTreeModel, self).__init__()
+
+        state = store.get_state()
+        if state is None: return None
+        store.subscribe(self.update)
+
+    @inject.params(store='store')
+    def update(self, action=None, store=None):
+        state = store.get_state()
+        if state is None: return None
+
+        self.clear()
+        for item in self.build(state.groups, None):
+            self.appendRow(item)
+
+        self.done.emit(self)
+
+    def build(self, collection, parent=None):
+        for group in collection:
+
+            item = QtGui.QStandardItem(group.name)
+            item.setData(group)
+
+            for child in self.build(group.children, item):
+                item.appendRow([child])
+
+            yield item
+
+
+class DashboardFolderTree(QtWidgets.QTreeView):
+    editNoteAction = QtCore.pyqtSignal(object)
+    removeAction = QtCore.pyqtSignal(object)
+    group = QtCore.pyqtSignal(object)
+    menuAction = QtCore.pyqtSignal(object, object)
+
+    def __init__(self):
+        super(DashboardFolderTree, self).__init__()
+
+        model = NotepadDashboardTreeModel()
+        model.done.connect(lambda: self.expandToDepth(3))
+        self.setModel(model)
+
+        self.customContextMenuRequested.connect(self.menuEvent)
         self.clicked.connect(self.noteSelectEvent)
 
         self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setUniformRowHeights(True)
         self.setIconSize(QtCore.QSize(0, 0))
         self.setMinimumWidth(200)
 
@@ -41,46 +80,43 @@ class NotepadDashboardTree(QtWidgets.QTreeView):
         self.setAnimated(True)
         self.expandAll()
 
-        self.setModel(storage)
-
-        location = config.get('storage.location')
-        self.setRootIndex(storage.index(location))
-
         self.setColumnHidden(1, True)
         self.setColumnHidden(2, True)
         self.setColumnHidden(3, True)
 
+    def menuEvent(self, event):
+        index = self.currentIndex()
+        if index is None: return None
+        entity = self.model().itemFromIndex(index)
+        if entity is None: return None
+        return self.menuAction.emit(event, entity.data())
+
     def keyPressEvent(self, event):
         if event.key() in [Qt.Key_Delete, Qt.Key_Backspace]:
             index = self.currentIndex()
-            return self.delete.emit(index)
+            if index is None: return None
+            return self.removeAction.emit(index)
         if event.key() in [Qt.Key_Space, Qt.Key_Return]:
             index = self.currentIndex()
-            return self.note.emit(index)
-        return super(NotepadDashboardTree, self).keyPressEvent(event)
+            if index is None: return None
+            self.model().itemFromIndex(index)
+            return self.editNoteAction.emit(index)
+        return super(DashboardFolderTree, self).keyPressEvent(event)
 
-    @inject.params(config='config', storage='storage')
-    def noteSelectEvent(self, index=None, config=None, storage=None):
-        if index is None:
-            return None
+    @inject.params(store='store')
+    def noteSelectEvent(self, index=None, store=None):
+        if index is None: return None
 
-        path = storage.filePath(index)
-        config.set('editor.current', path)
+        model = self.model()
+        if model is None: return None
 
-        if storage.isDir(index):
-            return self.group.emit(index)
+        item = model.itemFromIndex(index)
+        if item is None: return None
 
-        return self.note.emit(index)
-
-    @inject.params(storage='storage')
-    def expandAll(self, storage):
-        for index in storage.entities():
-            self.expand(index)
-
-    @inject.params(storage='storage')
-    def collapseAll(self, storage):
-        for index in storage.entities():
-            self.collapse(index)
+        store.dispatch({
+            'type': '@@app/storage/resource/selected/group',
+            'entity': item.data()
+        })
 
     @property
     def current(self):
@@ -101,3 +137,7 @@ class NotepadDashboardTree(QtWidgets.QTreeView):
         for index in self.selectedIndexes():
             return index
         return None
+
+    def close(self):
+        super(DashboardFolderTree, self).deleteLater()
+        return super(DashboardFolderTree, self).close()

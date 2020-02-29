@@ -10,19 +10,13 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import inject
+import functools
+
 from PyQt5.QtCore import Qt
-from PyQt5 import QtWidgets
 from PyQt5 import QtCore
+from PyQt5 import QtWidgets
 from PyQt5 import QtGui
-
-
-class ButtonDisabled(QtWidgets.QPushButton):
-
-    def __init__(self, icon=None, text=None):
-        super(ButtonDisabled, self).__init__(icon, None)
-        self.setCheckable(False)
-        self.setFlat(True)
-        self.setDisabled(True)
 
 
 class PictureButton(QtWidgets.QPushButton):
@@ -62,7 +56,7 @@ class PictureButtonFlat(PictureButton):
         if QEvent.type() == QtCore.QEvent.Leave:
             self.setGraphicsEffect(None)
 
-        return super(PictureButton, self).event(QEvent)
+        return super(PictureButtonFlat, self).event(QEvent)
 
 
 class ToolBarButton(QtWidgets.QPushButton):
@@ -80,18 +74,3 @@ class ToolBarButton(QtWidgets.QPushButton):
             return receiversCount > 0
         except (SyntaxError, RuntimeError) as err:
             return False
-
-
-class SearchField(QtWidgets.QLineEdit):
-
-    def __init__(self, parent=None):
-        super(SearchField, self).__init__(parent)
-        self.setPlaceholderText('Enter the search string...')
-        self.setObjectName('searchSearchField')
-        self.setFocusPolicy(Qt.StrongFocus)
-
-        effect = QtWidgets.QGraphicsDropShadowEffect()
-        effect.setBlurRadius(3)
-        effect.setOffset(0)
-
-        self.setGraphicsEffect(effect)

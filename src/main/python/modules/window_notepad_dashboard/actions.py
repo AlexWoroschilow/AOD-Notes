@@ -21,92 +21,65 @@ from PyQt5 import QtGui
 
 class ModuleActions(object):
 
-    def onActionClone(self, event=None, widget=None):
-        return self.onActionCopy(widget.tree.current, widget=widget)
-
-    def onActionRemove(self, event=None, widget=None):
-        return self.onActionDelete(widget.tree.current, widget=widget)
-
-    @inject.params(config='config', storage='storage', status='status')
-    def onActionNoteCreate(self, event, config, widget, storage, status):
+    @inject.params(store='store', status='status')
+    def onActionCreateNote(self, event, store, status):
         try:
-            index = widget.current
-            if index is None or not index:
-                index = config.get('storage.location')
-                index = storage.index(index)
-
-            if storage.isFile(index):
-                index = storage.fileDir(index)
-
-            index = storage.touch(index, 'New note')
-            if index is None or not index:
-                return None
-
-            widget.created.emit(index)
-
+            store.dispatch({'type': '@@app/storage/resource/create/document'})
         except Exception as ex:
-            getLogger('app').exception(ex)
             status.error(ex.__str__())
 
-    @inject.params(storage='storage', search='search', status='status')
-    def onActionCopy(self, index, widget, storage, search, status):
+    @inject.params(store='store', status='status')
+    def onActionCreateGroup(self, event, store, status):
         try:
-
-            index = storage.clone(index)
-            if index is None:
-                return None
-
-            widget.created.emit(index)
-
+            store.dispatch({'type': '@@app/storage/resource/create/group'})
         except Exception as ex:
-            getLogger('app').exception(ex)
             status.error(ex.__str__())
 
-    @inject.params(storage='storage', config='config', status='status')
-    def onActionFolderCreate(self, event, widget, storage, config, status):
+    @inject.params(store='store', status='status')
+    def onActionClone(self, entity, store, status):
         try:
-            index = widget.tree.current
-            if index is None or not index:
-                index = config.get('storage.location')
-                index = storage.index(index)
-
-            if storage.isFile(index):
-                index = storage.fileDir(index)
-
-            index = storage.mkdir(index, 'New group')
-            if index is None or not index:
-                return None
-
-            return widget.group(index)
-
+            print(entity)
+            store.dispatch({'type': '@@app/storage/resource/clone',
+                            'entity': entity})
         except Exception as ex:
-            getLogger('app').exception(ex)
             status.error(ex.__str__())
 
-    @inject.params(window='window', storage='storage', editor='notepad.editor')
-    def onActionFullScreen(self, index, window, storage, editor, widget=None):
+    @inject.params(store='store', status='status')
+    def onActionSaveNote(self, entity, store, status):
+        try:
+            store.dispatch({'type': '@@app/storage/resource/update/document',
+                            'entity': entity})
+        except Exception as ex:
+            status.error(ex.__str__())
+
+    @inject.params(store='store', status='status')
+    def onActionEditNote(self, entity, store, status):
+        try:
+            store.dispatch({'type': '@@app/storage/resource/selected/document',
+                            'entity': entity})
+        except Exception as ex:
+            status.error(ex.__str__())
+
+    @inject.params(window='window', editor='notepad.editor')
+    def onActionFullScreen(self, entity, window, editor):
         try:
 
-            # We need a custom document in a new tab to have it open even by switch of the parent folder
-            # the prices is the synchronisation between the tab and the document open at the dashboard.
-            # For now there are no synchronisation between the tabs and dashboard and it may even be a feature
-            editor.open(index)
-
-            name = storage.fileName(index)
-            window.tab.emit((editor, name))
+            editor = editor.open(entity)
+            editor.saveNoteAction.connect(self.onActionSaveNote)
+            window.tab.emit((editor, entity.name))
 
         except Exception as ex:
             getLogger('app').exception(ex)
 
-    @inject.params(storage='storage', status='status')
-    def onActionDelete(self, index, widget, storage, status):
+    @inject.params(store='store', status='status', window='window')
+    def onActionRemove(self, entity, store, status, window):
 
-        message = widget.tr("Are you sure you want to remove this element: {} ?".format(
-            storage.fileName(index)
+        message = window.tr('Are you sure you want to remove this element: "{}" ?'.format(
+            entity.name
         ))
 
         reply = QtWidgets.QMessageBox.question(
-            widget, 'Remove {}'.format('Group' if storage.isDir(index) else 'Note'),
+            window, 'Remove "{}" ?'.format(entity.name),
             message, QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No
         )
 
@@ -114,16 +87,9 @@ class ModuleActions(object):
             return None
 
         try:
-            if index is None:
-                return None
-
-            storage.remove(index)
-
-            index = storage.fileDir(index)
-            return widget.removed.emit(index)
-
+            store.dispatch({'type': '@@app/storage/resource/remove',
+                            'entity': entity})
         except Exception as ex:
-            getLogger('app').exception(ex)
             status.error(ex.__str__())
 
     @inject.params(config='config', status='status')
@@ -160,34 +126,22 @@ class ModuleActions(object):
         except AttributeError as ex:
             logger.exception(ex)
 
-    @inject.params(storage='storage')
-    def onActionContextMenu(self, event, widget, storage):
+    @inject.params(store='store')
+    def onActionContextMenu(self, event, entity, widget, store):
+
+        state = store.get_state()
+        if state is None: return None
 
         from .gui.menu import SettingsMenu
 
         menu = SettingsMenu(widget)
-
-        print(widget)
-        if widget.current and not storage.isDir(widget.current):
-            action = functools.partial(self.onActionFullScreen, event=widget.current)
-            menu.addAction(QtGui.QIcon("icons/tab-new"), 'Open in a new tab', action)
-            menu.addSeparator()
-
-        action = functools.partial(self.onActionNoteCreate, event=None, widget=widget)
-        menu.addAction(QtGui.QIcon("icons/note"), 'Create new note', action)
-
-        action = functools.partial(self.onActionFolderCreate, event=None, widget=widget)
-        menu.addAction(QtGui.QIcon("icons/book"), 'Create new group', action)
+        menu.addAction(QtGui.QIcon("icons/note"), 'New Document', lambda: self.onActionCreateNote(entity))
+        menu.addAction(QtGui.QIcon("icons/book"), 'New Group', lambda: self.onActionCreateGroup(entity))
         menu.addSeparator()
+        menu.addAction(QtGui.QIcon("icons/copy"), 'Clone', lambda: self.onActionClone(entity))
+        menu.addAction(QtGui.QIcon("icons/trash"), 'Remove', lambda: self.onActionRemove(entity))
 
-        if widget.current is not None and widget.current:
-            action = functools.partial(self.onActionClone, event=None, widget=widget)
-            menu.addAction(QtGui.QIcon("icons/copy"), 'Clone selected element', action)
-
-            action = functools.partial(self.onActionRemove, event=None, widget=widget)
-            menu.addAction(QtGui.QIcon("icons/trash"), 'Remove selected element', action)
-
-        menu.exec_(widget.tree.mapToGlobal(event))
+        menu.exec_(widget.mapToGlobal(event))
 
     @inject.params(storage='storage', config='config')
     def onActionNoteImport(self, event=None, storage=None, config=None, widget=None):

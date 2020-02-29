@@ -31,7 +31,8 @@ class Loader(object):
     def enabled(self, options=None, args=None):
         return True
 
-    @inject.params(config='config', factory_leftbar='toolbar_factory.leftbar', factory_rightbar='toolbar_factory.rightbar', factory_formatbar='toolbar_factory.formatbar')
+    @inject.params(config='config', factory_leftbar='toolbar_factory.leftbar',
+                   factory_rightbar='toolbar_factory.rightbar', factory_formatbar='toolbar_factory.formatbar')
     def _notepad_editor(self, config=None, factory_leftbar=None, factory_rightbar=None, factory_formatbar=None):
 
         widget = TextEditorWidget()
@@ -53,9 +54,6 @@ class Loader(object):
                 plugin.clicked.connect(functools.partial(plugin.clickedEvent, widget=widget))
             widget.rightbar.addWidget(plugin)
         widget.rightbar.setVisible(int(config.get('editor.rightbar')))
-
-        widget.fullscreen.connect(self.actions.onActionFullScreen)
-        widget.save.connect(functools.partial(self.actions.onActionSave, widget=widget))
 
         return widget
 

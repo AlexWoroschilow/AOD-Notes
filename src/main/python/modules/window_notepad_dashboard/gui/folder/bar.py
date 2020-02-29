@@ -10,41 +10,45 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import os
+import inject
+import functools
+
 from PyQt5.QtCore import Qt
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 
-from .button import PictureButtonFlat
+from .button import PictureButton
 
 
-class NotepadDashboardToolbar(QtWidgets.QFrame):
+class DashboardFolderTreeToolbar(QtWidgets.QFrame):
     newNoteAction = QtCore.pyqtSignal(object)
     importNoteAction = QtCore.pyqtSignal(object)
     newGroupAction = QtCore.pyqtSignal(object)
 
     def __init__(self):
-        super(NotepadDashboardToolbar, self).__init__()
+        super(DashboardFolderTreeToolbar, self).__init__()
 
         self.setLayout(QtWidgets.QHBoxLayout())
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setAlignment(Qt.AlignCenter)
 
-        self.note = PictureButtonFlat(QtGui.QIcon("icons/note"))
+        tooltip = 'Create new note. The new note will be created as a part of the selected group or in the root group.'
+        self.note = PictureButton(QtGui.QIcon("icons/note-main"), tooltip)
         self.note.clicked.connect(self.newNoteAction.emit)
-        self.note.setText(' New Note')
         self.layout().addWidget(self.note)
 
-        self.group = PictureButtonFlat(QtGui.QIcon("icons/book"))
+        tooltip = 'Create new note. The new note will be created as a part of the selected group or in the root group.'
+        self.group = PictureButton(QtGui.QIcon("icons/book-main"), tooltip)
         self.group.clicked.connect(self.newGroupAction.emit)
-        self.group.setText(' New Group')
         self.layout().addWidget(self.group)
 
-        self.importing = PictureButtonFlat(QtGui.QIcon("icons/import"))
+        tooltip = 'Create new note. The new note will be created as a part of the selected group or in the root group.'
+        self.importing = PictureButton(QtGui.QIcon("icons/import-main"), tooltip)
         self.importing.clicked.connect(self.importNoteAction.emit)
-        self.importing.setText(' Import Note')
         self.layout().addWidget(self.importing)
 
     def close(self):
-        super(NotepadDashboardToolbar, self).deleteLater()
-        return super(NotepadDashboardToolbar, self).close()
+        super(DashboardFolderTreeToolbar, self).deleteLater()
+        return super(DashboardFolderTreeToolbar, self).close()

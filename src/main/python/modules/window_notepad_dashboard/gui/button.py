@@ -23,32 +23,42 @@ from . import PictureButton
 from . import SearchField
 
 
-class ButtonDisabled(QtWidgets.QPushButton):
-
+class PictureButton(QtWidgets.QPushButton):
     def __init__(self, icon=None, text=None):
-        super(ButtonDisabled, self).__init__(icon, None)
-        self.setCheckable(False)
-        self.setFlat(True)
-        self.setDisabled(True)
-
-
-class ButtonPicture(QtWidgets.QPushButton):
-    def __init__(self, icon=None, text=None):
-        super(ButtonPicture, self).__init__(icon, None)
+        super(PictureButton, self).__init__(icon, None)
         self.setToolTipDuration(0)
         self.setToolTip(text)
 
+    def event(self, QEvent):
+        if QEvent.type() == QtCore.QEvent.Enter:
+            effect = QtWidgets.QGraphicsDropShadowEffect()
+            effect.setColor(QtGui.QColor('#6cccfc'))
+            effect.setBlurRadius(5)
+            effect.setOffset(0)
+            self.setGraphicsEffect(effect)
 
-class ButtonToolBar(QtWidgets.QPushButton):
-    activate = QtCore.pyqtSignal(object)
+        if QEvent.type() == QtCore.QEvent.Leave:
+            self.setGraphicsEffect(None)
 
-    def __init__(self, name=None):
-        super(ButtonToolBar, self).__init__(name)
+        return super(PictureButton, self).event(QEvent)
+
+
+class PictureButtonFlat(PictureButton):
+    def __init__(self, icon=None, text=None):
+        super(QtWidgets.QPushButton, self).__init__(icon, None)
+        self.setToolTipDuration(0)
+        self.setToolTip(text)
         self.setFlat(True)
 
-    def connected(self):
-        try:
-            receiversCount = self.receivers(self.clicked)
-            return receiversCount > 0
-        except (SyntaxError, RuntimeError) as err:
-            return False
+    def event(self, QEvent):
+        if QEvent.type() == QtCore.QEvent.Enter:
+            effect = QtWidgets.QGraphicsDropShadowEffect()
+            effect.setColor(QtGui.QColor('#6cccfc'))
+            effect.setBlurRadius(5)
+            effect.setOffset(0)
+            self.setGraphicsEffect(effect)
+
+        if QEvent.type() == QtCore.QEvent.Leave:
+            self.setGraphicsEffect(None)
+
+        return super(PictureButton, self).event(QEvent)

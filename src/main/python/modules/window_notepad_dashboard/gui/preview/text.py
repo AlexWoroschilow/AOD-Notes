@@ -21,7 +21,6 @@ class Description(QtWidgets.QLabel):
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.setAlignment(Qt.AlignTop | Qt.AlignLeft)
         self.setEnabled(False)
-        self.setFixedWidth(500)
         self.setWordWrap(True)
         self.setText(text)
         self.show()

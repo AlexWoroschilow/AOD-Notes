@@ -21,21 +21,18 @@ from .bar import ToolbarWidgetLeft
 from .bar import ToolBarWidgetRight
 from .bar import FormatbarWidget
 
-from .scroll import TextWriter
 from .text import TextEditor
 
 
 class TextEditorWidget(QtWidgets.QFrame):
-    fullscreen = QtCore.pyqtSignal(object)
-    fullscreenAction = QtCore.pyqtSignal(object)
-    save = QtCore.pyqtSignal(object)
-    update = QtCore.pyqtSignal(object)
+    fullscreenNoteAction = QtCore.pyqtSignal(object)
+    saveNoteAction = QtCore.pyqtSignal(object)
 
     def __init__(self):
         super(TextEditorWidget, self).__init__()
         self.setContentsMargins(0, 0, 0, 0)
 
-        self._index = None
+        self.entity = None
 
         self.writer = TextEditor(self)
         self.writer.cursorPositionChanged.connect(self.cursorPosition)
@@ -51,7 +48,6 @@ class TextEditorWidget(QtWidgets.QFrame):
         self.leftbar.pasteAction.clicked.connect(self.writer.pasteAction.emit)
         self.leftbar.undoAction.clicked.connect(self.writer.undoAction.emit)
         self.leftbar.redoAction.clicked.connect(self.writer.redoAction.emit)
-        self.leftbar.fullscreenAction.clicked.connect(self.writer.fullscreenAction.emit)
         self.leftbar.fullscreenAction.clicked.connect(self.fullscreenEvent)
         self.leftbar.saveAction.clicked.connect(self.writer.saveAction.emit)
         self.leftbar.saveAction.clicked.connect(self.saveEvent)
@@ -88,21 +84,20 @@ class TextEditorWidget(QtWidgets.QFrame):
         self.layout().addWidget(self.statusbar, 3, 1)
 
     def document(self):
+        """
+        Required for the plugins
+        :return:
+        """
         if self.writer is None:
             return None
 
         return self.writer.document()
 
-    @inject.params(storage='storage')
-    def open(self, index=None, document=None, storage=None):
-        if storage is None: return self
-        if index is None: return self
-        self.setIndex(index)
+    def open(self, entity=None):
+        if entity is None: return self
+        self.insertHtml(entity.content)
+        self.entity = entity
         return self
-
-    @inject.params(storage='storage')
-    def setDocument(self, document=None, storage=None):
-        return None
 
     def focus(self):
         if self.writer is None: return self
@@ -114,35 +109,24 @@ class TextEditorWidget(QtWidgets.QFrame):
 
         return self
 
-    @property
-    def index(self):
-        return self._index
-
-    @inject.params(storage='storage')
-    def setIndex(self, index=None, storage=None):
-        if index is None:
-            return None
-        self._index = index
-
-        content = storage.fileContent(index)
-        return self.insertHtml(content)
-
     def clean(self):
+        if self.writer is None: return self
         self.writer.text.setHtml('')
-        self._index = None
+        self.entity = None
+        return self
+
+    def fullscreenEvent(self, event=None):
+        self.fullscreenNoteAction.emit(self.entity)
         return self
 
     def saveEvent(self, event=None):
-        return self.save.emit((
-            self.index, self.document()
-        ))
-
-    def fullscreenEvent(self, event=None):
-        return self.fullscreen.emit(self.index)
+        if self.entity is None: return self
+        self.entity.content = self.getHtml()
+        self.saveNoteAction.emit(self.entity)
+        return self
 
     def zoomIn(self, value):
-        if self.writer is None:
-            return None
+        if self.writer is None: return None
         self.writer.zoomIn(value)
 
     def zoomOut(self, value):
@@ -159,13 +143,15 @@ class TextEditorWidget(QtWidgets.QFrame):
     def getHtml(self):
         return self.writer.toHtml()
 
-    def insertHtml(self, html=None):
-        if self.writer is not None and html is not None:
-            self.writer.setHtml(html)
+    def insertHtml(self, content=None):
+        if self.writer is None: return None
+        if content is None: return None
+        self.writer.setHtml(content)
 
     def appendHtml(self, html=None):
-        if self.writer is not None and html is not None:
-            self.writer.insertHtml(html)
+        if self.writer is None: return None
+        if content is None: return None
+        self.writer.insertHtml(content)
 
     def setTextColor(self, color=None):
         if self.writer is not None and color is not None:

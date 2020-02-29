@@ -23,36 +23,33 @@ from .label import Title
 
 
 class NotePreviewDescription(QtWidgets.QFrame):
-    editAction = QtCore.pyqtSignal(object)
-    fullscreenAction = QtCore.pyqtSignal(object)
-    deleteAction = QtCore.pyqtSignal(object)
-    cloneAction = QtCore.pyqtSignal(object)
+    fullscreenNoteAction = QtCore.pyqtSignal(object)
+    editNoteAction = QtCore.pyqtSignal(object)
+    removeNoteAction = QtCore.pyqtSignal(object)
+    cloneNoteAction = QtCore.pyqtSignal(object)
 
-    @inject.params(storage='storage')
-    def __init__(self, index, storage):
+    def __init__(self, entity):
         super(NotePreviewDescription, self).__init__()
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.setContentsMargins(0, 0, 0, 0)
-        self.setFixedWidth(550)
-
-        self.index = index
+        self.setMaximumWidth(550)
 
         self.layout = QtWidgets.QGridLayout()
         self.layout.setAlignment(Qt.AlignTop)
 
-        title = Title(storage.fileName(index))
+        title = Title(entity.name)
         self.layout.addWidget(title, 0, 0, 1, 30)
 
-        self.description = Description(storage.fileContent(index))
+        self.description = Description(entity.content)
         self.description.setFixedHeight(self.height() * 0.85)
         self.layout.addWidget(self.description, 1, 0, 20, 30)
 
         self.buttonClone = PictureButtonFlat(QtGui.QIcon("icons/copy"))
-        self.buttonClone.clicked.connect(lambda x: self.cloneAction.emit(index))
+        self.buttonClone.clicked.connect(lambda x: self.cloneNoteAction.emit(entity))
         self.layout.addWidget(self.buttonClone, 1, 30)
 
         self.buttonDelete = PictureButtonFlat(QtGui.QIcon("icons/trash"))
-        self.buttonDelete.clicked.connect(lambda x: self.deleteAction.emit(index))
+        self.buttonDelete.clicked.connect(lambda x: self.removeNoteAction.emit(entity))
         self.layout.addWidget(self.buttonDelete, 2, 30)
 
         self.setLayout(self.layout)
@@ -62,11 +59,7 @@ class NotePreviewDescription(QtWidgets.QFrame):
         effect.setOffset(0)
         self.setGraphicsEffect(effect)
 
-    def document(self):
-        return None
-
-    def setDocument(self, document=None):
-        return None
+        self.entity = entity
 
     def event(self, QEvent):
         if QEvent.type() == QtCore.QEvent.Enter:
@@ -83,10 +76,10 @@ class NotePreviewDescription(QtWidgets.QFrame):
             self.setGraphicsEffect(effect)
 
         if QEvent.type() == QtCore.QEvent.MouseButtonDblClick:
-            self.fullscreenAction.emit(self.index)
+            self.fullscreenNoteAction.emit(self.entity)
 
         if QEvent.type() == QtCore.QEvent.MouseButtonRelease:
-            self.editAction.emit(self.index)
+            self.editNoteAction.emit(self.entity)
 
             effect = QtWidgets.QGraphicsDropShadowEffect()
             effect.setColor(QtGui.QColor('#6cccfc'))
