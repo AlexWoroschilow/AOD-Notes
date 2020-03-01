@@ -38,8 +38,15 @@ class ModuleActions(object):
     @inject.params(store='store', status='status')
     def onActionClone(self, entity, store, status):
         try:
-            print(entity)
             store.dispatch({'type': '@@app/storage/resource/clone',
+                            'entity': entity})
+        except Exception as ex:
+            status.error(ex.__str__())
+
+    @inject.params(store='store', status='status')
+    def onActionRename(self, entity, store, status):
+        try:
+            store.dispatch({'type': '@@app/storage/resource/rename',
                             'entity': entity})
         except Exception as ex:
             status.error(ex.__str__())

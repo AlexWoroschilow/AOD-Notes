@@ -27,6 +27,7 @@ class NotepadDashboard(QtWidgets.QWidget):
     cloneNoteAction = QtCore.pyqtSignal(object)
     editNoteAction = QtCore.pyqtSignal(object)
     saveNoteAction = QtCore.pyqtSignal(object)
+    renameAction = QtCore.pyqtSignal(object)
     menuAction = QtCore.pyqtSignal(object, object)
 
     edit = QtCore.pyqtSignal(object)
@@ -67,6 +68,7 @@ class NotepadDashboard(QtWidgets.QWidget):
         self.splitter.removeNoteAction.connect(self.removeNoteAction.emit)
         self.splitter.cloneNoteAction.connect(self.cloneNoteAction.emit)
         self.splitter.saveNoteAction.connect(self.saveNoteAction.emit)
+        self.splitter.renameAction.connect(self.renameAction.emit)
         self.splitter.menuAction.connect(self.menuAction.emit)
 
         self.layout().addWidget(self.splitter)

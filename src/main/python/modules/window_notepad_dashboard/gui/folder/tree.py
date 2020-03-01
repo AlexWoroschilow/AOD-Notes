@@ -11,6 +11,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
+import functools
 
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
@@ -18,12 +19,35 @@ from PyQt5.QtCore import Qt
 from PyQt5 import QtGui
 
 
+class QCustomDelegate(QtWidgets.QStyledItemDelegate):
+    renameAction = QtCore.pyqtSignal(object)
+
+    def setModelData(self, editor, model, index):
+        item = model.itemFromIndex(index)
+        if item is None: return None
+        entity = item.data()
+        if entity is None: return None
+
+        try:
+            response = super(QCustomDelegate, self).setModelData(editor, model, index)
+            entity.name = editor.text()
+            self.renameAction.emit(entity)
+            return response
+        except OSError as ex:
+            print(ex)
+        return None
+
+
 class NotepadDashboardTreeModel(QtGui.QStandardItemModel):
-    done = QtCore.pyqtSignal(object)
+    doneDropAction = QtCore.pyqtSignal(object)
+    doneAction = QtCore.pyqtSignal(object)
 
     @inject.params(store='store')
     def __init__(self, store=None):
         super(NotepadDashboardTreeModel, self).__init__()
+        # self.rowsMoved.connect(lambda parent, start, stop, destination: print(parent, start, stop, destination))
+        # self.rowsRemoved.connect(lambda parent, first, last: print(parent, first, last))
+        # self.rowsInserted.connect(lambda parent, first, last: print(parent, first, last))
 
         state = store.get_state()
         if state is None: return None
@@ -38,12 +62,13 @@ class NotepadDashboardTreeModel(QtGui.QStandardItemModel):
         for item in self.build(state.groups, None):
             self.appendRow(item)
 
-        self.done.emit(self)
+        self.doneAction.emit(self)
 
     def build(self, collection, parent=None):
         for group in collection:
 
             item = QtGui.QStandardItem(group.name)
+            item.setEditable(True)
             item.setData(group)
 
             for child in self.build(group.children, item):
@@ -55,19 +80,13 @@ class NotepadDashboardTreeModel(QtGui.QStandardItemModel):
 class DashboardFolderTree(QtWidgets.QTreeView):
     editNoteAction = QtCore.pyqtSignal(object)
     removeAction = QtCore.pyqtSignal(object)
-    group = QtCore.pyqtSignal(object)
+    renameAction = QtCore.pyqtSignal(object)
     menuAction = QtCore.pyqtSignal(object, object)
+    group = QtCore.pyqtSignal(object)
 
     def __init__(self):
         super(DashboardFolderTree, self).__init__()
-
-        model = NotepadDashboardTreeModel()
-        model.done.connect(lambda: self.expandToDepth(3))
-        self.setModel(model)
-
-        self.customContextMenuRequested.connect(self.menuEvent)
-        self.clicked.connect(self.noteSelectEvent)
-
+        self.setEditTriggers(QtWidgets.QAbstractItemView.EditKeyPressed)
         self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -75,6 +94,17 @@ class DashboardFolderTree(QtWidgets.QTreeView):
         self.setUniformRowHeights(True)
         self.setIconSize(QtCore.QSize(0, 0))
         self.setMinimumWidth(200)
+
+        model = NotepadDashboardTreeModel()
+        model.doneAction.connect(lambda: self.expandToDepth(3))
+        self.setModel(model)
+
+        delegate = QCustomDelegate()
+        delegate.renameAction.connect(self.renameAction.emit)
+        self.setItemDelegate(delegate)
+
+        self.customContextMenuRequested.connect(self.menuEvent)
+        self.clicked.connect(self.noteSelectEvent)
 
         self.setHeaderHidden(True)
         self.setAnimated(True)

@@ -21,16 +21,50 @@ import glob
 
 
 class Group(object):
-    def __init__(self):
-        self.name = None
-        self.children = None
-        self.path = None
+    def __init__(self, path, children):
+        self.children = children
+        self.path = path
+
+    @property
+    def name(self):
+        return os.path.basename(self.path)
+
+    @name.setter
+    def name(self, value, counter=1):
+        if value == self.name:
+            return self
+        try:
+            destination = "{}/{}".format(os.path.dirname(self.path), value)
+            while os.path.exists(destination):
+                destination = "{} ({})".format(destination, counter)
+                counter += 1
+            shutil.move(self.path, destination)
+        except OSError as ex:
+            return self
+        return self
 
 
 class Document(object):
-    def __init__(self):
-        self.name = None
-        self.path = None
+    def __init__(self, path):
+        self.path = path
+
+    @property
+    def name(self):
+        return os.path.basename(self.path)
+
+    @name.setter
+    def name(self, value, counter=1):
+        if value == self.name:
+            return self
+        try:
+            destination = "{}/{}".format(os.path.dirname(self.path), value)
+            while os.path.exists(destination):
+                destination = "{} ({})".format(destination, counter)
+                counter += 1
+            shutil.move(self.path, destination)
+        except OSError as ex:
+            return self
+        return self
 
     @property
     def content(self):
@@ -70,13 +104,7 @@ class StoreFileSystem(object):
         for path in glob.iglob('{}/**'.format(location)):
             if not len(path) or os.path.isfile(path):
                 continue
-
-            entity = Group()
-            entity.name = os.path.basename(path)
-            entity.children = self._groups(path)
-            entity.path = path
-
-            result.append(entity)
+            result.append(Group(path, self._groups(path)))
         return result
 
     def _documents(self, location):
@@ -84,14 +112,10 @@ class StoreFileSystem(object):
         for filename in glob.iglob('{}/**'.format(location)):
             if not len(filename) or os.path.isdir(filename):
                 continue
-            entity = Document()
-            entity.name = os.path.basename(filename)
-            entity.path = filename
-            result.append(entity)
+            result.append(Document(filename))
         return result
 
-    @inject.params(config='config')
-    def clone(self, element, name='Copy', counter=1, config=None):
+    def clone(self, element, name='Copy', counter=1):
         """
 
         :param element:
@@ -109,32 +133,21 @@ class StoreFileSystem(object):
             if os.path.isfile(element.path):
                 with open(element.path, 'r') as origin:
                     with open(location, 'w') as clone:
-                        config.set('storage.selected.document', location)
                         clone.write(origin.read())
                         clone.close()
 
-                        entity = Document()
-                        entity.name = os.path.basename(location)
-                        entity.path = location
-                        return entity
+                        return Document(location)
 
             if os.path.isdir(element.path):
-                print(element.path, location)
                 shutil.copytree(element.path, location)
-
-                # group = Group()
-                # group.name = os.path.basename(location)
-                # group.children = self._groups(location)
-                # group.path = location
-                # return group
+                return Group(location, self._groups(location))
 
         except OSError as ex:
             pass
 
         return None
 
-    @inject.params(config='config')
-    def remove(self, element, config=None):
+    def remove(self, element):
         """
         :param element:
         :return:
@@ -158,8 +171,7 @@ class StoreFileSystem(object):
 
         return False
 
-    @inject.params(config='config')
-    def group_create(self, group, name='New Group', counter=1, config=None):
+    def group_create(self, group, name='New Group', counter=1):
         """
         Create new note in the given folder
         :param group:
@@ -174,21 +186,14 @@ class StoreFileSystem(object):
 
         try:
             os.mkdir(location)
-            config.set('storage.selected.group', location)
-
-            group = Group()
-            group.name = os.path.basename(location)
-            group.children = self._groups(location)
-            group.path = location
-            return group
+            return Group(location, self._groups(location))
 
         except OSError as ex:
             return None
 
         return None
 
-    @inject.params(config='config')
-    def document_create(self, group, name='New Note', counter=1, config=None):
+    def document_create(self, group, name='New Note', counter=1):
         """
         Create new note in the given folder
         :param group:
@@ -203,14 +208,10 @@ class StoreFileSystem(object):
             counter += 1
 
         with open(location, 'w') as stream:
-            config.set('storage.selected.document', location)
             stream.write('')
             stream.close()
 
-            entity = Document()
-            entity.name = os.path.basename(location)
-            entity.path = location
-            return entity
+            return Document(location)
 
         return None
 
@@ -221,13 +222,7 @@ class StoreFileSystem(object):
 
         if not os.path.exists(location):
             return None
-
-        group = Group()
-        group.name = os.path.basename(location)
-        group.children = self._groups(location)
-        group.path = location
-
-        return group
+        return Group(location, self._groups(location))
 
     @inject.params(config='config')
     def groups(self, group=None, config=None):
@@ -247,11 +242,7 @@ class StoreFileSystem(object):
         if not os.path.exists(location):
             return None
 
-        document = Document()
-        document.name = os.path.basename(location)
-        document.path = location
-
-        return document
+        return Document(location)
 
     @inject.params(config='config')
     def documents(self, group=None, config=None):

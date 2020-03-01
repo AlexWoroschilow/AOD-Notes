@@ -31,6 +31,7 @@ class NotepadDashboardSplitter(QtWidgets.QSplitter):
     cloneNoteAction = QtCore.pyqtSignal(object)
     editNoteAction = QtCore.pyqtSignal(object)
     saveNoteAction = QtCore.pyqtSignal(object)
+    renameAction = QtCore.pyqtSignal(object)
     menuAction = QtCore.pyqtSignal(object, object)
 
     settings = QtCore.pyqtSignal(object)
@@ -53,6 +54,7 @@ class NotepadDashboardSplitter(QtWidgets.QSplitter):
         self.panelLeft.importNoteAction.connect(self.importNoteAction.emit)
         self.panelLeft.newGroupAction.connect(self.newGroupAction.emit)
         self.panelLeft.menuAction.connect(self.menuAction.emit)
+        self.panelLeft.renameAction.connect(self.renameAction.emit)
 
         self.panelRight = DashboardPanelRight()
         self.panelRight.fullscreenNoteAction.connect(self.fullscreenNoteAction.emit)
