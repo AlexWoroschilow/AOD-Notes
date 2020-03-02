@@ -42,11 +42,11 @@ class QCustomDelegate(QtWidgets.QStyledItemDelegate):
 
 class DashboardFolderTree(QtWidgets.QTreeView):
     editNoteAction = QtCore.pyqtSignal(object)
+    groupAction = QtCore.pyqtSignal(object)
     removeAction = QtCore.pyqtSignal(object)
     renameAction = QtCore.pyqtSignal(object)
     moveAction = QtCore.pyqtSignal(object)
     menuAction = QtCore.pyqtSignal(object, object)
-    group = QtCore.pyqtSignal(object)
 
     def __init__(self):
         super(DashboardFolderTree, self).__init__()
@@ -68,7 +68,7 @@ class DashboardFolderTree(QtWidgets.QTreeView):
         self.setItemDelegate(delegate)
 
         self.customContextMenuRequested.connect(self.menuEvent)
-        self.clicked.connect(self.noteSelectEvent)
+        self.clicked.connect(self.clickedEvent)
 
         self.setHeaderHidden(True)
         self.setAnimated(True)
@@ -78,8 +78,7 @@ class DashboardFolderTree(QtWidgets.QTreeView):
         self.setColumnHidden(2, True)
         self.setColumnHidden(3, True)
 
-    @inject.params(store='store')
-    def dropEvent(self, QDropEvent, store):
+    def dropEvent(self, QDropEvent):
         item_current = self.model().itemFromIndex(self.currentIndex())
         if item_current is None: return QDropEvent.ignore()
 
@@ -96,24 +95,33 @@ class DashboardFolderTree(QtWidgets.QTreeView):
     def menuEvent(self, event):
         index = self.currentIndex()
         if index is None: return None
-        entity = self.model().itemFromIndex(index)
-        if entity is None: return None
-        return self.menuAction.emit(event, entity.data())
+
+        item = self.model().itemFromIndex(index)
+        if item is None: return None
+
+        return self.menuAction.emit(event, item.data())
 
     def keyPressEvent(self, event):
         if event.key() in [Qt.Key_Delete, Qt.Key_Backspace]:
             index = self.currentIndex()
             if index is None: return None
-            return self.removeAction.emit(index)
+
+            item = self.model().itemFromIndex(index)
+            if item is None: return None
+
+            return self.removeAction.emit(item.data())
         if event.key() in [Qt.Key_Space, Qt.Key_Return]:
+
             index = self.currentIndex()
             if index is None: return None
-            self.model().itemFromIndex(index)
-            return self.editNoteAction.emit(index)
+
+            item = self.model().itemFromIndex(index)
+            if item is None: return None
+
+            return self.editNoteAction.emit(item.data())
         return super(DashboardFolderTree, self).keyPressEvent(event)
 
-    @inject.params(store='store')
-    def noteSelectEvent(self, index=None, store=None):
+    def clickedEvent(self, index=None):
         if index is None: return None
 
         model = self.model()
@@ -122,30 +130,7 @@ class DashboardFolderTree(QtWidgets.QTreeView):
         item = model.itemFromIndex(index)
         if item is None: return None
 
-        store.dispatch({
-            'type': '@@app/storage/resource/selected/group',
-            'entity': item.data()
-        })
-
-    @property
-    def current(self):
-        for index in self.selectedIndexes():
-            return index
-        return None
-
-    @property
-    @inject.params(config='config')
-    def selected(self, config=None):
-        for index in self.selectedIndexes():
-            if index is not None and index:
-                return self.model().filePath(index)
-        return config.get('storage.location')
-
-    @property
-    def index(self):
-        for index in self.selectedIndexes():
-            return index
-        return None
+        return self.groupAction.emit(item.data())
 
     def close(self):
         super(DashboardFolderTree, self).deleteLater()

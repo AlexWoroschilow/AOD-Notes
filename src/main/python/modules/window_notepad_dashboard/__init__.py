@@ -44,6 +44,7 @@ class Loader(object):
         widget = NotepadDashboard()
         widget.newNoteAction.connect(self.actions.onActionCreateNote)
         widget.newGroupAction.connect(self.actions.onActionCreateGroup)
+        widget.groupAction.connect(self.actions.onActionGroup)
         widget.fullscreenNoteAction.connect(self.actions.onActionFullScreen)
         widget.saveNoteAction.connect(self.actions.onActionSaveNote)
         widget.editNoteAction.connect(self.actions.onActionEditNote)
@@ -53,15 +54,6 @@ class Loader(object):
         widget.renameAction.connect(self.actions.onActionRename)
         widget.menuAction.connect(functools.partial(self.actions.onActionContextMenu, widget=widget))
         widget.moveAction.connect(self.actions.onActionMove)
-
-        # widget.importNoteAction.connect(self.actions.onActionNoteImport)
-        # widget.fullscreen.connect(functools.partial(self.actions.onActionFullScreen, widget=widget))
-        # widget.storage_changed.connect(functools.partial(self.actions.onActionStorageChanged, widget=widget))
-        # widget.note_new.connect(functools.partial(self.actions.onActionNoteCreate, widget=widget))
-        # widget.note_import.connect(functools.partial(self.actions.onActionNoteImport, widget=widget))
-        # widget.group_new.connect(functools.partial(self.actions.onActionFolderCreate, widget=widget))
-        # widget.clone.connect(functools.partial(self.actions.onActionCopy, widget=widget))
-        # widget.delete.connect(functools.partial(self.actions.onActionDelete, widget=widget))
 
         return widget
 

@@ -34,6 +34,7 @@ class NotepadDashboardSplitter(QtWidgets.QSplitter):
     renameAction = QtCore.pyqtSignal(object)
     menuAction = QtCore.pyqtSignal(object, object)
     moveAction = QtCore.pyqtSignal(object)
+    groupAction = QtCore.pyqtSignal(object)
 
     settings = QtCore.pyqtSignal(object)
 
@@ -57,6 +58,7 @@ class NotepadDashboardSplitter(QtWidgets.QSplitter):
         self.panelLeft.menuAction.connect(self.menuAction.emit)
         self.panelLeft.renameAction.connect(self.renameAction.emit)
         self.panelLeft.moveAction.connect(self.moveAction.emit)
+        self.panelLeft.groupAction.connect(self.groupAction.emit)
 
         self.panelRight = DashboardPanelRight()
         self.panelRight.fullscreenNoteAction.connect(self.fullscreenNoteAction.emit)
