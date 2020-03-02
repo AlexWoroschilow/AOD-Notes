@@ -112,6 +112,12 @@ class Loader(object):
 
             return state
 
+        if action.get('type') == '@@app/storage/resource/move':
+            state.documents = filesystem.documents()
+            state.groups = filesystem.groups()
+
+            return state
+
         return state
 
 

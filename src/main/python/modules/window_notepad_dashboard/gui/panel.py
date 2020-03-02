@@ -26,6 +26,7 @@ class DashboardPanelLeft(QtWidgets.QFrame):
     newGroupAction = QtCore.pyqtSignal(object)
     renameAction = QtCore.pyqtSignal(object)
     menuAction = QtCore.pyqtSignal(object, object)
+    moveAction = QtCore.pyqtSignal(object)
 
     def __init__(self):
         super(DashboardPanelLeft, self).__init__()
@@ -37,6 +38,8 @@ class DashboardPanelLeft(QtWidgets.QFrame):
         self.tree = DashboardFolderTree()
         self.tree.menuAction.connect(self.menuAction.emit)
         self.tree.renameAction.connect(self.renameAction.emit)
+        self.tree.moveAction.connect(self.moveAction.emit)
+
         # self.tree.note.connect(self.note.emit)
         # self.tree.group.connect(self.group.emit)
         # self.tree.delete.connect(self.delete.emit)

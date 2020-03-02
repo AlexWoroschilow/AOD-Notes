@@ -43,6 +43,23 @@ class Group(object):
             return self
         return self
 
+    @property
+    def parent(self):
+        return os.path.dirname(self.path)
+
+    @parent.setter
+    def parent(self, entity, counter=1):
+        if entity.path == self.parent:
+            return self
+        try:
+            shutil.move(self.path, entity.path)
+        except OSError as ex:
+            return self
+        return self
+
+    def __str__(self):
+        return self.name
+
 
 class Document(object):
     def __init__(self, path):
@@ -76,6 +93,9 @@ class Document(object):
     @content.setter
     def content(self, value):
         return open(self.path, 'w').write(value)
+
+    def __str__(self):
+        return self.name
 
 
 class StoreFileSystem(object):

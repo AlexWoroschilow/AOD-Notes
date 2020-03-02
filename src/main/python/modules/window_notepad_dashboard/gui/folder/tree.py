@@ -18,6 +18,8 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5 import QtGui
 
+from .model import NotepadDashboardTreeModel
+
 
 class QCustomDelegate(QtWidgets.QStyledItemDelegate):
     renameAction = QtCore.pyqtSignal(object)
@@ -38,49 +40,11 @@ class QCustomDelegate(QtWidgets.QStyledItemDelegate):
         return None
 
 
-class NotepadDashboardTreeModel(QtGui.QStandardItemModel):
-    doneDropAction = QtCore.pyqtSignal(object)
-    doneAction = QtCore.pyqtSignal(object)
-
-    @inject.params(store='store')
-    def __init__(self, store=None):
-        super(NotepadDashboardTreeModel, self).__init__()
-        # self.rowsMoved.connect(lambda parent, start, stop, destination: print(parent, start, stop, destination))
-        # self.rowsRemoved.connect(lambda parent, first, last: print(parent, first, last))
-        # self.rowsInserted.connect(lambda parent, first, last: print(parent, first, last))
-
-        state = store.get_state()
-        if state is None: return None
-        store.subscribe(self.update)
-
-    @inject.params(store='store')
-    def update(self, action=None, store=None):
-        state = store.get_state()
-        if state is None: return None
-
-        self.clear()
-        for item in self.build(state.groups, None):
-            self.appendRow(item)
-
-        self.doneAction.emit(self)
-
-    def build(self, collection, parent=None):
-        for group in collection:
-
-            item = QtGui.QStandardItem(group.name)
-            item.setEditable(True)
-            item.setData(group)
-
-            for child in self.build(group.children, item):
-                item.appendRow([child])
-
-            yield item
-
-
 class DashboardFolderTree(QtWidgets.QTreeView):
     editNoteAction = QtCore.pyqtSignal(object)
     removeAction = QtCore.pyqtSignal(object)
     renameAction = QtCore.pyqtSignal(object)
+    moveAction = QtCore.pyqtSignal(object)
     menuAction = QtCore.pyqtSignal(object, object)
     group = QtCore.pyqtSignal(object)
 
@@ -113,6 +77,21 @@ class DashboardFolderTree(QtWidgets.QTreeView):
         self.setColumnHidden(1, True)
         self.setColumnHidden(2, True)
         self.setColumnHidden(3, True)
+
+    @inject.params(store='store')
+    def dropEvent(self, QDropEvent, store):
+        item_current = self.model().itemFromIndex(self.currentIndex())
+        if item_current is None: return QDropEvent.ignore()
+
+        index_parent = self.indexAt(QDropEvent.pos())
+        item_parent = self.model().itemFromIndex(index_parent)
+        if item_parent is None: return QDropEvent.ignore()
+
+        data_current = item_current.data()
+        if data_current is None: return QDropEvent.ignore()
+        data_current.parent = item_parent.data()
+        self.moveAction.emit(data_current)
+        return QDropEvent.accept()
 
     def menuEvent(self, event):
         index = self.currentIndex()
