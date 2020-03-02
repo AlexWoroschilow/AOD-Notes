@@ -37,6 +37,7 @@ class PreviewScrollArea(QtWidgets.QListWidget):
 
     def __init__(self, store=None, status=None):
         super(PreviewScrollArea, self).__init__()
+        self.setDragEnabled(True)
         self.setViewMode(QtWidgets.QListView.IconMode)
         self.setResizeMode(QtWidgets.QListView.Adjust)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)

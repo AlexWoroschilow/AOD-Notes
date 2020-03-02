@@ -37,8 +37,13 @@ class NotepadDashboardTreeModel(QtGui.QStandardItemModel):
         state = store.get_state()
         if state is None: return None
 
+        groups = state.groups
+        if not groups.fresh:
+            return None
+
         self.clear()
-        for item in self.build(state.groups, None):
+
+        for item in self.build(groups.collection, None):
             self.appendRow(item)
 
         self.doneAction.emit(self)

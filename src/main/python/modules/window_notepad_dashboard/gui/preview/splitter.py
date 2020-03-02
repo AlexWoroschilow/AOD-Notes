@@ -71,14 +71,15 @@ class DashboardDocumentPreview(QtWidgets.QSplitter):
 
         state = store.get_state()
         if state is None: return None
+        self.editor.open(state.document)
+
+        documents = state.documents
+        if not documents.fresh:
+            return None
 
         self.preview.clear()
-        if state.documents is None: return None
-
-        for document in state.documents:
+        for document in documents.collection:
             self.preview.addItemRow(document)
-
-        self.editor.open(state.document)
 
     def open(self, index=None):
         pass

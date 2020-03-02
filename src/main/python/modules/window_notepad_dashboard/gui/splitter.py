@@ -102,11 +102,6 @@ class DashboardDocumentPreview(QtWidgets.QSplitter):
         self.preview = PreviewScrollArea()
         self.preview.setMinimumWidth(410)
 
-        # self.preview.editAction.connect(self.previewClickedEvent)
-        # self.preview.fullscreenAction.connect(self.fullscreen.emit)
-        # self.preview.deleteAction.connect(self.delete.emit)
-        # self.preview.cloneAction.connect(self.clone.emit)
-
         container = inject.get_injector_or_die()
         if container is None: return None
 
@@ -118,33 +113,6 @@ class DashboardDocumentPreview(QtWidgets.QSplitter):
 
         self.setStretchFactor(0, 5)
         self.setStretchFactor(1, 2)
-
-        state = store.get_state()
-        if state is None: return None
-        store.subscribe(self.refresh)
-
-    @inject.params(store='store')
-    def refresh(self, store=None):
-
-        state = store.get_state()
-        if state is None: return None
-
-        self.preview.clear()
-        for document in state.documents:
-            item, widget = self.preview.getItemNew(document)
-            self.preview.addItem(item)
-            self.preview.setItemWidget(item, widget)
-
-        self.editor.open(state.document)
-
-    def open(self, index=None):
-        pass
-
-    def previewSelected(self, index=None, storage=None):
-        pass
-
-    def previewClickedEvent(self, index=None, storage=None):
-        pass
 
     def close(self):
         super(DashboardDocumentPreview, self).deleteLater()

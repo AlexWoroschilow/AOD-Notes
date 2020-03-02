@@ -78,6 +78,9 @@ class DashboardFolderTree(QtWidgets.QTreeView):
         self.setColumnHidden(2, True)
         self.setColumnHidden(3, True)
 
+    def dragEnterEvent(self, QDragEnterEvent):
+        return QDragEnterEvent.acceptProposedAction()
+
     def dropEvent(self, QDropEvent):
         item_current = self.model().itemFromIndex(self.currentIndex())
         if item_current is None: return QDropEvent.ignore()

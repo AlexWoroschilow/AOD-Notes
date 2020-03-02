@@ -16,10 +16,32 @@ import inject
 import shutil
 
 
+class StorageCollection(object):
+    def __init__(self):
+        self._collection = []
+        self._current = 0
+        self._last = 0
+
+    @property
+    def fresh(self):
+        return self._current != self._last
+
+    @property
+    def collection(self):
+        self._last = self._current
+        return self._collection
+
+    @collection.setter
+    def collection(self, collection):
+        self._collection = collection
+        self._current += 1
+        return self
+
+
 class Storage(object):
-    documents = []
+    documents = StorageCollection()
+    groups = StorageCollection()
     selections = []
-    groups = []
     document = None
     group = None
 
@@ -49,9 +71,10 @@ class Loader(object):
     @inject.params(filesystem='store.filesystem')
     def init_store(self, state=None, action=None, filesystem=None):
         state.document = filesystem.document()
-        state.documents = filesystem.documents()
         state.group = filesystem.group()
-        state.groups = filesystem.groups()
+
+        state.documents.collection = filesystem.documents()
+        state.groups.collection = filesystem.groups()
         return state
 
     @inject.params(filesystem='store.filesystem')
@@ -63,13 +86,13 @@ class Loader(object):
         if action.get('type') == '@@app/storage/resource/selected/group':
             state.group = action.get('entity')
             if state.group is None: return None
-            state.documents = filesystem.documents(state.group)
+            state.documents.collection = filesystem.documents(state.group)
             return state
 
         if action.get('type') == '@@app/storage/resource/create/document':
             document = filesystem.document_create(state.group)
             if document is None or not document: return state
-            state.documents = filesystem.documents(state.group)
+            state.documents.collection = filesystem.documents(state.group)
             state.document = document
             return state
 
@@ -77,8 +100,8 @@ class Loader(object):
             if state.group is None: return None
             group = filesystem.group_create(state.group)
             if group is None or not group: return state
-            state.documents = filesystem.documents(group)
-            state.groups = filesystem.groups()
+            state.documents.collection = filesystem.documents(group)
+            state.groups.collection = filesystem.groups()
             state.group = group
             return state
 
@@ -89,32 +112,32 @@ class Loader(object):
         if action.get('type') == '@@app/storage/resource/remove':
             filesystem.remove(action.get('entity'))
             state.document = filesystem.document()
-            state.documents = filesystem.documents()
+            state.documents.collection = filesystem.documents()
 
             state.group = filesystem.group()
-            state.groups = filesystem.groups()
+            state.groups.collection = filesystem.groups()
 
             return state
 
         if action.get('type') == '@@app/storage/resource/clone':
             filesystem.clone(action.get('entity'))
             state.document = filesystem.document()
-            state.documents = filesystem.documents()
+            state.documents.collection = filesystem.documents()
 
             state.group = filesystem.group()
-            state.groups = filesystem.groups()
+            state.groups.collection = filesystem.groups()
 
             return state
 
         if action.get('type') == '@@app/storage/resource/rename':
-            state.documents = filesystem.documents()
-            state.groups = filesystem.groups()
+            state.documents.collection = filesystem.documents()
+            state.groups.collection = filesystem.groups()
 
             return state
 
         if action.get('type') == '@@app/storage/resource/move':
-            state.documents = filesystem.documents()
-            state.groups = filesystem.groups()
+            state.documents.collection = filesystem.documents()
+            state.groups.collection = filesystem.groups()
 
             return state
 
