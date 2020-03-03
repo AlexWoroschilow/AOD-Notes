@@ -25,6 +25,9 @@ class Group(object):
         self.children = children
         self.path = path
 
+    def __eq__(self, other):
+        return self.path == other.path
+
     @property
     def name(self):
         return os.path.basename(self.path)

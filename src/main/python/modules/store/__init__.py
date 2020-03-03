@@ -15,35 +15,7 @@ import pydux
 import inject
 import shutil
 
-
-class StorageCollection(object):
-    def __init__(self):
-        self._collection = []
-        self._current = 0
-        self._last = 0
-
-    @property
-    def fresh(self):
-        return self._current != self._last
-
-    @property
-    def collection(self):
-        self._last = self._current
-        return self._collection
-
-    @collection.setter
-    def collection(self, collection):
-        self._collection = collection
-        self._current += 1
-        return self
-
-
-class Storage(object):
-    documents = StorageCollection()
-    groups = StorageCollection()
-    selections = []
-    document = None
-    group = None
+from .model import Storage
 
 
 class Loader(object):

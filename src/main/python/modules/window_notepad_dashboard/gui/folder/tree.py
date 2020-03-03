@@ -48,7 +48,8 @@ class DashboardFolderTree(QtWidgets.QTreeView):
     moveAction = QtCore.pyqtSignal(object)
     menuAction = QtCore.pyqtSignal(object, object)
 
-    def __init__(self):
+    @inject.params(store='store')
+    def __init__(self, store):
         super(DashboardFolderTree, self).__init__()
         self.setEditTriggers(QtWidgets.QAbstractItemView.EditKeyPressed)
         self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
@@ -59,9 +60,7 @@ class DashboardFolderTree(QtWidgets.QTreeView):
         self.setIconSize(QtCore.QSize(0, 0))
         self.setMinimumWidth(200)
 
-        model = NotepadDashboardTreeModel()
-        model.doneAction.connect(lambda: self.expandToDepth(3))
-        self.setModel(model)
+        self.setModel(NotepadDashboardTreeModel())
 
         delegate = QCustomDelegate()
         delegate.renameAction.connect(self.renameAction.emit)
@@ -77,6 +76,35 @@ class DashboardFolderTree(QtWidgets.QTreeView):
         self.setColumnHidden(1, True)
         self.setColumnHidden(2, True)
         self.setColumnHidden(3, True)
+
+        if store is None: return None
+        store.subscribe(functools.partial(
+            self.updateStore, store=store
+        ))
+
+    def updateStore(self, store=None):
+
+        state = store.get_state()
+        if state is None: return None
+
+        group = state.group
+        groups = state.groups
+        if not groups.fresh:
+            return None
+
+        model = self.model()
+        if model is None: return self
+
+        model.fill(groups.collection, group)
+        self.expandToDepth(3)
+
+        current = model.current
+        if current is None: return self
+
+        index = model.indexFromItem(current)
+        if index is None: return self
+
+        self.setCurrentIndex(index)
 
     def dragEnterEvent(self, QDragEnterEvent):
         return QDragEnterEvent.acceptProposedAction()

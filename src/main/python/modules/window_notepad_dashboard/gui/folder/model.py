@@ -20,41 +20,27 @@ from PyQt5 import QtGui
 
 
 class NotepadDashboardTreeModel(QtGui.QStandardItemModel):
-    doneDropAction = QtCore.pyqtSignal(object)
-    doneAction = QtCore.pyqtSignal(object)
+    current = None
 
-    @inject.params(store='store')
-    def __init__(self, store=None):
-        super(NotepadDashboardTreeModel, self).__init__()
-
-        state = store.get_state()
-        if state is None: return None
-        store.subscribe(self.update)
-
-    @inject.params(store='store')
-    def update(self, action=None, store=None):
-
-        state = store.get_state()
-        if state is None: return None
-
-        groups = state.groups
-        if not groups.fresh:
-            return None
+    def fill(self, collection=None, current=None):
 
         self.clear()
 
-        for item in self.build(groups.collection, None):
+        for item in self.build(collection, current):
             self.appendRow(item)
 
-        self.doneAction.emit(self)
+        print(self.current)
 
-    def build(self, collection, parent=None):
+    def build(self, collection, current=None):
         for group in collection:
 
             item = QtGui.QStandardItem(group.name)
             item.setData(group)
 
-            for child in self.build(group.children, item):
+            if current is not None and current == group:
+                self.current = item
+
+            for child in self.build(group.children, current):
                 item.appendRow([child])
 
             yield item

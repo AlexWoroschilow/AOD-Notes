@@ -10,8 +10,11 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import os
 import inject
 import functools
+
+from .service.config import ConfigFile
 
 
 class Loader(object):
@@ -22,14 +25,34 @@ class Loader(object):
     def __exit__(self, type, value, traceback):
         pass
 
+    def _construct(self, options, args):
+        return ConfigFile(options.config)
+
     def enabled(self, options=None, args=None):
         return True
 
     def configure(self, binder, options, args):
         binder.bind_to_constructor('config', functools.partial(
-            self._construct_config, options=options, args=args
+            self._construct, options=options, args=args
         ))
 
-    def _construct_config(self, options, args):
-        from .service.config import ConfigFile
-        return ConfigFile(options.config)
+    @inject.params(config='config', store='store')
+    def boot(self, options, args, config, store):
+        store.subscribe(functools.partial(
+            self.update, config=config, store=store
+        ))
+
+    def update(self, config=None, store=None):
+        if store is None: return None
+        state = store.get_state()
+        if state is None: return None
+
+        entity = state.group
+        if entity is not None and entity:
+            if len(entity.path) and os.path.exists(entity.path):
+                config.set('storage.selected.group', entity.path)
+
+        entity = state.document
+        if entity is not None and entity:
+            if len(entity.path) and os.path.exists(entity.path):
+                config.set('storage.selected.document', entity.path)
