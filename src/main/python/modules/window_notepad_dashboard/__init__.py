@@ -49,6 +49,7 @@ class Loader(object):
         widget.saveNoteAction.connect(self.actions.onActionSaveNote)
         widget.editNoteAction.connect(self.actions.onActionEditNote)
         widget.removeNoteAction.connect(self.actions.onActionRemove)
+        widget.renameNoteAction.connect(self.actions.onActionRename)
         widget.cloneNoteAction.connect(self.actions.onActionClone)
         widget.cloneNoteAction.connect(self.actions.onActionClone)
         widget.renameAction.connect(self.actions.onActionRename)

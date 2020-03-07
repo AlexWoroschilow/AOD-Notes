@@ -11,6 +11,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
+import functools
 from PyQt5.QtCore import Qt
 
 from PyQt5 import QtCore
@@ -22,17 +23,22 @@ from .bar import ToolBarWidgetRight
 from .bar import FormatbarWidget
 
 from .text import TextEditor
+from .line import NameEditor
 
 
 class TextEditorWidget(QtWidgets.QFrame):
     fullscreenNoteAction = QtCore.pyqtSignal(object)
     saveNoteAction = QtCore.pyqtSignal(object)
+    renameNoteAction = QtCore.pyqtSignal(object)
 
     def __init__(self):
         super(TextEditorWidget, self).__init__()
         self.setContentsMargins(0, 0, 0, 0)
 
         self.entity = None
+
+        self.label = NameEditor()
+        self.label.editingFinished.connect(self.renameEvent)
 
         self.writer = TextEditor(self)
         self.writer.cursorPositionChanged.connect(self.cursorPosition)
@@ -77,11 +83,12 @@ class TextEditorWidget(QtWidgets.QFrame):
         self.setLayout(QtWidgets.QGridLayout())
 
         self.layout().setContentsMargins(0, 0, 0, 0)
-        self.layout().addWidget(self.leftbar, 0, 0, 5, 1)
-        self.layout().addWidget(self.rightbar, 1, 2, 3, 1)
-        self.layout().addWidget(self.formatbar, 1, 1)
-        self.layout().addWidget(self.writer, 2, 1)
-        self.layout().addWidget(self.statusbar, 3, 1)
+        self.layout().addWidget(self.leftbar, 0, 0, 6, 1)
+        self.layout().addWidget(self.rightbar, 1, 2, 4, 1)
+        self.layout().addWidget(self.label, 1, 1)
+        self.layout().addWidget(self.formatbar, 2, 1)
+        self.layout().addWidget(self.writer, 3, 1)
+        self.layout().addWidget(self.statusbar, 4, 1)
 
     def document(self):
         """
@@ -96,6 +103,7 @@ class TextEditorWidget(QtWidgets.QFrame):
     def open(self, entity=None):
         if entity is None: return self
         self.insertHtml(entity.content)
+        self.label.setText(entity.name)
         self.entity = entity
         return self
 
@@ -113,6 +121,12 @@ class TextEditorWidget(QtWidgets.QFrame):
         if self.writer is None: return self
         self.writer.text.setHtml('')
         self.entity = None
+        return self
+
+    def renameEvent(self, event=None):
+        if self.entity is None: return self
+        self.entity.name = self.label.text()
+        self.renameNoteAction.emit(self.entity)
         return self
 
     def fullscreenEvent(self, event=None):

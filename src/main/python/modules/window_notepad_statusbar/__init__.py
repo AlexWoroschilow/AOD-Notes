@@ -31,14 +31,6 @@ class Loader(object):
     def enabled(self, options=None, args=None):
         return options.console is None
 
+    #
     def configure(self, binder, options, args):
-        binder.bind_to_constructor('status', self._widget)
-
-    @inject.params(window='window')
-    def _widget(self, window=None):
-        if window is None: return None
-
-        widget = Status()
-        window.statusBar().addWidget(widget)
-
-        return widget
+        binder.bind_to_constructor('status', Status)

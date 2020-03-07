@@ -26,6 +26,7 @@ class DashboardDocumentPreview(QtWidgets.QSplitter):
     saveNoteAction = QtCore.pyqtSignal(object)
     removeNoteAction = QtCore.pyqtSignal(object)
     cloneNoteAction = QtCore.pyqtSignal(object)
+    renameNoteAction = QtCore.pyqtSignal(object)
 
     delete = QtCore.pyqtSignal(object)
     edit = QtCore.pyqtSignal(object)
@@ -52,6 +53,7 @@ class DashboardDocumentPreview(QtWidgets.QSplitter):
 
         self.editor = container.get_instance('notepad.editor')
         self.editor.fullscreenNoteAction.connect(self.fullscreenNoteAction.emit)
+        self.editor.renameNoteAction.connect(self.renameNoteAction.emit)
         self.editor.saveNoteAction.connect(self.saveNoteAction.emit)
 
         self.editor.focus()

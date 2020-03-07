@@ -28,6 +28,7 @@ class NotepadDashboardSplitter(QtWidgets.QSplitter):
     newGroupAction = QtCore.pyqtSignal(object)
     fullscreenNoteAction = QtCore.pyqtSignal(object)
     removeNoteAction = QtCore.pyqtSignal(object)
+    renameNoteAction = QtCore.pyqtSignal(object)
     cloneNoteAction = QtCore.pyqtSignal(object)
     editNoteAction = QtCore.pyqtSignal(object)
     saveNoteAction = QtCore.pyqtSignal(object)
@@ -65,6 +66,7 @@ class NotepadDashboardSplitter(QtWidgets.QSplitter):
         self.panelRight.fullscreenNoteAction.connect(lambda x: print(x))
         self.panelRight.editNoteAction.connect(self.editNoteAction.emit)
         self.panelRight.removeNoteAction.connect(self.removeNoteAction.emit)
+        self.panelRight.renameNoteAction.connect(self.renameNoteAction.emit)
         self.panelRight.cloneNoteAction.connect(self.cloneNoteAction.emit)
         self.panelRight.saveNoteAction.connect(self.saveNoteAction.emit)
 

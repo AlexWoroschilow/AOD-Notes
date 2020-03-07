@@ -18,5 +18,4 @@ class NameEditor(QtWidgets.QLineEdit):
 
     def __init__(self):
         super(NameEditor, self).__init__()
-        self.setObjectName('editorNameEditor')
 

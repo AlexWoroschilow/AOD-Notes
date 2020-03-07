@@ -42,6 +42,7 @@ class Group(object):
                 destination = "{} ({})".format(destination, counter)
                 counter += 1
             shutil.move(self.path, destination)
+            self.path = destination
         except OSError as ex:
             return self
         return self
@@ -82,6 +83,7 @@ class Document(object):
                 destination = "{} ({})".format(destination, counter)
                 counter += 1
             shutil.move(self.path, destination)
+            self.path = destination
         except OSError as ex:
             return self
         return self

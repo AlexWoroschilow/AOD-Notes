@@ -29,6 +29,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         super(MainWindow, self).__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
+        self.setWindowTitle('AOD - Notepad')
+        self.setStyleSheet(themes.get_stylesheet())
 
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -37,14 +39,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.container.setLayout(layout)
 
         self.setCentralWidget(self.container)
-
-        spacer = QtWidgets.QWidget()
-        spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
-        self.statusBar().addWidget(spacer)
-
-        self.setWindowTitle('AOD - Notepad')
-
-        self.setStyleSheet(themes.get_stylesheet())
 
         if not os.path.exists('icons/icon.svg'): return None
         self.setWindowIcon(QtGui.QIcon('icons/icon.svg'))

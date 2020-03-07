@@ -42,9 +42,6 @@ class DashboardPanelLeft(QtWidgets.QFrame):
         self.tree.moveAction.connect(self.moveAction.emit)
         self.tree.groupAction.connect(self.groupAction.emit)
 
-        # self.tree.note.connect(self.note.emit)
-        # self.tree.group.connect(self.group.emit)
-        # self.tree.delete.connect(self.delete.emit)
         self.layout().addWidget(self.tree)
 
     def close(self):
@@ -57,6 +54,7 @@ class DashboardPanelRight(QtWidgets.QFrame):
     editNoteAction = QtCore.pyqtSignal(object)
     removeNoteAction = QtCore.pyqtSignal(object)
     cloneNoteAction = QtCore.pyqtSignal(object)
+    renameNoteAction = QtCore.pyqtSignal(object)
     saveNoteAction = QtCore.pyqtSignal(object)
 
     def __init__(self):
@@ -71,6 +69,7 @@ class DashboardPanelRight(QtWidgets.QFrame):
         self.preview.editNoteAction.connect(self.editNoteAction.emit)
         self.preview.removeNoteAction.connect(self.removeNoteAction.emit)
         self.preview.cloneNoteAction.connect(self.cloneNoteAction.emit)
+        self.preview.renameNoteAction.connect(self.renameNoteAction.emit)
         self.preview.saveNoteAction.connect(self.saveNoteAction.emit)
 
         self.toolbar = DashboardDocumentPreviewToolbar()
