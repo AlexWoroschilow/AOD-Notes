@@ -87,24 +87,23 @@ class DashboardFolderTree(QtWidgets.QTreeView):
         state = store.get_state()
         if state is None: return None
 
-        group = state.group
         groups = state.groups
         if not groups.fresh:
             return None
 
         model = self.model()
-        if model is None: return self
+        if model is None:
+            return self
 
-        model.fill(groups.collection, group)
+        model.fill(groups.collection)
         self.expandToDepth(3)
 
-        current = model.current
-        if current is None: return self
-
-        index = model.indexFromItem(current)
-        if index is None: return self
-
-        self.setCurrentIndex(index)
+        # current = model.itemFromData(state.group)
+        # if current is None: return self
+        # index = model.indexFromItem(current)
+        # if index is None: return self
+        # temporary disabled because of the move-problem
+        # self.setCurrentIndex(index)
 
     def dragEnterEvent(self, QDragEnterEvent):
         return QDragEnterEvent.acceptProposedAction()

@@ -34,6 +34,7 @@ class PreviewScrollArea(QtWidgets.QListWidget):
     editNoteAction = QtCore.pyqtSignal(object)
     removeNoteAction = QtCore.pyqtSignal(object)
     cloneNoteAction = QtCore.pyqtSignal(object)
+    selectNoteAction = QtCore.pyqtSignal(object)
 
     def __init__(self, store=None, status=None):
         super(PreviewScrollArea, self).__init__()
@@ -44,9 +45,12 @@ class PreviewScrollArea(QtWidgets.QListWidget):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setMovement(QtWidgets.QListView.Static)
 
-    def addItemRow(self, document):
+    def addItemRow(self, document, current=None):
         item = NoteItem(document)
         self.addItem(item)
+
+        if current is not None and current == document:
+            self.setCurrentItem(item)
 
         widget = NotePreviewDescription(document)
         self.setItemWidget(item, widget)
@@ -61,7 +65,4 @@ class PreviewScrollArea(QtWidgets.QListWidget):
 
     @inject.params(store='store')
     def itemClickedEvent(self, item, store=None):
-        store.dispatch({
-            'type': '@@app/storage/resource/selected/document',
-            'entity': item.data(0)
-        })
+        self.selectNoteAction.emit(item.data(0))

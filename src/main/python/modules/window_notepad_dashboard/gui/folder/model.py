@@ -20,7 +20,7 @@ from PyQt5 import QtGui
 
 
 class NotepadDashboardTreeModel(QtGui.QStandardItemModel):
-    current = None
+    collection = []
 
     def fill(self, collection=None, current=None):
 
@@ -29,18 +29,23 @@ class NotepadDashboardTreeModel(QtGui.QStandardItemModel):
         for item in self.build(collection, current):
             self.appendRow(item)
 
-        print(self.current)
-
     def build(self, collection, current=None):
         for group in collection:
-
             item = QtGui.QStandardItem(group.name)
             item.setData(group)
 
-            if current is not None and current == group:
-                self.current = item
-
             for child in self.build(group.children, current):
+                self.collection.append(child)
                 item.appendRow([child])
 
+            self.collection.append(item)
             yield item
+
+    def itemFromData(self, element=None):
+        for item in self.collection:
+            if item.data() == element:
+                return item
+
+    def clear(self):
+        self.collection = []
+        return super(NotepadDashboardTreeModel, self).clear()

@@ -19,7 +19,6 @@ from PyQt5 import QtGui
 
 from .panel import DashboardPanelLeft
 from .panel import DashboardPanelRight
-from .preview.list import PreviewScrollArea
 
 
 class NotepadDashboardSplitter(QtWidgets.QSplitter):
@@ -32,6 +31,7 @@ class NotepadDashboardSplitter(QtWidgets.QSplitter):
     cloneNoteAction = QtCore.pyqtSignal(object)
     editNoteAction = QtCore.pyqtSignal(object)
     saveNoteAction = QtCore.pyqtSignal(object)
+    selectNoteAction = QtCore.pyqtSignal(object)
     renameAction = QtCore.pyqtSignal(object)
     menuAction = QtCore.pyqtSignal(object, object)
     moveAction = QtCore.pyqtSignal(object)
@@ -68,6 +68,7 @@ class NotepadDashboardSplitter(QtWidgets.QSplitter):
         self.panelRight.removeNoteAction.connect(self.removeNoteAction.emit)
         self.panelRight.renameNoteAction.connect(self.renameNoteAction.emit)
         self.panelRight.cloneNoteAction.connect(self.cloneNoteAction.emit)
+        self.panelRight.selectNoteAction.connect(self.selectNoteAction.emit)
         self.panelRight.saveNoteAction.connect(self.saveNoteAction.emit)
 
         self.addWidget(self.panelLeft)
@@ -85,37 +86,3 @@ class NotepadDashboardSplitter(QtWidgets.QSplitter):
     def close(self):
         super(NotepadDashboardSplitter, self).deleteLater()
         return super(NotepadDashboardSplitter, self).close()
-
-
-class DashboardDocumentPreview(QtWidgets.QSplitter):
-    delete = QtCore.pyqtSignal(object)
-    edit = QtCore.pyqtSignal(object)
-    clicked = QtCore.pyqtSignal(object)
-    fullscreen = QtCore.pyqtSignal(object)
-    clone = QtCore.pyqtSignal(object)
-
-    editor = None
-
-    @inject.params(store='store')
-    def __init__(self, index=None, store=None):
-        super(DashboardDocumentPreview, self).__init__()
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-
-        self.preview = PreviewScrollArea()
-        self.preview.setMinimumWidth(410)
-
-        container = inject.get_injector_or_die()
-        if container is None: return None
-
-        self.editor = container.get_instance('notepad.editor')
-        self.editor.focus()
-
-        self.addWidget(self.preview)
-        self.addWidget(self.editor)
-
-        self.setStretchFactor(0, 5)
-        self.setStretchFactor(1, 2)
-
-    def close(self):
-        super(DashboardDocumentPreview, self).deleteLater()
-        return super(DashboardDocumentPreview, self).close()

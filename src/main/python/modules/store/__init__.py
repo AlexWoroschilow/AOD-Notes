@@ -101,13 +101,14 @@ class Loader(object):
 
             return state
 
-        if action.get('type') == '@@app/storage/resource/rename':
+        if action.get('type') == '@@app/storage/resource/move':
             state.documents.collection = filesystem.documents()
             state.groups.collection = filesystem.groups()
+            state.group = filesystem.group()
 
             return state
 
-        if action.get('type') == '@@app/storage/resource/move':
+        if action.get('type') == '@@app/storage/resource/rename':
             state.documents.collection = filesystem.documents()
             state.groups.collection = filesystem.groups()
 

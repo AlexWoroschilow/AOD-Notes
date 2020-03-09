@@ -25,7 +25,8 @@ class Group(object):
         self.children = children
         self.path = path
 
-    def __eq__(self, other):
+    def __eq__(self, other=None):
+        if other is None: return False
         return self.path == other.path
 
     @property
@@ -68,6 +69,10 @@ class Group(object):
 class Document(object):
     def __init__(self, path):
         self.path = path
+
+    def __eq__(self, other):
+        if other is None: return False
+        return self.path == other.path
 
     @property
     def name(self):
@@ -227,7 +232,6 @@ class StoreFileSystem(object):
         :return:
         """
         location = "{}/{}".format(group.path, name)
-        print(location, group.path)
         while os.path.exists(location):
             location = "{}/{} ({})".format(group.path, name, counter)
             counter += 1
@@ -257,7 +261,7 @@ class StoreFileSystem(object):
         if not os.path.exists(location):
             return None
 
-        return self._groups(location)
+        return [Group(location, self._groups(location))]
 
     @inject.params(config='config')
     def document(self, document=None, config=None):

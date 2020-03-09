@@ -27,6 +27,7 @@ class DashboardDocumentPreview(QtWidgets.QSplitter):
     removeNoteAction = QtCore.pyqtSignal(object)
     cloneNoteAction = QtCore.pyqtSignal(object)
     renameNoteAction = QtCore.pyqtSignal(object)
+    selectNoteAction = QtCore.pyqtSignal(object)
 
     delete = QtCore.pyqtSignal(object)
     edit = QtCore.pyqtSignal(object)
@@ -46,6 +47,8 @@ class DashboardDocumentPreview(QtWidgets.QSplitter):
         self.preview.fullscreenNoteAction.connect(self.fullscreenNoteAction.emit)
         self.preview.removeNoteAction.connect(self.removeNoteAction.emit)
         self.preview.cloneNoteAction.connect(self.cloneNoteAction.emit)
+        self.preview.selectNoteAction.connect(self.selectNoteAction.emit)
+
         self.preview.setMinimumWidth(410)
 
         container = inject.get_injector_or_die()
@@ -80,8 +83,9 @@ class DashboardDocumentPreview(QtWidgets.QSplitter):
             return None
 
         self.preview.clear()
+        current = state.document
         for document in documents.collection:
-            self.preview.addItemRow(document)
+            self.preview.addItemRow(document, current)
 
     def open(self, index=None):
         pass

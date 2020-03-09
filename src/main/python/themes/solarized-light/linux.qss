@@ -124,6 +124,8 @@ DashboardFolderTreeToolbar PictureButton { background: #2ca7f8; border: 1px; bor
 DashboardFolderTreeToolbar PictureButtonFlat { background: #ffffff; padding: 5px;  }
 
 
+NotepadDashboardToolbar { margin-bottom: 5px; }
+NameEditor { margin: 0px;    padding: 5px; border: 1px solid #eeeeee; font-size: 18px; }
 
 NotepadDashboardSplitter { border-bottom:  1px solid #eeeeee; }
 

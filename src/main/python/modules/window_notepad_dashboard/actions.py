@@ -77,6 +77,16 @@ class ModuleActions(object):
             status.error(ex.__str__())
 
     @inject.params(store='store', status='status')
+    def onActionSelectNote(self, entity, store, status):
+        try:
+            store.dispatch({
+                'type': '@@app/storage/resource/selected/document',
+                'entity': entity
+            })
+        except Exception as ex:
+            status.error(ex.__str__())
+
+    @inject.params(store='store', status='status')
     def onActionEditNote(self, entity, store, status):
         try:
             store.dispatch({'type': '@@app/storage/resource/selected/document',

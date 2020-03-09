@@ -47,6 +47,7 @@ class Loader(object):
         widget.groupAction.connect(self.actions.onActionGroup)
         widget.fullscreenNoteAction.connect(self.actions.onActionFullScreen)
         widget.saveNoteAction.connect(self.actions.onActionSaveNote)
+        widget.selectNoteAction.connect(self.actions.onActionSelectNote)
         widget.editNoteAction.connect(self.actions.onActionEditNote)
         widget.removeNoteAction.connect(self.actions.onActionRemove)
         widget.renameNoteAction.connect(self.actions.onActionRename)
