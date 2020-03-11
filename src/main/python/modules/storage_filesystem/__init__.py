@@ -95,6 +95,21 @@ class Document(object):
         return self
 
     @property
+    def parent(self):
+        return os.path.dirname(self.path)
+
+    @parent.setter
+    def parent(self, entity, counter=1):
+        if entity.path == self.parent:
+            return self
+        try:
+            shutil.move(self.path, entity.path)
+            self.path = "{}/{}".format(entity.path, self.name)
+        except OSError as ex:
+            return self
+        return self
+
+    @property
     def content(self):
         try:
             return open(self.path, 'r').read()

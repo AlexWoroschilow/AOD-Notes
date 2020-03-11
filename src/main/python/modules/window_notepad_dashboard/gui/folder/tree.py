@@ -98,7 +98,6 @@ class DashboardFolderTree(QtWidgets.QTreeView):
             return None
 
         current = model.fill(groups.collection, state.group)
-        print(current)
         self.expandAll()
 
         if current is None: return None

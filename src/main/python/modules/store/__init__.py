@@ -83,15 +83,17 @@ class Loader(object):
             return state
 
         if action.get('type') == '@@app/storage/resource/remove':
-            filesystem.remove(action.get('entity'))
+            entity = action.get('entity')
+            filesystem.remove(entity)
 
             state.document = filesystem.document()
             state.documents.collection = filesystem.documents()
 
             state.groups.collection = filesystem.groups()
-            state.group = filesystem.group()
 
-            print(state.group)
+            test = type("Group", (object,), {})()
+            test.path = entity.parent
+            state.group = filesystem.group(test)
 
             return state
 
