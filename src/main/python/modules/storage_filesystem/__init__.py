@@ -58,6 +58,7 @@ class Group(object):
             return self
         try:
             shutil.move(self.path, entity.path)
+            self.path = "{}/{}".format(entity.path, self.name)
         except OSError as ex:
             return self
         return self

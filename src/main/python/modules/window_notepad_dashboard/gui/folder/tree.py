@@ -10,6 +10,7 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+import time
 import inject
 import functools
 
@@ -52,12 +53,13 @@ class DashboardFolderTree(QtWidgets.QTreeView):
     def __init__(self, store):
         super(DashboardFolderTree, self).__init__()
         self.setEditTriggers(QtWidgets.QAbstractItemView.EditKeyPressed)
-        self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
+        self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setUniformRowHeights(True)
-        self.setIconSize(QtCore.QSize(0, 0))
+        self.setIconSize(QtCore.QSize(10, 10))
         self.setMinimumWidth(200)
 
         self.setModel(NotepadDashboardTreeModel())
@@ -78,10 +80,10 @@ class DashboardFolderTree(QtWidgets.QTreeView):
         self.setColumnHidden(3, True)
 
         if store is None: return None
-        store.subscribe(functools.partial(
-            self.updateStore, store=store
-        ))
 
+        store.subscribe(self.updateStore)
+
+    @inject.params(store='store')
     def updateStore(self, store=None):
 
         state = store.get_state()
@@ -93,17 +95,15 @@ class DashboardFolderTree(QtWidgets.QTreeView):
 
         model = self.model()
         if model is None:
-            return self
+            return None
 
-        model.fill(groups.collection)
-        self.expandToDepth(3)
+        current = model.fill(groups.collection, state.group)
+        print(current)
+        self.expandAll()
 
-        # current = model.itemFromData(state.group)
-        # if current is None: return self
-        # index = model.indexFromItem(current)
-        # if index is None: return self
-        # temporary disabled because of the move-problem
-        # self.setCurrentIndex(index)
+        if current is None: return None
+        self.setCurrentIndex(current)
+        self.scrollTo(self.indexBelow(current))
 
     def dragEnterEvent(self, QDragEnterEvent):
         return QDragEnterEvent.acceptProposedAction()

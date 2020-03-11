@@ -72,6 +72,7 @@ class Loader(object):
             if state.group is None: return None
             group = filesystem.group_create(state.group)
             if group is None or not group: return state
+
             state.documents.collection = filesystem.documents(group)
             state.groups.collection = filesystem.groups()
             state.group = group
@@ -83,11 +84,14 @@ class Loader(object):
 
         if action.get('type') == '@@app/storage/resource/remove':
             filesystem.remove(action.get('entity'))
+
             state.document = filesystem.document()
             state.documents.collection = filesystem.documents()
 
-            state.group = filesystem.group()
             state.groups.collection = filesystem.groups()
+            state.group = filesystem.group()
+
+            print(state.group)
 
             return state
 
@@ -104,8 +108,7 @@ class Loader(object):
         if action.get('type') == '@@app/storage/resource/move':
             state.documents.collection = filesystem.documents()
             state.groups.collection = filesystem.groups()
-            state.group = filesystem.group()
-
+            state.group = action.get('entity')
             return state
 
         if action.get('type') == '@@app/storage/resource/rename':

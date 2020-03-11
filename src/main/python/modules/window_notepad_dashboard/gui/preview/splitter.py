@@ -86,6 +86,7 @@ class DashboardDocumentPreview(QtWidgets.QSplitter):
         current = state.document
         for document in documents.collection:
             self.preview.addItemRow(document, current)
+        self.preview.scrollTo(self.preview.currentIndex())
 
     def open(self, index=None):
         pass

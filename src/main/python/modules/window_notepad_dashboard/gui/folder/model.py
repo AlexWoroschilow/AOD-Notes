@@ -20,6 +20,10 @@ from PyQt5 import QtGui
 
 
 class NotepadDashboardTreeModel(QtGui.QStandardItemModel):
+    doneAction = QtCore.pyqtSignal(object)
+
+    current = None
+
     collection = []
 
     def fill(self, collection=None, current=None):
@@ -29,10 +33,16 @@ class NotepadDashboardTreeModel(QtGui.QStandardItemModel):
         for item in self.build(collection, current):
             self.appendRow(item)
 
+        self.doneAction.emit(self.indexFromItem(self.current))
+        return self.indexFromItem(self.current)
+
     def build(self, collection, current=None):
         for group in collection:
             item = QtGui.QStandardItem(group.name)
             item.setData(group)
+
+            if group == current:
+                self.current = item
 
             for child in self.build(group.children, current):
                 self.collection.append(child)
@@ -41,10 +51,11 @@ class NotepadDashboardTreeModel(QtGui.QStandardItemModel):
             self.collection.append(item)
             yield item
 
-    def itemFromData(self, element=None):
-        for item in self.collection:
-            if item.data() == element:
-                return item
+    def indexFromData(self, element=None):
+        # for index, item in enumerate(self.collection, start=0):
+        #     if item.data() == element:
+        #         return self.indexFromItem(item)
+        return self.createIndex(0, 0)
 
     def clear(self):
         self.collection = []
