@@ -33,6 +33,7 @@ class TextEditorWidget(QtWidgets.QFrame):
     fullscreenNoteAction = QtCore.pyqtSignal(object)
     saveNoteAction = QtCore.pyqtSignal(object)
     renameNoteAction = QtCore.pyqtSignal(object)
+    moveNoteAction = QtCore.pyqtSignal(object)
 
     def __init__(self):
         super(TextEditorWidget, self).__init__()
@@ -47,6 +48,7 @@ class TextEditorWidget(QtWidgets.QFrame):
         self.writer.cursorPositionChanged.connect(self.cursorPosition)
 
         self.group = PictureButton(QtGui.QIcon("icons/book"))
+        self.group.clicked.connect(self.moveNoteEvent)
         self.group.setIconSize(QtCore.QSize(25, 25))
 
         self.statusbar = QtWidgets.QLabel()
@@ -134,6 +136,10 @@ class TextEditorWidget(QtWidgets.QFrame):
         if self.entity is None: return self
         self.entity.name = self.label.text()
         self.renameNoteAction.emit(self.entity)
+        return self
+
+    def moveNoteEvent(self, event=None):
+        self.moveNoteAction.emit(self.entity)
         return self
 
     def fullscreenEvent(self, event=None):

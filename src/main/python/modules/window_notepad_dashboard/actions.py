@@ -60,6 +60,15 @@ class ModuleActions(object):
             status.error(ex.__str__())
 
     @inject.params(store='store', status='status')
+    def onActionMoveNote(self, entity, store, status):
+        try:
+            # store.dispatch({'type': '@@app/storage/resource/move',
+            #                 'entity': entity})
+            print(entity)
+        except Exception as ex:
+            status.error(ex.__str__())
+
+    @inject.params(store='store', status='status')
     def onActionGroup(self, entity, store, status):
         try:
 

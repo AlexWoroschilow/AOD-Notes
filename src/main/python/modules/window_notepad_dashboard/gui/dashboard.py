@@ -33,6 +33,7 @@ class NotepadDashboard(QtWidgets.QWidget):
     menuAction = QtCore.pyqtSignal(object, object)
     moveAction = QtCore.pyqtSignal(object)
     groupAction = QtCore.pyqtSignal(object)
+    moveNoteAction = QtCore.pyqtSignal(object)
 
     edit = QtCore.pyqtSignal(object)
     delete = QtCore.pyqtSignal(object)
@@ -75,8 +76,10 @@ class NotepadDashboard(QtWidgets.QWidget):
         self.splitter.saveNoteAction.connect(self.saveNoteAction.emit)
         self.splitter.selectNoteAction.connect(self.selectNoteAction.emit)
         self.splitter.renameAction.connect(self.renameAction.emit)
+        self.splitter.moveNoteAction.connect(self.moveNoteAction.emit)
         self.splitter.menuAction.connect(self.menuAction.emit)
         self.splitter.moveAction.connect(self.moveAction.emit)
+
         self.splitter.groupAction.connect(self.groupAction.emit)
 
         self.layout().addWidget(self.splitter)

@@ -57,6 +57,7 @@ class DashboardPanelRight(QtWidgets.QFrame):
     renameNoteAction = QtCore.pyqtSignal(object)
     saveNoteAction = QtCore.pyqtSignal(object)
     selectNoteAction = QtCore.pyqtSignal(object)
+    moveNoteAction = QtCore.pyqtSignal(object)
 
     def __init__(self):
         super(DashboardPanelRight, self).__init__()
@@ -73,6 +74,7 @@ class DashboardPanelRight(QtWidgets.QFrame):
         self.preview.renameNoteAction.connect(self.renameNoteAction.emit)
         self.preview.selectNoteAction.connect(self.selectNoteAction.emit)
         self.preview.saveNoteAction.connect(self.saveNoteAction.emit)
+        self.preview.moveNoteAction.connect(self.moveNoteAction.emit)
 
         self.toolbar = DashboardDocumentPreviewToolbar()
 
