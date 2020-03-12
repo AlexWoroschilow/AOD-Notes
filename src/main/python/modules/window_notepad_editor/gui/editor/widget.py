@@ -25,6 +25,9 @@ from .bar import FormatbarWidget
 from .text import TextEditor
 from .line import NameEditor
 
+from .button import PictureButtonFlat
+from .button import PictureButton
+
 
 class TextEditorWidget(QtWidgets.QFrame):
     fullscreenNoteAction = QtCore.pyqtSignal(object)
@@ -42,6 +45,9 @@ class TextEditorWidget(QtWidgets.QFrame):
 
         self.writer = TextEditor(self)
         self.writer.cursorPositionChanged.connect(self.cursorPosition)
+
+        self.group = PictureButton(QtGui.QIcon("icons/book"))
+        self.group.setIconSize(QtCore.QSize(25, 25))
 
         self.statusbar = QtWidgets.QLabel()
         self.statusbar.setAlignment(Qt.AlignCenter)
@@ -84,10 +90,11 @@ class TextEditorWidget(QtWidgets.QFrame):
 
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().addWidget(self.leftbar, 0, 0, 6, 1)
-        self.layout().addWidget(self.rightbar, 1, 2, 4, 1)
+        self.layout().addWidget(self.rightbar, 1, 3, 4, 1)
         self.layout().addWidget(self.label, 1, 1)
-        self.layout().addWidget(self.formatbar, 2, 1)
-        self.layout().addWidget(self.writer, 3, 1)
+        self.layout().addWidget(self.group, 1, 2)
+        self.layout().addWidget(self.formatbar, 2, 1, 1, 2)
+        self.layout().addWidget(self.writer, 3, 1, 1, 2)
         self.layout().addWidget(self.statusbar, 4, 1)
 
     def document(self):
