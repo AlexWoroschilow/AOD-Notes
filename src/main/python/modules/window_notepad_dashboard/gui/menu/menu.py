@@ -14,14 +14,35 @@ import os
 import platform
 import inject
 from PyQt5 import QtWidgets
+from PyQt5 import QtCore
+from PyQt5.QtCore import Qt
+
+from .action import FolderTreeAction
 
 
-class SettingsMenu(QtWidgets.QMenu):
-
+class DefaultMenu(QtWidgets.QMenu):
     @inject.params(factory='settings_factory')
     def __init__(self, parent, factory):
-        super(SettingsMenu, self).__init__(parent)
-
+        super(DefaultMenu, self).__init__(parent)
         stylesheet = 'css/{}.qss'.format(platform.system().lower())
-        if os.path.exists(stylesheet):
+        if len(stylesheet) and os.path.exists(stylesheet):
             self.setStyleSheet(stylesheet)
+
+
+class SettingsMenu(DefaultMenu):
+    pass
+
+
+class FolderTreeMenu(DefaultMenu):
+    clickedAction = QtCore.pyqtSignal(object)
+
+    def __init__(self, parent):
+        super(FolderTreeMenu, self).__init__(parent)
+
+        self.tree = FolderTreeAction(self)
+        self.tree.clickedAction.connect(self.clickedAction.emit)
+        self.addAction(self.tree)
+
+    def setFolders(self, collection, selected):
+        self.tree.setFolders(collection, selected)
+        return self

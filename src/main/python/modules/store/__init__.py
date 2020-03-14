@@ -42,39 +42,61 @@ class Loader(object):
 
     @inject.params(filesystem='store.filesystem')
     def init_store(self, state=None, action=None, filesystem=None):
-        state.document = filesystem.document()
-        state.group = filesystem.group()
+        state.document = \
+            filesystem.document()
 
-        state.documents.collection = filesystem.documents()
-        state.groups.collection = filesystem.groups()
+        state.group = \
+            filesystem.group()
+
+        state.documents.collection = \
+            filesystem.documents()
+
+        state.groups.collection = \
+            filesystem.groups()
+
         return state
 
     @inject.params(filesystem='store.filesystem')
     def update_store(self, state=None, action=None, filesystem=None):
+
         if action.get('type') == '@@app/storage/resource/selected/document':
-            state.document = action.get('entity')
+            entity = action.get('entity')
+            if entity is None: return state
+            state.document = entity
             return state
 
         if action.get('type') == '@@app/storage/resource/selected/group':
-            state.group = action.get('entity')
-            if state.group is None: return None
-            state.documents.collection = filesystem.documents(state.group)
+            entity = action.get('entity')
+            if entity is None: return state
+
+            state.documents.collection = \
+                filesystem.documents(entity)
+
+            state.group = entity
+
             return state
 
         if action.get('type') == '@@app/storage/resource/create/document':
             document = filesystem.document_create(state.group)
-            if document is None or not document: return state
-            state.documents.collection = filesystem.documents(state.group)
+            if document is None: return state
+
+            state.documents.collection = \
+                filesystem.documents(state.group)
+
             state.document = document
             return state
 
         if action.get('type') == '@@app/storage/resource/create/group':
             if state.group is None: return None
             group = filesystem.group_create(state.group)
-            if group is None or not group: return state
+            if group is None: return state
 
-            state.documents.collection = filesystem.documents(group)
-            state.groups.collection = filesystem.groups()
+            state.documents.collection = \
+                filesystem.documents(group)
+
+            state.groups.collection = \
+                filesystem.groups()
+
             state.group = group
             return state
 
@@ -84,38 +106,67 @@ class Loader(object):
 
         if action.get('type') == '@@app/storage/resource/remove':
             entity = action.get('entity')
+            if entity is None: return state
+
             filesystem.remove(entity)
 
-            state.document = filesystem.document()
-            state.documents.collection = filesystem.documents()
+            state.document = \
+                filesystem.document()
 
-            state.groups.collection = filesystem.groups()
+            state.documents.collection = \
+                filesystem.documents()
 
-            test = type("Group", (object,), {})()
-            test.path = entity.parent
-            state.group = filesystem.group(test)
+            state.groups.collection = \
+                filesystem.groups()
+
+            group = type("Group", (object,), {})()
+            group.path = entity.parent
+            state.group = filesystem.group(group)
 
             return state
 
         if action.get('type') == '@@app/storage/resource/clone':
             filesystem.clone(action.get('entity'))
-            state.document = filesystem.document()
-            state.documents.collection = filesystem.documents()
 
-            state.group = filesystem.group()
-            state.groups.collection = filesystem.groups()
+            state.group = \
+                filesystem.group()
+
+            state.groups.collection = \
+                filesystem.groups()
+
+            state.document = \
+                filesystem.document()
+
+            state.documents.collection = \
+                filesystem.documents()
 
             return state
 
         if action.get('type') == '@@app/storage/resource/move':
-            state.documents.collection = filesystem.documents()
-            state.groups.collection = filesystem.groups()
-            state.group = action.get('entity')
+
+            entity = action.get('entity')
+            if entity is None: return state
+
+            destination = action.get('destination')
+            if destination is None: return state
+
+            entity.parent = destination
+            state.group = destination
+
+            state.groups.collection = \
+                filesystem.groups()
+
+            state.documents.collection = \
+                filesystem.documents(destination)
+
             return state
 
         if action.get('type') == '@@app/storage/resource/rename':
-            state.documents.collection = filesystem.documents()
-            state.groups.collection = filesystem.groups()
+            state.groups.collection = \
+                filesystem.groups()
+
+            state.documents.collection = \
+                filesystem.documents()
 
             return state
 

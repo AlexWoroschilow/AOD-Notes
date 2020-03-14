@@ -80,7 +80,6 @@ class DashboardFolderTree(QtWidgets.QTreeView):
         self.setColumnHidden(3, True)
 
         if store is None: return None
-
         store.subscribe(self.updateStore)
 
     @inject.params(store='store')
@@ -117,8 +116,7 @@ class DashboardFolderTree(QtWidgets.QTreeView):
 
         data_current = item_current.data()
         if data_current is None: return QDropEvent.ignore()
-        data_current.parent = item_parent.data()
-        self.moveAction.emit(data_current)
+        self.moveAction.emit((data_current, item_parent.data()))
         return QDropEvent.accept()
 
     def menuEvent(self, event):

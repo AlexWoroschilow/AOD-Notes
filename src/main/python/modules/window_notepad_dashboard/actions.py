@@ -18,6 +18,9 @@ from logging import getLogger
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 
+from .gui.menu import SettingsMenu
+from .gui.menu import FolderTreeMenu
+
 
 class ModuleActions(object):
 
@@ -52,35 +55,49 @@ class ModuleActions(object):
             status.error(ex.__str__())
 
     @inject.params(store='store', status='status')
-    def onActionMove(self, entity, store, status):
+    def onActionMove(self, event, store, status):
         try:
-            store.dispatch({'type': '@@app/storage/resource/move',
-                            'entity': entity})
+
+            entity, destination = event
+            if destination is None: return None
+            if entity is None: return None
+
+            store.dispatch({
+                'type': '@@app/storage/resource/move',
+                'destination': destination,
+                'entity': entity
+            })
         except Exception as ex:
             status.error(ex.__str__())
 
-    @inject.params(store='store', status='status')
-    def onActionMoveNote(self, entity, store, status):
+    @inject.params(store='store', status='status', window='window')
+    def onActionMoveNote(self, entity, store, status, window):
         try:
-            # store.dispatch({'type': '@@app/storage/resource/move',
-            #                 'entity': entity})
-            print(entity)
+
+            state = store.get_state()
+            if state is None: return None
+
+            def moveNoteAction(note, group):
+                store.dispatch({
+                    'type': '@@app/storage/resource/move',
+                    'destination': group,
+                    'entity': note
+                })
+
+            menu = FolderTreeMenu(window)
+            menu.clickedAction.connect(lambda group: moveNoteAction(entity, group))
+            menu.clickedAction.connect(lambda group: menu.close())
+            menu.setFolders(state.groups.collection, state.group)
+            menu.exec_(QtGui.QCursor.pos())
+
         except Exception as ex:
+            print(ex)
             status.error(ex.__str__())
 
     @inject.params(store='store', status='status')
     def onActionGroup(self, entity, store, status):
         try:
-
             store.dispatch({'type': '@@app/storage/resource/selected/group',
-                            'entity': entity})
-        except Exception as ex:
-            status.error(ex.__str__())
-
-    @inject.params(store='store', status='status')
-    def onActionSaveNote(self, entity, store, status):
-        try:
-            store.dispatch({'type': '@@app/storage/resource/update/document',
                             'entity': entity})
         except Exception as ex:
             status.error(ex.__str__())
@@ -92,6 +109,14 @@ class ModuleActions(object):
                 'type': '@@app/storage/resource/selected/document',
                 'entity': entity
             })
+        except Exception as ex:
+            status.error(ex.__str__())
+
+    @inject.params(store='store', status='status')
+    def onActionSaveNote(self, entity, store, status):
+        try:
+            store.dispatch({'type': '@@app/storage/resource/update/document',
+                            'entity': entity})
         except Exception as ex:
             status.error(ex.__str__())
 
@@ -169,22 +194,20 @@ class ModuleActions(object):
         except AttributeError as ex:
             logger.exception(ex)
 
-    @inject.params(store='store')
-    def onActionContextMenu(self, event, entity, widget, store):
+    @inject.params(store='store', window='window')
+    def onActionContextMenu(self, event, entity, window, store):
 
         state = store.get_state()
         if state is None: return None
 
-        from .gui.menu import SettingsMenu
-
-        menu = SettingsMenu(widget)
+        menu = SettingsMenu(window)
         menu.addAction(QtGui.QIcon("icons/note"), 'New Document', lambda: self.onActionCreateNote(entity))
         menu.addAction(QtGui.QIcon("icons/book"), 'New Group', lambda: self.onActionCreateGroup(entity))
         menu.addSeparator()
         menu.addAction(QtGui.QIcon("icons/copy"), 'Clone', lambda: self.onActionClone(entity))
         menu.addAction(QtGui.QIcon("icons/trash"), 'Remove', lambda: self.onActionRemove(entity))
 
-        menu.exec_(widget.mapToGlobal(event))
+        menu.exec_(QtGui.QCursor.pos())
 
     @inject.params(storage='storage', config='config')
     def onActionNoteImport(self, event=None, storage=None, config=None, widget=None):

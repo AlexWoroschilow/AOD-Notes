@@ -33,7 +33,7 @@ class NotepadDashboardTreeModel(QtGui.QStandardItemModel):
         for item in self.build(collection, current):
             self.appendRow(item)
 
-        self.doneAction.emit(self.indexFromItem(self.current))
+        # self.doneAction.emit(self.indexFromItem(self.current))
         return self.indexFromItem(self.current)
 
     def build(self, collection, current=None):

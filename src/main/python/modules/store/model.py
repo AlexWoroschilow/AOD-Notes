@@ -45,3 +45,16 @@ class Storage(object):
     selections = []
     document = None
     group = None
+
+    def __getitem__(self, item):
+        if hasattr(self, item):
+            return getattr(self, item)
+        return None
+
+    def __setitem__(self, key, value):
+        return setattr(self, key, value)
+
+    def get(self, name):
+        if hasattr(self, name):
+            return getattr(self, name)
+        return {}

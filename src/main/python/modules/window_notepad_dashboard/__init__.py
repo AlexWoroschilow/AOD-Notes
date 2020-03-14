@@ -55,7 +55,7 @@ class Loader(object):
         widget.cloneNoteAction.connect(self.actions.onActionClone)
         widget.renameAction.connect(self.actions.onActionRename)
         widget.moveNoteAction.connect(self.actions.onActionMoveNote)
-        widget.menuAction.connect(functools.partial(self.actions.onActionContextMenu, widget=widget))
+        widget.menuAction.connect(self.actions.onActionContextMenu)
         widget.moveAction.connect(self.actions.onActionMove)
 
         return widget
