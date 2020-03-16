@@ -17,8 +17,11 @@ import shutil
 
 from .model import Storage
 
+from .actions import StorageActions
+
 
 class Loader(object):
+    actions = StorageActions()
 
     def __enter__(self):
         return self
@@ -26,149 +29,51 @@ class Loader(object):
     def __exit__(self, type, value, traceback):
         pass
 
-    def __construct_store(self):
-        return pydux.create_store(self.init_store, Storage())
+    def __store(self):
+        return pydux.create_store(self.actions.initAction, Storage())
 
     @property
     def enabled(self):
         return True
 
     def configure(self, binder, options, args):
-        binder.bind_to_constructor('store', self.__construct_store)
+        binder.bind_to_constructor('store', self.__store)
 
     @inject.params(store='store')
     def boot(self, options, args, store):
-        store.replace_reducer(self.update_store)
+        store.replace_reducer(self.update)
 
-    @inject.params(filesystem='store.filesystem')
-    def init_store(self, state=None, action=None, filesystem=None):
-        state.document = \
-            filesystem.document()
+    def update(self, state=None, action=None):
 
-        state.group = \
-            filesystem.group()
-
-        state.documents.collection = \
-            filesystem.documents()
-
-        state.groups.collection = \
-            filesystem.groups()
-
-        return state
-
-    @inject.params(filesystem='store.filesystem')
-    def update_store(self, state=None, action=None, filesystem=None):
+        if action.get('type') == '@@app/search/request':
+            return self.actions.searchAction(state, action)
 
         if action.get('type') == '@@app/storage/resource/selected/document':
-            entity = action.get('entity')
-            if entity is None: return state
-            state.document = entity
-            return state
+            return self.actions.selectDocumentEvent(state, action)
 
         if action.get('type') == '@@app/storage/resource/selected/group':
-            entity = action.get('entity')
-            if entity is None: return state
-
-            state.documents.collection = \
-                filesystem.documents(entity)
-
-            state.group = entity
-
-            return state
+            return self.actions.selectGroupEvent(state, action)
 
         if action.get('type') == '@@app/storage/resource/create/document':
-            document = filesystem.document_create(state.group)
-            if document is None: return state
-
-            state.documents.collection = \
-                filesystem.documents(state.group)
-
-            state.document = document
-            return state
+            return self.actions.createDocumentEvent(state, action)
 
         if action.get('type') == '@@app/storage/resource/create/group':
-            if state.group is None: return None
-            group = filesystem.group_create(state.group)
-            if group is None: return state
-
-            state.documents.collection = \
-                filesystem.documents(group)
-
-            state.groups.collection = \
-                filesystem.groups()
-
-            state.group = group
-            return state
+            return self.actions.createGroupEvent(state, action)
 
         if action.get('type') == '@@app/storage/resource/update/document':
-            print('update', action.get('entity'))
-            return state
+            return self.actions.updateDocumentEvent(state, action)
 
         if action.get('type') == '@@app/storage/resource/remove':
-            entity = action.get('entity')
-            if entity is None: return state
-
-            filesystem.remove(entity)
-
-            state.document = \
-                filesystem.document()
-
-            state.documents.collection = \
-                filesystem.documents()
-
-            state.groups.collection = \
-                filesystem.groups()
-
-            group = type("Group", (object,), {})()
-            group.path = entity.parent
-            state.group = filesystem.group(group)
-
-            return state
+            return self.actions.removeResourceEvent(state, action)
 
         if action.get('type') == '@@app/storage/resource/clone':
-            filesystem.clone(action.get('entity'))
-
-            state.group = \
-                filesystem.group()
-
-            state.groups.collection = \
-                filesystem.groups()
-
-            state.document = \
-                filesystem.document()
-
-            state.documents.collection = \
-                filesystem.documents()
-
-            return state
+            return self.actions.cloneResourceEvent(state, action)
 
         if action.get('type') == '@@app/storage/resource/move':
-
-            entity = action.get('entity')
-            if entity is None: return state
-
-            destination = action.get('destination')
-            if destination is None: return state
-
-            entity.parent = destination
-            state.group = destination
-
-            state.groups.collection = \
-                filesystem.groups()
-
-            state.documents.collection = \
-                filesystem.documents(destination)
-
-            return state
+            return self.actions.moveResourceEvent(state, action)
 
         if action.get('type') == '@@app/storage/resource/rename':
-            state.groups.collection = \
-                filesystem.groups()
-
-            state.documents.collection = \
-                filesystem.documents()
-
-            return state
+            return self.actions.renameResourceEvent(state, action)
 
         return state
 

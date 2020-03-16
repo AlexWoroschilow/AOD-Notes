@@ -25,6 +25,16 @@ from .gui.menu import FolderTreeMenu
 class ModuleActions(object):
 
     @inject.params(store='store', status='status')
+    def onActionSearch(self, string, store, status):
+        try:
+            store.dispatch({
+                'type': '@@app/search/request',
+                'string': string
+            })
+        except Exception as ex:
+            status.error(ex.__str__())
+
+    @inject.params(store='store', status='status')
     def onActionCreateNote(self, event, store, status):
         try:
             store.dispatch({'type': '@@app/storage/resource/create/document'})

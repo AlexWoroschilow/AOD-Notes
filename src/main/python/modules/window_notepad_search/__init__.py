@@ -16,6 +16,7 @@ import functools
 
 from .actions import ModuleActions
 from .gui.settings.search import WidgetSettingsSearch
+from .gui.preview.list import PreviewScrollArea
 
 
 class Loader(object):
@@ -27,21 +28,34 @@ class Loader(object):
     def __exit__(self, type, value, traceback):
         pass
 
-    @inject.params(config='config')
-    def _widget_settings_search(self, options, args, config):
-        return WidgetSettingsSearch()
-
     def enabled(self, options=None, args=None):
         return options.console is None
 
-    @inject.params(dashboard='notepad.dashboard', factory='settings_factory')
-    def boot(self, options=None, args=None, dashboard=None, factory=None):
-        dashboard.createdAction.connect(self.actions.onNoteCreated)
-        dashboard.updatedAction.connect(self.actions.onNoteUpdated)
-        dashboard.searchAction.connect(self.actions.onActionSearchRequest)
-        dashboard.removedAction.connect(self.actions.onNoteRemoved)
+    @inject.params(store='store', factory='settings_factory')
+    def boot(self, options=None, args=None, store=None, factory=None):
+        """
 
-        factory.addWidget(functools.partial(
-            self._widget_settings_search,
-            options=options, args=args
-        ))
+        :param options:
+        :param args:
+        :param store:
+        :param factory:
+        :return:
+        """
+        factory.addWidget(WidgetSettingsSearch)
+
+        store.subscribe(self.searchEvent)
+
+    @inject.params(search='search', storage='storage', window='window')
+    def searchEvent(self, text=None, search=None, storage=None, window=None):
+        if not len(text): return None
+
+        preview = PreviewScrollArea(window)
+        preview.editAction.connect(self.actions.onActionEditRequest)
+
+        for index, path in enumerate(search.search(text), start=1):
+            preview.addPreview(storage.index(path))
+
+        title = text if len(text) <= 25 else \
+            "{}...".format(text[0:22])
+
+        window.tab.emit((preview, title))

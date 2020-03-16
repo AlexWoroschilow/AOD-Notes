@@ -53,6 +53,7 @@ class Loader(object):
         widget.menuAction.connect(self.actions.onActionContextMenu)
         widget.moveAction.connect(self.actions.onActionMove)
         widget.updateAction.connect(self.actions.onActionUpdate)
+        widget.searchAction.connect(self.actions.onActionSearch)
 
         return widget
 

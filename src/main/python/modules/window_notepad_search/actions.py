@@ -13,54 +13,21 @@
 import inject
 from logging import getLogger
 
-# from .gui.preview.widget import PreviewScrollArea
-from .gui.preview.list import PreviewScrollArea
-
 
 class ModuleActions(object):
 
-    @inject.params(search='search', storage='storage', window='window', status='status')
-    def onActionSearchRequest(self, widget=None, search=None, storage=None, window=None, status=None):
-
-        text = widget.text()
-        if len(text) == 0:
-            return None
-
-        preview = PreviewScrollArea(window)
-        preview.editAction.connect(self.onActionEditRequest)
-
-        index = 0
-        for index, path in enumerate(search.search(widget.text()), start=1):
-            preview.addPreview(storage.index(path))
-
-        status.info("Search request: '{}', {} records found".format(text, index))
-
-        title = text if len(text) <= 25 else \
-            "{}...".format(text[0:22])
-
-        window.tab.emit((preview, title))
-
-    @inject.params(storage='storage', window='window', dashboard='notepad.dashboard')
-    def onActionEditRequest(self, index, storage, window, dashboard):
+    @inject.params(store='store', window='window')
+    def onActionEditRequest(self, entity, store, window):
         try:
 
-            if index is None: return None
+            print(entity)
 
-            if storage.isDir(index):
-                dashboard.group(index)
-                window.tabSwitch.emit(0)
-                return None
-
-            if storage.isFile(index):
-                dashboard.note(index)
-                window.tabSwitch.emit(0)
-                return None
-
+            window.tabSwitch.emit(0)
             return None
 
         except Exception as ex:
-            logger = getLogger('search')
-            logger.exception(ex)
+            getLogger('search') \
+                .exception(ex)
 
     @inject.params(storage='storage', search='search')
     def onNoteCreated(self, index, storage, search):

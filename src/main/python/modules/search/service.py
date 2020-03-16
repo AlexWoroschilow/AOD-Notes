@@ -11,6 +11,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
+import shutil
 
 from bs4 import BeautifulSoup
 from whoosh.fields import Schema, TEXT, ID
@@ -33,7 +34,7 @@ class Search(object):
         )
 
         if not os.path.exists(self.destination):
-            os.mkdir(self.destination)
+            os.makedirs(self.destination, exist_ok=True)
 
         if not self.exists(self.destination):
             return self.create(self.destination)
