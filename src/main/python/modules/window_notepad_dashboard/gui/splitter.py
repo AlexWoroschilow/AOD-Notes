@@ -38,10 +38,10 @@ class NotepadDashboardSplitter(QtWidgets.QSplitter):
     groupAction = QtCore.pyqtSignal(object)
     moveNoteAction = QtCore.pyqtSignal(object)
 
-    settings = QtCore.pyqtSignal(object)
+    settingsAction = QtCore.pyqtSignal(object)
+    searchAction = QtCore.pyqtSignal(object)
 
     saveAction = QtCore.pyqtSignal(object)
-    search = QtCore.pyqtSignal(object)
 
     storage = QtCore.pyqtSignal(object)
     storage_changed = QtCore.pyqtSignal(object)
@@ -64,7 +64,6 @@ class NotepadDashboardSplitter(QtWidgets.QSplitter):
 
         self.panelRight = DashboardPanelRight()
         self.panelRight.fullscreenNoteAction.connect(self.fullscreenNoteAction.emit)
-        self.panelRight.fullscreenNoteAction.connect(lambda x: print(x))
         self.panelRight.editNoteAction.connect(self.editNoteAction.emit)
         self.panelRight.removeNoteAction.connect(self.removeNoteAction.emit)
         self.panelRight.renameNoteAction.connect(self.renameNoteAction.emit)
@@ -72,6 +71,8 @@ class NotepadDashboardSplitter(QtWidgets.QSplitter):
         self.panelRight.selectNoteAction.connect(self.selectNoteAction.emit)
         self.panelRight.saveNoteAction.connect(self.saveNoteAction.emit)
         self.panelRight.moveNoteAction.connect(self.moveNoteAction.emit)
+        self.panelRight.settingsAction.connect(self.settingsAction.emit)
+        self.panelRight.searchAction.connect(self.searchAction.emit)
 
         self.addWidget(self.panelLeft)
         self.addWidget(self.panelRight)
@@ -82,7 +83,8 @@ class NotepadDashboardSplitter(QtWidgets.QSplitter):
         self.setStretchFactor(0, 1)
         self.setStretchFactor(1, 2)
 
-    def note(self, index=None, storage=None):
+    def setFolders(self, collection, selected):
+        self.panelLeft.setFolders(collection, selected)
         return self
 
     def close(self):

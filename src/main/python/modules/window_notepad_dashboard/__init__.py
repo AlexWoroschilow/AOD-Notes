@@ -16,6 +16,7 @@ import functools
 from .actions import ModuleActions
 
 from .gui.dashboard import NotepadDashboard
+from .gui.tab import Notepad
 
 
 class Loader(object):
@@ -27,20 +28,14 @@ class Loader(object):
     def __exit__(self, type, value, traceback):
         pass
 
-    @inject.params(config='config', dashboard='notepad.dashboard')
-    def _notepad_tab(self, config=None, dashboard=None):
-        if dashboard is None:
-            return None
+    @inject.params(dashboard='notepad.dashboard')
+    def _notepad_tab(self, dashboard=None):
+        widget = Notepad()
+        widget.addTab(dashboard, 'Dashboard')
 
-        from .gui.tab import Notepad
+        return widget
 
-        content = Notepad()
-        content.addTab(dashboard, content.tr('Dashboard'))
-
-        return content
-
-    @inject.params(config='config', storage='storage')
-    def _notepad_dashboard(self, config, storage, binder):
+    def _notepad_dashboard(self, binder):
         widget = NotepadDashboard()
         widget.newNoteAction.connect(self.actions.onActionCreateNote)
         widget.newGroupAction.connect(self.actions.onActionCreateGroup)
@@ -57,6 +52,7 @@ class Loader(object):
         widget.moveNoteAction.connect(self.actions.onActionMoveNote)
         widget.menuAction.connect(self.actions.onActionContextMenu)
         widget.moveAction.connect(self.actions.onActionMove)
+        widget.updateAction.connect(self.actions.onActionUpdate)
 
         return widget
 
@@ -69,6 +65,6 @@ class Loader(object):
             self._notepad_dashboard, binder=binder
         ))
 
-    @inject.params(dashboard='notepad.dashboard')
-    def boot(self, options=None, args=None, dashboard=None):
-        pass
+    @inject.params(store='store', dashboard='notepad.dashboard')
+    def boot(self, options=None, args=None, store=None, dashboard=None):
+        store.subscribe(dashboard.updateAction.emit)

@@ -34,28 +34,12 @@ class NotepadDashboard(QtWidgets.QWidget):
     moveAction = QtCore.pyqtSignal(object)
     groupAction = QtCore.pyqtSignal(object)
     moveNoteAction = QtCore.pyqtSignal(object)
-
-    edit = QtCore.pyqtSignal(object)
-    delete = QtCore.pyqtSignal(object)
-    clone = QtCore.pyqtSignal(object)
-
-    created = QtCore.pyqtSignal(object)
-    removed = QtCore.pyqtSignal(object)
-    updated = QtCore.pyqtSignal(object)
-
-    note_new = QtCore.pyqtSignal(object)
-    note_import = QtCore.pyqtSignal(object)
-    group_new = QtCore.pyqtSignal(object)
-
-    settings = QtCore.pyqtSignal(object)
-
-    saveAction = QtCore.pyqtSignal(object)
-    search = QtCore.pyqtSignal(object)
-
-    storage = QtCore.pyqtSignal(object)
-    storage_changed = QtCore.pyqtSignal(object)
-
-    fullscreen = QtCore.pyqtSignal(object)
+    updateAction = QtCore.pyqtSignal()
+    settingsAction = QtCore.pyqtSignal(object)
+    searchAction = QtCore.pyqtSignal(object)
+    createdAction = QtCore.pyqtSignal(object)
+    removedAction = QtCore.pyqtSignal(object)
+    updatedAction = QtCore.pyqtSignal(object)
 
     def __init__(self):
         super(NotepadDashboard, self).__init__()
@@ -79,11 +63,16 @@ class NotepadDashboard(QtWidgets.QWidget):
         self.splitter.moveNoteAction.connect(self.moveNoteAction.emit)
         self.splitter.menuAction.connect(self.menuAction.emit)
         self.splitter.moveAction.connect(self.moveAction.emit)
-
         self.splitter.groupAction.connect(self.groupAction.emit)
+        self.splitter.settingsAction.connect(self.settingsAction.emit)
+        self.splitter.searchAction.connect(self.searchAction.emit)
 
         self.layout().addWidget(self.splitter)
         self.layout().addWidget(self.toolbar)
+
+    def setFolders(self, collection, selected):
+        self.splitter.setFolders(collection, selected)
+        return self
 
     def note(self, index=None, storage=None):
         return self

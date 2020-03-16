@@ -49,8 +49,7 @@ class DashboardFolderTree(QtWidgets.QTreeView):
     moveAction = QtCore.pyqtSignal(object)
     menuAction = QtCore.pyqtSignal(object, object)
 
-    @inject.params(store='store')
-    def __init__(self, store):
+    def __init__(self):
         super(DashboardFolderTree, self).__init__()
         self.setEditTriggers(QtWidgets.QAbstractItemView.EditKeyPressed)
         self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
@@ -79,29 +78,14 @@ class DashboardFolderTree(QtWidgets.QTreeView):
         self.setColumnHidden(2, True)
         self.setColumnHidden(3, True)
 
-        if store is None: return None
-        store.subscribe(self.updateStore)
+    def setFolders(self, collection, selected):
+        index = self.model(). \
+            setFolders(collection, selected)
 
-    @inject.params(store='store')
-    def updateStore(self, store=None):
-
-        state = store.get_state()
-        if state is None: return None
-
-        groups = state.groups
-        if not groups.fresh:
-            return None
-
-        model = self.model()
-        if model is None:
-            return None
-
-        current = model.fill(groups.collection, state.group)
         self.expandAll()
 
-        if current is None: return None
-        self.setCurrentIndex(current)
-        self.scrollTo(self.indexBelow(current))
+        self.setCurrentIndex(index)
+        self.scrollTo(self.indexBelow(index))
 
     def dragEnterEvent(self, QDragEnterEvent):
         return QDragEnterEvent.acceptProposedAction()

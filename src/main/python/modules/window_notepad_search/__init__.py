@@ -15,6 +15,7 @@ import inject
 import functools
 
 from .actions import ModuleActions
+from .gui.settings.search import WidgetSettingsSearch
 
 
 class Loader(object):
@@ -28,20 +29,17 @@ class Loader(object):
 
     @inject.params(config='config')
     def _widget_settings_search(self, options, args, config):
-        from .gui.settings.search import WidgetSettingsSearch
-        widget = WidgetSettingsSearch()
-
-        return widget
+        return WidgetSettingsSearch()
 
     def enabled(self, options=None, args=None):
         return options.console is None
 
     @inject.params(dashboard='notepad.dashboard', factory='settings_factory')
     def boot(self, options=None, args=None, dashboard=None, factory=None):
-        dashboard.created.connect(self.actions.onNoteCreated)
-        dashboard.updated.connect(self.actions.onNoteUpdated)
-        dashboard.search.connect(self.actions.onActionSearchRequest)
-        dashboard.removed.connect(self.actions.onNoteRemoved)
+        dashboard.createdAction.connect(self.actions.onNoteCreated)
+        dashboard.updatedAction.connect(self.actions.onNoteUpdated)
+        dashboard.searchAction.connect(self.actions.onActionSearchRequest)
+        dashboard.removedAction.connect(self.actions.onNoteRemoved)
 
         factory.addWidget(functools.partial(
             self._widget_settings_search,

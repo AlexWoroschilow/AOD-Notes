@@ -25,8 +25,8 @@ from .button import ButtonDisabled
 
 
 class DashboardDocumentPreviewToolbar(QtWidgets.QFrame):
-    settings = QtCore.pyqtSignal(object)
-    search = QtCore.pyqtSignal(object)
+    settingsAction = QtCore.pyqtSignal(object)
+    searchAction = QtCore.pyqtSignal(object)
 
     def __init__(self):
         super(DashboardDocumentPreviewToolbar, self).__init__()
@@ -41,39 +41,42 @@ class DashboardDocumentPreviewToolbar(QtWidgets.QFrame):
         self.spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
         self.layout.addWidget(self.spacer)
 
-        self.text_search = SearchField()
-        self.text_search.returnPressed.connect(lambda event=None: self.search.emit(self.text_search))
-        self.text_search.returnPressed.connect(self.text_search.clearFocus)
-        self.layout.addWidget(self.text_search)
+        self.search = SearchField()
+        self.search.returnPressed.connect(self.searchEvent)
+        self.layout.addWidget(self.search)
 
-        shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+f"), self.text_search)
-        shortcut.activatedAmbiguously.connect(self.text_search.setFocus)
-        shortcut.activated.connect(self.text_search.setFocus)
+        shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+f"), self.search)
+        shortcut.activatedAmbiguously.connect(self.search.setFocus)
+        shortcut.activated.connect(self.search.setFocus)
         shortcut.setEnabled(True)
 
-        shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Esc"), self.text_search)
-        shortcut.activated.connect(lambda event=None: self.text_search.setText(None))
-        shortcut.activatedAmbiguously.connect(self.text_search.clearFocus)
-        shortcut.activated.connect(self.text_search.clearFocus)
+        shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Esc"), self.search)
+        shortcut.activated.connect(lambda event=None: self.search.setText(None))
+        shortcut.activatedAmbiguously.connect(self.search.clearFocus)
+        shortcut.activated.connect(self.search.clearFocus)
 
-        self.text_search.focusInEvent = self.on_search_focus_in
-        self.text_search.focusOutEvent = self.on_search_focus_out
+        self.search.focusInEvent = self.searchFocusIn
+        self.search.focusOutEvent = self.searchFocusOut
 
         tooltip = 'Create new note. The new note will be created as a part of the selected group or in the root group.'
         self.button_settings = PictureButtonFlat(QtGui.QIcon("icons/icons"), tooltip)
-        self.button_settings.clicked.connect(lambda event=None: self.settings.emit(self.button_settings))
+        self.button_settings.clicked.connect(self.settingsAction.emit)
         self.button_settings.setFlat(True)
         self.layout.addWidget(self.button_settings)
 
         self.setLayout(self.layout)
 
-    def on_search_focus_in(self, event):
-        self.text_search.setAlignment(Qt.AlignCenter)
+    def searchEvent(self, event=None):
+        self.searchAction.emit(self.search.text())
+        self.search.clearFocus()
+
+    def searchFocusIn(self, event=None):
+        self.search.setAlignment(Qt.AlignCenter)
         self.spacer.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         self.spacer.setVisible(False)
 
-    def on_search_focus_out(self, event):
-        self.text_search.setAlignment(Qt.AlignLeft)
+    def searchFocusOut(self, event=None):
+        self.search.setAlignment(Qt.AlignLeft)
         self.spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
         self.spacer.setVisible(True)
 

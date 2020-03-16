@@ -15,6 +15,8 @@ import functools
 
 from .actions import ModuleActions
 
+from .settings import SettingsFactory
+
 
 class Loader(object):
     actions = ModuleActions()
@@ -29,11 +31,10 @@ class Loader(object):
         return options.console is None
 
     def configure(self, binder, options, args):
-        from .settings import SettingsFactory
         binder.bind('settings_factory', SettingsFactory())
 
     @inject.params(dashboard='notepad.dashboard')
     def boot(self, options, args, dashboard):
-        dashboard.settings.connect(functools.partial(
+        dashboard.settingsAction.connect(functools.partial(
             self.actions.onActionSettings, widget=dashboard
         ))

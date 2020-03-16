@@ -70,6 +70,22 @@ class ModuleActions(object):
         except Exception as ex:
             status.error(ex.__str__())
 
+    @inject.params(store='store', widget='notepad.dashboard')
+    def onActionUpdate(self, store, widget):
+        try:
+
+            state = store.get_state()
+            if state is None: return None
+
+            groups = state.groups
+            if not groups.fresh:
+                return None
+
+            widget.setFolders(groups.collection, state.group)
+
+        except Exception as ex:
+            print(ex)
+
     @inject.params(store='store', status='status', window='window')
     def onActionMoveNote(self, entity, store, status, window):
         try:

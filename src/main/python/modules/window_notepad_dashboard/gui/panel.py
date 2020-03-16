@@ -44,6 +44,10 @@ class DashboardPanelLeft(QtWidgets.QFrame):
 
         self.layout().addWidget(self.tree)
 
+    def setFolders(self, collection, selected):
+        self.tree.setFolders(collection, selected)
+        return self
+
     def close(self):
         super(DashboardPanelLeft, self).deleteLater()
         return super(DashboardPanelLeft, self).close()
@@ -58,6 +62,8 @@ class DashboardPanelRight(QtWidgets.QFrame):
     saveNoteAction = QtCore.pyqtSignal(object)
     selectNoteAction = QtCore.pyqtSignal(object)
     moveNoteAction = QtCore.pyqtSignal(object)
+    settingsAction = QtCore.pyqtSignal(object)
+    searchAction = QtCore.pyqtSignal(object)
 
     def __init__(self):
         super(DashboardPanelRight, self).__init__()
@@ -77,6 +83,8 @@ class DashboardPanelRight(QtWidgets.QFrame):
         self.preview.moveNoteAction.connect(self.moveNoteAction.emit)
 
         self.toolbar = DashboardDocumentPreviewToolbar()
+        self.toolbar.settingsAction.connect(self.settingsAction.emit)
+        self.toolbar.searchAction.connect(self.searchAction.emit)
 
         self.layout().addWidget(self.toolbar)
         self.layout().addWidget(self.preview)
