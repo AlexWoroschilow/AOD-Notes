@@ -44,14 +44,9 @@ class FolderTree(QtWidgets.QTreeView):
         self.setColumnHidden(2, True)
         self.setColumnHidden(3, True)
 
-    def setFolders(self, collection, selected):
-        index = self.model(). \
-            setFolders(collection, selected)
-
+    def setModel(self, model):
+        super(FolderTree, self).setModel(model)
         self.expandAll()
-
-        self.setCurrentIndex(index)
-        self.scrollTo(self.indexBelow(index))
 
     def clickedEvent(self, index=None):
         if index is None: return None

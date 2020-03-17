@@ -22,63 +22,72 @@ class StorageActions(object):
 
     @inject.params(filesystem='store.filesystem')
     def initAction(self, state, action, filesystem):
-        state.document = \
-            filesystem.document()
-
-        state.group = \
-            filesystem.group()
-
-        state.documents.collection = \
-            filesystem.documents()
-
-        state.groups.collection = \
-            filesystem.groups()
-
-        return state
+        return {
+            'document': filesystem.document(),
+            'documents': filesystem.documents(),
+            'group': filesystem.group(),
+            'groups': filesystem.groups(),
+        }
 
     @inject.params(search='search')
-    def searchAction(self, state, action):
+    def searchAction(self, state, action, search):
         print(action.get('string'))
         return state
 
     @inject.params(filesystem='store.filesystem')
     def selectDocumentEvent(self, state, action, filesystem):
-        state.document = action.get('entity')
-        return state
+        entity = action.get('entity')
+        if entity is None:
+            return state
+
+        group = type("Group", (object,), {})()
+        group.path = entity.parent
+
+        return {
+            'group': filesystem.group(group),
+            'document': entity,
+        }
 
     @inject.params(filesystem='store.filesystem')
     def selectGroupEvent(self, state, action, filesystem):
-        state.group = action.get('entity')
+        group = action.get('entity')
+        if group is None:
+            return state
 
-        state.documents.collection = \
-            filesystem.documents(state.group)
-
-        return state
+        return {
+            'groups': filesystem.groups(),
+            'documents': filesystem.documents(group),
+            'group': group
+        }
 
     @inject.params(filesystem='store.filesystem')
     def createDocumentEvent(self, state, action, filesystem):
-        document = filesystem. \
-            document_create(state.group)
+        group = state['group']
+        if group is None:
+            return state
 
-        state.documents.collection = \
-            filesystem.documents(state.group)
-
-        state.document = document
-        return state
+        return {
+            'document': filesystem.document_create(group),
+            'documents': filesystem.documents(group),
+            'group': filesystem.group(group)
+        }
 
     @inject.params(filesystem='store.filesystem')
     def createGroupEvent(self, state, action, filesystem):
-        group = filesystem. \
-            group_create(state.group)
 
-        state.documents.collection = \
-            filesystem.documents(group)
+        group = state['group']
+        if group is None:
+            return state
 
-        state.groups.collection = \
-            filesystem.groups()
+        group = filesystem.group_create(group)
+        if group is None:
+            return state
 
-        state.group = group
-        return state
+        return {
+            'groups': filesystem.groups(),
+            'documents': filesystem.documents(group),
+            'group': group
+        }
 
     @inject.params(filesystem='store.filesystem')
     def updateDocumentEvent(self, state, action, filesystem):
@@ -87,68 +96,63 @@ class StorageActions(object):
     @inject.params(filesystem='store.filesystem')
     def removeResourceEvent(self, state, action, filesystem):
         entity = action.get('entity')
+        if entity is None:
+            return state
 
         filesystem.remove(entity)
 
-        state.groups.collection = \
-            filesystem.groups()
-
-        state.document = \
-            filesystem.document()
-
         group = type("Group", (object,), {})()
         group.path = entity.parent
-        state.group = filesystem.group(group)
 
-        state.documents.collection = \
-            filesystem.documents()
-
-        return state
+        return {
+            'groups': filesystem.groups(),
+            'documents': filesystem.documents(group),
+            'document': filesystem.document(),
+            'group': filesystem.group(group)
+        }
 
     @inject.params(filesystem='store.filesystem')
     def cloneResourceEvent(self, state, action, filesystem):
-        filesystem.clone(action.get('entity'))
+        entity = action.get('entity')
+        if entity is None:
+            return state
 
-        state.group = \
-            filesystem.group()
+        filesystem.clone(entity)
 
-        state.groups.collection = \
-            filesystem.groups()
+        group = type("Group", (object,), {})()
+        group.path = entity.parent
 
-        state.document = \
-            filesystem.document()
-
-        state.documents.collection = \
-            filesystem.documents()
-
-        return state
+        return {
+            'groups': filesystem.groups(),
+            'documents': filesystem.documents(group),
+            'document': filesystem.document(),
+            'group': filesystem.group(group)
+        }
 
     @inject.params(filesystem='store.filesystem')
     def moveResourceEvent(self, state, action, filesystem):
-
         entity = action.get('entity')
-        if entity is None: return state
+        if entity is None:
+            return state
 
         destination = action.get('destination')
-        if destination is None: return state
+        if destination is None:
+            return state
 
         entity.parent = destination
-        state.group = destination
 
-        state.groups.collection = \
-            filesystem.groups()
-
-        state.documents.collection = \
-            filesystem.documents(destination)
-
-        return state
+        return {
+            'groups': filesystem.groups(),
+            'documents': filesystem.documents(destination),
+            'document': filesystem.document(),
+            'group': filesystem.group(destination)
+        }
 
     @inject.params(filesystem='store.filesystem')
     def renameResourceEvent(self, state, action, filesystem):
-        state.groups.collection = \
-            filesystem.groups()
-
-        state.documents.collection = \
-            filesystem.documents()
-
-        return state
+        return {
+            'groups': filesystem.groups(),
+            'documents': filesystem.documents(),
+            'document': filesystem.document(),
+            'group': filesystem.group()
+        }

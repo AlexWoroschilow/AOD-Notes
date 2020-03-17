@@ -24,10 +24,14 @@ class NotepadDashboardTreeModel(QtGui.QStandardItemModel):
 
     def setFolders(self, collection=None, current=None):
 
-        self.clear()
+        if collection is not None:
+            self.clear()
 
-        for item in self.buildFolder(collection, current):
-            self.appendRow(item)
+            for item in self.buildFolder(collection, current):
+                self.appendRow(item)
+
+        if current is None:
+            return None
 
         return self.indexFromItem(self.current)
 

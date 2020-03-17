@@ -87,6 +87,10 @@ class NotepadDashboardSplitter(QtWidgets.QSplitter):
         self.panelLeft.setFolders(collection, selected)
         return self
 
+    def setDocuments(self, collection, selected):
+        self.panelRight.setDocuments(collection, selected)
+        return self
+
     def close(self):
         super(NotepadDashboardSplitter, self).deleteLater()
         return super(NotepadDashboardSplitter, self).close()

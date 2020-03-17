@@ -43,6 +43,5 @@ class FolderTreeMenu(DefaultMenu):
         self.tree.clickedAction.connect(self.clickedAction.emit)
         self.addAction(self.tree)
 
-    def setFolders(self, collection, selected):
-        self.tree.setFolders(collection, selected)
-        return self
+    def setModel(self, model):
+        self.tree.setModel(model)

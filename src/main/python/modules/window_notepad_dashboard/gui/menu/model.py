@@ -21,11 +21,15 @@ class FolderTreeModel(QtGui.QStandardItemModel):
 
     def setFolders(self, collection=None, selected=None):
 
-        self.clear()
+        if collection is not None:
+            self.clear()
 
-        for item in self.buildFolder(collection, selected):
-            self.appendRow(item)
+            for item in self.buildFolder(collection, selected):
+                self.appendRow(item)
 
+        if selected is None:
+            return None
+        
         return self.indexFromItem(self.selected)
 
     def buildFolder(self, collection, selected=None):

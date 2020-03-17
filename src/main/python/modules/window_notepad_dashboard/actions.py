@@ -24,146 +24,130 @@ from .gui.menu import FolderTreeMenu
 
 class ModuleActions(object):
 
-    @inject.params(store='store', status='status')
-    def onActionSearch(self, string, store, status):
-        try:
-            store.dispatch({
-                'type': '@@app/search/request',
-                'string': string
-            })
-        except Exception as ex:
-            status.error(ex.__str__())
+    @inject.params(store='store')
+    def onActionSearch(self, string, store):
+        store.dispatch({
+            'type': '@@app/search/request',
+            'string': string
+        })
 
-    @inject.params(store='store', status='status')
-    def onActionCreateNote(self, event, store, status):
-        try:
-            store.dispatch({'type': '@@app/storage/resource/create/document'})
-        except Exception as ex:
-            status.error(ex.__str__())
+    @inject.params(store='store')
+    def onActionCreateNote(self, event, store):
+        store.dispatch({
+            'type': '@@app/storage/resource/create/document'
+        })
 
-    @inject.params(store='store', status='status')
-    def onActionCreateGroup(self, event, store, status):
-        try:
-            store.dispatch({'type': '@@app/storage/resource/create/group'})
-        except Exception as ex:
-            status.error(ex.__str__())
+    @inject.params(store='store')
+    def onActionCreateGroup(self, event, store):
+        store.dispatch({
+            'type': '@@app/storage/resource/create/group'
+        })
 
-    @inject.params(store='store', status='status')
-    def onActionClone(self, entity, store, status):
-        try:
-            store.dispatch({'type': '@@app/storage/resource/clone',
-                            'entity': entity})
-        except Exception as ex:
-            status.error(ex.__str__())
+    @inject.params(store='store')
+    def onActionClone(self, entity, store):
+        store.dispatch({
+            'type': '@@app/storage/resource/clone',
+            'entity': entity
+        })
 
-    @inject.params(store='store', status='status')
-    def onActionRename(self, entity, store, status):
-        try:
-            store.dispatch({'type': '@@app/storage/resource/rename',
-                            'entity': entity})
-        except Exception as ex:
-            status.error(ex.__str__())
+    @inject.params(store='store')
+    def onActionRename(self, entity, store):
+        store.dispatch({
+            'type': '@@app/storage/resource/rename',
+            'entity': entity
+        })
 
-    @inject.params(store='store', status='status')
-    def onActionMove(self, event, store, status):
-        try:
+    @inject.params(store='store')
+    def onActionMove(self, event, store):
 
-            entity, destination = event
-            if destination is None: return None
-            if entity is None: return None
+        entity, destination = event
+        if destination is None: return None
+        if entity is None: return None
 
-            store.dispatch({
-                'type': '@@app/storage/resource/move',
-                'destination': destination,
-                'entity': entity
-            })
-        except Exception as ex:
-            status.error(ex.__str__())
+        store.dispatch({
+            'type': '@@app/storage/resource/move',
+            'destination': destination,
+            'entity': entity
+        })
 
     @inject.params(store='store', widget='notepad.dashboard')
     def onActionUpdate(self, store, widget):
-        try:
 
-            state = store.get_state()
-            if state is None: return None
+        state = store.get_state()
+        if state is None: return None
 
-            groups = state.groups
-            if not groups.fresh:
-                return None
+        group = state['group'] \
+            if 'group' in state.keys() \
+            else None
 
-            widget.setFolders(groups.collection, state.group)
+        groups = state['groups'] \
+            if 'groups' in state.keys() \
+            else None
 
-        except Exception as ex:
-            print(ex)
+        widget.setFolders(groups, group)
 
-    @inject.params(store='store', status='status', window='window')
-    def onActionMoveNote(self, entity, store, status, window):
-        try:
+        document = state['document'] \
+            if 'document' in state.keys() \
+            else None
 
-            state = store.get_state()
-            if state is None: return None
+        documents = state['documents'] \
+            if 'documents' in state.keys() \
+            else None
 
-            def moveNoteAction(note, group):
-                store.dispatch({
-                    'type': '@@app/storage/resource/move',
-                    'destination': group,
-                    'entity': note
-                })
+        widget.setDocuments(documents, document)
 
-            menu = FolderTreeMenu(window)
-            menu.clickedAction.connect(lambda group: moveNoteAction(entity, group))
-            menu.clickedAction.connect(lambda group: menu.close())
-            menu.setFolders(state.groups.collection, state.group)
-            menu.exec_(QtGui.QCursor.pos())
+    @inject.params(store='store', dashboard='notepad.dashboard')
+    def onActionMoveNote(self, entity, store, dashboard):
+        state = store.get_state()
+        if state is None:
+            return None
 
-        except Exception as ex:
-            print(ex)
-            status.error(ex.__str__())
-
-    @inject.params(store='store', status='status')
-    def onActionGroup(self, entity, store, status):
-        try:
-            store.dispatch({'type': '@@app/storage/resource/selected/group',
-                            'entity': entity})
-        except Exception as ex:
-            status.error(ex.__str__())
-
-    @inject.params(store='store', status='status')
-    def onActionSelectNote(self, entity, store, status):
-        try:
+        def moveNoteAction(note, group):
             store.dispatch({
-                'type': '@@app/storage/resource/selected/document',
-                'entity': entity
+                'type': '@@app/storage/resource/move',
+                'destination': group,
+                'entity': note
             })
-        except Exception as ex:
-            status.error(ex.__str__())
 
-    @inject.params(store='store', status='status')
-    def onActionSaveNote(self, entity, store, status):
-        try:
-            store.dispatch({'type': '@@app/storage/resource/update/document',
-                            'entity': entity})
-        except Exception as ex:
-            status.error(ex.__str__())
+        menu = FolderTreeMenu(dashboard)
+        menu.clickedAction.connect(lambda group: moveNoteAction(entity, group))
+        menu.clickedAction.connect(lambda group: menu.close())
+        menu.setModel(dashboard.model())
+        menu.exec_(QtGui.QCursor.pos())
 
-    @inject.params(store='store', status='status')
-    def onActionEditNote(self, entity, store, status):
-        try:
-            store.dispatch({'type': '@@app/storage/resource/selected/document',
-                            'entity': entity})
-        except Exception as ex:
-            status.error(ex.__str__())
+    @inject.params(store='store')
+    def onActionGroup(self, entity, store):
+        store.dispatch({
+            'type': '@@app/storage/resource/selected/group',
+            'entity': entity
+        })
+
+    @inject.params(store='store')
+    def onActionSelectNote(self, entity, store):
+        store.dispatch({
+            'type': '@@app/storage/resource/selected/document',
+            'entity': entity
+        })
+
+    @inject.params(store='store')
+    def onActionSaveNote(self, entity, store):
+        store.dispatch({
+            'type': '@@app/storage/resource/update/document',
+            'entity': entity
+        })
+
+    @inject.params(store='store')
+    def onActionEditNote(self, entity, store):
+        store.dispatch({
+            'type': '@@app/storage/resource/selected/document',
+            'entity': entity
+        })
 
     @inject.params(window='window', editor='notepad.editor')
     def onActionFullScreen(self, entity, window, editor):
-        try:
-
-            editor = editor.open(entity)
-            editor.saveNoteAction.connect(self.onActionSaveNote)
-            window.tab.emit((editor, entity.name))
-
-        except Exception as ex:
-            getLogger('app').exception(ex)
+        editor = editor.open(entity)
+        editor.saveNoteAction.connect(self.onActionSaveNote)
+        window.tab.emit((editor, entity.name))
 
     @inject.params(store='store', status='status', window='window')
     def onActionRemove(self, entity, store, status, window):
@@ -180,45 +164,10 @@ class ModuleActions(object):
         if reply == QtWidgets.QMessageBox.No:
             return None
 
-        try:
-            store.dispatch({'type': '@@app/storage/resource/remove',
-                            'entity': entity})
-        except Exception as ex:
-            status.error(ex.__str__())
-
-    @inject.params(config='config', status='status')
-    def onActionConfigUpdated(self, event, config, widget, status):
-
-        try:
-            visible = int(config.get('folders.toolbar'))
-            widget.toolbar.setVisible(visible)
-
-        except AttributeError as ex:
-            getLogger('app').exception(ex)
-            status.error(ex.__str__())
-
-        self.onActionConfigUpdatedEditor(event, widget=widget.editor)
-
-    @inject.params(config='config', logger='logger')
-    def onActionConfigUpdatedEditor(self, event, widget, config, logger):
-
-        try:
-            visible = int(config.get('editor.formatbar'))
-            widget.formatbar.setVisible(visible)
-        except AttributeError as ex:
-            logger.exception(ex)
-
-        try:
-            visible = int(config.get('editor.leftbar'))
-            widget.leftbar.setVisible(visible)
-        except AttributeError as ex:
-            logger.exception(ex)
-
-        try:
-            visible = int(config.get('editor.rightbar'))
-            widget.rightbar.setVisible(visible)
-        except AttributeError as ex:
-            logger.exception(ex)
+        store.dispatch({
+            'type': '@@app/storage/resource/remove',
+            'entity': entity
+        })
 
     @inject.params(store='store', window='window')
     def onActionContextMenu(self, event, entity, window, store):

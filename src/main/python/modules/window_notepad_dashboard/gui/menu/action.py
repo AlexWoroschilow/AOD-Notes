@@ -32,6 +32,5 @@ class FolderTreeAction(QtWidgets.QWidgetAction):
 
         self.setDefaultWidget(widget)
 
-    def setFolders(self, collection, selected):
-        self.tree.setFolders(collection, selected)
-        return self
+    def setModel(self, model):
+        self.tree.setModel(model)

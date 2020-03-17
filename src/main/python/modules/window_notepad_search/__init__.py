@@ -43,7 +43,7 @@ class Loader(object):
         """
         factory.addWidget(WidgetSettingsSearch)
 
-        store.subscribe(self.searchEvent)
+        # store.subscribe(self.searchEvent)
 
     @inject.params(search='search', storage='storage', window='window')
     def searchEvent(self, text=None, search=None, storage=None, window=None):

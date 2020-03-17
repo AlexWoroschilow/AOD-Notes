@@ -89,6 +89,10 @@ class DashboardPanelRight(QtWidgets.QFrame):
         self.layout().addWidget(self.toolbar)
         self.layout().addWidget(self.preview)
 
+    def setDocuments(self, collection, selected):
+        self.preview.setDocuments(collection, selected)
+        return self
+
     def close(self):
         super(DashboardPanelRight, self).deleteLater()
         return super(DashboardPanelRight, self).close()

@@ -38,8 +38,7 @@ class DashboardDocumentPreview(QtWidgets.QSplitter):
 
     editor = None
 
-    @inject.params(store='store')
-    def __init__(self, index=None, store=None):
+    def __init__(self, index=None):
         super(DashboardDocumentPreview, self).__init__()
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
@@ -69,26 +68,18 @@ class DashboardDocumentPreview(QtWidgets.QSplitter):
         self.setStretchFactor(0, 5)
         self.setStretchFactor(1, 2)
 
-        state = store.get_state()
-        if state is None: return None
-        store.subscribe(self.refresh)
+    def setDocuments(self, collection=None, selected=None):
 
-    @inject.params(store='store')
-    def refresh(self, store=None):
+        if collection is not None:
+            self.preview.clear()
+            for document in collection:
+                self.preview.addItemRow(document, selected)
+            self.preview.scrollTo(self.preview.currentIndex())
 
-        state = store.get_state()
-        if state is None: return None
-        self.editor.open(state.document)
-
-        documents = state.documents
-        if not documents.fresh:
-            return None
-
-        self.preview.clear()
-        current = state.document
-        for document in documents.collection:
-            self.preview.addItemRow(document, current)
-        self.preview.scrollTo(self.preview.currentIndex())
+        if selected is not None:
+            self.editor.open(selected)
+            
+        return self
 
     def open(self, index=None):
         pass

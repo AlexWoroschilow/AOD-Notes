@@ -70,8 +70,15 @@ class NotepadDashboard(QtWidgets.QWidget):
         self.layout().addWidget(self.splitter)
         self.layout().addWidget(self.toolbar)
 
+    def model(self):
+        return self.splitter.panelLeft.tree.model()
+
     def setFolders(self, collection, selected):
         self.splitter.setFolders(collection, selected)
+        return self
+
+    def setDocuments(self, collection, selected):
+        self.splitter.setDocuments(collection, selected)
         return self
 
     def note(self, index=None, storage=None):

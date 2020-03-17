@@ -36,23 +36,31 @@ class Loader(object):
             self._construct, options=options, args=args
         ))
 
-    @inject.params(config='config', store='store')
-    def boot(self, options, args, config, store):
-        store.subscribe(functools.partial(
-            self.update, config=config, store=store
-        ))
+    @inject.params(store='store')
+    def boot(self, options, args, store):
+        store.subscribe(self.update)
 
+    @inject.params(config='config', store='store')
     def update(self, config=None, store=None):
-        if store is None: return None
         state = store.get_state()
         if state is None: return None
 
-        entity = state.group
-        if entity is not None and entity:
-            if len(entity.path) and os.path.exists(entity.path):
-                config.set('storage.selected.group', entity.path)
+        if 'group' in state.keys():
+            self.updateGroupAction(state['group'])
 
-        entity = state.document
-        if entity is not None and entity:
-            if len(entity.path) and os.path.exists(entity.path):
-                config.set('storage.selected.document', entity.path)
+        if 'document' in state.keys():
+            self.updateNoteAction(state['document'])
+
+    @inject.params(config='config')
+    def updateGroupAction(self, entity=None, config=None):
+        if entity is None: return None
+        if not len(entity.path): return None
+        if not os.path.exists(entity.path): return None
+        config.set('storage.selected.group', entity.path)
+
+    @inject.params(config='config')
+    def updateNoteAction(self, entity=None, config=None):
+        if entity is None: return None
+        if not len(entity.path): return None
+        if not os.path.exists(entity.path): return None
+        config.set('storage.selected.document', entity.path)

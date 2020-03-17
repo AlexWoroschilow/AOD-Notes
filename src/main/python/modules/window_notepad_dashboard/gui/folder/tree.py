@@ -78,11 +78,15 @@ class DashboardFolderTree(QtWidgets.QTreeView):
         self.setColumnHidden(2, True)
         self.setColumnHidden(3, True)
 
-    def setFolders(self, collection, selected):
+    def setFolders(self, collection=None, selected=None):
+
         index = self.model(). \
             setFolders(collection, selected)
 
         self.expandAll()
+
+        if index is None:
+            return None
 
         self.setCurrentIndex(index)
         self.scrollTo(self.indexBelow(index))
