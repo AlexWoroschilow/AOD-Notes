@@ -25,11 +25,13 @@ class Loader(object):
     def __exit__(self, type, value, traceback):
         pass
 
-    @inject.params(config='config', notepad='notepad')
-    def _constructor_window(self, config=None, notepad=None):
+    @inject.params(store='store', notepad='notepad')
+    def _constructor_window(self, store=None, notepad=None):
         widget = MainWindow()
         widget.resize.connect(self.actions.onActionWindowResize)
         widget.setMainWidget(notepad)
+
+        store.subscribe(self.update)
 
         return widget
 
@@ -38,3 +40,11 @@ class Loader(object):
 
     def configure(self, binder, options, args):
         binder.bind_to_constructor('window', self._constructor_window)
+
+    @inject.params(store='store', window='window')
+    def update(self, store=None, window=None):
+        state = store.get_state()
+        if state is None: return None
+
+        if 'document' in state.keys():
+            window.tabSwitch.emit(0)

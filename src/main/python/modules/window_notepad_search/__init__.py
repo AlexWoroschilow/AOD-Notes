@@ -33,29 +33,26 @@ class Loader(object):
 
     @inject.params(store='store', factory='settings_factory')
     def boot(self, options=None, args=None, store=None, factory=None):
-        """
-
-        :param options:
-        :param args:
-        :param store:
-        :param factory:
-        :return:
-        """
         factory.addWidget(WidgetSettingsSearch)
 
-        # store.subscribe(self.searchEvent)
+        store.subscribe(self.update)
 
-    @inject.params(search='search', storage='storage', window='window')
-    def searchEvent(self, text=None, search=None, storage=None, window=None):
-        if not len(text): return None
+    @inject.params(store='store', window='window')
+    def update(self, store=None, window=None):
+        state = store.get_state()
+        if state is None: return None
 
-        preview = PreviewScrollArea(window)
-        preview.editAction.connect(self.actions.onActionEditRequest)
+        if 'search' not in state.keys():
+            return None
 
-        for index, path in enumerate(search.search(text), start=1):
-            preview.addPreview(storage.index(path))
+        collection = state['search']
+        for hash in collection.keys():
+            search = collection[hash]
+            if search is None: continue
 
-        title = text if len(text) <= 25 else \
-            "{}...".format(text[0:22])
+            preview = PreviewScrollArea(window)
+            preview.selectAction.connect(self.actions.onActionSelect)
+            for documents in search['documents']:
+                preview.addPreview(documents)
 
-        window.tab.emit((preview, title))
+            window.tab.emit((preview, search['title']))

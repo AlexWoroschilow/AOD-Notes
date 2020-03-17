@@ -23,23 +23,20 @@ from .button import PictureButtonFlat
 
 
 class NotePreviewDescription(QtWidgets.QGroupBox):
-    fullscreenAction = QtCore.pyqtSignal(object)
-    editAction = QtCore.pyqtSignal(object)
 
-    @inject.params(storage='storage')
-    def __init__(self, index, storage):
+    def __init__(self, document):
         super(NotePreviewDescription, self).__init__()
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.setContentsMargins(0, 0, 0, 0)
-        self.index = index
+        self.document = document
 
         self.layout = QtWidgets.QGridLayout()
         self.layout.setAlignment(Qt.AlignTop)
 
-        title = Title(storage.fileName(index))
+        title = Title(document.name)
         self.layout.addWidget(title, 0, 0, 1, 27)
 
-        self.description = Description(storage.fileContent(index))
+        self.description = Description(document.content)
         self.description.setFixedHeight(self.height() * 0.85)
         self.layout.addWidget(self.description, 1, 0, 4, 30)
 
@@ -49,18 +46,6 @@ class NotePreviewDescription(QtWidgets.QGroupBox):
         effect.setBlurRadius(10)
         effect.setOffset(0)
         self.setGraphicsEffect(effect)
-
-    def document(self):
-        if self.description is None:
-            return None
-        return self.description.document()
-
-    def setDocument(self, document=None):
-        if document is None:
-            return None
-        if self.description is None:
-            return None
-        return self.description.setDocument(document)
 
     def event(self, QEvent):
         if QEvent.type() == QtCore.QEvent.Enter:
@@ -76,10 +61,6 @@ class NotePreviewDescription(QtWidgets.QGroupBox):
             effect.setBlurRadius(10)
             effect.setOffset(0)
             self.setGraphicsEffect(effect)
-
-        if QEvent.type() == QtCore.QEvent.MouseButtonRelease:
-            self.editAction.emit(self.index)
-            return super(NotePreviewDescription, self).event(QEvent)
 
         return super(NotePreviewDescription, self).event(QEvent)
 

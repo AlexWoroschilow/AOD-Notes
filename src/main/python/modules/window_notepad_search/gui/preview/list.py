@@ -28,7 +28,7 @@ class NoteItem(QtWidgets.QListWidgetItem):
 
 
 class PreviewScrollArea(QtWidgets.QListWidget):
-    editAction = QtCore.pyqtSignal(object)
+    selectAction = QtCore.pyqtSignal(object)
 
     def __init__(self, parent=None):
         super(PreviewScrollArea, self).__init__(parent)
@@ -44,72 +44,19 @@ class PreviewScrollArea(QtWidgets.QListWidget):
 
         self.hashmap_index = {}
 
-    @inject.params(storage='storage')
-    def addPreview(self, index=None, storage=None):
-        if index is None: return self
-
+    def addPreview(self, document=None):
         item = NoteItem()
+        item.setData(0, document)
         self.addItem(item)
 
-        widget = NotePreviewDescription(index)
-        widget.editAction.connect(self.editAction.emit)
-
+        widget = NotePreviewDescription(document)
         self.setItemWidget(item, widget)
 
-        path = storage.filePath(index)
-        if path is None: return self
-
-        self.hashmap_index[path] = (item, widget)
         return self
 
     def itemClickedEvent(self, item):
-        widget = self.itemWidget(item)
-        if widget is None: return None
-        return self.editAction.emit(widget.index)
-
-    @inject.params(storage='storage')
-    def document(self, index=None, storage=None):
-        if index is None: return None
-
-        path = storage.filePath(index)
-        if path is None: return None
-
-        if path not in self.hashmap_index.keys():
-            return None
-
-        item, widget = self.hashmap_index[path]
-        if widget is None: return None
-        if item is None: return None
-
-        return widget.document()
-
-    @inject.params(storage='storage')
-    def getWidgetItemByIndex(self, index=None, storage=None):
-        path = storage.filePath(index)
-        if path is None: return None
-
-        if path not in self.hashmap_index.keys():
-            return None
-
-        item, widget = self.hashmap_index[path]
-        if widget is None: return None
-        if item is None: return None
-
-        return item
-
-    @inject.params(storage='storage')
-    def getWidgetByIndex(self, index=None, storage=None):
-        path = storage.filePath(index)
-        if path is None: return None
-
-        if path not in self.hashmap_index.keys():
-            return None
-
-        item, widget = self.hashmap_index[path]
-        if widget is None: return None
-        if item is None: return None
-
-        return widget
+        document = item.data(0)
+        return self.selectAction.emit(document)
 
     def count(self):
         return len(self.hashmap_index.keys())

@@ -17,8 +17,6 @@ import shutil
 
 
 class StorageActions(object):
-    def __init__(self):
-        pass
 
     @inject.params(filesystem='store.filesystem')
     def initAction(self, state, action, filesystem):
@@ -29,9 +27,21 @@ class StorageActions(object):
             'groups': filesystem.groups(),
         }
 
-    @inject.params(search='search')
-    def searchAction(self, state, action, search):
-        print(action.get('string'))
+    @inject.params(search='search', filesystem='store.filesystem')
+    def searchAction(self, state, action, search, filesystem):
+        return {
+            'search': {
+                '123': {
+                    'title': action.get('string'),
+                    'documents': filesystem.documents()
+                },
+                '234': {
+                    'title': action.get('string'),
+                    'documents': filesystem.documents()
+                }
+            },
+            'group': filesystem.group(),
+        }
         return state
 
     @inject.params(filesystem='store.filesystem')
