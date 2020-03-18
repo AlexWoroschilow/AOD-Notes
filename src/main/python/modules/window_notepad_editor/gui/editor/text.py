@@ -99,6 +99,11 @@ class TextEditor(QtWidgets.QTextEdit):
         self.boldAction.connect(self.onActionBold)
         self.underlAction.connect(self.onActionUnderline)
 
+        shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+e"), self)
+        shortcut.activatedAmbiguously.connect(self.setFocus)
+        shortcut.activated.connect(self.setFocus)
+        shortcut.setEnabled(True)
+
     @property
     def entity(self):
         return self._entity

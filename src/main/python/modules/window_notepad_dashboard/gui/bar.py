@@ -45,6 +45,21 @@ class NotepadDashboardToolbar(QtWidgets.QFrame):
         self.importing.setText(' Import Note')
         self.layout().addWidget(self.importing)
 
+        shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+n"), self.note)
+        shortcut.activatedAmbiguously.connect(lambda x=None: self.newNoteAction.emit(self.note))
+        shortcut.activated.connect(lambda x=None: self.newNoteAction.emit(self.note))
+        shortcut.setEnabled(True)
+
+        shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+g"), self.group)
+        shortcut.activatedAmbiguously.connect(lambda x=None: self.newGroupAction.emit(self.group))
+        shortcut.activated.connect(lambda x=None: self.newGroupAction.emit(self.group))
+        shortcut.setEnabled(True)
+
+        shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+i"), self.importing)
+        shortcut.activatedAmbiguously.connect(lambda x=None: self.importNoteAction.emit(self.importing))
+        shortcut.activated.connect(lambda x=None: self.importNoteAction.emit(self.importing))
+        shortcut.setEnabled(True)
+
     def close(self):
         super(NotepadDashboardToolbar, self).deleteLater()
         return super(NotepadDashboardToolbar, self).close()

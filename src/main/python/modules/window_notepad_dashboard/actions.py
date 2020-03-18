@@ -184,9 +184,8 @@ class ModuleActions(object):
 
         menu.exec_(QtGui.QCursor.pos())
 
-    @inject.params(storage='storage', config='config')
+    @inject.params(storage='storage', config='config', widget='window')
     def onActionNoteImport(self, event=None, storage=None, config=None, widget=None):
-        if widget is None or storage is None or config is None: return None
 
         currentwd = config.get('storage.lastimport', os.path.expanduser('~'))
         selector = QtWidgets.QFileDialog(None, 'Select file', currentwd)
