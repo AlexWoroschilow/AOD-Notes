@@ -15,6 +15,7 @@ from PyQt5.QtCore import Qt
 from PyQt5 import QtWidgets
 from PyQt5 import QtGui
 from PyQt5 import QtCore
+import base64
 
 
 class ImageResizeToolbar(QtWidgets.QWidget):
@@ -39,11 +40,16 @@ class ImageResizeToolbar(QtWidgets.QWidget):
 class ImageResizeWidget(QtWidgets.QWidget):
     sizeChanged = QtCore.pyqtSignal(object)
 
-    def __init__(self, parent=None, name=None, width=None):
+    def __init__(self, parent=None, content=None, width=None):
         super().__init__(parent)
         self.setLayout(QtWidgets.QVBoxLayout())
+        self.setMinimumSize(QtCore.QSize(450, 450))
 
-        self.image = QtGui.QPixmap(name)
+        header, content = content.split(',')
+        content = content.encode('utf-8')
+
+        self.image = QtGui.QPixmap()
+        self.image.loadFromData(base64.decodebytes(content))
 
         self.label = QtWidgets.QLabel(self)
         self.label.setBackgroundRole(QtGui.QPalette.Base)
@@ -56,7 +62,7 @@ class ImageResizeWidget(QtWidgets.QWidget):
         self.label.setPixmap(image)
 
         self.scrollArea = QtWidgets.QScrollArea(self)
-        self.scrollArea.setMaximumSize(320, 240)
+        self.scrollArea.setMinimumSize(QtCore.QSize(500, 300))
         self.scrollArea.setBackgroundRole(QtGui.QPalette.Dark)
         self.scrollArea.setWidget(self.label)
         self.layout().addWidget(self.scrollArea)

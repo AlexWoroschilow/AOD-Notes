@@ -32,7 +32,7 @@ class NotePreviewDescription(QtWidgets.QFrame):
         super(NotePreviewDescription, self).__init__()
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.setContentsMargins(0, 0, 0, 0)
-        self.setMaximumWidth(550)
+        self.setFixedWidth(430)
 
         self.layout = QtWidgets.QGridLayout()
         self.layout.setAlignment(Qt.AlignTop)

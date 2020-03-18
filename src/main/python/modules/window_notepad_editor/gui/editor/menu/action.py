@@ -20,10 +20,10 @@ from .widget import ImageResizeWidget
 class ImageResizeAction(QtWidgets.QWidgetAction):
     sizeChanged = QtCore.pyqtSignal(object)
 
-    def __init__(self, parent, name, width):
+    def __init__(self, parent, content, width):
         super(ImageResizeAction, self).__init__(parent)
 
-        widget = ImageResizeWidget(parent, name, width)
+        widget = ImageResizeWidget(parent, content, width)
         widget.sizeChanged.connect(self.sizeChanged.emit)
 
         self.setDefaultWidget(widget)

@@ -20,6 +20,7 @@ from PyQt5 import QtCore
 from PyQt5 import QtGui
 
 from .menu.action import ImageResizeAction
+import base64
 
 
 class TextEditor(QtWidgets.QTextEdit):
@@ -223,34 +224,6 @@ class TextEditor(QtWidgets.QTextEdit):
         if dialog.exec_() == QtWidgets.QDialog.Accepted:
             self.document().print_(dialog.printer())
 
-    def resizeImageEvent(self, size):
-        cursor = self.textCursor()
-        iterator = cursor.block().begin()
-        while not iterator.atEnd():
-
-            fragment = iterator.fragment()
-            if fragment is None: break
-
-            if not fragment.isValid() or not fragment.charFormat().isImageFormat():
-                continue
-
-            width, height = size
-            if height is None: break
-            if width is None: break
-
-            image = fragment.charFormat().toImageFormat()
-            if image is None: break
-
-            image.setWidth(width)
-            image.setHeight(height)
-
-            cursor.setPosition(fragment.position())
-            cursor.setPosition(fragment.position() + fragment.length(), QtGui.QTextCursor.KeepAnchor)
-            cursor.setCharFormat(image)
-            break
-
-            iterator += 1
-
     def mouseDoubleClickEvent(self, event):
         cursor = self.textCursor()
         iterator = cursor.block().begin()
@@ -287,21 +260,51 @@ class TextEditor(QtWidgets.QTextEdit):
 
         folder = config.get('editor.import_image', os.path.expanduser('~'))
         filename, formats = QtWidgets.QFileDialog.getOpenFileName(self, title, folder, formats)
-        if filename is None: return None
+        if filename is None or not len(filename):
+            return None
 
-        image = QtGui.QImage(filename)
-        if image.isNull(): return None
+        with open(filename, 'rb') as stream:
+            config.set('editor.import_image', os.path.dirname(filename))
 
+            content_raw = stream.read()
+            content_encoded = base64.b64encode(content_raw).decode('utf8')
+            self.insertHtml('<img src="data:image/png;base64, {}" />'.format(content_encoded))
+            stream.close()
+
+            popup = ImageResizeAction(self, "data:image/png;base64, {}".format(content_encoded), 800)
+            popup.sizeChanged.connect(self.resizeImageEvent)
+
+            menu = QtWidgets.QMenu()
+            menu.addAction(popup)
+            menu.exec_(QtGui.QCursor.pos())
+
+    def resizeImageEvent(self, size):
         cursor = self.textCursor()
-        cursor.insertImage(image.scaled(800, 600, Qt.KeepAspectRatio), filename)
-        config.set('editor.import_image', os.path.dirname(filename))
+        iterator = cursor.block().begin()
+        while not iterator.atEnd():
 
-        popup = ImageResizeAction(self, filename, 800)
-        popup.sizeChanged.connect(self.resizeImageEvent)
+            fragment = iterator.fragment()
+            if fragment is None: break
 
-        menu = QtWidgets.QMenu()
-        menu.addAction(popup)
-        menu.exec_(QtGui.QCursor.pos())
+            if not fragment.isValid() or not fragment.charFormat().isImageFormat():
+                continue
+
+            width, height = size
+            if height is None: break
+            if width is None: break
+
+            image = fragment.charFormat().toImageFormat()
+            if image is None: break
+
+            image.setWidth(width)
+            image.setHeight(height)
+
+            cursor.setPosition(fragment.position())
+            cursor.setPosition(fragment.position() + fragment.length(), QtGui.QTextCursor.KeepAnchor)
+            cursor.setCharFormat(image)
+            break
+
+            iterator += 1
 
     def wheelEvent(self, event):
         point = event.angleDelta()
