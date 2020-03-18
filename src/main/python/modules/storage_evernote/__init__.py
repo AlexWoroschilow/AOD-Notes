@@ -13,14 +13,16 @@
 import inject
 
 
-class ModuleActions(object):
+class Loader(object):
 
-    @inject.params(store='store', window='window')
-    def onActionSelect(self, entity, store, window):
+    def __enter__(self):
+        return self
 
-        window.switchTabAction.emit(0)
+    def __exit__(self, type, value, traceback):
+        pass
 
-        store.dispatch({
-            'type': '@@app/storage/resource/selected/document',
-            'entity': entity
-        })
+    def enabled(self, options=None, args=None):
+        return True
+
+    def configure(self, binder, options, args):
+        pass

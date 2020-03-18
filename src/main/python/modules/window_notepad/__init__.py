@@ -45,6 +45,3 @@ class Loader(object):
     def update(self, store=None, window=None):
         state = store.get_state()
         if state is None: return None
-
-        if 'document' in state.keys():
-            window.tabSwitch.emit(0)

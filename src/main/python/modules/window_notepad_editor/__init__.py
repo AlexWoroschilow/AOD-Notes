@@ -13,14 +13,11 @@
 import inject
 import functools
 
-from .actions import ModuleActions
-
 from .gui.editor.widget import TextEditorWidget
 from .factory import ToolbarFactory
 
 
 class Loader(object):
-    actions = ModuleActions()
 
     def __enter__(self):
         return self

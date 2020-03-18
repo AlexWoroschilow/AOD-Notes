@@ -23,37 +23,37 @@ from PyQt5 import QtGui
 
 
 class SearchThread(QtCore.QThread):
-    progress = QtCore.pyqtSignal(object)
-    started = QtCore.pyqtSignal(object)
-    finished = QtCore.pyqtSignal(object)
+    progressAction = QtCore.pyqtSignal(object)
+    startedAction = QtCore.pyqtSignal(object)
+    finishedAction = QtCore.pyqtSignal(object)
 
-    @inject.params(storage='storage', search='search')
-    def run(self, storage=None, search=None):
+    @inject.params(store='store', search='search')
+    def run(self, store=None, search=None):
         if not search.clean():
             return None
 
-        self.started.emit(0)
-        collection = storage.entities()
-        for progress, index in enumerate(collection, start=1):
-            self.progress.emit(progress / len(collection) * 100)
-            if not storage.isFile(index):
-                continue
-
-            path = storage.filePath(index)
-            if path is None:
-                continue
-
-            name = storage.fileName(path)
-            if name is None:
-                continue
-
-            content = storage.fileContent(path)
-            if content is None:
-                continue
-
-            search.append(name, path, content)
-        self.progress.emit(100)
-        self.finished.emit(100)
+        self.startedAction.emit(0)
+        # collection = storage.entities()
+        # for progress, index in enumerate(collection, start=1):
+        #     self.progressAction.emit(progress / len(collection) * 100)
+        #     if not storage.isFile(index):
+        #         continue
+        #
+        #     path = storage.filePath(index)
+        #     if path is None:
+        #         continue
+        #
+        #     name = storage.fileName(path)
+        #     if name is None:
+        #         continue
+        #
+        #     content = storage.fileContent(path)
+        #     if content is None:
+        #         continue
+        #
+        #     search.append(name, path, content)
+        self.progressAction.emit(100)
+        self.finishedAction.emit(100)
 
 
 class WidgetSettingsSearch(WidgetSettings):
@@ -80,16 +80,16 @@ class WidgetSettingsSearch(WidgetSettings):
 
         self.setLayout(self.layout)
 
-        self.thread.started.connect(lambda x: self.rebuild.setVisible(False))
-        self.thread.progress.connect(lambda x: self.rebuild.setVisible(False))
-        self.thread.finished.connect(lambda x: self.rebuild.setVisible(True))
+        self.thread.startedAction.connect(lambda x: self.rebuild.setVisible(False))
+        self.thread.progressAction.connect(lambda x: self.rebuild.setVisible(False))
+        self.thread.finishedAction.connect(lambda x: self.rebuild.setVisible(True))
 
-        self.thread.started.connect(lambda x: self.progress.setVisible(True))
-        self.thread.progress.connect(lambda x: self.progress.setVisible(True))
-        self.thread.progress.connect(lambda x: self.progress.setValue(x))
-        self.thread.finished.connect(lambda x: self.progress.setVisible(False))
+        self.thread.startedAction.connect(lambda x: self.progress.setVisible(True))
+        self.thread.progressAction.connect(lambda x: self.progress.setVisible(True))
+        self.thread.progressAction.connect(lambda x: self.progress.setValue(x))
+        self.thread.finishedAction.connect(lambda x: self.progress.setVisible(False))
 
-        self.thread.finished.connect(self.thread.exit)
+        self.thread.finishedAction.connect(self.thread.exit)
         self.show()
 
     def quit(self):

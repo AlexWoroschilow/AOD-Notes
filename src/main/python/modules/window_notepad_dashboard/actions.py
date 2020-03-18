@@ -147,7 +147,7 @@ class ModuleActions(object):
     def onActionFullScreen(self, entity, window, editor):
         editor = editor.open(entity)
         editor.saveNoteAction.connect(self.onActionSaveNote)
-        window.tab.emit((editor, entity.name))
+        window.newTabAction.emit((editor, entity.name))
 
     @inject.params(store='store', status='status', window='window')
     def onActionRemove(self, entity, store, status, window):
@@ -184,8 +184,8 @@ class ModuleActions(object):
 
         menu.exec_(QtGui.QCursor.pos())
 
-    @inject.params(storage='storage', config='config', widget='window')
-    def onActionNoteImport(self, event=None, storage=None, config=None, widget=None):
+    @inject.params(store='store', config='config', widget='window')
+    def onActionNoteImport(self, event=None, store=None, config=None, widget=None):
 
         currentwd = config.get('storage.lastimport', os.path.expanduser('~'))
         selector = QtWidgets.QFileDialog(None, 'Select file', currentwd)
@@ -203,35 +203,4 @@ class ModuleActions(object):
                 if reply == QtWidgets.QMessageBox.No: continue
 
             with open(path, 'r') as source:
-                index = widget.current
-                if index is None or not index:
-                    index = config.get('storage.location')
-                    index = storage.index(index)
-
-                if not storage.isDir(index):
-                    index = config.get('storage.location')
-                    index = storage.index(index)
-
-                if storage.isFile(index):
-                    index = config.get('storage.location')
-                    index = storage.index(index)
-
-                name = os.path.basename(path)
-                index = storage.touch(index, name)
-                if index is None:
-                    return None
-
-                index = storage.setFileContent(index, source.read())
-                if index is None:
-                    return None
-
-                widget.created.emit(index)
-
                 source.close()
-
-    @inject.params(storage='storage', dashboard='notepad.dashboard')
-    def onActionStorageChanged(self, destination, storage, dashboard, widget):
-        dashboard.tree.setModel(storage)
-        index = storage.setRootPath(destination)
-        dashboard.tree.setRootIndex(index)
-        dashboard.group(index)

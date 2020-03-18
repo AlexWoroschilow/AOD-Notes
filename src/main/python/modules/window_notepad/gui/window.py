@@ -19,8 +19,8 @@ from PyQt5 import QtCore
 
 
 class MainWindow(QtWidgets.QMainWindow):
-    tab = QtCore.pyqtSignal(object)
-    tabSwitch = QtCore.pyqtSignal(object)
+    newTabAction = QtCore.pyqtSignal(object)
+    switchTabAction = QtCore.pyqtSignal(object)
     resize = QtCore.pyqtSignal(object)
 
     @inject.params(themes='themes')
@@ -43,8 +43,8 @@ class MainWindow(QtWidgets.QMainWindow):
         if not os.path.exists('icons/icon.svg'): return None
         self.setWindowIcon(QtGui.QIcon('icons/icon.svg'))
 
-        self.tabSwitch.connect(self.onActionTabSwitch)
-        self.tab.connect(self.onActionTabOpen)
+        self.switchTabAction.connect(self.onActionSwitchTab)
+        self.newTabAction.connect(self.onActionNewTab)
 
     def resizeEvent(self, event):
         self.resize.emit(event)
@@ -72,11 +72,11 @@ class MainWindow(QtWidgets.QMainWindow):
         layout = self.container.layout()
         layout.addWidget(self.content)
 
-    def onActionTabSwitch(self, index=None):
+    def onActionSwitchTab(self, index=None):
         if index is None: return None
         self.content.setCurrentIndex(index)
 
-    def onActionTabOpen(self, event=None):
+    def onActionNewTab(self, event=None):
         if event is None: return None
         widget, name = event
         if widget is None: return None

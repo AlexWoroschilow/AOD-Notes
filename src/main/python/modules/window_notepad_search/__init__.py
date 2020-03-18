@@ -53,4 +53,4 @@ class Loader(object):
             for documents in search['documents']:
                 preview.addPreview(documents)
 
-            window.tab.emit((preview, search['title']))
+            window.newTabAction.emit((preview, search['title']))
