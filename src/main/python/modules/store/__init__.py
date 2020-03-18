@@ -45,6 +45,9 @@ class Loader(object):
 
     def update(self, state=None, action=None):
 
+        if action.get('type') == '@@app/storage/location/switch':
+            return self.actions.locationSwitchAction(state, action)
+
         if action.get('type') == '@@app/search/request':
             return self.actions.searchAction(state, action)
 

@@ -25,6 +25,7 @@ from PyQt5 import QtGui
 
 
 class WidgetSettingsStorage(WidgetSettings):
+    locationAction = QtCore.pyqtSignal(object)
 
     @inject.params(config='config')
     def __init__(self, config):
@@ -48,7 +49,9 @@ class WidgetSettingsStorage(WidgetSettings):
         location = location.replace(os.path.expanduser('~'), '~')
 
         self.layout.addWidget(SettingsTitle('Storage'))
+
         self.location = PictureButton(' {}'.format(location))
+        self.location.clicked.connect(self.locationAction.emit)
         self.location.setIcon(QtGui.QIcon("icons/save"))
         self.location.setToolTip("Clone selected preview")
         self.location.setFlat(True)

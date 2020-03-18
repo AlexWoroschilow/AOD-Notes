@@ -11,168 +11,186 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
-import glob
+import pydux
 import shutil
+import inject
+import functools
 
-from PyQt5 import QtWidgets
-from PyQt5 import QtCore
-from PyQt5.QtCore import Qt
+import glob
 
-from .gui.icons import IconProvider
+from .model import Group
+from .model import Document
 
 
-class FilesystemStorage(QtWidgets.QFileSystemModel):
+class StoreFileSystem(object):
 
-    def __init__(self, location=None):
-        super(FilesystemStorage, self).__init__()
-        self.setFilter(QtCore.QDir.Dirs | QtCore.QDir.NoDotAndDotDot)
+    def _groups(self, location):
+        result = []
+        for path in glob.iglob('{}/**'.format(location)):
+            if not len(path) or os.path.isfile(path):
+                continue
+            result.append(Group(path, self._groups(path)))
+        return result
 
-        self.setIconProvider(IconProvider())
-        self.setRootPath(location)
-        self.setReadOnly(False)
+    def _documents(self, location):
+        result = []
+        for filename in glob.iglob('{}/**'.format(location)):
+            if not len(filename) or os.path.isdir(filename):
+                continue
+            result.append(Document(filename))
+        return result
 
-    def touch(self, path=None, name=None):
-        if path is None or name is None:
-            return None
+    @property
+    def default(self):
+        pool = [
+            '~/Dropbox', '~/DropBox', '~/dropbox', '~/dropbox',
+            '~/Own Cloud', '~/Owncloud', '~/OwnCloud', '~/ownCloud', '~/owncloud',
+            '~/Next Cloud', '~/Nextcloud', '~/NextCloud', '~/nextCloud', '~/nextcloud',
+            '~/Google Drive', '~/GoogleDrive', '~/googleDrive', '~/googledrive',
+            '~/One Drive', '~/Onedrive', '~/OneDrive', '~/oneDrive', '~/onedrive',
+        ]
 
-        if isinstance(path, QtCore.QModelIndex):
-            path = self.filePath(path)
+        for candidate in pool:
+            if not os.path.exists(candidate): continue
+            if not os.path.isdir(candidate): continue
+            return candidate
 
-        if path is None:
-            return None
+        return os.path.expanduser('~/AOD-Notepad')
 
-        path = '{}/{}'.format(path, name)
-        if os.path.exists(path):
-            raise Exception('File exists')
+    def clone(self, element, name='Copy', counter=1):
+        """
 
-        open(path, 'w').write('')
+        :param element:
+        :param name:
+        :param counter:
+        :return:
+        """
+        location = "{} ({})".format(element.path, name)
+        while os.path.exists(location):
+            location = "{} ({} {})".format(element.path, name, counter)
+            counter += 1
 
-        if path is None:
-            return None
+        try:
 
-        return self.index(path)
+            if os.path.isfile(element.path):
+                with open(element.path, 'r') as origin:
+                    with open(location, 'w') as clone:
+                        clone.write(origin.read())
+                        clone.close()
 
-    def clone(self, path=None):
-        if isinstance(path, QtCore.QModelIndex):
-            path = self.filePath(path)
+                        return Document(location)
 
-        if path is None: return None
-        destination = '{}(clone)'.format(path)
-        if os.path.exists(destination):
-            raise Exception('File exists')
+            if os.path.isdir(element.path):
+                shutil.copytree(element.path, location)
+                return Group(location, self._groups(location))
 
-        if self.isFile(path):
-            shutil.copy2(path, destination)
-        elif self.isDir(path):
-            shutil.copytree(path, destination)
+        except OSError as ex:
+            pass
 
-        return self.index(destination)
-
-    def rootIndex(self):
-        path = self.rootPath()
-        return self.index(path)
-
-    def isDir(self, path=None):
-        if isinstance(path, QtCore.QModelIndex):
-            path = self.filePath(path)
-
-        if path is None:
-            return None
-
-        return os.path.isdir(path)
-
-    def isFile(self, path=None):
-        if isinstance(path, QtCore.QModelIndex):
-            path = self.filePath(path)
-
-        if path is None:
-            return None
-
-        return os.path.isfile(path)
-
-    def fileDir(self, path=None):
-        if isinstance(path, QtCore.QModelIndex):
-            path = self.filePath(path)
-
-        if self.isDir(path):
-            return path
-
-        return self.index(os.path.dirname(path))
-
-    def fileName(self, path=None):
-        if not isinstance(path, QtCore.QModelIndex):
-            path = self.index(path)
-
-        return super(FilesystemStorage, self).fileName(path)
-
-    def fileContent(self, path=None):
-        if path is None: return None
-        if isinstance(path, QtCore.QModelIndex):
-            path = self.filePath(path)
-
-        if self.isDir(path):
-            return None
-
-        if not len(path): return None
-        return open(path, 'r').read()
-
-    def setFileContent(self, path, content):
-        if isinstance(path, QtCore.QModelIndex):
-            path = self.filePath(path)
-
-        open(path, 'w').write(content)
-
-        return self.index(path)
-
-    def first(self):
-        index = self.rootIndex()
-        source = self.filePath(index)
-        if not os.path.exists(source):
-            return None
-
-        sources = [self.filePath(index)]
-        while len(sources):
-            for path in glob.glob('{}/*'.format(sources.pop())):
-                index = self.index(path)
-                if self.isDir(index):
-                    sources.append(path)
-                    continue
-                return index
         return None
 
-    def entities(self, index=None):
-        if index is None or not index:
-            index = self.index(self.rootPath())
-        source = self.filePath(index)
-        return self.entitiesByPath(source)
+    def remove(self, element):
+        """
+        :param element:
+        :return:
+        """
+        location = element.path
+        if not os.path.exists(location):
+            return False
 
-    def entitiesByFileType(self, source=None):
-        if isinstance(source, QtCore.QModelIndex):
-            source = self.filePath(source)
-        if not os.path.exists(source):
-            return None
-        response = []
-        for path in glob.glob('{}/*'.format(source)):
-            index = self.index(path)
-            if index is None:
-                continue
-            if os.path.isdir(path):
-                continue
-            response.append(index)
-        return response
+        try:
 
-    def entitiesByPath(self, source=None):
-        if not os.path.exists(source):
+            if os.path.isdir(location):
+                shutil.rmtree(location)
+
+            if os.path.isfile(location):
+                os.remove(location)
+
+            return not os.path.exists(location)
+
+        except OSError as ex:
+            return False
+
+        return False
+
+    def group_create(self, group, name='New Group', counter=1):
+        """
+        Create new note in the given folder
+        :param group:
+        :param name:
+        :param counter:
+        :return:
+        """
+        location = "{}/{}".format(group.path, name)
+        while os.path.exists(location):
+            location = "{}/{} ({})".format(group.path, name, counter)
+            counter += 1
+
+        try:
+            os.mkdir(location)
+            return Group(location, self._groups(location))
+        except OSError as ex:
+            print(ex)
             return None
-        response = []
-        for path in glob.glob('{}/*'.format(source)):
-            index = self.index(path)
-            if index is None:
-                continue
-            if os.path.isdir(path):
-                response.append(index)
-                children = self.entitiesByPath(path)
-                response = response + children
-                continue
-            response.append(index)
-        return response
+
+        return None
+
+    def document_create(self, group, name='New Note', counter=1):
+        """
+        Create new note in the given folder
+        :param group:
+        :param name:
+        :param counter:
+        :return:
+        """
+        location = "{}/{}".format(group.path, name)
+        while os.path.exists(location):
+            location = "{}/{} ({})".format(group.path, name, counter)
+            counter += 1
+
+        with open(location, 'w') as stream:
+            stream.write('')
+            stream.close()
+
+            return Document(location)
+
+        return None
+
+    @inject.params(config='config')
+    def group(self, group=None, config=None):
+        location = group.path if group is not None \
+            else config.get('storage.selected.group')
+
+        if not os.path.exists(location):
+            return None
+        return Group(location, self._groups(location))
+
+    @inject.params(config='config')
+    def groups(self, group=None, config=None):
+        location = group.path if group is not None \
+            else config.get('storage.location', self.default)
+
+        if not os.path.exists(location):
+            return None
+
+        return [Group(location, self._groups(location))]
+
+    @inject.params(config='config')
+    def document(self, document=None, config=None):
+        location = document.path if document is not None \
+            else config.get('storage.selected.document')
+
+        if location is None or not os.path.exists(location):
+            return None
+
+        return Document(location)
+
+    @inject.params(config='config')
+    def documents(self, group=None, config=None):
+        location = group.path if group is not None \
+            else config.get('storage.selected.group')
+
+        if location is None or not os.path.exists(location):
+            return None
+
+        return self._documents(location)

@@ -18,6 +18,19 @@ import shutil
 
 class StorageActions(object):
 
+    @inject.params(filesystem='store.filesystem', config='config')
+    def locationSwitchAction(self, state, action, filesystem, config):
+        config.set('storage.location', action.get('location'))
+        config.set('storage.selected.document', '')
+        config.set('storage.selected.group', '')
+
+        return {
+            'document': filesystem.document(),
+            'documents': filesystem.documents(),
+            'group': filesystem.group(),
+            'groups': filesystem.groups(),
+        }
+
     @inject.params(filesystem='store.filesystem')
     def initAction(self, state, action, filesystem):
         return {
