@@ -45,9 +45,7 @@ class Loader(object):
         if 'search' not in state.keys():
             return None
 
-        collection = state['search']
-        for hash in collection.keys():
-            search = collection[hash]
+        for search in state['search']:
             if search is None: continue
 
             preview = PreviewScrollArea(window)

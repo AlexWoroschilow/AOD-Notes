@@ -29,20 +29,30 @@ class StorageActions(object):
 
     @inject.params(search='search', filesystem='store.filesystem')
     def searchAction(self, state, action, search, filesystem):
-        return {
-            'search': {
-                '123': {
-                    'title': action.get('string'),
-                    'documents': filesystem.documents()
-                },
-                '234': {
-                    'title': action.get('string'),
-                    'documents': filesystem.documents()
-                }
-            },
-            'group': filesystem.group(),
+        string = action.get('string')
+        if not len(string):
+            return None
+
+        search_result = {
+            'title': string,
+            'documents': []
         }
-        return state
+
+        for path in search.search(string):
+            model = type("Document", (object,), {})()
+            model.path = path
+
+            document = filesystem.document(model)
+            if document is None:
+                continue
+
+            search_result['documents'] \
+                .append(document)
+
+        return {
+            'group': filesystem.group(),
+            'search': [search_result]
+        }
 
     @inject.params(filesystem='store.filesystem')
     def selectDocumentEvent(self, state, action, filesystem):
@@ -53,10 +63,7 @@ class StorageActions(object):
         group = type("Group", (object,), {})()
         group.path = entity.parent
 
-        return {
-            'group': filesystem.group(group),
-            'document': entity,
-        }
+        return {'group': filesystem.group(group), 'document': entity}
 
     @inject.params(filesystem='store.filesystem')
     def selectGroupEvent(self, state, action, filesystem):
