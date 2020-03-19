@@ -14,6 +14,7 @@ import os
 import inject
 import hashlib
 import functools
+from .service import Search
 
 
 class Loader(object):
@@ -41,8 +42,6 @@ class Loader(object):
 
     @inject.params(kernel='kernel')
     def _construct_search(self, kernel, options, args):
-        from .service import Search
-
         return Search('{}/index/{}'.format(
             os.path.dirname(options.config),
             self.identifier

@@ -82,7 +82,6 @@ class Search(object):
         return None
 
     def append(self, title, path, text):
-
         path = u"{}".format(path)
         title = u"{}".format(title)
         text = u"{}".format(text)
@@ -96,6 +95,8 @@ class Search(object):
         self.writer.commit()
 
     def update(self, title, path, text):
+        if not self.exists(path):
+            return self.append(title, path, text)
 
         path = u"{}".format(path)
         title = u"{}".format(title)
@@ -113,6 +114,9 @@ class Search(object):
         self.writer.commit()
 
     def remove(self, path=None):
+        if not self.exists(path):
+            return None
+
         path = u"{}".format(path)
 
         with self.ix.searcher() as searcher:

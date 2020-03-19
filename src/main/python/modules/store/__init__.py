@@ -15,8 +15,6 @@ import pydux
 import inject
 import shutil
 
-from .model import Storage
-
 from .actions import StorageActions
 
 
@@ -30,7 +28,7 @@ class Loader(object):
         pass
 
     def __store(self):
-        return pydux.create_store(self.actions.initAction, Storage())
+        return pydux.create_store(self.actions.initAction, {})
 
     @property
     def enabled(self):
