@@ -62,13 +62,7 @@ class Search(object):
 
         self.ix = index.create_in(destination, self.schema)
 
-    def exists(self, destination=None):
-        if destination is None:
-            return False
-
-        if not os.path.exists(destination):
-            return False
-
+    def exists(self, destination):
         return index.exists_in(destination)
 
     def previous(self, destination=None):
@@ -95,19 +89,20 @@ class Search(object):
         self.writer.commit()
 
     def update(self, title, path, text):
-        if not self.exists(path):
-            return self.append(title, path, text)
 
         path = u"{}".format(path)
         title = u"{}".format(title)
         text = u"{}".format(text)
 
-        content = self._strip_tags(text)
         with self.ix.searcher() as searcher:
             self.writer = self.ix.writer()
             for number in searcher.document_numbers(path=path):
                 self.writer.delete_document(number)
             self.writer.commit()
+
+        content = self._strip_tags(text)
+        if content is None or not len(content):
+            return None
 
         self.writer = self.ix.writer()
         self.writer.add_document(title=title, path=path, content=content)
