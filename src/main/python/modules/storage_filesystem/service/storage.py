@@ -161,8 +161,12 @@ class StoreFileSystem(object):
         location = group.path if group is not None \
             else config.get('storage.selected.group')
 
+        if location is None or not len(location):
+            return None
+
         if not os.path.exists(location):
             return None
+
         return Group(location, self._groups(location))
 
     @inject.params(config='config')
@@ -170,8 +174,11 @@ class StoreFileSystem(object):
         location = group.path if group is not None \
             else config.get('storage.location', self.default)
 
+        if location is None or not len(location):
+            return []
+
         if not os.path.exists(location):
-            return None
+            return []
 
         return [Group(location, self._groups(location))]
 
@@ -190,7 +197,10 @@ class StoreFileSystem(object):
         location = group.path if group is not None \
             else config.get('storage.selected.group')
 
-        if location is None or not os.path.exists(location):
-            return None
+        if location is None or not len(location):
+            return []
+
+        if not os.path.exists(location):
+            return []
 
         return self._documents(location)

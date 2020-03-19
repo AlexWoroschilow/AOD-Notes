@@ -11,15 +11,14 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
+from .decorators import *
 
 
 class StorageActions(object):
 
-    @inject.params(filesystem='store.filesystem', config='config')
-    def locationSwitchAction(self, state, action, filesystem, config):
-        config.set('storage.location', action.get('location'))
-        config.set('storage.selected.document', '')
-        config.set('storage.selected.group', '')
+    @service_config_decorator
+    @inject.params(filesystem='store.filesystem')
+    def locationSwitchAction(self, state, action, filesystem):
 
         return {
             'document': filesystem.document(),
@@ -28,6 +27,7 @@ class StorageActions(object):
             'groups': filesystem.groups(),
         }
 
+    @service_config_decorator
     @inject.params(filesystem='store.filesystem')
     def initAction(self, state, action, filesystem):
         return {
@@ -87,6 +87,7 @@ class StorageActions(object):
             'group': group
         }
 
+    @service_search_decorator
     @inject.params(filesystem='store.filesystem')
     def createDocumentEvent(self, state, action, filesystem):
         group = state['group']
@@ -116,10 +117,12 @@ class StorageActions(object):
             'group': group
         }
 
+    @service_search_decorator
     @inject.params(filesystem='store.filesystem')
     def updateDocumentEvent(self, state, action, filesystem):
         return state
 
+    @service_search_decorator
     @inject.params(filesystem='store.filesystem')
     def removeResourceEvent(self, state, action, filesystem):
         entity = action.get('entity')
@@ -138,6 +141,7 @@ class StorageActions(object):
             'group': filesystem.group(group)
         }
 
+    @service_search_decorator
     @inject.params(filesystem='store.filesystem')
     def cloneResourceEvent(self, state, action, filesystem):
         entity = action.get('entity')
@@ -156,6 +160,7 @@ class StorageActions(object):
             'group': filesystem.group(group)
         }
 
+    @service_search_decorator
     @inject.params(filesystem='store.filesystem')
     def moveResourceEvent(self, state, action, filesystem):
         entity = action.get('entity')
@@ -175,6 +180,7 @@ class StorageActions(object):
             'group': filesystem.group(destination)
         }
 
+    @service_search_decorator
     @inject.params(filesystem='store.filesystem')
     def renameResourceEvent(self, state, action, filesystem):
         return {
