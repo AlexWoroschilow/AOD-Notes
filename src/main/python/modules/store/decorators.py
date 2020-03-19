@@ -15,16 +15,26 @@ import inject
 
 def service_config_decorator(func):
     def wrapper(this, store, action):
-        location = action.get('location')
-        if location is None or not len(location):
-            return func(this, store, action)
-
         container = inject.get_injector_or_die()
         config = container.get_instance('config')
 
-        config.set('storage.location', location)
-        config.set('storage.selected.document', '')
-        config.set('storage.selected.group', '')
+        location = action.get('location')
+        if location is not None and len(location):
+            config.set('storage.selected.document', '')
+            config.set('storage.selected.group', '')
+            config.set('storage.location', location)
+
+            return func(this, store, action)
+
+        entity = action.get('entity')
+        if entity is not None:
+            if entity.__class__.__name__ == 'Group':
+                config.set('storage.selected.group', entity.path)
+                return func(this, store, action)
+
+            if entity.__class__.__name__ == 'Document':
+                config.set('storage.selected.document', entity.path)
+                return func(this, store, action)
 
         return func(this, store, action)
 

@@ -64,6 +64,7 @@ class StorageActions(object):
             'search': [search_result]
         }
 
+    @service_config_decorator
     @inject.params(filesystem='store.filesystem')
     def selectDocumentEvent(self, state, action, filesystem):
         entity = action.get('entity')
@@ -75,6 +76,7 @@ class StorageActions(object):
 
         return {'group': filesystem.group(group), 'document': entity}
 
+    @service_config_decorator
     @inject.params(filesystem='store.filesystem')
     def selectGroupEvent(self, state, action, filesystem):
         group = action.get('entity')
