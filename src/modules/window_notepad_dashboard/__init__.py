@@ -58,10 +58,14 @@ class Loader(object):
 
         return widget
 
-    def enabled(self, options=None, args=None):
-        return options.console is None
-
     def configure(self, binder, options, args):
+        """
+        Configure service container for the dependency injections
+        :param binder:
+        :param options:
+        :param args:
+        :return:
+        """
         binder.bind_to_provider('notepad', self._notepad_tab)
         binder.bind_to_constructor('notepad.dashboard', functools.partial(
             self._notepad_dashboard, binder=binder

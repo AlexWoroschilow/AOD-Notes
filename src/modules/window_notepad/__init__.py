@@ -35,10 +35,14 @@ class Loader(object):
 
         return widget
 
-    def enabled(self, options=None, args=None):
-        return options.console is None
-
     def configure(self, binder, options, args):
+        """
+        Configure service container for the dependency injections
+        :param binder:
+        :param options:
+        :param args:
+        :return:
+        """
         binder.bind_to_constructor('window', self._constructor_window)
 
     @inject.params(store='store', window='window')

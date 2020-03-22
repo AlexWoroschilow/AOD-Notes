@@ -31,9 +31,6 @@ class Loader(object):
         widget.indexAction.connect(self.actions.onActionIndexation)
         return widget
 
-    def enabled(self, options=None, args=None):
-        return options.console is None
-
     @inject.params(store='store', factory='settings_factory')
     def boot(self, options=None, args=None, store=None, factory=None):
         factory.addWidget(self.__construct)

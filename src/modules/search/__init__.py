@@ -25,9 +25,6 @@ class Loader(object):
     def __exit__(self, type, value, traceback):
         pass
 
-    def enabled(self, options=None, args=None):
-        return options.console is None
-
     @property
     @inject.params(config='config')
     def identifier(self, config):
@@ -48,6 +45,13 @@ class Loader(object):
         ))
 
     def configure(self, binder, options, args):
+        """
+        Configure service container for the dependency injections
+        :param binder:
+        :param options:
+        :param args:
+        :return:
+        """
         binder.bind_to_provider('search', functools.partial(
             self._construct_search, options=options, args=args
         ))

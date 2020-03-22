@@ -25,9 +25,6 @@ class Loader(object):
     def __exit__(self, type, value, traceback):
         pass
 
-    def enabled(self, options=None, args=None):
-        return True
-
     @inject.params(config='config', factory_leftbar='toolbar_factory.leftbar',
                    factory_rightbar='toolbar_factory.rightbar', factory_formatbar='toolbar_factory.formatbar')
     def _notepad_editor(self, config=None, factory_leftbar=None, factory_rightbar=None, factory_formatbar=None):
@@ -55,7 +52,13 @@ class Loader(object):
         return widget
 
     def configure(self, binder, options, args):
-
+        """
+        Configure service container for the dependency injections
+        :param binder:
+        :param options:
+        :param args:
+        :return:
+        """
         binder.bind_to_provider('notepad.editor', self._notepad_editor)
 
         binder.bind('toolbar_factory.leftbar', ToolbarFactory())

@@ -46,19 +46,19 @@ class Loader(object):
         ), 128)
 
         themes_default = config.get('themes.default', 'themes/')
-        themes_custom = config.get('themes.custom', '~/.config/AOD-Notepad/themes')
+        themes_custom = config.get('themes.custom', '~/.config/AOD-Notes/themes')
 
         return ServiceTheme([themes_default, themes_custom])
 
-    def enabled(self, options=None, args=None):
-        return options.console is None
-
     def configure(self, binder, options, args):
+        """
+        Configure service container for the dependency injections
+        :param binder:
+        :param options:
+        :param args:
+        :return:
+        """
         binder.bind_to_constructor('themes', functools.partial(
             self._constructor_themes,
             options=options, args=args
         ))
-
-    @inject.params(themes='themes')
-    def boot(self, options=None, args=None, themes=None):
-        pass

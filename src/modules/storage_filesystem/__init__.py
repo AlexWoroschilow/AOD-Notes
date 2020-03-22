@@ -27,9 +27,6 @@ class Loader(object):
     def __exit__(self, type, value, traceback):
         pass
 
-    def enabled(self, options=None, args=None):
-        return True
-
     def configure(self, binder, options, args):
         """
         Setup services for the current module

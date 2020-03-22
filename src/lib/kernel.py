@@ -102,11 +102,9 @@ class Kernel(object):
                 module_class = getattr(module, 'Loader')
                 with module_class() as loader:
 
-                    if not hasattr(loader, 'enabled'):
-                        continue
-
-                    if not loader.enabled:
-                        continue
+                    if hasattr(loader, 'enabled'):
+                        if not loader.enabled:
+                            continue
 
                     logger.debug("loading: {}".format(loader))
                     modules.append(loader)

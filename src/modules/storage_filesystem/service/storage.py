@@ -55,7 +55,7 @@ class StoreFileSystem(object):
             if not os.path.isdir(candidate): continue
             return candidate
 
-        return os.path.expanduser('~/AOD-Notepad')
+        return os.path.expanduser('~/AOD-Notes')
 
     def clone(self, element, name='Copy', counter=1):
         """

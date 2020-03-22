@@ -17,8 +17,8 @@ from .actions import StorageActions
 
 
 class Loader(object):
-    actions = StorageActions()
     order = 99
+    actions = StorageActions()
 
     def __enter__(self):
         return self
@@ -27,20 +27,41 @@ class Loader(object):
         pass
 
     def __store(self):
-        return pydux.create_store(self.actions.initAction, {})
+        """
+        Store constructor, default reducer does nothing
+        :return:
+        """
 
-    @property
-    def enabled(self):
-        return True
+        def default(state, action):
+            return state
+
+        return pydux.create_store(default, {})
 
     def configure(self, binder, options, args):
+        """
+        Configure service container for the dependency injections
+        :param binder:
+        :param options:
+        :param args:
+        :return:
+        """
         binder.bind_to_constructor('store', self.__store)
 
     @inject.params(store='store')
     def boot(self, options, args, store):
+        """
+        Do staff after the service container was build
+        :param options:
+        :param args:
+        :param store:
+        :return:
+        """
         store.replace_reducer(self.update)
 
     def update(self, state=None, action=None):
+
+        if action.get('type') == '@@redux/INIT':
+            return self.actions.initAction(state, action)
 
         if action.get('type') == '@@app/search/index/progress':
             return self.actions.searchIndexProgressAction(state, action)
