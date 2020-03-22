@@ -70,6 +70,10 @@ class NotepadDashboard(QtWidgets.QWidget):
         self.layout().addWidget(self.splitter)
         self.layout().addWidget(self.toolbar)
 
+    def setProgress(self, value):
+        self.toolbar.setProgress(value)
+        return self
+
     def model(self):
         return self.splitter.panelLeft.tree.model()
 

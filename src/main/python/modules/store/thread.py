@@ -17,18 +17,27 @@ from PyQt5 import QtGui
 
 
 class SearchThread(QtCore.QThread):
-    progressAction = QtCore.pyqtSignal(object)
 
-    @inject.params(search='search', filesystem='store.filesystem')
-    def run(self, search=None, filesystem=None):
+    @inject.params(store='store', search='search', filesystem='store.filesystem')
+    def run(self, store=None, search=None, filesystem=None):
         if not search.clean():
             return None
 
-        self.progressAction.emit(0)
+        store.dispatch({
+            'type': '@@app/search/index/progress',
+            'progress': 0
+        })
 
         collection = filesystem.allDocuments()
         for progress, document in enumerate(collection, start=1):
-            self.progressAction.emit(progress / len(collection) * 100)
+            store.dispatch({
+                'type': '@@app/search/index/progress',
+                'progress': progress / len(collection) * 100
+            })
+
             search.update(document.name, document.path, document.content)
 
-        self.progressAction.emit(100)
+        store.dispatch({
+            'type': '@@app/search/index/progress',
+            'progress': 100
+        })

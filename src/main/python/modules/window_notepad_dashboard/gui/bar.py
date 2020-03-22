@@ -60,6 +60,25 @@ class NotepadDashboardToolbar(QtWidgets.QFrame):
         shortcut.activated.connect(lambda x=None: self.importNoteAction.emit(self.importing))
         shortcut.setEnabled(True)
 
+        self.progress = QtWidgets.QProgressBar(self)
+        self.progress.setVisible(False)
+        self.layout().addWidget(self.progress)
+
+    def setProgress(self, value=None):
+        if value in [None, 0, 100]:
+            self.progress.setVisible(False)
+            self.note.setVisible(True)
+            self.importing.setVisible(True)
+            self.group.setVisible(True)
+            return self
+
+        self.progress.setVisible(True)
+        self.progress.setValue(value)
+        self.note.setVisible(False)
+        self.importing.setVisible(False)
+        self.group.setVisible(False)
+        return self
+
     def close(self):
         super(NotepadDashboardToolbar, self).deleteLater()
         return super(NotepadDashboardToolbar, self).close()

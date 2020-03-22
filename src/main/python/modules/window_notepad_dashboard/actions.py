@@ -96,6 +96,12 @@ class ModuleActions(object):
 
         widget.setDocuments(documents, document)
 
+        progress = state['progress'] \
+            if 'progress' in state.keys() \
+            else None
+
+        widget.setProgress(progress)
+
     @inject.params(store='store', dashboard='notepad.dashboard')
     def onActionMoveNote(self, entity, store, dashboard):
         state = store.get_state()

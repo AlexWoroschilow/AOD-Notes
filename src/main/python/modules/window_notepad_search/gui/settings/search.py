@@ -40,22 +40,3 @@ class WidgetSettingsSearch(WidgetSettings):
         self.rebuild.setToolTip("Rebuild the search index")
         self.rebuild.clicked.connect(self.indexAction.emit)
         self.rebuild.setFlat(True)
-
-        self.progress = QtWidgets.QProgressBar(self)
-        self.progress.setVisible(False)
-        self.layout().addWidget(self.progress)
-
-        # self.thread.startedAction.connect(lambda x: self.rebuild.setVisible(False))
-        # self.thread.progressAction.connect(lambda x: self.rebuild.setVisible(False))
-        # self.thread.finishedAction.connect(lambda x: self.rebuild.setVisible(True))
-        #
-        # self.thread.startedAction.connect(lambda x: self.progress.setVisible(True))
-        # self.thread.progressAction.connect(lambda x: self.progress.setVisible(True))
-        # self.thread.progressAction.connect(lambda x: self.progress.setValue(x))
-        # self.thread.finishedAction.connect(lambda x: self.progress.setVisible(False))
-        #
-        # self.thread.finishedAction.connect(self.thread.exit)
-        self.show()
-
-    def quit(self):
-        self.thread.exit()

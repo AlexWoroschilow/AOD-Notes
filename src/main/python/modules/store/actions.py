@@ -11,26 +11,20 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
-
-from PyQt5 import QtCore
-
-from .decorators import *
+from .decorators import service_search_decorator
+from .decorators import service_config_decorator
 from .thread import SearchThread
 
 
-class StorageActions(QtCore.QObject):
-    progressAction = QtCore.pyqtSignal(object)
-
+class StorageActions(object):
     thread = SearchThread()
 
-    @inject.params(search='search', filesystem='store.filesystem')
-    def searchIndexAction(self, state, action, search, filesystem):
-        try:
-            self.thread.progressAction.disconnect()
-        except TypeError as ex:
-            pass
+    @inject.params(filesystem='store.filesystem')
+    def searchIndexProgressAction(self, state, action, filesystem):
+        return {'progress': action.get('progress')}
 
-        self.thread.progressAction.connect(self.progressAction.emit)
+    @inject.params(filesystem='store.filesystem')
+    def searchIndexAction(self, state, action, filesystem):
         self.thread.start()
         return state
 
@@ -39,6 +33,7 @@ class StorageActions(QtCore.QObject):
     def locationSwitchAction(self, state, action, filesystem):
 
         return {
+            'progress': state['progress'] if 'progress' in state.keys() else None,
             'document': filesystem.document(),
             'documents': filesystem.documents(),
             'group': filesystem.group(),
@@ -49,6 +44,7 @@ class StorageActions(QtCore.QObject):
     @inject.params(filesystem='store.filesystem')
     def initAction(self, state, action, filesystem):
         return {
+            'progress': state['progress'] if 'progress' in state.keys() else None,
             'document': filesystem.document(),
             'documents': filesystem.documents(),
             'group': filesystem.group(),
@@ -78,6 +74,7 @@ class StorageActions(QtCore.QObject):
                 .append(document)
 
         return {
+            'progress': state['progress'] if 'progress' in state.keys() else None,
             'group': filesystem.group(),
             'search': [search_result]
         }
@@ -92,9 +89,11 @@ class StorageActions(QtCore.QObject):
         group = type("Group", (object,), {})()
         group.path = entity.parent
 
-        print(filesystem.allDocuments())
-
-        return {'group': filesystem.group(group), 'document': entity}
+        return {
+            'progress': state['progress'] if 'progress' in state.keys() else None,
+            'group': filesystem.group(group),
+            'document': entity
+        }
 
     @service_config_decorator
     @inject.params(filesystem='store.filesystem')
@@ -104,6 +103,7 @@ class StorageActions(QtCore.QObject):
             return state
 
         return {
+            'progress': state['progress'] if 'progress' in state.keys() else None,
             'groups': filesystem.groups(),
             'documents': filesystem.documents(group),
             'group': group
@@ -117,6 +117,7 @@ class StorageActions(QtCore.QObject):
             return state
 
         return {
+            'progress': state['progress'] if 'progress' in state.keys() else None,
             'document': filesystem.document_create(group),
             'documents': filesystem.documents(group),
             'group': filesystem.group(group)
@@ -134,6 +135,7 @@ class StorageActions(QtCore.QObject):
             return state
 
         return {
+            'progress': state['progress'] if 'progress' in state.keys() else None,
             'groups': filesystem.groups(),
             'documents': filesystem.documents(group),
             'group': group
@@ -142,6 +144,7 @@ class StorageActions(QtCore.QObject):
     @service_search_decorator
     @inject.params(filesystem='store.filesystem')
     def updateDocumentEvent(self, state, action, filesystem):
+        state['progress'] = action.get('progress')
         return state
 
     @service_search_decorator
@@ -157,6 +160,7 @@ class StorageActions(QtCore.QObject):
         group.path = entity.parent
 
         return {
+            'progress': state['progress'] if 'progress' in state.keys() else None,
             'groups': filesystem.groups(),
             'documents': filesystem.documents(group),
             'document': filesystem.document(),
@@ -176,6 +180,7 @@ class StorageActions(QtCore.QObject):
         group.path = entity.parent
 
         return {
+            'progress': state['progress'] if 'progress' in state.keys() else None,
             'groups': filesystem.groups(),
             'documents': filesystem.documents(group),
             'document': filesystem.document(),
@@ -196,6 +201,7 @@ class StorageActions(QtCore.QObject):
         entity.parent = destination
 
         return {
+            'progress': state['progress'] if 'progress' in state.keys() else None,
             'groups': filesystem.groups(),
             'documents': filesystem.documents(destination),
             'document': filesystem.document(),
@@ -206,6 +212,7 @@ class StorageActions(QtCore.QObject):
     @inject.params(filesystem='store.filesystem')
     def renameResourceEvent(self, state, action, filesystem):
         return {
+            'progress': state['progress'] if 'progress' in state.keys() else None,
             'groups': filesystem.groups(),
             'documents': filesystem.documents(),
             'document': filesystem.document(),

@@ -35,12 +35,14 @@ class Loader(object):
     def configure(self, binder, options, args):
         binder.bind_to_constructor('store', self.__store)
 
-    @inject.params(store='store', window='window')
-    def boot(self, options, args, store, window):
-        self.actions.progressAction.connect(window.progressAction.emit)
+    @inject.params(store='store')
+    def boot(self, options, args, store):
         store.replace_reducer(self.update)
 
     def update(self, state=None, action=None):
+
+        if action.get('type') == '@@app/search/index/progress':
+            return self.actions.searchIndexProgressAction(state, action)
 
         if action.get('type') == '@@app/search/index/rebuild':
             return self.actions.searchIndexAction(state, action)
