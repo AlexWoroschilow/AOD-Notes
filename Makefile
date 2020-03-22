@@ -1,60 +1,28 @@
-project = AOD-Notepad
-source_rpm = ~/rpmbuild/SOURCES
-project_version = 0.1
-source_project = $(source_rpm)/$(project)-$(project_version)
-GLIBC_VERSION_RAW=$(shell getconf GNU_LIBC_VERSION)
-GLIBC_VERSION=$(shell sed -e 's/ /./g' <<< '${GLIBC_VERSION_RAW}')
+SHELL := /usr/bin/bash
+APPDIR := ./AppDir
+GLIBC_VERSION := $(shell getconf GNU_LIBC_VERSION | sed 's/ /-/g' )
+PWD := $(shell pwd)
 
-all: appimage clean
-	echo "done"
+all: init appimage clean
 
-clean: 
-	@echo	"[clean] Cleanup the AppDir" && 		rm	-rf		$(project).AppDir
-	@echo	"[clean] Cleanup the PyInstaller" && 	rm 	-rf		target/PyInstaller
-	@echo	"[clean] Cleanup the Build" && 			rm  -rf		target/$(project)
-	echo $(GLIBC_VERSION1)
+init:
+	rm -rf $(PWD)/venv
+	python3 -m venv --copies $(PWD)/venv
+	source $(PWD)/venv/bin/activate && python3 -m pip install --upgrade pip && python3 -m pip install -r $(PWD)/requirements.txt
 
-dmg:
-	python3 		-m 	   fbs freeze
-	cp              -r     src/main/python/modules target/$(project).app/Contents/MacOS
-	cp              -r     src/main/python/plugins target/$(project).app/Contents/MacOS
-	cp              -r     src/main/python/template target/$(project).app/Contents/MacOS
-	cp              -r     src/main/python/icons target/$(project).app/Contents/MacOS
-	cp              -r     src/main/python/css target/$(project).app/Contents/MacOS
-	cp              -r     src/main/python/themes target/$(project).app/Contents/MacOS
-	cp              -r     src/main/python/lib target/$(project).app/Contents/MacOS
-	cp              -r     src/main/python/application.py target/$(project).app/Contents/MacOS
-	python3 		-m 	   fbs installer
 
-appimage:
-	python3 	-m     fbs freeze
-	cp              -r     src/main/python/modules target/$(project)
-	cp              -r     src/main/python/plugins target/$(project)
-	cp              -r     src/main/python/template target/$(project)
-	cp              -r     src/main/python/icons target/$(project)
-	cp              -r     src/main/python/themes target/$(project)
-	cp              -r     src/main/python/lib target/$(project)
-	cp              -r     src/main/python/themes target/$(project)
-	cp              -r     src/main/python/application.py target/$(project)
+appimage: clean
+	source $(PWD)/venv/bin/activate && python3 -O -m PyInstaller src/main.py --distpath $(APPDIR) --name application --noconfirm
+	cp -r ./src/icons $(APPDIR)/application
+	cp -r ./src/lib $(APPDIR)/application
+	cp -r ./src/modules $(APPDIR)/application
+	cp -r ./src/plugins $(APPDIR)/application
+	cp -r ./src/themes $(APPDIR)/application
 
-	rm              -rf    $(project).AppDir
-	mkdir           -p     $(project).AppDir/opt/$(project)
-	cp              -r     target/$(project) $(project).AppDir/opt
-	cp              -r     src/main/icons/Icon.svg $(project).AppDir/icon.svg
-	echo			"[Desktop Entry]" >> $(project).AppDir/$(project).desktop
-	echo			"Name=$(project)" >> $(project).AppDir/$(project).desktop
-	echo			"Exec=AppRun" >> $(project).AppDir/$(project).desktop
-	echo			"Icon=icon" >> $(project).AppDir/$(project).desktop
-	echo			"Type=Application" >> $(project).AppDir/$(project).desktop
-	echo			"Categories=Office;Education;" >> $(project).AppDir/$(project).desktop
+	bin/appimagetool-x86_64.AppImage  ./AppDir bin/AOD-Notes.AppImage
+	@echo "done: bin/AOD-Notes.AppImage"
 
-	echo			"#! /bin/bash" >> $(project).AppDir/AppRun
-	echo			"set -e" >> $(project).AppDir/AppRun
-	echo			"cd \$${HOME}" >> $(project).AppDir/AppRun
-	echo			"exec \$${APPDIR}/opt/$(project)/$(project)" >> $(project).AppDir/AppRun
-	chmod 			+x $(project).AppDir/AppRun
-	find 			$(project).AppDir -name '__pycache__' -exec rm -rf {} +
-	find 			$(project).AppDir -name '.pyc*' -exec rm -rf {} +
-	export 			ARCH=x86_64
-	exec 			bin/appimagetool $(project).AppDir bin/$(project).AppImage
-
+clean:
+	rm -rf ${APPDIR}/venv
+	rm -rf ${APPDIR}/application
+	rm -rf ${APPDIR}/opt
