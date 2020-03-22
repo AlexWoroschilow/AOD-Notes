@@ -19,6 +19,7 @@ from PyQt5 import QtCore
 
 
 class MainWindow(QtWidgets.QMainWindow):
+    progressAction = QtCore.pyqtSignal(object)
     newTabAction = QtCore.pyqtSignal(object)
     switchTabAction = QtCore.pyqtSignal(object)
     resize = QtCore.pyqtSignal(object)

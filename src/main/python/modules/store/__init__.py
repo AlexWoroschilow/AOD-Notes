@@ -10,10 +10,8 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import os
 import pydux
 import inject
-import shutil
 
 from .actions import StorageActions
 
@@ -37,11 +35,15 @@ class Loader(object):
     def configure(self, binder, options, args):
         binder.bind_to_constructor('store', self.__store)
 
-    @inject.params(store='store')
-    def boot(self, options, args, store):
+    @inject.params(store='store', window='window')
+    def boot(self, options, args, store, window):
+        self.actions.progressAction.connect(window.progressAction.emit)
         store.replace_reducer(self.update)
 
     def update(self, state=None, action=None):
+
+        if action.get('type') == '@@app/search/index/rebuild':
+            return self.actions.searchIndexAction(state, action)
 
         if action.get('type') == '@@app/storage/location/switch':
             return self.actions.locationSwitchAction(state, action)

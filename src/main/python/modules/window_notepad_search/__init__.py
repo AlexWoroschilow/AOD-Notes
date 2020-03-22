@@ -10,9 +10,7 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-import os
 import inject
-import functools
 
 from .actions import ModuleActions
 from .gui.settings.search import WidgetSettingsSearch
@@ -28,12 +26,17 @@ class Loader(object):
     def __exit__(self, type, value, traceback):
         pass
 
+    def __construct(self):
+        widget = WidgetSettingsSearch()
+        widget.indexAction.connect(self.actions.onActionIndexation)
+        return widget
+
     def enabled(self, options=None, args=None):
         return options.console is None
 
     @inject.params(store='store', factory='settings_factory')
     def boot(self, options=None, args=None, store=None, factory=None):
-        factory.addWidget(WidgetSettingsSearch)
+        factory.addWidget(self.__construct)
 
         store.subscribe(self.update)
 

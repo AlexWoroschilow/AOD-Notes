@@ -11,10 +11,28 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
+
+from PyQt5 import QtCore
+
 from .decorators import *
+from .thread import SearchThread
 
 
-class StorageActions(object):
+class StorageActions(QtCore.QObject):
+    progressAction = QtCore.pyqtSignal(object)
+
+    thread = SearchThread()
+
+    @inject.params(search='search', filesystem='store.filesystem')
+    def searchIndexAction(self, state, action, search, filesystem):
+        try:
+            self.thread.progressAction.disconnect()
+        except TypeError as ex:
+            pass
+
+        self.thread.progressAction.connect(self.progressAction.emit)
+        self.thread.start()
+        return state
 
     @service_config_decorator
     @inject.params(filesystem='store.filesystem')
@@ -73,6 +91,8 @@ class StorageActions(object):
 
         group = type("Group", (object,), {})()
         group.path = entity.parent
+
+        print(filesystem.allDocuments())
 
         return {'group': filesystem.group(group), 'document': entity}
 

@@ -13,22 +13,22 @@
 import inject
 
 from PyQt5 import QtCore
+from PyQt5 import QtGui
 
 
-class ModuleActions(QtCore.QObject):
+class SearchThread(QtCore.QThread):
     progressAction = QtCore.pyqtSignal(object)
 
-    @inject.params(store='store')
-    def onActionIndexation(self, event, store):
-        store.dispatch({
-            'type': '@@app/search/index/rebuild',
-        })
+    @inject.params(search='search', filesystem='store.filesystem')
+    def run(self, search=None, filesystem=None):
+        if not search.clean():
+            return None
 
-    @inject.params(store='store', window='window')
-    def onActionSelect(self, entity, store, window):
-        window.switchTabAction.emit(0)
+        self.progressAction.emit(0)
 
-        store.dispatch({
-            'type': '@@app/storage/resource/selected/document',
-            'entity': entity
-        })
+        collection = filesystem.allDocuments()
+        for progress, document in enumerate(collection, start=1):
+            self.progressAction.emit(progress / len(collection) * 100)
+            search.update(document.name, document.path, document.content)
+
+        self.progressAction.emit(100)

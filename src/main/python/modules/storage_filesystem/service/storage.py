@@ -32,9 +32,9 @@ class StoreFileSystem(object):
             result.append(Group(path, self._groups(path)))
         return result
 
-    def _documents(self, location):
+    def _documents(self, location, recursive=False):
         result = []
-        for filename in glob.iglob('{}/**'.format(location)):
+        for filename in glob.iglob('{}/**'.format(location), recursive=recursive):
             if not len(filename) or os.path.isdir(filename):
                 continue
             result.append(Document(filename))
@@ -204,3 +204,16 @@ class StoreFileSystem(object):
             return []
 
         return self._documents(location)
+
+    @inject.params(config='config')
+    def allDocuments(self, group=None, config=None):
+        location = group.path if group is not None \
+            else config.get('storage.location', self.default)
+
+        if location is None or not len(location):
+            return []
+
+        if not os.path.exists(location):
+            return []
+
+        return self._documents(location, True)
