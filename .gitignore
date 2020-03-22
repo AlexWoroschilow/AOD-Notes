@@ -5,3 +5,6 @@ __pycache__/
 .project
 .pydevproject
 .settings
+/venv/
+/build/application/
+/AppDir/application/
