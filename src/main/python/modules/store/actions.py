@@ -21,19 +21,43 @@ class StorageActions(object):
 
     @inject.params(filesystem='store.filesystem')
     def searchIndexProgressAction(self, state, action, filesystem):
+        """
+
+        :param state:
+        :param action:
+        :param filesystem:
+        :return:
+        """
         return {'progress': action.get('progress')}
 
     @inject.params(filesystem='store.filesystem')
     def searchIndexAction(self, state, action, filesystem):
+        """
+
+        :param state:
+        :param action:
+        :param filesystem:
+        :return:
+        """
         self.thread.start()
         return state
 
     @service_config_decorator
     @inject.params(filesystem='store.filesystem')
     def locationSwitchAction(self, state, action, filesystem):
+        """
+
+        :param state:
+        :param action:
+        :param filesystem:
+        :return:
+        """
+        progress = state['progress'] \
+            if 'progress' in state.keys() \
+            else None
 
         return {
-            'progress': state['progress'] if 'progress' in state.keys() else None,
+            'progress': progress,
             'document': filesystem.document(),
             'documents': filesystem.documents(),
             'group': filesystem.group(),
@@ -43,8 +67,19 @@ class StorageActions(object):
     @service_config_decorator
     @inject.params(filesystem='store.filesystem')
     def initAction(self, state, action, filesystem):
+        """
+
+        :param state:
+        :param action:
+        :param filesystem:
+        :return:
+        """
+        progress = state['progress'] \
+            if 'progress' in state.keys() \
+            else None
+
         return {
-            'progress': state['progress'] if 'progress' in state.keys() else None,
+            'progress': progress,
             'document': filesystem.document(),
             'documents': filesystem.documents(),
             'group': filesystem.group(),
@@ -53,9 +88,20 @@ class StorageActions(object):
 
     @inject.params(search='search', filesystem='store.filesystem')
     def searchAction(self, state, action, search, filesystem):
+        """
+
+        :param state:
+        :param action:
+        :param search:
+        :param filesystem:
+        :return:
+        """
+        progress = state['progress'] \
+            if 'progress' in state.keys() \
+            else None
+
         string = action.get('string')
-        if not len(string):
-            return None
+        if not len(string): return None
 
         search_result = {
             'title': string,
@@ -74,7 +120,7 @@ class StorageActions(object):
                 .append(document)
 
         return {
-            'progress': state['progress'] if 'progress' in state.keys() else None,
+            'progress': progress,
             'group': filesystem.group(),
             'search': [search_result]
         }
@@ -82,15 +128,25 @@ class StorageActions(object):
     @service_config_decorator
     @inject.params(filesystem='store.filesystem')
     def selectDocumentEvent(self, state, action, filesystem):
+        """
+
+        :param state:
+        :param action:
+        :param filesystem:
+        :return:
+        """
+        progress = state['progress'] \
+            if 'progress' in state.keys() \
+            else None
+
         entity = action.get('entity')
-        if entity is None:
-            return state
+        if entity is None: return state
 
         group = type("Group", (object,), {})()
         group.path = entity.parent
 
         return {
-            'progress': state['progress'] if 'progress' in state.keys() else None,
+            'progress': progress,
             'group': filesystem.group(group),
             'document': entity
         }
@@ -98,12 +154,22 @@ class StorageActions(object):
     @service_config_decorator
     @inject.params(filesystem='store.filesystem')
     def selectGroupEvent(self, state, action, filesystem):
+        """
+
+        :param state:
+        :param action:
+        :param filesystem:
+        :return:
+        """
+        progress = state['progress'] \
+            if 'progress' in state.keys() \
+            else None
+
         group = action.get('entity')
-        if group is None:
-            return state
+        if group is None: return state
 
         return {
-            'progress': state['progress'] if 'progress' in state.keys() else None,
+            'progress': progress,
             'groups': filesystem.groups(),
             'documents': filesystem.documents(group),
             'group': group
@@ -112,12 +178,22 @@ class StorageActions(object):
     @service_search_decorator
     @inject.params(filesystem='store.filesystem')
     def createDocumentEvent(self, state, action, filesystem):
+        """
+
+        :param state:
+        :param action:
+        :param filesystem:
+        :return:
+        """
+        progress = state['progress'] \
+            if 'progress' in state.keys() \
+            else None
+
         group = state['group']
-        if group is None:
-            return state
+        if group is None: return state
 
         return {
-            'progress': state['progress'] if 'progress' in state.keys() else None,
+            'progress': progress,
             'document': filesystem.document_create(group),
             'documents': filesystem.documents(group),
             'group': filesystem.group(group)
@@ -125,17 +201,25 @@ class StorageActions(object):
 
     @inject.params(filesystem='store.filesystem')
     def createGroupEvent(self, state, action, filesystem):
+        """
+
+        :param state:
+        :param action:
+        :param filesystem:
+        :return:
+        """
+        progress = state['progress'] \
+            if 'progress' in state.keys() \
+            else None
 
         group = state['group']
-        if group is None:
-            return state
+        if group is None: return state
 
         group = filesystem.group_create(group)
-        if group is None:
-            return state
+        if group is None: return state
 
         return {
-            'progress': state['progress'] if 'progress' in state.keys() else None,
+            'progress': progress,
             'groups': filesystem.groups(),
             'documents': filesystem.documents(group),
             'group': group
@@ -144,15 +228,35 @@ class StorageActions(object):
     @service_search_decorator
     @inject.params(filesystem='store.filesystem')
     def updateDocumentEvent(self, state, action, filesystem):
-        state['progress'] = action.get('progress')
+        """
+
+        :param state:
+        :param action:
+        :param filesystem:
+        :return:
+        """
+        state['progress'] = state['progress'] \
+            if 'progress' in state.keys() \
+            else None
+
         return state
 
     @service_search_decorator
     @inject.params(filesystem='store.filesystem')
     def removeResourceEvent(self, state, action, filesystem):
+        """
+
+        :param state:
+        :param action:
+        :param filesystem:
+        :return:
+        """
+        progress = state['progress'] \
+            if 'progress' in state.keys() \
+            else None
+
         entity = action.get('entity')
-        if entity is None:
-            return state
+        if entity is None: return state
 
         filesystem.remove(entity)
 
@@ -160,7 +264,7 @@ class StorageActions(object):
         group.path = entity.parent
 
         return {
-            'progress': state['progress'] if 'progress' in state.keys() else None,
+            'progress': progress,
             'groups': filesystem.groups(),
             'documents': filesystem.documents(group),
             'document': filesystem.document(),
@@ -170,9 +274,19 @@ class StorageActions(object):
     @service_search_decorator
     @inject.params(filesystem='store.filesystem')
     def cloneResourceEvent(self, state, action, filesystem):
+        """
+
+        :param state:
+        :param action:
+        :param filesystem:
+        :return:
+        """
+        progress = state['progress'] \
+            if 'progress' in state.keys() \
+            else None
+
         entity = action.get('entity')
-        if entity is None:
-            return state
+        if entity is None: return state
 
         filesystem.clone(entity)
 
@@ -180,7 +294,7 @@ class StorageActions(object):
         group.path = entity.parent
 
         return {
-            'progress': state['progress'] if 'progress' in state.keys() else None,
+            'progress': progress,
             'groups': filesystem.groups(),
             'documents': filesystem.documents(group),
             'document': filesystem.document(),
@@ -190,18 +304,27 @@ class StorageActions(object):
     @service_search_decorator
     @inject.params(filesystem='store.filesystem')
     def moveResourceEvent(self, state, action, filesystem):
+        """
+
+        :param state:
+        :param action:
+        :param filesystem:
+        :return:
+        """
+        progress = state['progress'] \
+            if 'progress' in state.keys() \
+            else None
+
         entity = action.get('entity')
-        if entity is None:
-            return state
+        if entity is None: return state
 
         destination = action.get('destination')
-        if destination is None:
-            return state
+        if destination is None: return state
 
         entity.parent = destination
 
         return {
-            'progress': state['progress'] if 'progress' in state.keys() else None,
+            'progress': progress,
             'groups': filesystem.groups(),
             'documents': filesystem.documents(destination),
             'document': filesystem.document(),
@@ -211,8 +334,19 @@ class StorageActions(object):
     @service_search_decorator
     @inject.params(filesystem='store.filesystem')
     def renameResourceEvent(self, state, action, filesystem):
+        """
+
+        :param state:
+        :param action:
+        :param filesystem:
+        :return:
+        """
+        progress = state['progress'] \
+            if 'progress' in state.keys() \
+            else None
+
         return {
-            'progress': state['progress'] if 'progress' in state.keys() else None,
+            'progress': progress,
             'groups': filesystem.groups(),
             'documents': filesystem.documents(),
             'document': filesystem.document(),
