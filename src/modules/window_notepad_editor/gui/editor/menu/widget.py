@@ -45,7 +45,8 @@ class ImageResizeWidget(QtWidgets.QWidget):
         self.setLayout(QtWidgets.QVBoxLayout())
         self.setMinimumSize(QtCore.QSize(450, 450))
 
-        header, content = content.split(',')
+        if len(content.split(',')) == 2:
+            header, content = content.split(',')
         content = content.encode('utf-8')
 
         self.image = QtGui.QPixmap()
