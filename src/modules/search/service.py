@@ -33,9 +33,6 @@ class Search(object):
             path=ID(stored=True)
         )
 
-        if not os.path.exists(self.destination):
-            os.makedirs(self.destination, exist_ok=True)
-
         if not self.exists(self.destination):
             return self.create(self.destination)
 
@@ -54,11 +51,14 @@ class Search(object):
         return soup.text
 
     def create(self, destination=None):
-        if self.schema is None:
-            return None
+        if destination is None: return None
+        if self.schema is None: return None
 
-        if destination is None:
-            return None
+        if os.path.exists(destination):
+            shutil.rmtree(destination, ignore_errors=True)
+
+        if not os.path.exists(destination):
+            os.makedirs(destination, exist_ok=True)
 
         self.ix = index.create_in(destination, self.schema)
 
@@ -134,9 +134,5 @@ class Search(object):
                 yield result['path']
 
     def clean(self):
-        if os.path.exists(self.destination):
-            shutil.rmtree(self.destination, True)
-        if not os.path.exists(self.destination):
-            os.makedirs(self.destination, exist_ok=True)
         self.create(self.destination)
         return True
