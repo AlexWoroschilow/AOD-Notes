@@ -134,6 +134,9 @@ class Search(object):
                 yield result['path']
 
     def clean(self):
-        if self.destination is None: return None
+        if os.path.exists(self.destination):
+            shutil.rmtree(self.destination, True)
+        if not os.path.exists(self.destination):
+            os.makedirs(self.destination, exist_ok=True)
         self.create(self.destination)
         return True
