@@ -33,10 +33,12 @@ class Search(object):
             path=ID(stored=True)
         )
 
-        if not self.exists(self.destination):
+        try:
+            if not self.exists(self.destination):
+                return self.create(self.destination)
+            return self.previous(self.destination)
+        except ValueError as ex:
             return self.create(self.destination)
-
-        return self.previous(self.destination)
 
     def _strip_tags(self, html=None):
         if html is None:
@@ -54,7 +56,7 @@ class Search(object):
         if destination is None: return None
         if self.schema is None: return None
 
-        if os.path.exists(destination):
+        if os.path.exists(destination) and os.path.isdir(destination):
             shutil.rmtree(destination, ignore_errors=True)
 
         if not os.path.exists(destination):
