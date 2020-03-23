@@ -208,5 +208,9 @@ class ModuleActions(object):
                                                        QtWidgets.QMessageBox.No)
                 if reply == QtWidgets.QMessageBox.No: continue
 
-            with open(path, 'r') as source:
-                source.close()
+            with open(path, 'r') as stream:
+                store.dispatch({
+                    'type': '@@app/storage/resource/create/document',
+                    'content': stream.read()
+                })
+                stream.close()

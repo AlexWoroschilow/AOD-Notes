@@ -192,9 +192,16 @@ class StorageActions(object):
         group = state['group']
         if group is None: return state
 
+        document = filesystem.document_create(group)
+        if document is None: return state
+
+        content = action.get('content')
+        if content is not None and len(content):
+            document.content = content
+
         return {
             'progress': progress,
-            'document': filesystem.document_create(group),
+            'document': document,
             'documents': filesystem.documents(group),
             'group': filesystem.group(group)
         }

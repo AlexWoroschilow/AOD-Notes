@@ -176,9 +176,10 @@ class TextEditorWidget(QtWidgets.QFrame):
         self.writer.setHtml(content)
 
     def appendHtml(self, html=None):
-        if self.writer is None: return None
-        if content is None: return None
-        self.writer.insertHtml(content)
+        if self.writer is None:
+            return None
+
+        self.writer.insertHtml(html)
 
     def setTextColor(self, color=None):
         if self.writer is not None and color is not None:

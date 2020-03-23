@@ -117,7 +117,10 @@ class Document(object):
 
     @content.setter
     def content(self, value):
-        return open(self.path, 'w').write(value)
+        with open(self.path, 'w') as stream:
+            stream.write(value)
+            stream.close
+        return self
 
     def __str__(self):
         return self.name
