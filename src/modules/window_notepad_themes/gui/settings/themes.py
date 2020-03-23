@@ -24,7 +24,7 @@ from PyQt5 import QtGui
 
 
 class ThemeLabel(QtWidgets.QLabel):
-    clicked = QtCore.pyqtSignal(object)
+    clickedAction = QtCore.pyqtSignal(object)
 
     def __init__(self, parent, theme=None):
         super(ThemeLabel, self).__init__(parent)
@@ -33,7 +33,7 @@ class ThemeLabel(QtWidgets.QLabel):
         self.theme = theme
 
     def mousePressEvent(self, event):
-        self.clicked.emit(self.theme)
+        self.clickedAction.emit(self.theme)
 
     def event(self, QEvent):
         if QEvent.type() == QtCore.QEvent.Enter:
@@ -56,22 +56,20 @@ class ThemeLabel(QtWidgets.QLabel):
 
 
 class WidgetSettingsThemes(WidgetSettings):
-    theme = QtCore.pyqtSignal(object)
+    themeAction = QtCore.pyqtSignal(object)
 
     @inject.params(themes='themes')
     def __init__(self, themes=None):
         super(WidgetSettingsThemes, self).__init__()
 
-        self.layout = QtWidgets.QVBoxLayout()
-        self.layout.setAlignment(Qt.AlignLeft)
-
-        self.layout.addWidget(SettingsTitle('Themes'))
+        self.setLayout(QtWidgets.QVBoxLayout())
+        self.layout().setAlignment(Qt.AlignLeft)
+        self.layout().addWidget(SettingsTitle('Themes'))
 
         for theme in themes.get_stylesheets():
             label = ThemeLabel(self, theme)
-            label.clicked.connect(self.theme.emit)
-            self.layout.addWidget(label)
+            label.clickedAction.connect(self.themeAction.emit)
 
-        self.setLayout(self.layout)
+            self.layout().addWidget(label)
 
         self.show()

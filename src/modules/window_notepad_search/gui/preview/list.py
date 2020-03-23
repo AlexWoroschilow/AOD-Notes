@@ -44,6 +44,11 @@ class PreviewScrollArea(QtWidgets.QListWidget):
 
         self.hashmap_index = {}
 
+    def setPreview(self, collection=[]):
+        for documents in collection:
+            self.addPreview(documents)
+        return self
+
     def addPreview(self, document=None):
         item = NoteItem()
         item.setData(0, document)

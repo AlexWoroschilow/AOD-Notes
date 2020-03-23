@@ -17,9 +17,10 @@ import functools
 from .actions import ModuleActions
 from .service import ServiceTheme
 
+from .decorators import service_settings_decorator
+
 
 class Loader(object):
-    actions = ModuleActions()
 
     def __enter__(self):
         return self
@@ -27,28 +28,12 @@ class Loader(object):
     def __exit__(self, type, value, traceback):
         pass
 
-    def _constructor_settings(self, options, args):
-        from .gui.settings.themes import WidgetSettingsThemes
-        widget = WidgetSettingsThemes()
-        widget.theme.connect(functools.partial(
-            self.actions.on_action_theme, widget=widget
-        ))
-        return widget
-
-    @inject.params(config='config', factory='settings_factory')
-    def _constructor_themes(self, options=None, args=None, config=None, factory=None):
-        if config is None: return None
-        if factory is None: return None
-
-        factory.addWidget(functools.partial(
-            self._constructor_settings,
-            options=options, args=args
-        ), 128)
-
-        themes_default = config.get('themes.default', 'themes/')
-        themes_custom = config.get('themes.custom', '~/.config/AOD-Notes/themes')
-
-        return ServiceTheme([themes_default, themes_custom])
+    @inject.params(config='config')
+    def __construct(self, config=None):
+        return ServiceTheme([
+            config.get('themes.default', 'themes/'),
+            config.get('themes.custom', '~/.config/AOD-Notes/themes')
+        ])
 
     def configure(self, binder, options, args):
         """
@@ -58,7 +43,8 @@ class Loader(object):
         :param args:
         :return:
         """
-        binder.bind_to_constructor('themes', functools.partial(
-            self._constructor_themes,
-            options=options, args=args
-        ))
+        binder.bind_to_constructor('themes', self.__construct)
+
+    @service_settings_decorator
+    def boot(self, options=None, args=None):
+        pass

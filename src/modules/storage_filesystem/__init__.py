@@ -12,14 +12,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import inject
 
-from .actions import ModuleActions
 from .service.storage import StoreFileSystem
-
-from .gui.settings.storage import WidgetSettingsStorage
+from .decorators import service_settings_decorator
 
 
 class Loader(object):
-    actions = ModuleActions()
 
     def __enter__(self):
         return self
@@ -37,19 +34,6 @@ class Loader(object):
         """
         binder.bind('store.filesystem', StoreFileSystem())
 
-    @inject.params(factory='settings_factory')
-    def boot(self, options, args, factory):
-        """
-        Do some actions after the modules and plugins were loaded
-        :param options:
-        :param args:
-        :param factory:
-        :return:
-        """
-
-        def settings():
-            widget = WidgetSettingsStorage()
-            widget.locationAction.connect(self.actions.onActionLocation)
-            return widget
-
-        factory.addWidget(settings)
+    @service_settings_decorator
+    def boot(self, options, args):
+        pass

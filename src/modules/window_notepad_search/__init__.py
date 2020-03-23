@@ -13,8 +13,9 @@
 import inject
 
 from .actions import ModuleActions
-from .gui.settings.search import WidgetSettingsSearch
 from .gui.preview.list import PreviewScrollArea
+
+from .decorators import service_settings_decorator
 
 
 class Loader(object):
@@ -26,31 +27,26 @@ class Loader(object):
     def __exit__(self, type, value, traceback):
         pass
 
-    def __construct(self):
-        widget = WidgetSettingsSearch()
-        widget.indexAction.connect(self.actions.onActionIndexation)
-        return widget
-
-    @inject.params(store='store', factory='settings_factory')
-    def boot(self, options=None, args=None, store=None, factory=None):
-        factory.addWidget(self.__construct)
-
+    @service_settings_decorator
+    @inject.params(store='store')
+    def boot(self, options, args, store):
         store.subscribe(self.update)
 
     @inject.params(store='store', window='window')
     def update(self, store=None, window=None):
         state = store.get_state()
-        if state is None: return None
+        if state is None:
+            return None
 
         if 'search' not in state.keys():
             return None
 
         for search in state['search']:
-            if search is None: continue
+            if search is None:
+                continue
 
             preview = PreviewScrollArea(window)
             preview.selectAction.connect(self.actions.onActionSelect)
-            for documents in search['documents']:
-                preview.addPreview(documents)
+            preview.setPreview(search['documents'])
 
             window.newTabAction.emit((preview, search['title']))
