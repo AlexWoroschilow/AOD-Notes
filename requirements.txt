@@ -8,8 +8,8 @@ Inject==3.5.4
 pdfkit==0.6.1
 pydux==0.2.2
 PyInstaller==3.6
-PyQt5==5.14.1
-PyQt5-sip==12.7.1
+PyQt5==5.12
+PyQt5-sip==4.19.19
 six==1.14.0
 soupsieve==1.9.5
 webencodings==0.5.1

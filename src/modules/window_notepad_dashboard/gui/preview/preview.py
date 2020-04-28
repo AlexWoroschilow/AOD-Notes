@@ -32,7 +32,7 @@ class NotePreviewDescription(QtWidgets.QFrame):
         super(NotePreviewDescription, self).__init__()
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.setContentsMargins(0, 0, 0, 0)
-        self.setFixedWidth(430)
+        self.setFixedHeight(120)
 
         self.layout = QtWidgets.QGridLayout()
         self.layout.setAlignment(Qt.AlignTop)
@@ -41,8 +41,7 @@ class NotePreviewDescription(QtWidgets.QFrame):
         self.layout.addWidget(title, 0, 0, 1, 30)
 
         self.description = Description(entity.content)
-        self.description.setFixedHeight(self.height() * 0.85)
-        self.layout.addWidget(self.description, 1, 0, 20, 30)
+        self.layout.addWidget(self.description, 1, 0, 2, 30)
 
         self.buttonClone = PictureButtonFlat(QtGui.QIcon("icons/copy"))
         self.buttonClone.clicked.connect(lambda x: self.cloneNoteAction.emit(entity))

@@ -17,7 +17,8 @@ class Title(QtWidgets.QLabel):
 
     def __init__(self, text):
         super(Title, self).__init__(text)
+        self.setWordWrap(False)
+
         font = self.font()
-        font.setPixelSize(20)
+        font.setPixelSize(16)
         self.setFont(font)
-        self.setWordWrap(True)

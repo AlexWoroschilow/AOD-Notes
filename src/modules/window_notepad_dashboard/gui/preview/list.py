@@ -24,7 +24,7 @@ class NoteItem(QtWidgets.QListWidgetItem):
 
     def __init__(self, document=None):
         super(NoteItem, self).__init__()
-        self.setSizeHint(QtCore.QSize(435, 550))
+        self.setSizeHint(QtCore.QSize(200, 120))
         self.setTextAlignment(Qt.AlignCenter)
         self.setData(0, document)
 
@@ -39,11 +39,11 @@ class PreviewScrollArea(QtWidgets.QListWidget):
     def __init__(self, store=None, status=None):
         super(PreviewScrollArea, self).__init__()
         self.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
-        self.setViewMode(QtWidgets.QListView.IconMode)
         self.setResizeMode(QtWidgets.QListView.Adjust)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setMovement(QtWidgets.QListView.Static)
+        self.setMaximumWidth(550)
 
     def addItemRow(self, document, current=None):
         item = NoteItem(document)
