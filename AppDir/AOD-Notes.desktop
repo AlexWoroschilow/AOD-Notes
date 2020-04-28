@@ -1,5 +1,7 @@
 [Desktop Entry]
 Name=AOD-Notes
+Comment=A program for free-form information gathering.
+GenericName=AOD-Notes
 Exec=AppRun
 Icon=icon
 Type=Application
