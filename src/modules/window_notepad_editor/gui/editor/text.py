@@ -337,6 +337,48 @@ class TextEditor(QtWidgets.QTextEdit):
 
         return super(TextEditor, self).event(QEvent)
 
+    def __insertPicture(self, QMimeData=None):
+        if QMimeData is None: return None
+
+        data = QMimeData.imageData()
+        if data is None: return None
+
+        pixmap = QtGui.QPixmap.fromImage(data)
+        if pixmap is None: return None
+
+        buffer = QtCore.QBuffer()
+        buffer.open(QtCore.QBuffer.WriteOnly)
+        pixmap.save(buffer, "PNG")
+
+        return '<img src="data:image/png;base64, {}" />'.format(
+            str(buffer.data().toBase64(), encoding='utf-8')
+        )
+
+    def __insertText(self, QMimeData=None):
+        if QMimeData is None: return None
+
+        from bs4 import BeautifulSoup
+
+        def strip_tags(html=None):
+            if html is None: return None
+
+            soup = BeautifulSoup(html, "html5lib")
+            [x.extract() for x in soup.find_all('script')]
+            [x.extract() for x in soup.find_all('style')]
+            [x.extract() for x in soup.find_all('meta')]
+            [x.extract() for x in soup.find_all('noscript')]
+            [x.extract() for x in soup.find_all('iframe')]
+            return soup.text
+
+        return strip_tags(QMimeData.text())
+
+    def insertFromMimeData(self, QMimeData):
+        if QMimeData.hasImage() and not QMimeData.hasText():
+            string = self.__insertPicture(QMimeData)
+            return self.textCursor().insertHtml(string)
+        text = self.__insertText(QMimeData)
+        return self.textCursor().insertText(text)
+
     def close(self):
         super(TextEditor, self).deleteLater()
         return super(TextEditor, self).close()

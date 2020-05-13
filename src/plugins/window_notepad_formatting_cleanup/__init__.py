@@ -53,6 +53,5 @@ class Loader(object):
         return soup.text
 
     def clickedEvent(self, event=None, widget=None):
-        print(widget)
         content = widget.document().toRawText()
         widget.document().setPlainText(content)
