@@ -111,7 +111,8 @@ class TextEditorWidget(QtWidgets.QFrame):
 
     def open(self, entity=None):
         if entity is None: return self
-        self.insertHtml(entity.content)
+        if self.getHtml() != entity.content:
+            self.insertHtml(entity.content)
         self.label.setText(entity.name)
         self.entity = entity
         return self

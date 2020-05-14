@@ -52,17 +52,16 @@ class StorageActions(object):
         :param filesystem:
         :return:
         """
-        progress = state['progress'] \
+        response = {}
+        response['documents'] = filesystem.documents()
+        response['groups'] = filesystem.groups()
+        response['document'] = filesystem.document()
+        response['group'] = filesystem.group()
+        response['progress'] = state['progress'] \
             if 'progress' in state.keys() \
             else None
 
-        return {
-            'progress': progress,
-            'document': filesystem.document(),
-            'documents': filesystem.documents(),
-            'group': filesystem.group(),
-            'groups': filesystem.groups(),
-        }
+        return response
 
     @service_config_decorator
     @inject.params(filesystem='store.filesystem')
@@ -74,17 +73,16 @@ class StorageActions(object):
         :param filesystem:
         :return:
         """
-        progress = state['progress'] \
+        response = {}
+        response['documents'] = filesystem.documents()
+        response['groups'] = filesystem.groups()
+        response['document'] = filesystem.document()
+        response['group'] = filesystem.group()
+        response['progress'] = state['progress'] \
             if 'progress' in state.keys() \
             else None
 
-        return {
-            'progress': progress,
-            'document': filesystem.document(),
-            'documents': filesystem.documents(),
-            'group': filesystem.group(),
-            'groups': filesystem.groups(),
-        }
+        return response
 
     @inject.params(search='search', filesystem='store.filesystem')
     def searchAction(self, state, action, search, filesystem):
@@ -268,6 +266,10 @@ class StorageActions(object):
         :param filesystem:
         :return:
         """
+        if 'search' in state.keys():
+            del (state['search'])
+
+        state['document'] = filesystem.document()
         state['progress'] = state['progress'] \
             if 'progress' in state.keys() \
             else None

@@ -18,6 +18,11 @@ from PyQt5 import QtCore
 class ModuleActions(QtCore.QObject):
     progressAction = QtCore.pyqtSignal(object)
 
+    @inject.params(search='search')
+    def onActionDocumentUpdate(self, document=None, search=None):
+        if document is None or not document: return None
+        return search.update(document.name, document.path, document.content)
+
     @inject.params(store='store')
     def onActionIndexation(self, event, store):
         store.dispatch({

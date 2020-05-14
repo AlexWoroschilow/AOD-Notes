@@ -38,6 +38,12 @@ class Loader(object):
         if state is None:
             return None
 
+        print(state)
+        if 'document' in state.keys():
+            document = state['document']
+            return self.actions. \
+                onActionDocumentUpdate(document)
+
         if 'search' not in state.keys():
             return None
 

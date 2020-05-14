@@ -26,10 +26,10 @@ class ModuleActions(object):
 
     @inject.params(store='store')
     def onActionSearch(self, string, store):
-        store.dispatch({
-            'type': '@@app/search/request',
-            'string': string
-        })
+        event = {}
+        event['type'] = '@@app/search/request'
+        event['string'] = string
+        store.dispatch(event)
 
     @inject.params(store='store')
     def onActionCreateNote(self, event, store):
@@ -130,24 +130,24 @@ class ModuleActions(object):
 
     @inject.params(store='store')
     def onActionSelectNote(self, entity, store):
-        store.dispatch({
-            'type': '@@app/storage/resource/selected/document',
-            'entity': entity
-        })
+        event = {}
+        event['type'] = '@@app/storage/resource/selected/document'
+        event['entity'] = entity
+        store.dispatch(event)
 
     @inject.params(store='store')
     def onActionSaveNote(self, entity, store):
-        store.dispatch({
-            'type': '@@app/storage/resource/update/document',
-            'entity': entity
-        })
+        event = {}
+        event['type'] = '@@app/storage/resource/update/document'
+        event['entity'] = entity
+        store.dispatch(event)
 
     @inject.params(store='store')
     def onActionEditNote(self, entity, store):
-        store.dispatch({
-            'type': '@@app/storage/resource/selected/document',
-            'entity': entity
-        })
+        event = {}
+        event['type'] = '@@app/storage/resource/selected/document'
+        event['entity'] = entity
+        store.dispatch(event)
 
     @inject.params(window='window', editor='notepad.editor')
     def onActionFullScreen(self, entity, window, editor):

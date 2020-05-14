@@ -86,7 +86,6 @@ class DashboardFolderTree(QtWidgets.QTreeView):
         index = model.getIndexByData(selected)
         if index is None: return None
 
-        print(index, selected)
         self.setCurrentIndex(index)
         self.scrollTo(self.indexBelow(index))
 
