@@ -77,6 +77,11 @@ class NotepadDashboard(QtWidgets.QWidget):
     def model(self):
         return self.splitter.panelLeft.tree.model()
 
+    def setFolderCurrent(self, selected=None):
+        if selected is None: return self
+        self.splitter.setFolderCurrent(selected)
+        return self
+
     def setFolders(self, collection, selected):
         self.splitter.setFolders(collection, selected)
         return self

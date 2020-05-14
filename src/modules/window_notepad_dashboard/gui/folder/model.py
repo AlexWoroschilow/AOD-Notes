@@ -20,7 +20,10 @@ from PyQt5 import QtGui
 
 
 class NotepadDashboardTreeModel(QtGui.QStandardItemModel):
-    current = None
+    def __init__(self):
+        super().__init__()
+        self.current = None
+        self.items = []
 
     def setFolders(self, collection=None, current=None):
 
@@ -35,10 +38,23 @@ class NotepadDashboardTreeModel(QtGui.QStandardItemModel):
 
         return self.indexFromItem(self.current)
 
+    def getIndexByData(self, current=None):
+        try:
+            for item in self.items:
+                if item.data() != current:
+                    continue
+                return self.indexFromItem(item)
+        except RuntimeError:
+            return None
+
+        return None
+
     def buildFolder(self, collection, current=None):
         for group in collection:
             item = QtGui.QStandardItem(group.name)
             item.setData(group)
+
+            self.items.append(item)
 
             if group == current:
                 self.current = item

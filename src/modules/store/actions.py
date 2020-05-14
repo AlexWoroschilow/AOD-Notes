@@ -147,6 +147,32 @@ class StorageActions(object):
 
         return {
             'progress': progress,
+            'document': entity
+        }
+
+    @service_config_decorator
+    @inject.params(filesystem='store.filesystem')
+    def foundDocumentEvent(self, state, action, filesystem):
+        """
+
+        :param state:
+        :param action:
+        :param filesystem:
+        :return:
+        """
+        progress = state['progress'] \
+            if 'progress' in state.keys() \
+            else None
+
+        entity = action.get('entity')
+        if entity is None: return state
+
+        group = type("Group", (object,), {})()
+        group.path = entity.parent
+
+        return {
+            'progress': progress,
+            'documents': filesystem.documents(group),
             'group': filesystem.group(group),
             'document': entity
         }

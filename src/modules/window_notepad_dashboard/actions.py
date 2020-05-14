@@ -74,7 +74,8 @@ class ModuleActions(object):
     def onActionUpdate(self, store, widget):
 
         state = store.get_state()
-        if state is None: return None
+        if state is None:
+            return None
 
         group = state['group'] \
             if 'group' in state.keys() \
@@ -84,8 +85,6 @@ class ModuleActions(object):
             if 'groups' in state.keys() \
             else None
 
-        widget.setFolders(groups, group)
-
         document = state['document'] \
             if 'document' in state.keys() \
             else None
@@ -94,12 +93,13 @@ class ModuleActions(object):
             if 'documents' in state.keys() \
             else None
 
-        widget.setDocuments(documents, document)
-
         progress = state['progress'] \
             if 'progress' in state.keys() \
             else None
 
+        widget.setFolders(groups, group)
+        widget.setFolderCurrent(group)
+        widget.setDocuments(documents, document)
         widget.setProgress(progress)
 
     @inject.params(store='store', dashboard='notepad.dashboard')

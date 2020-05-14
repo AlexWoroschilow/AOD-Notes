@@ -44,6 +44,11 @@ class DashboardPanelLeft(QtWidgets.QFrame):
 
         self.layout().addWidget(self.tree)
 
+    def setFolderCurrent(self, selected=None):
+        if selected is None: return self
+        self.tree.setFolderCurrent(selected)
+        return self
+
     def setFolders(self, collection, selected):
         self.tree.setFolders(collection, selected)
         return self

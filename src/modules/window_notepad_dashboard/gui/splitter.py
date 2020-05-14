@@ -83,6 +83,11 @@ class NotepadDashboardSplitter(QtWidgets.QSplitter):
         self.setStretchFactor(0, 1)
         self.setStretchFactor(1, 2)
 
+    def setFolderCurrent(self, selected=None):
+        if selected is None: return self
+        self.panelLeft.setFolderCurrent(selected)
+        return self
+
     def setFolders(self, collection, selected):
         self.panelLeft.setFolders(collection, selected)
         return self

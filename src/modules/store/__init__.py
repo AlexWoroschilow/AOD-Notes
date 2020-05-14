@@ -78,6 +78,9 @@ class Loader(object):
         if action.get('type') == '@@app/storage/resource/selected/document':
             return self.actions.selectDocumentEvent(state, action)
 
+        if action.get('type') == '@@app/storage/resource/found/document':
+            return self.actions.foundDocumentEvent(state, action)
+
         if action.get('type') == '@@app/storage/resource/selected/group':
             return self.actions.selectGroupEvent(state, action)
 

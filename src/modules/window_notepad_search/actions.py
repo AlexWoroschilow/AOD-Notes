@@ -29,6 +29,6 @@ class ModuleActions(QtCore.QObject):
         window.switchTabAction.emit(0)
 
         store.dispatch({
-            'type': '@@app/storage/resource/selected/document',
+            'type': '@@app/storage/resource/found/document',
             'entity': entity
         })
