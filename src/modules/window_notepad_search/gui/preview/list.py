@@ -86,7 +86,7 @@ class PreviewScrollArea(QtWidgets.QWidget):
         self.layout().addWidget(self.list)
 
     def setTitle(self, text):
-        self.title.setText(text)
+        self.title.setText(text.capitalize())
         return self
 
     def setPreview(self, collection=[]):
