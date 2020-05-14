@@ -82,6 +82,13 @@ PreviewScrollArea NotePreviewDescription Description { color: #4d5357; }
 PreviewScrollArea NotePreviewDescription PictureButtonFlat {  background: #fdf6e3; border: none; padding: 5px; margin: 0px;  }
 PreviewScrollArea { background: #ffffff; padding: 0px 0px; border: none; margin: 0px; }
 
+PreviewSearchList NotePreviewDescription { background-color: #fdf6e3; border-radius: 0px; padding: 10px 30px; margin: 3px; }
+PreviewSearchList NotePreviewDescription Title { background: #fdf6e3; }
+PreviewSearchList NotePreviewDescription Description { color: #4d5357; }
+PreviewSearchList NotePreviewDescription PictureButtonFlat {  background: #fdf6e3; border: none; padding: 5px; margin: 0px;  }
+PreviewSearchList { background: #ffffff; padding: 0px 0px; border: none; margin: 0px; }
+
+
 QSplitter { background: #ffffff; border: none; }
 QSplitter::handle { image: url(icons/splitter-light); }
 QSplitter::handle:vertical { height: 5px; }

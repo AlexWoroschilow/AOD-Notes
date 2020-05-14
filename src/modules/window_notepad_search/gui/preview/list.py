@@ -17,6 +17,9 @@ from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 from .preview import NotePreviewDescription
+from PyQt5.QtCore import Qt
+
+from .label import Title
 
 
 class NoteItem(QtWidgets.QListWidgetItem):
@@ -27,11 +30,11 @@ class NoteItem(QtWidgets.QListWidgetItem):
         self.setTextAlignment(Qt.AlignCenter)
 
 
-class PreviewScrollArea(QtWidgets.QListWidget):
+class PreviewSearchList(QtWidgets.QListWidget):
     selectAction = QtCore.pyqtSignal(object)
 
     def __init__(self, parent=None):
-        super(PreviewScrollArea, self).__init__(parent)
+        super(PreviewSearchList, self).__init__(parent)
         self.setViewMode(QtWidgets.QListView.IconMode)
         self.setResizeMode(QtWidgets.QListView.Adjust)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -65,3 +68,34 @@ class PreviewScrollArea(QtWidgets.QListWidget):
 
     def count(self):
         return len(self.hashmap_index.keys())
+
+
+class PreviewScrollArea(QtWidgets.QWidget):
+    selectAction = QtCore.pyqtSignal(object)
+
+    def __init__(self, parent=None):
+        super(PreviewScrollArea, self).__init__()
+        self.setLayout(QtWidgets.QVBoxLayout())
+        self.layout().setAlignment(Qt.AlignCenter)
+
+        self.title = Title('...')
+        self.layout().addWidget(self.title)
+
+        self.list = PreviewSearchList(parent)
+        self.list.selectAction.connect(self.selectAction.emit)
+        self.layout().addWidget(self.list)
+
+    def setTitle(self, text):
+        self.title.setText(text)
+        return self
+
+    def setPreview(self, collection=[]):
+        self.list.setPreview(collection)
+        return self
+
+    def addPreview(self, document=None):
+        self.list.addPreview(document)
+        return self
+
+    def count(self):
+        return self.list.count()

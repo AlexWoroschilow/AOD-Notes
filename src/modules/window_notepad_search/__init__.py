@@ -38,7 +38,6 @@ class Loader(object):
         if state is None:
             return None
 
-        print(state)
         if 'document' in state.keys():
             document = state['document']
             return self.actions. \
@@ -47,11 +46,13 @@ class Loader(object):
         if 'search' not in state.keys():
             return None
 
+        print(state)
         for search in state['search']:
             if search is None:
                 continue
 
             preview = PreviewScrollArea(window)
+            preview.setTitle(search['title'])
             preview.selectAction.connect(self.actions.onActionSelect)
             preview.setPreview(search['documents'])
 

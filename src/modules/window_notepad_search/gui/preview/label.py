@@ -11,6 +11,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt
 
 
 class Title(QtWidgets.QLabel):
@@ -21,3 +22,4 @@ class Title(QtWidgets.QLabel):
         font.setPixelSize(20)
         self.setFont(font)
         self.setWordWrap(True)
+        self.setAlignment(Qt.AlignCenter)
