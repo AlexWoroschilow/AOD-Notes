@@ -11,6 +11,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 import os
+import re
 import pydux
 import shutil
 import inject
@@ -22,11 +23,23 @@ from .model import Group
 from .model import Document
 
 
+def natural_keys(text):
+    def atoi(text):
+        return int(text) if text.isdigit() else text
+
+    '''
+    alist.sort(key=natural_keys) sorts in human order
+    http://nedbatchelder.com/blog/200712/human_sorting.html
+    (See Toothy's implementation in the comments)
+    '''
+    return [atoi(c) for c in re.split('(\d+)', text.lower())]
+
+
 class StoreFileSystem(object):
 
     def _groups(self, location):
         result = []
-        for path in glob.iglob('{}/**'.format(location)):
+        for path in sorted(glob.iglob('{}/**'.format(location)), key=natural_keys, reverse=False):
             if not len(path) or os.path.isfile(path):
                 continue
             result.append(Group(path, self._groups(path)))
@@ -34,7 +47,7 @@ class StoreFileSystem(object):
 
     def _documents(self, location, recursive=False):
         result = []
-        for filename in glob.iglob('{}/**'.format(location), recursive=recursive):
+        for filename in sorted(glob.iglob('{}/**'.format(location)), key=natural_keys, reverse=False):
             if not len(filename) or os.path.isdir(filename):
                 continue
             result.append(Document(filename))
