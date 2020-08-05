@@ -209,6 +209,9 @@ class StorageActions(object):
         :param filesystem:
         :return:
         """
+        if 'group' not in state.keys():
+            return state
+
         progress = state['progress'] \
             if 'progress' in state.keys() \
             else None
