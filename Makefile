@@ -19,7 +19,7 @@ appimage: clean
 	cp -r ./src/plugins $(APPDIR)/application
 	cp -r ./src/themes $(APPDIR)/application
 
-	bin/appimagetool-x86_64.AppImage  ./AppDir bin/AOD-Notes.AppImage
+	bin/appimagetool-x86_64.AppImage  ./AppDir AOD-Notes.AppImage
 	@echo "done: bin/AOD-Notes.AppImage"
 
 clean:
