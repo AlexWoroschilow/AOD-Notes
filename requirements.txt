@@ -7,7 +7,7 @@ html5lib==1.0.1
 Inject==3.5.4
 pdfkit==0.6.1
 pydux==0.2.2
-PyInstaller==3.6
+PyInstaller==5.13.1
 PyQt5==5.12
 PyQt5-sip==4.19.19
 six==1.14.0
